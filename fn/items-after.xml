@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-items-after">
+   <description>Tests for the fn:items-after function (4.0 proposal)</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-11/"
+         idref="func-items-after"/>
+         
+    <dependency type="spec" value="XP40+ XQ40+"/>  
+
+   <test-case name="items-after-001">
+       <description>Basic example</description>
+      <created by="Michael Kay" on="2019-06-09"/>
+      <test>saxon:items-after(1 to 29, function($x){$x=10})</test>
+      <result>
+          <assert-deep-eq>11 to 29</assert-deep-eq>
+      </result>
+   </test-case>
+    
+    <test-case name="items-after-002">
+        <description>No match</description>
+        <created by="Michael Kay" on="2019-06-09"/>
+        <test>saxon:items-after(1 to 29, function($x){$x=100})</test>
+        <result>
+            <assert-empty/>
+        </result>
+    </test-case>
+    
+    <test-case name="items-after-003">
+        <description>Match on first</description>
+        <created by="Michael Kay" on="2019-06-09"/>
+        <test>saxon:items-after(1 to 29, function($x){true()})</test>
+        <result>
+            <assert-deep-eq>2 to 29</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="items-after-004">
+        <description>Empty input</description>
+        <created by="Michael Kay" on="2019-06-09"/>
+        <test>saxon:items-after((), function($x){$x = 3})</test>
+        <result>
+            <assert-empty/>
+        </result>
+    </test-case>
+    
+    <test-case name="items-after-005">
+        <description>Match at end of sequence</description>
+        <created by="Michael Kay" on="2019-06-09"/>
+        <test>saxon:items-after(1 to 29, function($x){$x eq 29})</test>
+        <result>
+            <assert-empty/>
+        </result>
+    </test-case>
+    
+    <test-case name="items-after-006">
+        <description>Map as argument</description>
+        <created by="Michael Kay" on="2019-06-09"/>
+        <test>saxon:items-after(1 to 5, map{1:false(), 2:false(), 3:true(), 4:true(), 5:true()})</test>
+        <result>
+            <assert-deep-eq>4 to 5</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="items-after-007">
+        <description>Sequence of nodes</description>
+        <created by="Michael Kay" on="2019-06-09"/>
+        <dependency type="spec" value="XQ31+"/>
+        <test><![CDATA[
+            let $nodes := document{<x><a/><b/><c/><d/><e/></x>}
+            return saxon:items-after($nodes/x/*, function($node){exists($node[self::c])})!local-name()
+            ]]></test>
+        <result>
+            <assert-deep-eq>'d', 'e'</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="items-after-901">
+        <description>Test use of EBV is disallowed</description>
+        <created by="Michael Kay" on="2019-06-09"/>
+        <test>saxon:items-after(1 to 100, function($x){$x - 1})</test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
+    <test-case name="items-after-902">
+        <description>Wrong arity of function</description>
+        <created by="Michael Kay" on="2019-06-09"/>
+        <test>saxon:items-after(1 to 100, function($x, $y){$x - 1})</test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
+ 
+    
+
+  
+</test-set>
