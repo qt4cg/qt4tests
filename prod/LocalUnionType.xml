@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-LocalUnionType">
+   <description>Tests for union types of the form union(hexBinary,base64Binary): 4.0 proposal</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-11/"
+         idref="func-abs"/>
+         
+   <dependency type="spec" value="XP40+ XQ40+"/>
+      
+   <test-case name="union-001">
+      <description>instance of test</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <test><![CDATA[
+      	2 instance of union(xs:integer, xs:double, xs:string)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="union-002">
+      <description>instance of test</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <test><![CDATA[
+      	current-date() instance of union(xs:hexBinary, xs:base64Binary)
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="union-003">
+      <description>cast as test</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <test><![CDATA[
+      	"2016-10-07" cast as union(xs:dateTime, xs:date, xs:time)
+      ]]></test>
+      <result>
+         <assert-type>xs:date</assert-type>
+      </result>
+   </test-case>
+   
+   <test-case name="union-004">
+      <description>function argument test</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <test><![CDATA[
+      	declare function local:f($a as union(xs:dateTime, xs:date, xs:time)) as xs:string {
+      	  typeswitch($a)
+      	    case xs:dateTime return "dateTime"
+      	    case xs:date return "date"
+      	    case xs:time return "time"
+      	    default return "***"
+      	};
+      	local:f(current-time())
+      ]]></test>
+      <result>
+         <assert-eq>"time"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="union-005">
+      <description>function argument test, failure case</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <test><![CDATA[
+      	declare function local:f($a as union(xs:dateTime, xs:date, xs:time)) as xs:string {
+      	  typeswitch($a)
+      	    case xs:dateTime return "dateTime"
+      	    case xs:date return "date"
+      	    case xs:time return "time"
+      	    default return "***"
+      	};
+      	local:f("tomorrow")
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   
+   <test-case name="union-007">
+      <description>polymorphic function test</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <test><![CDATA[
+   declare function local:format($in as union(xs:dateTime, xs:date, xs:time, xs:string), $fmt as xs:string) as xs:string {
+      typeswitch ($in) 
+      case xs:dateTime return format-dateTime($in, $fmt)
+      case xs:date return format-date($in, $fmt)
+      case xs:time return format-time($in, $fmt)
+      case xs:string return local:format($in cast as union(xs:dateTime, xs:date, xs:time), $fmt)
+      default return error()
+   };    
+   local:format("2016-10-07", "[D] [MNn] [Y]")
+      ]]></test>
+      <result>
+         <assert-eq>"7 October 2016"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="union-008">
+      <description>polymorphic function test - error case</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <test><![CDATA[
+   declare function local:format($in as union(xs:dateTime, xs:date, xs:time, xs:string), $fmt as xs:string) as xs:string {
+      typeswitch ($in) 
+      case xs:dateTime return format-dateTime($in, $fmt)
+      case xs:date return format-date($in, $fmt)
+      case xs:time return format-time($in, $fmt)
+      case xs:string return local:format($in cast as union(xs:dateTime, xs:date, xs:time), $fmt)
+      default return error()
+   };    
+   local:format("2016-10-32", "[D] [MNn] [Y]")
+      ]]></test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   
+   
+   
+   
+ 
+
+</test-set>
