@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-RecordTest">
+   <description>Tests for RecordTest item type (proposed 4.0 extension)</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-11/"
+         idref="func-abs"/>
+         
+   <dependency type="spec" value="XP40+ XQ40+"/>
+      
+   <test-case name="RecordTest-001">
+      <description>instance of test, no declared types</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>map{"x":3, "y":4} instance of record(x, y)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="RecordTest-002">
+      <description>Use in type signature</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace map = "http://www.w3.org/2005/xpath-functions/map";
+         declare namespace _ = "http://local/";
+      	declare function _:make-map($entries as record(name as xs:string, value as item()*)*) as map(*) {
+      	   map:merge($entries ! map{ ?name : ?value })
+      	};
+      	declare function _:entry($name as xs:string, $value as item()*) as record(name as xs:string, value as item()*) {
+      	   map{ "name":$name, "value": $value }
+      	};
+      	let $temp := _:make-map(( 
+      	  _:entry("A", 23),
+      	  _:entry("B", 32),
+      	  _:entry("C", 89)))
+      	return $temp?A
+      ]]></test>
+      <result>
+         <assert-eq>23</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="RecordTest-003">
+      <description>Record types with absent field type</description>
+      <created by="Michael Kay" on="2017-11-12"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace map = "http://www.w3.org/2005/xpath-functions/map";
+         declare namespace _ = "http://local/";
+         declare function _:make-map($entries as record(name as xs:string, value as item())*) as map(*) {
+      	   map:merge($entries ! map{ ?name : ?value })
+      	};
+      	declare function _:entry($name, $value) as record(name as xs:string, value as item()) {
+      	   map{ "name":$name, "value": $value }
+      	};
+      	let $temp := _:make-map(( 
+      	  _:entry("A", 23),
+      	  _:entry("B", 32),
+      	  _:entry("C", 89)))
+      	return $temp?A
+      ]]></test>
+      <result>
+         <assert-eq>23</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="RecordTest-004">
+      <description>Fields in record type may be omitted if optional</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>
+         map{"name":"xyz"} instance of record(name as xs:string, value? as item()?)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="RecordTest-005">
+      <description>Fields in record type may be empty</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>
+         map{"name":"xyz", "value":()} instance of record(name as xs:string, value as item()?)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="RecordTest-006">
+      <description>Undeclared fields in record type may not be present, unless the type is extensible</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>
+         map{"name":1, "value":(), "extra":3} instance of record(name as xs:string, value as item()?)
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="RecordTest-007">
+      <description>Fields in extensible record type may be present even if undeclared</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test><![CDATA[
+         map{"name":1, "value":(), "extra":3} instance of record(name as xs:numeric, value as item()?, *)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="RecordTest-008">
+      <description>Fields in record type may not be omitted unless the field is optional</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>
+         map{"name":"xyz"} instance of record(name as item()*, value as item()?)
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="RecordTest-009">
+      <description>Fields in non-extensible record type may not be present if undeclared</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>
+      	map{"name":1, "value":(), "extra":3} instance of record(name as xs:string, value as item()*)
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+
+   
+   
+ 
+
+</test-set>
