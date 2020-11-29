@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-some">
+   <description>Tests for the fn:some() function (4.0 proposal)</description>
+   <link type="spec" document="http://www.w3.org/TR/xquery-30/"
+         idref="doc-xquery30-QuantifiedExpr"/>
+   <link type="spec" document="XQuery" section-number="3.11"
+         idref="id-quantified-expressions"/>
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+   
+   <test-case name="some-1">
+      <description> Simple quantified expression using "some" keyword and addition expression. Returns false </description>
+      <created by="Carmelo Montanez" on="2005-08-18"/>
+      <test>some((1, 2), function($x){$x + $x = 3})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="some-2">
+      <description> Simple quantified expression using "some" keyword and addition expression. Returns true </description>
+      <created by="Carmelo Montanez" on="2005-08-18"/>
+      <test>some((1, 2), function($x){$x + $x = 2})</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="some-3">
+      <description> Simple quantified expression using "some" keyword and a subtraction expression. Returns false </description>
+      <created by="Carmelo Montanez" on="2005-08-18"/>
+      <test>some((1, 2), function($x){$x - 2 = 2})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="some-4">
+      <description>some() applied to empty sequence</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>some(year-from-date(current-date()) to 0, is-NaN#1)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="some-5">
+      <description>some() with function returning non-boolean</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>some(1 to 10, function($x){$x + 1})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="some-6">
+      <description>some() with function having wrong arity</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>some(10 to 20, function($x, $y){$x + 1})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="some-7">
+      <description>some() with function accepting wrong type</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>some(10 to 20, function($x){name($x) = 'alpha'})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="some-16">
+      <description> Simple quantified expression using "some" keyword and use of lofical expression (and). </description>
+      <created by="Carmelo Montanez" on="2005-08-19"/>
+      <test>some((1, 2), function($x){ $x = 1 and ($x +1) = 2})</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="some-17">
+      <description> Simple quantified expression using "some" keyword and and use of string data. </description>
+      <created by="Carmelo Montanez" on="2005-08-19"/>
+      <test>some(("A","B","C"), function($x){ $x = "A" })</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="some-18">
+      <description> Simple quantified expression using "some" keyword with multiple variables and addition expression </description>
+      <created by="Carmelo Montanez" on="2005-08-19"/>
+      <test>some((1,2,3), function($x){some((4,5,6), function($y){$x + $y = 5})})</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+</test-set>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-all">
+   <description>Tests for the fn:all() function (4.0 proposal)</description>
+   <link type="spec" document="http://www.w3.org/TR/xquery-30/"
+         idref="doc-xquery30-QuantifiedExpr"/>
+   <link type="spec" document="XQuery" section-number="3.11"
+         idref="id-quantified-expressions"/>
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+   
+   <test-case name="all-1">
+      <description> Simple quantified expression using "all" keyword and addition expression. Returns false </description>
+      <created by="Carmelo Montanez" on="2005-08-18"/>
+      <test>all((1, 2), function($x){$x + $x = 3})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="all-2">
+      <description> Simple quantified expression using "all" keyword and addition expression. Returns true </description>
+      <created by="Carmelo Montanez" on="2005-08-18"/>
+      <test>all((1, 2), function($x){$x + $x = 2})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="all-3">
+      <description> Simple quantified expression using "all" keyword and a subtraction expression. Returns false </description>
+      <created by="Carmelo Montanez" on="2005-08-18"/>
+      <test>all((1, 2), function($x){$x - 2 = 2})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="all-4">
+      <description>all() applied to empty sequence</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>all(year-from-date(current-date()) to 0, is-NaN#1)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="all-5">
+      <description>all() with function returning non-boolean</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>all(1 to 10, function($x){$x + 1})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="all-6">
+      <description>all() with function having wrong arity</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>all(10 to 20, function($x, $y){$x + 1})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="all-7">
+      <description>all() with function accepting wrong type</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>all(10 to 20, function($x){name($x) = 'alpha'})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="all-16">
+      <description> Simple quantified expression using "all" keyword and use of lofical expression (and). </description>
+      <created by="Carmelo Montanez" on="2005-08-19"/>
+      <test>all((1, 2), function($x){ $x = 1 and ($x +1) = 2})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="all-17">
+      <description> Simple quantified expression using "all" keyword and and use of string data. </description>
+      <created by="Carmelo Montanez" on="2005-08-19"/>
+      <test>all(("A","B","C"), function($x){ $x = "A" })</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="all-18">
+      <description> Simple quantified expression using "all" keyword with multiple variables and addition expression </description>
+      <created by="Carmelo Montanez" on="2005-08-19"/>
+      <test>all((1,2,3), function($x){all((4,5,6), function($y){$x + $y = 5})})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="all-19">
+      <description> Simple quantified expression using "all" keyword and and use of string data. </description>
+      <created by="Carmelo Montanez" on="2005-08-19"/>
+      <test>all(("A","B","C"), function($x){ $x instance of xs:string })</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+</test-set>
