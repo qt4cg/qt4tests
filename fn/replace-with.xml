@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="saxon-replace-with">
+  <description>Tests for the saxon:replace-with() function</description>
+  <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-replace-with"/>
+
+  <environment name="e">
+    <saxon:property name="http://saxon.sf.net/feature/allowSyntaxExtensions" value="true"
+      xmlns:saxon="http://saxon.sf.net/"/>
+  </environment>
+
+  <test-case name="replace-with-1">
+    <description>Evaluation of replace function with replacement = "*" as an example 1 for this function. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra", "bra", .{"*"})</test>
+    <result>
+      <assert-string-value>a*cada*</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-2">
+    <description>Evaluation of replace function with pattern = "a.*a" and replacement = "*" as an example 2 for this function. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra", "a.*a", .{"*"})</test>
+    <result>
+      <assert-string-value>*</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-3">
+    <description>Evaluation of replace function with pattern = "a.*?a" and replacement = "*" as an example 3 for this function. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra", "a.*?a", .{"*"})</test>
+    <result>
+      <assert-string-value>*c*bra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-4">
+    <description>Evaluation of replace function with pattern = "a" and replacement = "" as an example 4 for this function. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra", "a", .{""})</test>
+    <result>
+      <assert-string-value>brcdbr</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-5">
+    <description>Evaluation of replace function with pattern = "a(.)" and replacement = "a$1$1" as an example 5 for this function. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra", "a(.)", .{"a"||substring(.,2)||substring(.,2)})</test>
+    <result>
+      <assert-string-value>abbraccaddabbra</assert-string-value>
+    </result>
+  </test-case>
+
+
+
+  <test-case name="replace-with-7">
+    <description>Evaluation of replace function with pattern = "A+" and replacement = "b" as an example 7 for this function. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("AAAA", "A+", .{"b"})</test>
+    <result>
+      <assert-string-value>b</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-8">
+    <description>Evaluation of replace function with pattern = "A+?" and replacement = "b" as an example 8 for this function. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("AAAA", "A+?", .{"b"})</test>
+    <result>
+      <assert-string-value>bbbb</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-11">
+    <description>Evaluation of fn:replace function with input set to empty sequence. Uses the fn:count function to avoid empty file. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>fn:count(saxon:replace-with((), "bra", .{"*"}))</test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-12">
+    <description>Evaluate that calling function with flags omitted is same as flags being the zero length string. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra", "bra", .{"*"}, "")</test>
+    <result>
+      <assert-string-value>a*cada*</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-13">
+    <description>Evaluation of replace function with pattern set to "\?" for an input string that contains "?". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra?abracadabra", "\?", .{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-14">
+    <description>Evaluation of replace function with pattern set to "\*" for an input string that contains "*". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra*abracadabra", "\*", .{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-15">
+    <description>Evaluation of replace function with pattern set to "\+" for an input string that contains "+". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra+abracadabra", "\+", .{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-16">
+    <description>Evaluation of replace function with pattern set to "\{" for an input string that contains "}". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra{abracadabra", "\{", .{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-17">
+    <description>Evaluation of replace function with pattern set to "\}" for an input string that contains "}". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra}abracadabra", "\}", .{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-18">
+    <description>Evaluation of replace function with pattern set to "\(" for an input string that contains "(". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra(abracadabra", "\(", .{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-19">
+    <description>Evaluation of replace function with pattern set to "\)" for an input string that contains ")". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra)abracadabra", "\)", .{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-20">
+    <description>Evaluation of replace function with pattern set to "\[" for an input string that contains "[". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra[abracadabra", "\[", .{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-21">
+    <description>Evaluation of replace function with pattern set to "\]" for an input string that contains "]". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2005-10-13"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra]abracadabra", "\]", .{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-22">
+    <description>Evaluation of replace function with pattern set to "\-" for an input string that contains "-". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra-abracadabra", "\-",.{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-23">
+    <description>Evaluation of replace function with pattern set to "\." for an input string that contains ".". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra.abracadabra", "\.",.{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-24">
+    <description>Evaluation of replace function with pattern set to "\|" for an input string that contains "|". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra|abracadabra", "\|",.{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-25">
+    <description>Evaluation of replace function with pattern set to "\\" for an input string that contains "\". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra\abracadabra", "\\",.{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-26">
+    <description>Evaluation of replace function with pattern set to "\t" for an input string that contains the tab character. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra	abracadabra", "\t",.{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-27">
+    <description>Evaluation of replace function with pattern set to "\n" for an input string that contains the newline character. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra
+abracadabra", "\n",.{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-28">
+    <description>Evaluation of replace function with pattern set to "aa{1}" (exact quantity) for an input string that contains the "aa" string. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabraabracadabra", "aa{1}",.{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrwithbracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-29">
+    <description>Evaluation of replace function with pattern set to "aa{1,}" (min quantity) for an input string that contains the "aa" string twice. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabraabracadabraabracadabra", "aa{1,}",.{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrwithbracadabrwithbracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-30">
+    <description>Evaluation of replace function with pattern set to "aa{1,2}" (range quantity) for an input string that contains the "aa" string twice. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabraabracadabraabracadabra", "aa{1,2}",.{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrwithbracadabrwithbracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-31">
+    <description>Evaluation of replace function with pattern set to "\^". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra^abracadabra", "\^",.{"with"})</test>
+    <result>
+      <assert-string-value>abracadabrawithabracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-32">
+    <description>Evaluation of replace function with pattern set to "^a". </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra", "^a",.{"with"})</test>
+    <result>
+      <assert-string-value>withbracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-33">
+    <description>Evaluation of replace function with pattern that does not match the input string. </description>
+    <created by="Michael Kay after Carmelo Montanez" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra", "ww",.{"with"})</test>
+    <result>
+      <assert-string-value>abracadabra</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-34">
+    <description>Evaluation of replace function with q flag.</description>
+    <created by="Michael Kay" on="2020-02-08"/>
+    <dependency type="spec" value="XP30+ XQ30+"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("abracadabra", "a", .{"$1"}, "q")</test>
+    <result>
+      <assert-string-value>$1br$1c$1d$1br$1</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-35">
+    <description>Evaluation of replace function with q flag.</description>
+    <created by="Michael Kay" on="2020-02-08"/>
+    <dependency type="spec" value="XP30+ XQ30+"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("a?bracadabra?", "a?", .{"\$1"}, "q")</test>
+    <result>
+      <assert-string-value>\$1bracadabr\$1</assert-string-value>
+    </result>
+  </test-case>
+
+
+
+  <test-case name="replace-with-43">
+    <description> "." does NOT match CR in default mode</description>
+    <created by="Michael Kay after Tim Mills" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with(concat('Mary', codepoints-to-string(13), 'Jones'), 'Mary.Jones', .{'Jacob Jones'})</test>
+    <result>
+      <assert-eq>concat('Mary', codepoints-to-string(13), 'Jones')</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-44">
+    <description> "." does match CR in dot-all mode</description>
+    <created by="Michael Kay after Tim Mills" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with(concat('Mary', codepoints-to-string(13), 'Jones'), 'Mary.Jones', .{'Jacob Jones'}, 's')</test>
+    <result>
+      <assert-eq>'Jacob Jones'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-45">
+    <description>fn:replace, using $0</description>
+    <created by="Michael Kay after Andrew Eisenberg" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("Now, let's SEND OUT for QUICHE!!", "[A-Z][A-Z]+", .{.||.})</test>
+    <result>
+      <assert-eq>"Now, let's SENDSEND OUTOUT for QUICHEQUICHE!!"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-49">
+    <description>Evaluation of replace function with q flag, with pattern set to "\".</description>
+    <created by="Michael Kay after Debbie Lockett" on="2020-02-08"/>
+    <dependency type="spec" value="XP30+ XQ30+"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("a/b/c", "/", .{"\"}, "q")</test>
+    <result>
+      <assert-string-value>a\b\c</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-50">
+    <description>Evaluation of replace function with q flag, with pattern set to "\\", example
+         from spec. (See bug #29522)</description>
+    <created by="Michael Kay after Debbie Lockett" on="2020-02-08"/>
+    <dependency type="spec" value="XP30+ XQ30+"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("a\b\c", "\", .{"\\"}, "q")</test>
+    <result>
+      <assert-string-value>a\\b\\c</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-51">
+    <description>Evaluation of replace function with q flag, with pattern set to "$", example from
+         spec. (See bug #29522)</description>
+    <created by="Michael Kay after Debbie Lockett" on="2020-02-08"/>
+    <dependency type="spec" value="XP30+ XQ30+"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("a/b/c", "/", .{"$"}, "q")</test>
+    <result>
+      <assert-string-value>a$b$c</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-52">
+    <description>Evaluation of replace function with q flag, with pattern set to "$'". (See bug #29522)</description>
+    <created by="Michael Kay after Debbie Lockett" on="2020-02-08"/>
+    <dependency type="spec" value="XP30+ XQ30+"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("a/b/c", "/", .{"$'"}, "q")</test>
+    <result>
+      <assert-string-value>a$'b$'c</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-53">
+    <description>Evaluation of replace function with q flag, with pattern set to "$`". (See bug #29522)</description>
+    <created by="Michael Kay after Debbie Lockett" on="2020-02-08"/>
+    <dependency type="spec" value="XP30+ XQ30+"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with("a/b/c", "/", .{"$`"}, "q")</test>
+    <result>
+      <assert-string-value>a$`b$`c</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-56">
+    <description>Test case based on Saxon bug 3429.</description>
+    <created by="Michael Kay after Stefan Poeschel" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with('10%', '^\d*\.?\d+', .{''})</test>
+    <result>
+      <assert-string-value>%</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-70">
+    <description>Convert matching strings to upper case.</description>
+    <created by="Michael Kay" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with('AND so TO bed', '[A-Za-z]+', upper-case#1, 'i')</test>
+    <result>
+      <assert-string-value>AND SO TO BED</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replace-with-71">
+    <description>Arithmetic on numeric substrings.</description>
+    <created by="Michael Kay" on="2020-02-08"/>
+    <environment ref="e"/>
+    <test>saxon:replace-with('Part 3 Chapter 5', '[0-9]+', .{string(number(.)+1)})</test>
+    <result>
+      <assert-string-value>Part 4 Chapter 6</assert-string-value>
+    </result>
+  </test-case>
+
+
+
+</test-set>

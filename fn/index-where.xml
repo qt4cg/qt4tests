@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-index-where">
+  <description>Tests for the fn:index-where() function (4.0 proposal)</description>
+  <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-index-where"/>
+
+  <dependency type="feature" value="higherOrderFunctions"/>
+  <dependency type="spec" value="XP40+ XQ40+"/>
+  
+  
+  <test-case name="index-where-01">
+    <description>Empty sequence</description>
+    <created by="Michael Kay" on="2020-02-09"/>
+    <test>index-where((), ->{true()})</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="index-where-02">
+    <description>No matches</description>
+    <created by="Michael Kay" on="2020-02-09"/>
+    <test>index-where(1 to 100, ->{. lt 0})</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="index-where-03">
+    <description>All matches</description>
+    <created by="Michael Kay" on="2020-02-09"/>
+    <test>index-where(1 to 100, ->{. gt 0})</test>
+    <result>
+      <assert-deep-eq>1 to 100</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="index-where-04">
+    <description>Selective matches</description>
+    <created by="Michael Kay" on="2020-02-09"/>
+    <test>index-where(1 to 100, ->{. mod 30 = 0})</test>
+    <result>
+      <assert-deep-eq>30, 60, 90</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="index-where-50">
+    <description>Worked example</description>
+    <created by="Michael Kay" on="2020-02-09"/>
+    <dependency type="spec" value="XQ30+"/>      
+    <test><![CDATA[
+      let $D := function($x){document-node{$x}},
+          $E := function($n, $x){element{$n}{$x}},
+          $input := parse-xml("<doc><p/><q/><r/><h1/><p/><q/><h1/><p/></doc>"),
+          $seq := $input/doc/*,
+          $headings := trace(index-where($seq, .{local-name()='h1'}), 'headings')
+      return $D($E('result',(
+          if (head($headings) != 1) then $E('preface', subsequence($seq, 1, head($headings)-1)) else (),
+          for-each-pair($headings, tail($headings), _{$E('section', subsequence($seq, $1, $2 - $1))}),
+          $E('section', subsequence($seq, $headings[last()])))))  
+      ]]></test>
+    <result>
+      <assert-xml><![CDATA[<result><preface><p/><q/><r/></preface><section><h1/><p/><q/></section><section><h1/><p/></section></result>]]></assert-xml>
+    </result>
+  </test-case>
+  
+ 
+
+</test-set>
