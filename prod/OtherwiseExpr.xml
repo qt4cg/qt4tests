@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-OtherwiseExpr">
+   <description>Tests for the OtherwiseExpr production: 4.0 proposal</description>
+             
+   <dependency type="spec" value="XP40+ XQ40+"/>
+   
+   <test-case name="otherwise-001">
+      <description>Basic test of operator</description>
+      <created by="Michael Kay" on="2020-12-01"/>
+      <environment ref="staff"/>
+      <test>(//employee[empname='Freda'] otherwise //employee[empname='Carmen'])/city</test>
+      <result>
+        <assert-eq>"Vienna"</assert-eq>
+      </result>
+   </test-case> 
+   
+   <test-case name="otherwise-002">
+      <description>Basic test of operator, repeated</description>
+      <created by="Michael Kay" on="2020-12-01"/>
+      <environment ref="staff"/>
+      <test>(//employee[empname='Freda'] otherwise //employee[empname='Gretchen'] otherwise //employee[empname='Carmen'])/city</test>
+      <result>
+         <assert-eq>"Vienna"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="otherwise-003">
+      <description>No error if not evaluated</description>
+      <created by="Michael Kay" on="2020-12-01"/>
+      <environment ref="staff"/>
+      <test>//employee[empname='Carmen']/city otherwise (count(//employee) div count(//manager))</test>
+      <result>
+         <assert-eq>"Vienna"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="otherwise-004">
+      <description>Precedence less than union operator</description>
+      <created by="Michael Kay" on="2020-12-01"/>
+      <environment ref="staff"/>
+      <test>(//employee[empname='Freda'] | //employee[empname='Gertrude'] otherwise //employee[empname='Don'] | //employee[empname='Ed'])/city/string()</test>
+      <result>
+         <assert-deep-eq>"Deale", "Akron"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="otherwise-005">
+      <description>Precedence less than union operator</description>
+      <created by="Michael Kay" on="2020-12-01"/>
+      <environment ref="staff"/>
+      <test>(//employee[empname='Don'] | //employee[empname='Gertrude'] otherwise //employee[empname='Freda'] | //employee[empname='Ed'])/city</test>
+      <result>
+         <assert-eq>"Deale"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="otherwise-006">
+      <description>Precedence greater than multiplication operator</description>
+      <created by="Michael Kay" on="2020-12-01"/>
+      <environment ref="staff"/>
+      <test>//employee[empname='Freda']/grade otherwise //employee[empname='Betty']/grade * 2</test>
+      <result>
+         <assert-eq>20</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="otherwise-007">
+      <description>Precedence greater than multiplication operator</description>
+      <created by="Michael Kay" on="2020-12-01"/>
+      <environment ref="staff"/>
+      <test>2 * //employee[empname='Betty']/grade otherwise //employee[empname='Freda']/grade</test>
+      <result>
+         <assert-eq>20</assert-eq>
+      </result>
+   </test-case>
+ 
+   
+</test-set>
