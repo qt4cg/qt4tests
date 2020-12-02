@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-InlineFunctionExpr.focus">
+   <description>Tests for inline functions using focus notation (4.0 proposal)</description>
+   <link type="spec" document="http://www.w3.org/TR/xquery-30/"
+         idref="doc-xquery30-EQName"/>
+   <link type="spec" document="XQuery" section-number="H.0.0.0.0.0.0.0" idref="__HOF"/>
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+   <dependency type="feature" value="higherOrderFunctions"/>       
+
+   <test-case name="focus-function-001">
+      <description>Basic inline function</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+        let $f := ->{.+1} return $f(2)</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-004">
+      <description>Function accessing local variables</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         sum(for $i in 1 to 6 return
+             let $add := ->{. + $i} return $add(4))</test>
+      <result>
+         <assert-eq>45</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-007" covers="empty-enclosed-expr">
+      <description>Function with empty body (3.1)</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>let $void := ->{} return $void(3)</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-008">
+      <description>Nested inline functions</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         let $outer := ->($x) {
+            let $inner := ->{. + $x}
+            return $inner(5)
+         }
+         return $outer(3)
+      </test>
+      <result>
+         <assert-eq>8</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-009">
+      <description>Nested inline functions accessing a "grandfather" variable</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         let $bonus := 10,
+             $outer := ->($x) {
+                let $inner := ->{. + $x + $bonus}
+                return $inner(5)
+             }
+         return $outer(3)
+      </test>
+      <result>
+         <assert-eq>18</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-011">
+      <description>Function with sequence-valued argument</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         let $add := ->{.+1}
+         return $add((3, 4.2))
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+ 
+   <test-case name="focus-function-014">
+      <description>Function returning a function containing a closure</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         let $process := ->($op, $x, $y) as function(*) {if ($op = "+") then ->{$x + $y} else ->{$x - $y}}
+         return $process("+", 3, 4)(926)
+      </test>
+      <result>
+         <assert-eq>7</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-015">
+      <description>Annotations are allowed in XQuery</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         let $add := %Q{http://example.com/speed}fast %Q{http://example.com/origin}author("Mike") ->{.+1} return $add(2)
+      </test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-016">
+      <description>Annotations are not allowed in XPath</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <dependency type="spec" value="XP40+"/>
+      <test>
+         let $add := %Q{http://example.com/speed}fast %Q{http://example.com/origin}author("Mike") ->{.+1} return $add(2,2)
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-017">
+      <description>Annotations with parentheses must have parameters</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         let $add := %Q{http://example.com/speed}fast() %Q{http://example.com/origin}author("Mike") ->{.+1} return $add(2,2)
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-018">
+      <description>Parameters to Annotations must be literals</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         let $add := %Q{http://example.com/speed}fast(true())  ->{.+1} return $add(2)
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-019">
+      <description>Parameters to Annotations must be literals</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         let $add := % Q{http://example.com/speed}speed (-1)  ->{.+1} return $add(2)
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-020">
+      <description>Parameters to Annotations must be literals</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         let $add := % Q{http://example.com/speed}speed (())  ->{.+1} return $add(2)
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-021">
+      <description>Name of an inline function</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         let $add := ->{.+1} return function-name($add)
+      </test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-022">
+      <description>Arity of an inline function</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         let $add := ->{.+1} return function-arity($add)
+      </test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-023" covers="fn-apply">
+      <description>Apply an inline function</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         let $add := ->{.+1} return apply($add, [12])
+      </test>
+      <result>
+         <assert-eq>13</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-024">
+      <description>An inline function is a primary</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         ->{.+1} (12)
+      </test>
+      <result>
+         <assert-eq>13</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-025">
+      <description>An inline function is a primary</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         ->{.+1} [function-arity(.) = 1] (12)
+      </test>
+      <result>
+         <assert-eq>13</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-027" covers="map-general">
+      <description>A map containing inline functions</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         let $b := 2, $calc := map{
+            "+" : ->{. + $b},
+            "-" : ->{. - $b},
+            "*" : ->{. * $b},
+            "/" : ->{. div $b}}
+         return $calc("*")(3)  
+      </test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-028">
+      <description>Inline function has no string value</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         string(->{.+1})
+      </test>
+      <result>
+         <error code="FOTY0014"/>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-029">
+      <description>deep-equal() comparing inline functions</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         deep-equal(->{.+1}, ->{.+1})
+      </test>
+      <result>
+         <error code="FOTY0015"/>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-030">
+      <description>Inline function has no typed value</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         data(->{.+1})
+      </test>
+      <result>
+         <error code="FOTY0013"/>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-031">
+      <description>Inline function has no typed value</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         let $x := ->{.+1}, 
+             $y := ->{.-1},
+             $c := ->($x, $y) {$x = $y}
+         return $c($x, $y)
+      </test>
+      <result>
+         <error code="FOTY0013"/>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-032">
+      <description>Type of an inline function</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         ->{.+1}
+      </test>
+      <result>
+         <all-of>
+            <assert-type>item()</assert-type>
+            <assert-type>function(*)</assert-type>
+            <assert-type>function(item()) as item()*</assert-type>
+            <not>
+               <assert-type>function(item()*) as xs:integer</assert-type>
+            </not>
+            <not>
+               <assert-type>function(item()*, item()*, item()*) as item()*</assert-type>
+            </not>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-034">
+      <description>Inline function accessing global variable in XQuery</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <environment>
+         <param name="p" select="7" declared="true"/>
+      </environment>
+      <test>
+         declare variable $p as xs:integer external;
+         declare variable $f := ->{. + $p};
+         $f(12)
+      </test>
+      <result>
+         <assert-eq>19</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-035">
+      <description>Inline function with closure accessing global variables and functions in XQuery</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <environment>
+         <param name="p" select="7" declared="true"/>
+      </environment>
+      <test>
+         declare variable $p as xs:integer external;
+         declare function local:negate($x) {-$x};
+         declare variable $f := let $x := $p return ->{local:negate(. + $x + $p)};
+         $f(12)
+      </test>
+      <result>
+         <assert-eq>-26</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-036">
+      <description>Body of inline function fails type-checking</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         let $f := ->{1 to .}
+         return $f(2.5)
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="focus-function-037">
+      <description>Used as an argument to fn:filter</description>
+      <created by="Michael Kay" on="2020-12-02"/>
+      <test>
+         filter(1 to 10, ->{. mod 3 = 0})
+      </test>
+      <result>
+         <assert-deep-eq>3, 6, 9</assert-deep-eq>
+      </result>
+   </test-case>
+   
+
+   
+</test-set>
