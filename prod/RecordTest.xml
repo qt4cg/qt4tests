@@ -129,6 +129,40 @@
       </result>
    </test-case>
    
+   
+   <test-case name="RecordTest-101">
+      <description>Recursive record test, binary tree</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>
+         let $lhs := map{"value":3},
+             $rhs := map{"value":10}
+             $root := map{"lhs":$lhs, "value":7, "rhs":$rhs}
+         return $root instance of record(lhs? as .., value as item()*, rhs? as ..)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="RecordTest-102">
+      <description>Recursive record test, general tree, recursive walk</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:walk ($node as record(value as xs:integer, children? as ..*)) as xs:string {
+            $node?value || '(' || string-join($node?children ! local:walk(.), ',') || ')'
+         };   
+         let $three := map{"value":3},
+             $ten := map{"value":10, "children":map{"value", 15}},
+             $root := map{"value":7, "children":($three, $ten)}
+         return local:walk($root)
+      </test>
+      <result>
+         <assert-eq>"7(3(),10(15()))"</assert-eq>
+      </result>
+   </test-case>
+   
+   
 
    
    
