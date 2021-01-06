@@ -915,6 +915,125 @@
          <assert-deep-eq>map{"a":1, "b":2}</assert-deep-eq>
       </result>
    </test-case>
+   
+   <test-case name="fn-parse-json-709">
+      <description>Use supplied number-parser</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":2.01}' => parse-json(number-parser: ->{.=>xs:double()=>xs:integer()})</test>
+      <result>
+         <all-of>
+            <assert>$result?a = 1</assert>
+            <assert>$result?b = 2</assert>
+            <assert>$result?a instance of xs:integer</assert>
+            <assert>$result?b instance of xs:integer</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-710">
+      <description>Use supplied number-parser</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":2}' => parse-json(number-parser: xs:integer#1)</test>
+      <result>
+         <all-of>
+            <assert>$result?a = 1</assert>
+            <assert>$result?b = 2</assert>
+            <assert>$result?a instance of xs:integer</assert>
+            <assert>$result?b instance of xs:integer</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-711">
+      <description>Use supplied number-parser</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":2.01}' => parse-json(number-parser: xs:integer#1)</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-712">
+      <description>Use supplied number-parser with liberal=true</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":+2.01}' => parse-json(number-parser: xs:decimal#1, liberal: true())</test>
+      <result>
+         <all-of>
+            <assert>$result?a = 1</assert>
+            <assert>$result?b = 2.01</assert>
+            <assert>$result?a instance of xs:decimal</assert>
+            <assert>$result?b instance of xs:decimal</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-713">
+      <description>Use supplied number-parser with liberal=false</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":+2.01}' => parse-json(number-parser: xs:decimal#1, liberal: false())</test>
+      <result>
+         <error code="FOJS0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-714">
+      <description>Use supplied number-parser with invalid decimal</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":2.01e0}' => parse-json(number-parser: xs:decimal#1)</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-715">
+      <description>Use supplied number-parser with extended decimal precision</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":2.12345678901234567890}' => parse-json(number-parser: xs:decimal#1)</test>
+      <result>
+         <assert>$result?b = 2.12345678901234567890</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-716">
+      <description>Use supplied number-parser returning a string</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":0002.12345678901234567890}' => parse-json(number-parser: identity#1, liberal: true())</test>
+      <result>
+         <assert>$result?b = "0002.12345678901234567890"</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-717">
+      <description>Use supplied number-parser returning a node (which gets atomized)</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA['{"a":1, "b":1.2}' => parse-json(number-parser: ->{parse-xml("<a>" || string(.) || "</a>")})]]></test>
+      <result>
+         <all-of>
+            <assert>$result?b = "1.2"</assert>
+            <assert>$result?b instance of xs:untypedAtomic</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-718">
+      <description>Use supplied number-parser returning a sequence (which is an error</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA['{"a":1, "b":1.2}' => parse-json(number-parser: ->{., 20})]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
 
   
    <!-- things that a liberal parser might allow -->
