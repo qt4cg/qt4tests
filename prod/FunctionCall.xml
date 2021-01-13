@@ -897,6 +897,129 @@
       </result>
    </test-case>
    
+   <test-case name="FunctionCall-400">
+      <description>Coercion rules allow downcasting (type relabeling) in 4.0</description>
+      <created by="Michael Kay" on="2021-01-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:product ($s as xs:positiveInteger) as xs:integer { 
+            $s + 1
+         };  
+         local:product(3) 
+      ]]></test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-401">
+      <description>Downcasting failure in 4.0</description>
+      <created by="Michael Kay" on="2021-01-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:product ($s as xs:positiveInteger) as xs:integer { 
+            $s + 1
+         };  
+         local:product(-3) 
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-402">
+      <description>Type relabelling in 4.0 - dynamic value, success case</description>
+      <created by="Michael Kay" on="2021-01-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:product ($s as xs:positiveInteger) as xs:integer { 
+            $s + 1
+         };  
+         local:product(parts(current-date())?year - 2000) 
+      ]]></test>
+      <result>
+         <assert>. gt 20</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-403">
+      <description>Type relabelling in 4.0 - dynamic value, failure case</description>
+      <created by="Michael Kay" on="2021-01-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:product ($s as xs:positiveInteger) as xs:integer { 
+            $s + 1
+         };  
+         local:product(parts(current-date())?year - 10000) 
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-404">
+      <description>Type relabelling in 4.0 casting across the type hierarchy</description>
+      <created by="Michael Kay" on="2021-01-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:product ($s as xs:positiveInteger) as xs:integer { 
+            $s + 1
+         };  
+         local:product(xs:byte(22)) 
+      ]]></test>
+      <result>
+         <assert>. gt 20</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-405">
+      <description>Type relabelling in 4.0 of function result</description>
+      <created by="Michael Kay" on="2021-01-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:product ($s as xs:positiveInteger) as xs:positiveInteger { 
+            $s + 1
+         };  
+         local:product(22) 
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-eq>23</assert-eq>
+            <assert-type>xs:positiveInteger</assert-type>
+         </all-of>        
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-406">
+      <description>Type relabelling in 4.0 of function result - failure case</description>
+      <created by="Michael Kay" on="2021-01-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:product ($s as xs:positiveInteger) as xs:negativeInteger { 
+            $s + 1
+         };  
+         local:product(22) 
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>       
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-407">
+      <description>Type relabelling in 4.0 of function result - does not allow decimal-to-integer rounding</description>
+      <created by="Michael Kay" on="2021-01-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:product ($s as xs:decimal) as xs:integer { 
+            $s + 0.5
+         };  
+         local:product(22) 
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>       
+      </result>
+   </test-case>
+   
    <test-case name="K-FunctionCallExpr-1">
       <description> A test whose essence is: `func-does-not-exist(1, 2, 3)`. </description>
       <created by="Frans Englich" on="2007-11-26"/>
