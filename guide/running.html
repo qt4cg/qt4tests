@@ -222,7 +222,12 @@ section of the test metadata list features or properties that must be present fo
   <td>moduleImport</td>
   <td>53</td>
   <td>For XQuery, requires support for import module declaration</td>
-</tr> 
+</tr>
+  <tr>
+    <td>XQUpdate</td>
+    <td>1000</td>
+    <td>Requires support for XQuery Update</td>
+  </tr>
 <tr>
   <td>schema-location-hint</td>
   <td>3</td>
@@ -458,7 +463,34 @@ in a particular filestore location (though this may make it difficult to achieve
   implementation, provided that imposition of such constraints is permitted by the language specification. This might include, for example,
   replacing a call to the doc() function by a reference to an external variable.</p>
 
-
+  <h2>XQuery Update Tests</h2>
+  
+  <p>The original XQuery Update test suite has been converted into QT3 format, and appears in subdirectory
+  <code>/upd/</code>. To run these tests, note the following:</p>
+  
+  <ul>
+    <li>The tests are marked with dependency <code>XQUpdate</code>.</li>
+    <li>Generally, each test consists of a number of <code>test</code> queries, which
+    are run as a pipeline: each one operates on the output of the one before, and the final
+    assertions in the <code>result</code> element apply to the final result.</li>
+    <li>A source document that is subject to updating is marked <code>mutable="true"</code>
+    to indicate that it needs to be built using a tree implementation that supports updating</li>
+    <li>Queries that use XQuery updating features are marked <code>update="true"</code>.</li>
+  </ul>
+  
+  <p>The exact definition of the "output" of one query that becomes the "input" of another
+  is a little bit more complicated than it might seem:</p>
+  
+  <ul><li>If the query has a parameter named "input-context" and updates this document,
+    then the updated document is used as the context item for the next query in the pipeline.</li>
+  <li>If the query has a parameter (of any other name) that is a mutable document, then the
+  same parameter is passed to the next query in the pipeline, with the same name, but referring
+  to the updated version of the document.</li>
+  <li>For a non-updating query, the actual query result becomes the input to the next phase
+  of processing.</li></ul>
+  
+  <p>The <code>fn:put()</code> function is tested by writing to a sandpit URI; it's up to the test
+  driver to organise how this works.</p>
 
 
 
