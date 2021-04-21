@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="upd-FunctionCall">
+   <description>XQuery Update - Function Call</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="id-function-call-001">
+      <description>Evaluates an insert expression as an parameter to a function
+                  call.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-call-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare function local:insertFunction($e as xs:anyAtomicType) { let $e1 := $e return $e1 }; let $arg1 := $input-context/employees[1]/employee[1] return local:insertFunction(insert node <salary>45000</salary> into $arg1)]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-call-002">
+      <description>Evaluates a delete expression as a parameter to a function
+                  call.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-call-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare function local:insertFunction($e as xs:anyAtomicType) { let $e1 := $e return $e1 }; let $arg1 := $input-context/employees[1]/employee[1] return local:insertFunction(delete node $arg1/salary[1])]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-call-003">
+      <description>Evaluates a replace expression as a parameter to a function
+                  call.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-call-03"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare function local:replaceFunction($e as xs:anyAtomicType) { let $e1 := $e return $e }; let $arg1 :=$input-context/employees[1] return local:replaceFunction(replace node $arg1/employee[1]/salary[1] with $arg1/employee[2]/salary[1])]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-call-004">
+      <description>Evaluates a rename expression as a parameter to a function
+                  call.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-call-04"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare function local:renameFunction($e as xs:anyAtomicType) { let $e1 := $e return $e1 }; let $arg1 := $input-context/employees[1]/employee[1] return local:renameFunction(rename node $arg1/salary[1] as "salary-1")]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-call-005">
+      <description>Evaluates a transform expression as a parameter to a function
+                  call.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-call-05"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[
+         declare variable $input-context external; 
+         declare function local:transformFunction($e as xs:anyAtomicType) { 
+            let $e1 := $e return $e1 }; 
+         let $arg1 := $input-context/employees[1]/employee[1] 
+         return normalize-space(local:transformFunction(copy $newVar := $arg1 
+                                                    modify delete node $newVar/salary[1] 
+                                                    return $newVar))
+      ]]></test>
+      <result>
+         <assert-string-value>Smith</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-call-006">
+      <description>Evaluates a function call than contains two parameters, one updating
+                  (rename) and an integer.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-call-06"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare function local:renameFunction($e as xs:anyAtomicType, $b as xs:integer) as item()* { let $e1 := $e return $e1 }; let $arg1 := $input-context/employees[1]/employee[1] return local:renameFunction(rename node $arg1/salary[1] as "salary-1", xs:integer(1))]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+</test-set>

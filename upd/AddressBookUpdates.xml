@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-AddressBookUpdates">
+   <description>XQuery Update - Use Cases "address Book" - Synchronizing address book entries</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="address-book-q1">
+      <description>Address Book Use case # 1</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test address-book-q1"/>
+      <environment>
+         <source role="$archive"
+                 file="TestSources/archive.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$copy1"
+                 file="TestSources/copy1.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$copy2"
+                 file="TestSources/copy2.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$log"
+                 file="TestSources/log.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $archive external; declare variable $copy1 external; declare variable $copy2 external; declare variable $log external; for $a in $archive/archived-agenda/entry, $v1 in $copy1/agenda-version/entry, $v2 in $copy2/agenda-version/entry where $a/name = $v1/name and $v1/name = $v2/name return if ($a/contact = $v1/contact and $v1/contact=$v2/contact) then () else if ($v1/contact = $v2/contact) then ( replace value of node $a/contact with $v1/contact, replace value of node $archive/*/last-synch-time with "2006-04-23T12:00" ) else if ($a/contact = $v1/contact) then ( replace value of node $a/contact with $v2/contact, replace value of node $v1/contact with $v2/contact, replace value of node $archive/*/last-synch-time with "2006-04-23T12:00" ) else if ($a/contact = $v2/contact) then ( replace value of node $a/contact with $v1/contact, replace value of node $v2/contact with $v1/contact, replace value of node $archive/*/last-synch-time with "2006-04-23T12:00" ) else ( insert node <fail> <arch>{ $a }</arch> <v1>{ $v1 }</v1> <v2>{ $v2 }</v2> </fail> into $log/log )]]></test>
+      <result>
+         <error code="XUDY0017"/>
+      </result>
+   </test-case>
+</test-set>

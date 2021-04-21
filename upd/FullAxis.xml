@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="upd-FullAxis">
+   <description>XQuery Update - Tests that need the Full Axis Feature</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="complex-deletes-q1">
+      <description>Delete leading comments of document element.</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q1"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete nodes $input-context/comment()[. << $input-context/*]]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := ./*/preceding::node() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="1"><?a-pi pi-1?></result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-deletes-q2">
+      <description>Delete trailing comments of document element.</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q2"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete nodes $input-context/comment()[. >> $input-context/*]]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := ./*/following::node() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="1"><?a-pi pi-6?></result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-deletes-q6">
+      <description>Delete the text node child of element "east".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q6"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete nodes $input-context//east/text()]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//east/node() return <result count="{count($a)}">{$a}</result>, let $a := .//east/preceding-sibling::text() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="0"/><result count="6"> text-3A
+       text-3B
+       text-3C
+       text-3D
+       text-3E
+       text-3F
+      </result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-deletes-q7">
+      <description>Delete all text nodes that come directly after a comment or
+               PI.</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q7"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete nodes $input-context//text()[preceding-sibling::node()[1]/(self::comment() | self::processing-instruction())]]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//far-south/preceding::text() return <result count="{count($a)}">{$a}</result>, let $a := .//far-south/following::text() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="10"> text-1A
+     text-2A
+       text-3A
+       text-3B
+       text-3C
+       text-3D
+       text-4A
+         text-4B
+             text-5A
+           text-6A
+            </result><result count="12"> text-6B
+           text-5B
+         text-4E
+             text-4G
+         text-4H
+       text-3E
+       text-3F
+      Text in east text-3G
+       text-3H
+     text-2D
+   text-1D
+</result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-deletes-q8">
+      <description>Delete all elements called "south-east".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q8"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete nodes $input-context//south-east]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//near-south/following-sibling::node() return <result count="{count($a)}">{ $a }</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="3"> text-4E
+            <?c-pi pi-5?> text-4F
+         text-4G
+         text-4H
+      </result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-deletes-q9">
+      <description>Delete the element called "center".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q9"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete nodes $input-context/far-north/north/near-north/center]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//near-east/preceding-sibling::node() return <result count="{count($a)}">{$a}</result>, let $a := .//near-west/following-sibling::node() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="7"> text-3A
+      <far-west/> text-3B
+      <west mark="w0" west-attr-1="w1" west-attr-2="w2" west-attr-3="w3"/> text-3C
+      <near-west/> text-3D
+       text-3E
+      </result><result count="7"> text-3D
+       text-3E
+      <near-east/> text-3F
+      <east mark="e0">Text in east</east> text-3G
+      <far-east/> text-3H
+    </result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-replacevalues-q1">
+      <description>Replace the value of the leading comments of document
+               element.</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-replacevalues-q1"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $a in $input-context/comment()[. << $input-context/*] return replace value of node $a with substring($a, 1, 5)]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := ./*/preceding::node() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="3"><!-- Comm--><?a-pi pi-1?><!-- Comm--></result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-replacevalues-q2">
+      <description>Replace values of trailing comments of document element.</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-replacevalues-q2"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $a in $input-context/comment()[. >> $input-context/*] return replace value of node $a with "Some comment"]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := ./*/following::node() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="3"><!--Some comment--><?a-pi pi-6?><!--Some comment--></result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-replacevalues-q6">
+      <description>Replace value of the text node child of element "east".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-replacevalues-q6"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; replace value of node $input-context//east/text() with "very east"]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//east/node() return <result count="{count($a)}">{$a}</result>, let $a := .//east/preceding-sibling::text() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="1">very east</result><result count="6"> text-3A
+       text-3B
+       text-3C
+       text-3D
+       text-3E
+       text-3F
+      </result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-replacevalues-q7">
+      <description>Replace the value of all text nodes that come directly after a comment or
+               PI.</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-replacevalues-q7"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $a in $input-context//text()[preceding-sibling::node()[1]/(self::comment() | self::processing-instruction())] return replace value of node $a with ""]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//far-south/preceding::text() return <result count="{count($a)}">{$a}</result>, let $a := .//far-south/following::text() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="10"> text-1A
+     text-2A
+       text-3A
+       text-3B
+       text-3C
+       text-3D
+       text-4A
+         text-4B
+             text-5A
+           text-6A
+            </result><result count="12"> text-6B
+           text-5B
+         text-4E
+             text-4G
+         text-4H
+       text-3E
+       text-3F
+      Text in east text-3G
+       text-3H
+     text-2D
+   text-1D
+</result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-replacevalues-q8">
+      <description>Replace value of all elements called "south-east".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-replacevalues-q8"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $a in $input-context//south-east return replace value of node $a with "very south east"]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//near-south/following-sibling::node() return <result count="{count($a)}">{ $a }</result>, let $a := .//south-east[. = "very south east"] return <result count="{count($a)}">{ $a }</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="7"> text-4E
+            <?c-pi pi-5?> text-4F
+        <south-east mark="1se">very south east</south-east> text-4G
+        <south-east mark="2se">very south east</south-east> text-4H
+      </result><result count="2"><south-east mark="1se">very south east</south-east><south-east mark="2se">very south east</south-east></result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-renames-q2">
+      <description>Rename all elements called "south-east".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-renames-q2"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $a in $input-context//south-east return rename node $a as "se"]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//near-south/following-sibling::node() return <result count="{count($a)}">{ $a }</result>, let $a := .//south-east return <result count="{count($a)}">{ $a }</result>, let $a := .//se return <result count="{count($a)}">{ $a }</result>, let $a := .//south-east[@mark="1se"] return <result count="{count($a)}">{ $a }</result>, let $a := .//se[@mark="1se"] return <result count="{count($a)}">{ $a }</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="7"> text-4E
+            <?c-pi pi-5?> text-4F
+        <se mark="1se"/> text-4G
+        <se mark="2se"/> text-4H
+      </result><result count="0"/><result count="2"><se mark="1se"/><se mark="2se"/></result><result count="0"/><result count="1"><se mark="1se"/></result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-renames-q3">
+      <description>Rename the element called "center".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-renames-q3"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; rename node $input-context/far-north/north/near-north/center as "middle"]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//near-east/preceding-sibling::node() return <result count="{count($a)}">{$a}</result>, let $a := .//near-west/following-sibling::node() return <result count="{count($a)}">{$a}</result>, let $a := .//center return <result count="{count($a)}">{$a}</result>, let $a := .//middle return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="9"> text-3A
+      <far-west/> text-3B
+      <west mark="w0" west-attr-1="w1" west-attr-2="w2" west-attr-3="w3"/> text-3C
+      <near-west/> text-3D
+      <middle center-attr-1="c1" center-attr-2="c2" center-attr-3="c3" mark="c0"> text-4A
+        <near-south-west/> text-4B
+            <!--Comment-5--> text-4C
+            <?a-pi pi-4?> text-4D
+        <near-south> text-5A
+          <south mark="s0" south-attr-1="s1" south-attr-2="s2"> text-6A
+            <far-south/> text-6B
+          </south> text-5B
+        </near-south> text-4E
+            <?c-pi pi-5?> text-4F
+        <south-east mark="1se"/> text-4G
+        <south-east mark="2se"/> text-4H
+      </middle> text-3E
+      </result><result count="9"> text-3D
+      <middle center-attr-1="c1" center-attr-2="c2" center-attr-3="c3" mark="c0"> text-4A
+        <near-south-west/> text-4B
+            <!--Comment-5--> text-4C
+            <?a-pi pi-4?> text-4D
+        <near-south> text-5A
+          <south mark="s0" south-attr-1="s1" south-attr-2="s2"> text-6A
+            <far-south/> text-6B
+          </south> text-5B
+        </near-south> text-4E
+            <?c-pi pi-5?> text-4F
+        <south-east mark="1se"/> text-4G
+        <south-east mark="2se"/> text-4H
+      </middle> text-3E
+      <near-east/> text-3F
+      <east mark="e0">Text in east</east> text-3G
+      <far-east/> text-3H
+    </result><result count="0"/><result count="1"><middle center-attr-1="c1" center-attr-2="c2" center-attr-3="c3" mark="c0"> text-4A
+        <near-south-west/> text-4B
+            <!--Comment-5--> text-4C
+            <?a-pi pi-4?> text-4D
+        <near-south> text-5A
+          <south mark="s0" south-attr-1="s1" south-attr-2="s2"> text-6A
+            <far-south/> text-6B
+          </south> text-5B
+        </near-south> text-4E
+            <?c-pi pi-5?> text-4F
+        <south-east mark="1se"/> text-4G
+        <south-east mark="2se"/> text-4H
+      </middle></result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-renames-q4">
+      <description>Rename one of the elements called "south-east".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-renames-q4"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; rename node ($input-context//south-east)[1] as "se"]]></test>
+      <test><![CDATA[ let $a := .//near-south/following-sibling::node() return <result count="{count($a)}">{ $a }</result>, let $a := .//south-east return <result count="{count($a)}">{ $a }</result>, let $a := .//se return <result count="{count($a)}">{ $a }</result>, let $a := .//south-east[@mark="1se"] return <result count="{count($a)}">{ $a }</result>, let $a := .//se[@mark="1se"] return <result count="{count($a)}">{ $a }</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="7"> text-4E
+            <?c-pi pi-5?> text-4F
+        <se mark="1se"/> text-4G
+        <south-east mark="2se"/> text-4H
+      </result><result count="1"><south-east mark="2se"/></result><result count="1"><se mark="1se"/></result><result count="0"/><result count="1"><se mark="1se"/></result>]]></assert-xml>
+      </result>
+   </test-case>
+</test-set>

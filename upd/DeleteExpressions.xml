@@ -1,0 +1,886 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-DeleteExpressions">
+   <description>XQuery Update - Delete Expressions</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="id-delete-expr-001">
+      <description>A delete expression that removes an element from a directly constructed
+                  element node.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[3] return delete node $var/hours[1]]]></test>
+      <test><![CDATA[ ./works[1]/employee[3]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "Jane Doe 3" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P3</pnum>
+   
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-002">
+      <description>A delete expression that removes an attribute from a directly
+                  constructed element node.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[4] return delete node $var/attribute::name]]></test>
+      <test><![CDATA[ ./works[1]/employee[4]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee gender="male">
+   <empnum>E1</empnum>
+   <pnum>P4</pnum>
+   <hours>20</hours>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-003">
+      <description>A delete expression that removes a comment node from a directly
+                  constructed element node.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-03"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[13] return delete node $var/child::comment()]]></test>
+      <test><![CDATA[ ./works[1]/employee[13]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+   
+   <?PI value="PIValue"?>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-004">
+      <description>A delete expression that removes multiple element nodes from an XML
+                  File.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-04"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1] return delete node $var/employee[position() <= 12]]]></test>
+      <test><![CDATA[ .//employee]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+   <!-- A Comment on Employee # 13 -->
+   <?PI value="PIValue"?>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-005">
+      <description>A delete expression that removes a sequence of element nodes from
+                  directly constructed element nodes.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-05"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := ($input-context/works[1]/employee[1],$input-context/works[1]/employee[2],$input-context/works[1]/employee[3],$input-context/works[1]/employee[4]) return delete node $var]]></test>
+      <test><![CDATA[ fn:count(.//employee)]]></test>
+      <result>
+         <assert-string-value>9</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-006">
+      <description>A delete expression where the target expression is an updating
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-06"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return delete node (delete node $var/salary[1])]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-007">
+      <description>A delete expression where the target expression is a mathematical
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-07"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return delete node (xs:integer($var/salary) + 3)]]></test>
+      <result>
+         <error code="XUTY0007"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-008">
+      <description>A delete expression where the target expression results in a sequence of
+                  zero nodes.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-08"/>
+      <environment>
+         <source role="$in"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[
+         declare variable $in external; 
+         let $var := $in/works[1]/employee[1] 
+         return delete node ($var/hours[2+1])
+      ]]></test>
+      <test><![CDATA[
+         declare variable $in external;
+         $in/works[1]/employee[1]
+      ]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-009">
+      <description>A delete expression where the target expression is set to
+                  "()".</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-09"/>
+      <environment>
+         <source role="$in"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[
+         declare variable $in external; 
+         let $var := $in/employees[1]/employee[1] 
+         return delete node ()]]></test>
+      <test><![CDATA[
+         declare variable $in external; 
+         fn:count($in//employee)
+      ]]></test>
+      <result>
+         <assert-eq>13</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-010">
+      <description>A delete expression where the target expression is a complex
+                  one.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-010"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return delete node $var/hours[(10 idiv 5) - 1]]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-011">
+      <description>A delete expression where the target expression results in a sequence of
+                  integers.</description>
+      <created by="Carmelo Montanez" on="2007-08-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-011"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return delete node (xs:integer($var/salary[1]), xs:integer($var/salary[1]))]]></test>
+      <result>
+         <error code="XUTY0007"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-012">
+      <description>A delete expression with multiple delete states.</description>
+      <created by="Carmelo Montanez" on="2007-08-31"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-012"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[
+         declare variable $input-context external; 
+         let $var := $input-context/works[1]/employee[1] 
+         return delete node $var
+         ]]></test>
+      <test update="true"><![CDATA[ 
+         let $var := ./works[1]/employee[2] 
+         return delete node $var
+         ]]></test>
+      <test><![CDATA[ 
+         fn:count(./works[1]//employee)
+         ]]></test>
+      <result>
+         <assert-eq>11</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-013">
+      <description>Delete an element node and its parent.</description>
+      <created by="Andrew Eisenberg" on="2008-10-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-013"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $ot := $input-context/works[1]/employee[@name="John Doe 12"]/overtime return ( delete node $ot/day[. eq "Monday"], delete node $ot )]]></test>
+      <test><![CDATA[ ./works[1]/employee[@name="John Doe 12"]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name= "John Doe 12" gender="male">
+   <empnum>E4</empnum>
+   <pnum>P4</pnum>
+   <hours>40</hours>
+   
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-014">
+      <description>Delete an element node parent and then the element node.</description>
+      <created by="Andrew Eisenberg" on="2008-10-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-014"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $ot := $input-context/works[1]/employee[@name="John Doe 12"]/overtime return ( delete node $ot, delete node $ot/day[. eq "Monday"] )]]></test>
+      <test><![CDATA[ ./works[1]/employee[@name="John Doe 12"]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name= "John Doe 12" gender="male">
+   <empnum>E4</empnum>
+   <pnum>P4</pnum>
+   <hours>40</hours>
+   
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-015">
+      <description>Delete an element node multiple times.</description>
+      <created by="Andrew Eisenberg" on="2008-10-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-015"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $ot := $input-context/works[1]/employee[@name="John Doe 12"]/overtime return ( delete node $ot, delete node $ot )]]></test>
+      <test><![CDATA[ ./works[1]/employee[@name="John Doe 12"]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name= "John Doe 12" gender="male">
+   <empnum>E4</empnum>
+   <pnum>P4</pnum>
+   <hours>40</hours>
+   
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-016">
+      <description>Delete an element node multiple times.</description>
+      <created by="Andrew Eisenberg" on="2008-10-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-016"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $ot := $input-context/works[1]/employee[@name="John Doe 12"]/overtime return ( delete node $ot, delete node $ot, delete node $ot )]]></test>
+      <test><![CDATA[ ./works[1]/employee[@name="John Doe 12"]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name= "John Doe 12" gender="male">
+   <empnum>E4</empnum>
+   <pnum>P4</pnum>
+   <hours>40</hours>
+   
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-017">
+      <description>Delete an element node, making sure that it is remains visible in this
+                  snapshot.</description>
+      <created by="Andrew Eisenberg" on="2008-10-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-017"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete node $input-context/works[1]/employee[@name="John Doe 12"]/overtime/day[1], delete node $input-context/works[1]/employee [count($input-context/works[1]/employee[@name="John Doe 12"]/overtime/day)]]]></test>
+      <test><![CDATA[ .]]></test>
+      <result>
+         <assert-xml><![CDATA[<works>
+  <employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>
+  
+  <employee name = "Jane Doe 3" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P3</pnum>
+   <hours>80</hours>
+  </employee>
+  <employee name= "John Doe 4" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P4</pnum>
+   <hours>20</hours>
+   <hours>40</hours>
+  </employee>
+  <employee name= "Jane Doe 5" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P5</pnum>
+   <hours>20</hours>
+   <hours>30</hours>   
+  </employee>
+  <employee name= "John Doe 6" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P6</pnum>
+   <hours>12</hours>
+  </employee>
+  <employee name= "Jane Doe 7" gender="female">
+   <empnum>E2</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>
+  <employee name= "John Doe 8" gender="male">
+   <empnum>E2</empnum>
+   <pnum>P2</pnum>
+   <hours>80</hours>
+  </employee>
+  <employee name= "Jane Doe 9" gender="female">
+   <empnum>E3</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "John Doe 10" gender="male">
+   <empnum>E3</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "Jane Doe 11" gender="female">
+   <empnum>E4</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "John Doe 12" gender="male">
+   <empnum>E4</empnum>
+   <pnum>P4</pnum>
+   <hours>40</hours>
+   <overtime>
+     
+     <day>Tuesday</day>
+   </overtime>
+  </employee>
+  <employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+   <!-- A Comment on Employee # 13 -->
+   <?PI value="PIValue"?>
+  </employee>
+ </works>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-018">
+      <description>Delete an element node, making sure that it is remains visible in this
+                  snapshot.</description>
+      <created by="Andrew Eisenberg" on="2008-10-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-018"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete node $input-context/works[1]/employee [count($input-context/works[1]/employee[@name="John Doe 12"]/overtime/day)], delete node $input-context/works[1]/employee[@name="John Doe 12"]/overtime/day[1]]]></test>
+      <test><![CDATA[ .]]></test>
+      <result>
+         <assert-xml><![CDATA[<works>
+  <employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>
+  
+  <employee name = "Jane Doe 3" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P3</pnum>
+   <hours>80</hours>
+  </employee>
+  <employee name= "John Doe 4" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P4</pnum>
+   <hours>20</hours>
+   <hours>40</hours>
+  </employee>
+  <employee name= "Jane Doe 5" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P5</pnum>
+   <hours>20</hours>
+   <hours>30</hours>   
+  </employee>
+  <employee name= "John Doe 6" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P6</pnum>
+   <hours>12</hours>
+  </employee>
+  <employee name= "Jane Doe 7" gender="female">
+   <empnum>E2</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>
+  <employee name= "John Doe 8" gender="male">
+   <empnum>E2</empnum>
+   <pnum>P2</pnum>
+   <hours>80</hours>
+  </employee>
+  <employee name= "Jane Doe 9" gender="female">
+   <empnum>E3</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "John Doe 10" gender="male">
+   <empnum>E3</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "Jane Doe 11" gender="female">
+   <empnum>E4</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "John Doe 12" gender="male">
+   <empnum>E4</empnum>
+   <pnum>P4</pnum>
+   <hours>40</hours>
+   <overtime>
+     
+     <day>Tuesday</day>
+   </overtime>
+  </employee>
+  <employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+   <!-- A Comment on Employee # 13 -->
+   <?PI value="PIValue"?>
+  </employee>
+ </works>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-019">
+      <description>Delete an attribute node multiple times.</description>
+      <created by="Andrew Eisenberg" on="2008-11-12"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-019"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $emp := $input-context/works[1]/employee[1] let $attr := $emp/@gender return ( delete node $attr, delete node $attr, delete node $attr )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-020">
+      <description>Delete a text node multiple times.</description>
+      <created by="Andrew Eisenberg" on="2008-11-12"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-020"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $emp := $input-context/works[1]/employee[1] let $text := $emp/pnum/text() return ( delete node $text, delete node $text, delete node $text )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum></pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-021">
+      <description>Delete a comment node multiple times.</description>
+      <created by="Andrew Eisenberg" on="2008-11-12"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-021"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $emp := $input-context/works[1]/employee[13] let $comment := $emp/comment() return ( delete node $comment, delete node $comment, delete node $comment )]]></test>
+      <test><![CDATA[ ./works[1]/employee[13]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+   
+   <?PI value="PIValue"?>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-022">
+      <description>Delete a PI node multiple times.</description>
+      <created by="Andrew Eisenberg" on="2008-11-12"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-delete-expr-022"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $emp := $input-context/works[1]/employee[13] let $pi := $emp/processing-instruction() return ( delete node $pi, delete node $pi, delete node $pi )]]></test>
+      <test><![CDATA[ ./works[1]/employee[13]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+   <!-- A Comment on Employee # 13 -->
+   
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-deletes-q3">
+      <description>Delete all PIs with target "a-pi".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q3"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete nodes $input-context//processing-instruction("a-pi")]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//(north | near-south)/preceding-sibling::comment() return <result count="{count($a)}">{$a}</result>, let $a := .//(north | near-south)/preceding-sibling::text() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="2"><!-- Comment-3 --><!--Comment-5--></result><result count="5"> text-1A
+     text-1B
+     text-1C
+   text-4A
+         text-4B
+             text-4C
+             text-4D
+        </result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-deletes-q4">
+      <description>Delete last text node child of document element.</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q4"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete nodes $input-context/far-north/text()[last()]]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := ./far-north/text() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="3"> text-1A
+     text-1B
+     text-1C
+  </result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-deletes-q5">
+      <description>Delete all text node children of element "south".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q5"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete nodes $input-context//south/text()]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//near-south//text() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="2"> text-5A
+           text-5B
+        </result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-deletes-q10">
+      <description>Delete the element called "far-east".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q10"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete nodes $input-context/far-north/north/near-north/far-east]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//near-north/text() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="7"> text-3A
+       text-3B
+       text-3C
+       text-3D
+       text-3E
+       text-3F
+       text-3G
+       text-3H
+    </result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-deletes-q11">
+      <description>Delete all attributes called "mark".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q11"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete nodes $input-context//@mark]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//@* return <result count="{count($a)}">{$a}</result>, let $a := .//west[@west-attr-2]/@* return <result count="{count($a)}">{$a}</result>, let $a := .//center[@center-attr-3]/@* return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="8" west-attr-1="w1" west-attr-2="w2" west-attr-3="w3" center-attr-1="c1" center-attr-2="c2" center-attr-3="c3" south-attr-1="s1" south-attr-2="s2"/><result count="3" west-attr-1="w1" west-attr-2="w2" west-attr-3="w3"/><result count="3" center-attr-1="c1" center-attr-2="c2" center-attr-3="c3"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-deletes-q12">
+      <description>Delete all attributes on the "west" element.</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q12"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete nodes $input-context//west/@*]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//near-north/*/@* return <result count="{count($a)}">{for $b in $a order by name($b), string($b) return <attr>{$b}</attr>}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="5"><attr center-attr-1="c1"/><attr center-attr-2="c2"/><attr center-attr-3="c3"/><attr mark="c0"/><attr mark="e0"/></result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-deletes-q13">
+      <description>Delete the attributes names "west-attr-2", "center-attr-2", and
+                  "south-attr-2".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q13"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; delete nodes $input-context//(@west-attr-2 | @center-attr-2 | @south-attr-2)]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//@west-attr-3/../@* return <result count="{count($a)}">{$a}</result>, let $a := .//@mark[. = "c0"]/../@* return <result count="{count($a)}">{$a}</result>, let $a := .//@south-attr-1/../@* return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="3" mark="w0" west-attr-1="w1" west-attr-3="w3"/><result count="3" center-attr-1="c1" center-attr-3="c3" mark="c0"/><result count="2" mark="s0" south-attr-1="s1"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-deletes-q14">
+      <description>Delete the document node. (Deleting a parentless node leaves the XDM instance unchanged)</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-deletes-q14"/>
+      <environment>
+         <source role="$in"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[
+         declare variable $in external; 
+         delete nodes $in
+      ]]></test>
+      <test>declare variable $in external; $in</test>
+      <result>
+         <assert-xml><![CDATA[<!-- Comment-1 --><?a-pi pi-1?><!-- Comment-2 --><far-north> text-1A
+    <!-- Comment-3 --> text-1B
+    <?a-pi pi-2?> text-1C
+  <north mark="n0"> text-2A
+      <!-- Comment-4 --> text-2B
+      <?b-pi pi-3?> text-2C
+    <near-north> text-3A
+      <far-west/> text-3B
+      <west mark="w0" west-attr-1="w1" west-attr-2="w2" west-attr-3="w3"/> text-3C
+      <near-west/> text-3D
+      <center center-attr-1="c1" center-attr-2="c2" center-attr-3="c3" mark="c0"> text-4A
+        <near-south-west/> text-4B
+            <!--Comment-5--> text-4C
+            <?a-pi pi-4?> text-4D
+        <near-south> text-5A
+          <south mark="s0" south-attr-1="s1" south-attr-2="s2"> text-6A
+            <far-south/> text-6B
+          </south> text-5B
+        </near-south> text-4E
+            <?c-pi pi-5?> text-4F
+        <south-east mark="1se"/> text-4G
+        <south-east mark="2se"/> text-4H
+      </center> text-3E
+      <near-east/> text-3F
+      <east mark="e0">Text in east</east> text-3G
+      <far-east/> text-3H
+    </near-north> text-2D
+  </north> text-1D
+</far-north><!-- Comment-6 --><?a-pi pi-6?><!-- Comment-7 -->]]></assert-xml>
+      </result>
+   </test-case>
+</test-set>

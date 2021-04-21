@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-RelationalDataUpdates">
+   <description>XQuery Update - Use Cases "R" - Updating Relational Data</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="relational-data-q1">
+      <description>Update Use Case # 1</description>
+      <created by="Update Task Force" on="2005-02-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test relational-data-q1"/>
+      <environment>
+         <source role="$users"
+                 file="TestSources/users.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $users external; insert node <user_tuple> <userid>U07</userid> <name>Annabel Lee</name> </user_tuple> into $users/users]]></test>
+      <test><![CDATA[declare variable $users external; $users/users/user_tuple[name="Annabel Lee"]]]></test>
+      <result>
+         <assert-xml><![CDATA[<user_tuple><userid>U07</userid><name>Annabel Lee</name></user_tuple>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="relational-data-q2">
+      <description>Update Use Case # 2</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test relational-data-q2"/>
+      <environment>
+         <source role="$users"
+                 file="TestSources/users2.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$bids"
+                 file="TestSources/bids.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $users external; declare variable $bids external; let $uid := $users/users/user_tuple[name="Annabel Lee"]/userid return insert node <bid_tuple> <userid>{data($uid)}</userid> <itemno>1001</itemno> <bid>60</bid> <bid_date>1999-02-01</bid_date> </bid_tuple> into $bids/bids]]></test>
+      <test><![CDATA[declare variable $users external; declare variable $bids external; let $uid := $users/users/user_tuple[name="Annabel Lee"]/userid return $bids/bids/bid_tuple[userid=$uid]]]></test>
+      <result>
+         <assert-xml><![CDATA[<bid_tuple><userid>U07</userid><itemno>1001</itemno><bid>60</bid><bid_date>1999-02-01</bid_date></bid_tuple>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="relational-data-q3">
+      <description>Update Use Case # 3</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test relational-data-q3"/>
+      <environment>
+         <source role="$users"
+                 file="TestSources/users2.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$bids"
+                 file="TestSources/bids.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $users external; declare variable $bids external; let $uid := $users/users/user_tuple[name="Annabel Lee"]/userid let $topbid := max($bids/bids/bid_tuple[itemno=1002]/bid) return insert node <bid_tuple> <userid>{data($uid)}</userid> <itemno>1002</itemno> <bid>{$topbid*1.1}</bid> <bid_date>1999-02-01</bid_date> </bid_tuple> into $bids/bids]]></test>
+      <test><![CDATA[declare variable $users external; declare variable $bids external; let $uid := $users/users/user_tuple[name="Annabel Lee"]/userid return $bids/bids/bid_tuple[userid=$uid]]]></test>
+      <result>
+         <assert-xml><![CDATA[<bid_tuple><userid>U07</userid><itemno>1002</itemno><bid>1320</bid><bid_date>1999-02-01</bid_date></bid_tuple>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="relational-data-q4">
+      <description>Update Use Case # 4</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test relational-data-q4"/>
+      <environment>
+         <source role="$users"
+                 file="TestSources/users2.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $users external; let $user := $users/users/user_tuple[name="Annabel Lee"] return if($user/rating) then replace value of node $user/rating with "B" else insert node <rating>B</rating> into $user]]></test>
+      <test><![CDATA[declare variable $users external; $users/users/user_tuple[name="Annabel Lee"]]]></test>
+      <result>
+         <assert-xml><![CDATA[<user_tuple><userid>U07</userid><name>Annabel Lee</name><rating>B</rating></user_tuple>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="relational-data-q5-1">
+      <description>Update Use Case # 5</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test relational-data-q5-1"/>
+      <environment>
+         <source role="$users"
+                 file="TestSources/users2.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$bids"
+                 file="TestSources/bids.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $users external; declare variable $bids external; let $uid := $users/users/user_tuple[name="Annabel Lee"]/userid let $topbid := max($bids/bids/bid_tuple[itemno=1007]/bid) where $topbid*1.1 <= 200 return insert node <bid_tuple> <userid>{data($uid)}</userid> <itemno>1007</itemno> <bid>{$topbid*1.1}</bid> <bid_date>1999-02-01</bid_date> </bid_tuple> into $bids/bids]]></test>
+      <test><![CDATA[declare variable $users external; declare variable $bids external; let $uid := $users/users/user_tuple[name="Annabel Lee"]/userid return fn:count($bids/bids/bid_tuple[userid=$uid])]]></test>
+      <result>
+         <assert-string-value>0</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="relational-data-q5-2">
+      <description>Update Use Case # 5</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test relational-data-q5-2"/>
+      <environment>
+         <source role="$users"
+                 file="TestSources/users2.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$bids"
+                 file="TestSources/bids.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $users external; declare variable $bids external; let $uid := $users/users/user_tuple[name="Annabel Lee"]/userid let $topbid := max($bids/bids/bid_tuple[itemno=1007]/bid/xs:decimal(.)) where $topbid*1.1 <= 500 return insert nodes <bid_tuple> <userid>{data($uid)}</userid> <itemno>1007</itemno> <bid>{$topbid*1.1}</bid> <bid_date>1999-02-01</bid_date> </bid_tuple> into $bids/bids]]></test>
+      <test><![CDATA[declare variable $users external; declare variable $bids external; let $uid := $users/users/user_tuple[name="Annabel Lee"]/userid return $bids/bids/bid_tuple[userid=$uid]]]></test>
+      <result>
+         <assert-xml><![CDATA[<bid_tuple><userid>U07</userid><itemno>1007</itemno><bid>247.5</bid><bid_date>1999-02-01</bid_date></bid_tuple>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="relational-data-q6-1">
+      <description>Update Use Case # 6</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test relational-data-q6-1"/>
+      <environment>
+         <source role="$users"
+                 file="TestSources/users.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$items"
+                 file="TestSources/items.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$bids"
+                 file="TestSources/bids.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $users external; declare variable $items external; declare variable $bids external; let $user := $users/users/user_tuple[name="Dee Linquent"] let $items := $items/items/item_tuple[offered_by=$user/userid] let $bids := $bids/bids/bid_tuple[userid=$user/userid] return ( delete nodes $user, delete nodes $items, delete nodes $bids )]]></test>
+      <test><![CDATA[declare variable $users external; declare variable $items external; declare variable $bids external; let $user := $users/users/user_tuple[name="Dee Linquent"] let $items := $items/items/item_tuple[offered_by="U03"] let $bids := $bids/bids/bid_tuple[userid="U03"] return ($user,$items,$bids)]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="relational-data-q6-2">
+      <description>Update Use Case # 6 - Alternate method</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test relational-data-q6-2"/>
+      <environment>
+         <source role="$users"
+                 file="TestSources/users.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$items"
+                 file="TestSources/items.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$bids"
+                 file="TestSources/bids.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $users external; declare variable $items external; declare variable $bids external; let $user := $users/users/user_tuple[name="Dee Linquent"] let $items := $items/items/item_tuple[offered_by=$user/userid] let $bids := $bids/bids/bid_tuple[userid=$user/userid] return delete nodes ($user, $items, $bids)]]></test>
+      <test><![CDATA[declare variable $users external; declare variable $items external; declare variable $bids external; let $user := $users/users/user_tuple[name="Dee Linquent"] let $items := $items/items/item_tuple[offered_by="U03"] let $bids := $bids/bids/bid_tuple[userid="U03"] return ($user,$items,$bids)]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="relational-data-q7">
+      <description>Update Use Case # 7</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test relational-data-q7"/>
+      <environment>
+         <source role="$items"
+                 file="TestSources/items.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $items external; insert nodes <comment>This is a bargain !</comment> as last into $items/items/item_tuple[itemno=1002]]]></test>
+      <test><![CDATA[declare variable $items external; $items/items/item_tuple[itemno=1002]]]></test>
+      <result>
+         <assert-xml><![CDATA[<item_tuple>
+  <itemno>1002</itemno>
+  <description>Motorcycle</description>
+  <offered_by>U02</offered_by>
+  <start_date>1999-02-11</start_date>
+  <end_date>1999-03-15</end_date>
+  <reserve_price>500</reserve_price>
+ <comment>This is a bargain !</comment></item_tuple>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="relational-data-q8">
+      <description>Update Use Case # 8</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test relational-data-q8"/>
+      <environment>
+         <source role="$users"
+                 file="TestSources/users2.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$bids"
+                 file="TestSources/bids.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $users external; declare variable $bids external; let $uid := $users/users/user_tuple[name="Annabel Lee"]/userid return insert nodes <bid_tuple> <userid>{data($uid)}</userid> <itemno>1010</itemno> <bid>60</bid> <bid_date>2006-04-23</bid_date> </bid_tuple> into $bids/bids]]></test>
+      <test><![CDATA[declare variable $users external; declare variable $bids external; let $uid := $users/users/user_tuple[name="Annabel Lee"]/userid return fn:count(($bids/bids/bid_tuple[userid=$uid]))]]></test>
+      <result>
+         <any-of>
+            <assert-xml><![CDATA[1]]></assert-xml>
+            <assert-xml><![CDATA[0]]></assert-xml>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="relational-data-q9">
+      <description>Update Use Case # 9</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test relational-data-q9"/>
+      <environment>
+         <source role="$users"
+                 file="TestSources/users2.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$bids"
+                 file="TestSources/bids.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $users external; declare variable $bids external; let $uid := $users/users/user_tuple[name="Annabel Lee"]/userid let $topbid := max($bids//bid_tuple[itemno=1002]/bid) return insert nodes <bid_tuple> <userid>{data($uid)}</userid> <itemno>1002</itemno> <bid>{$topbid - 5.00}</bid> <bid_date>2006-04-23</bid_date> </bid_tuple> into $bids/bids]]></test>
+      <test><![CDATA[declare variable $users external; declare variable $bids external; let $uid := $users/users/user_tuple[name="Annabel Lee"]/userid return fn:count(($bids/bids/bid_tuple[userid=$uid]))]]></test>
+      <result>
+         <any-of>
+            <assert-xml><![CDATA[1]]></assert-xml>
+            <assert-xml><![CDATA[0]]></assert-xml>
+         </any-of>
+      </result>
+   </test-case>
+</test-set>

@@ -1,0 +1,942 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-RenameExpressions">
+   <description>XQuery Update - Rename Expressions</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="id-rename-expr-001">
+      <description>A rename expression that renames an element from a directly constructed
+                  element node.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/hours[1] as "hours1"]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours1>40</hours1>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-002">
+      <description>A rename expression that renames an attribute from a directly
+                  constructed element node.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/@name as "name1"]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name1="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-003">
+      <description>A rename expression that renames a Processing Instruction.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-03"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[13]/processing-instruction() return rename node $var as "name1"]]></test>
+      <test><![CDATA[ ./works[1]/employee[13]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+   <!-- A Comment on Employee # 13 -->
+   <?name1 value="PIValue"?>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-004">
+      <description>A rename expression that renames an element from an xml
+                  file.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-04"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/empnum[1] as "newempnum"]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <newempnum>E1</newempnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-005">
+      <description>A rename expression that renames an attribute from an xml
+                  file.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-05"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/attribute::name as "newname"]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee newname="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-006">
+      <description>A rename expression where the target expression is an updating
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-06"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return rename node(rename node $var/salary[1] as "newSalary") as "newSalary"]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-007">
+      <description>A rename expression where the target expression results in a sequence of
+                  two nodes.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-07"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees return rename node $var/employee[position() < 3] as "employee1"]]></test>
+      <result>
+         <error code="XUTY0012"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-008">
+      <description>A rename expression where the target expression is the empty
+                  sequence.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-08"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[5] return rename node ($var) as "employee1"]]></test>
+      <result>
+         <error code="XUDY0027"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-009">
+      <description>A rename expression where the new name expression is the empty
+                  sequence.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-09"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return rename node $var/salary[1] as ()]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-010">
+      <description>A rename expression where the new name expression is an updating
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-010"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return rename node $var/salary[1] as delete node $var/name[1]]]></test>
+      <result>
+         <any-of>
+            <error code="XUST0001"/>
+            <error code="XPTY0004"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-011">
+      <description>A rename expression where the new name expression is build dynamically
+                  (fn:string-join function).</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-011"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/hours[1] as fn:concat('hou','rs1')]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours1>40</hours1>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-012">
+      <description>A rename expression where the target expression evaluates to a
+                  number.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-012"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return rename node (xs:int($var/salary[1]) + 1) as "salary1"]]></test>
+      <result>
+         <error code="XUTY0012"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-013">
+      <description>A rename expression where the newname expression evaluates to a
+                  number.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-013"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return rename node $var/salary[1] as xs:int($var/salary[1]) + 1]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-014">
+      <description>A rename expression where the target expression is a complex
+                  one.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-014"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var[hours[xs:integer(9-3) idiv 6]] as "hours1"]]></test>
+      <test><![CDATA[ ./works[1]/hours1]]></test>
+      <result>
+         <assert-xml><![CDATA[<hours1 name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </hours1>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-015">
+      <description>A rename expression where the target expression evaluates to a sequence
+                  of two attribute nodes.</description>
+      <created by="Carmelo Montanez" on="2007-08-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-015"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1]/attribute::* return rename node $var as "mgr1"]]></test>
+      <result>
+         <error code="XUTY0012"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-016">
+      <description>A rename expression, where the new name expression uses fn:concat
+                  function.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-016"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/hours[1] as fn:concat("hour","s1")]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours1>40</hours1>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-017">
+      <description>A rename expression, where the new name expression uses fn:substring
+                  function.</description>
+      <created by="Carmelo Montanez" on="2007-08-09"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-017"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/hours[1] as fn:substring("xyhours1",3)]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours1>40</hours1>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-018">
+      <description>A rename expression, where the new name expression is a transform
+                  expression that returns a node. The fn:name function is used to retrieve the name
+                  of the node.</description>
+      <created by="Carmelo Montanez" on="2007-08-09"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-018"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/hours[1] as copy $newVar := $var modify rename node $newVar/hours[1] as "hours1" return fn:name($newVar/hours1[1])]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours1>40</hours1>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-019">
+      <description>A rename expression where the target expression is a comment
+                  node.</description>
+      <created by="Carmelo Montanez" on="2007-08-09"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-019"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[4]/comment() return rename node $var as "comment1"]]></test>
+      <result>
+         <error code="XUTY0012"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-020">
+      <description>A rename expression where the new name expression is a comment
+                  node.</description>
+      <created by="Carmelo Montanez" on="2007-08-09"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-020"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1]/salary[1] return rename node $var as <!-- A comment Node -->]]></test>
+      <result>
+         <error code="XQDY0074"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-021">
+      <description>Rename a document node.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-021"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; rename node $input-context as "document"]]></test>
+      <result>
+         <error code="XUTY0012"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-022">
+      <description>Rename a text node.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-022"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/text()[1] as "text"]]></test>
+      <result>
+         <error code="XUTY0012"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-023">
+      <description>Rename an element using a sequence.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-023"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var as ("this", "is", "an", "element")]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-024">
+      <description>Rename an element using a sequence.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-024"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var as ("", "element", "")]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-025">
+      <description>Rename an attribute using a number.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-025"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/@name as 12]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-026">
+      <description>Rename an attribute using an invalid NCName.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-026"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/@name as "12"]]></test>
+      <result>
+         <error code="XQDY0074"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-027">
+      <description>Rename an element using an invalid QName.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-027"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var as "example:empl"]]></test>
+      <result>
+         <error code="XQDY0074"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-028">
+      <description>Rename an attribute using an invalid QName.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-028"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/@name as "example:fullname"]]></test>
+      <result>
+         <error code="XQDY0074"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-029">
+      <description>Rename an element using a QName.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-029"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare namespace example = "http://www.example.com/xquery"; declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var as "example:empl"]]></test>
+      <test><![CDATA[ ./works[1]/*[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<example:empl xmlns:example="http://www.example.com/xquery" name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </example:empl>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-030">
+      <description>Rename an attribute using a QName.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-030"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare namespace example = "http://www.example.com/xquery"; declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/@name as "example:fullname"]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee xmlns:example="http://www.example.com/xquery" example:fullname="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-031">
+      <description>Rename an element using a QName.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-031"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare namespace example = "http://www.example.com/xquery"; declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var as xs:QName("example:empl")]]></test>
+      <test><![CDATA[ ./works[1]/*[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<example:empl xmlns:example="http://www.example.com/xquery" name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </example:empl>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-032">
+      <description>Rename an attribute using a QName.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-032"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare namespace example = "http://www.example.com/xquery"; declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/@name as xs:QName("example:fullname")]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee xmlns:example="http://www.example.com/xquery" example:fullname="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-033">
+      <description>Check namespace propagation when renaming an element.</description>
+      <created by="Andrew Eisenberg" on="2008-12-18"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-033"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[
+         declare copy-namespaces preserve, inherit; 
+         declare namespace myco="http://www.example.com/myco"; 
+         declare namespace hisco="http://www.example.com/hisco"; 
+         let $myemps := <myco:employees salaried="false"> <myco:employee id='100'> <myco:name>Samuel</myco:name> </myco:employee> </myco:employees> 
+         let $newemps := copy $e := $myemps 
+                         modify rename node $e as xs:QName("hisco:employees") 
+                         return $e
+         return namespace-uri-for-prefix("hisco", $newemps/myco:employee[1])
+       ]]></test>
+      <result>
+         <assert-string-value>http://www.example.com/hisco</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-034">
+      <description>Check namespace propagation when renaming an attribute.</description>
+      <created by="Andrew Eisenberg" on="2008-12-18"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-034"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[
+         declare copy-namespaces preserve, inherit; 
+         declare namespace myco="http://www.example.com/myco"; 
+         declare namespace hisco="http://www.example.com/hisco"; 
+         let $myemps := <myco:employees salaried="false"> <myco:employee id='100'> <myco:name>Samuel</myco:name> </myco:employee> </myco:employees> 
+         let $newemps := copy $e := $myemps 
+                         modify rename node $e/@salaried as xs:QName("hisco:salaried") 
+                         return $e 
+         return namespace-uri-for-prefix("hisco", $newemps/myco:employee[1])
+      ]]></test>
+      <result>
+         <assert-string-value>http://www.example.com/hisco</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-033-no-inherit">
+      <description>Check namepsace propogation when renaming an element.</description>
+      <created by="Josh Spiegel" on="2010-04-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-033-no-inherit"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare copy-namespaces preserve, no-inherit; declare namespace myco="http://www.example.com/myco"; declare namespace hisco="http://www.example.com/hisco"; let $myemps := <myco:employees salaried="false"> <myco:employee id='100'> <myco:name>Samuel</myco:name> </myco:employee> </myco:employees> let $newemps := copy $e := $myemps modify rename node $e as xs:QName("hisco:employees") return $e return namespace-uri-for-prefix("hisco", $newemps/myco:employee[1])]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-034-no-inherit">
+      <description>Check namepsace propogation when renaming an attribute.</description>
+      <created by="Josh Spiegel" on="2010-04-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-034-no-inherit"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare copy-namespaces preserve, no-inherit; declare namespace myco="http://www.example.com/myco"; declare namespace hisco="http://www.example.com/hisco"; let $myemps := <myco:employees salaried="false"> <myco:employee id='100'> <myco:name>Samuel</myco:name> </myco:employee> </myco:employees> let $newemps := copy $e := $myemps modify rename node $e/@salaried as xs:QName("hisco:salaried") return $e return namespace-uri-for-prefix("hisco", $newemps/myco:employee[1])]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-035">
+      <description>Rename an element to be in a namespace (the default
+                  namespace)</description>
+      <created by="Michael Kay" on="2010-02-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-035"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare copy-namespaces preserve, inherit; declare namespace myco="http://www.example.com/myco"; declare namespace hisco="http://www.example.com/hisco"; let $in := <FitnessCenter> <Member level="platinum"> <Name>Jeff</Name> <FavoriteColor>lightgrey</FavoriteColor> </Member> <Member level="gold"> <Name>David</Name> <FavoriteColor>lightblue</FavoriteColor> </Member> <Member level="platinum"> <Name>Roger</Name> <FavoriteColor>lightyellow</FavoriteColor> </Member> </FitnessCenter> let $newelement := copy $copy := $in modify for $i in $copy//* return rename node $i as QName('http://www.gym.com', name($i)) return $copy return $newelement/*[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<Member xmlns="http://www.gym.com" level="platinum"><Name>Jeff</Name><FavoriteColor>lightgrey</FavoriteColor></Member>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-036">
+      <description>Rename an element to be in a namespace (with a prefix)</description>
+      <created by="Michael Kay" on="2010-02-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-036"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare copy-namespaces preserve, inherit; declare namespace myco="http://www.example.com/myco"; declare namespace hisco="http://www.example.com/hisco"; let $in := <FitnessCenter> <Member level="platinum"> <Name>Jeff</Name> <FavoriteColor>lightgrey</FavoriteColor> </Member> <Member level="gold"> <Name>David</Name> <FavoriteColor>lightblue</FavoriteColor> </Member> <Member level="platinum"> <Name>Roger</Name> <FavoriteColor>lightyellow</FavoriteColor> </Member> </FitnessCenter> let $newelement := copy $copy := $in modify for $i in $copy//* return rename node $i as QName('http://www.gym.com', concat('gym:', local-name($i))) return $copy return $newelement/*[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<gym:Member xmlns:gym="http://www.gym.com" level="platinum"><gym:Name>Jeff</gym:Name><gym:FavoriteColor>lightgrey</gym:FavoriteColor></gym:Member>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-rename-expr-037">
+      <description>Rename an attribute to be in a namespace (with a prefix)</description>
+      <created by="Michael Kay" on="2010-02-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-rename-expr-037"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare copy-namespaces preserve, inherit; declare namespace myco="http://www.example.com/myco"; declare namespace hisco="http://www.example.com/hisco"; let $in := <FitnessCenter> <Member level="platinum"> <Name>Jeff</Name> <FavoriteColor>lightgrey</FavoriteColor> </Member> <Member level="gold"> <Name>David</Name> <FavoriteColor>lightblue</FavoriteColor> </Member> <Member level="platinum"> <Name>Roger</Name> <FavoriteColor>lightyellow</FavoriteColor> </Member> </FitnessCenter> let $newelement := copy $copy := $in modify for $i in $copy//@* return rename node $i as QName('http://www.gym.com', concat('gym:', local-name($i))) return $copy return $newelement/*[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<Member xmlns:gym="http://www.gym.com" gym:level="platinum"><Name>Jeff</Name><FavoriteColor>lightgrey</FavoriteColor></Member>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-renames-q1">
+      <description>Rename all PIs with target "a-pi".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-renames-q1"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $a in $input-context//processing-instruction("a-pi") return rename node $a as "new-a"]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//(north | near-south)/preceding-sibling::comment() return <result count="{count($a)}">{$a}</result>, let $a := .//(north | near-south)/preceding-sibling::text() return <result count="{count($a)}">{$a}</result>, let $a := .//(north | near-south)/preceding-sibling::processing-instruction() return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="2"><!-- Comment-3 --><!--Comment-5--></result><result count="7"> text-1A
+     text-1B
+     text-1C
+   text-4A
+         text-4B
+             text-4C
+             text-4D
+        </result><result count="2"><?new-a pi-2?><?new-a pi-4?></result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-renames-q5">
+      <description>Rename the element called "far-east".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-renames-q5"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; rename node $input-context/far-north/north/near-north/far-east as "new-far-east"]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//near-north/text() return <result count="{count($a)}">{$a}</result>, let $a := .//far-east return <result count="{count($a)}">{$a}</result>, let $a := .//new-far-east return <result count="{count($a)}">{$a}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="8"> text-3A
+       text-3B
+       text-3C
+       text-3D
+       text-3E
+       text-3F
+       text-3G
+       text-3H
+    </result><result count="0"/><result count="1"><new-far-east/></result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-renames-q6">
+      <description>Rename all attributes called "mark".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-renames-q6"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $a in $input-context//@mark return rename node $a as "matthew"]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//@* return <result count="{count($a)}">{for $b in $a order by name($b), string($b) return <attr>{$b}</attr>}</result>, let $a := .//west[@west-attr-2]/@* return <result count="{count($a)}">{$a}</result>, let $a := .//center[@center-attr-3]/@* return <result count="{count($a)}">{$a}</result>, let $a := .//@matthew return <result count="{count($a)}">{for $b in $a order by name($b), string($b) return <attr>{$b}</attr>}</result>, let $a := .//@mark return <result count="{count($a)}">{for $b in $a order by name($b), string($b) return <attr>{$b}</attr>}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="15"><attr center-attr-1="c1"/><attr center-attr-2="c2"/><attr center-attr-3="c3"/><attr matthew="1se"/><attr matthew="2se"/><attr matthew="c0"/><attr matthew="e0"/><attr matthew="n0"/><attr matthew="s0"/><attr matthew="w0"/><attr south-attr-1="s1"/><attr south-attr-2="s2"/><attr west-attr-1="w1"/><attr west-attr-2="w2"/><attr west-attr-3="w3"/></result><result count="4" matthew="w0" west-attr-1="w1" west-attr-2="w2" west-attr-3="w3"/><result count="4" center-attr-1="c1" center-attr-2="c2" center-attr-3="c3" matthew="c0"/><result count="7"><attr matthew="1se"/><attr matthew="2se"/><attr matthew="c0"/><attr matthew="e0"/><attr matthew="n0"/><attr matthew="s0"/><attr matthew="w0"/></result><result count="0"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-renames-q7">
+      <description>Rename all attributes on the "west" element.</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-renames-q7"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $a at $pos in $input-context//west/@* return rename node $a as concat("at", $pos)]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//near-north/*/@* return <result count="{count($a)}">{for $b in $a order by name($b), string($b) return <attr>{$b}</attr>}</result>, let $a := .//@at1 return <result count="{count($a)}">{for $b in $a order by name($b), string($b) return <attr>{$b}</attr>}</result>, let $a := .//@mark return <result count="{count($a)}">{for $b in $a order by name($b), string($b) return <attr>{$b}</attr>}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="9"><attr at1="w0"/><attr at2="w1"/><attr at3="w2"/><attr at4="w3"/><attr center-attr-1="c1"/><attr center-attr-2="c2"/><attr center-attr-3="c3"/><attr mark="c0"/><attr mark="e0"/></result><result count="1"><attr at1="w0"/></result><result count="6"><attr mark="1se"/><attr mark="2se"/><attr mark="c0"/><attr mark="e0"/><attr mark="n0"/><attr mark="s0"/></result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="complex-renames-q8">
+      <description>Rename the attributes names "west-attr-2", "center-attr-2", and
+                  "south-attr-2".</description>
+      <created by="John Snelson" on="2007-10-23"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test complex-renames-q8"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/TopMany.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $a in $input-context//(@west-attr-2 | @center-attr-2 | @south-attr-2) return rename node $a as "luke"]]></test>
+      <test update="true"><![CDATA[ .]]></test>
+      <test><![CDATA[ let $a := .//@west-attr-3/../@* return <result count="{count($a)}">{for $b in $a order by name($b), string($b) return <attr>{$b}</attr>}</result>, let $a := .//@mark[. = "c0"]/../@* return <result count="{count($a)}">{for $b in $a order by name($b), string($b) return <attr>{$b}</attr>}</result>, let $a := .//@south-attr-1/../@* return <result count="{count($a)}">{for $b in $a order by name($b), string($b) return <attr>{$b}</attr>}</result>, let $a := .//(@west-attr-2 | @center-attr-2 | @south-attr-2) return <result count="{count($a)}">{for $b in $a order by name($b), string($b) return <attr>{$b}</attr>}</result>, let $a := .//@luke return <result count="{count($a)}">{for $b in $a order by name($b), string($b) return <attr>{$b}</attr>}</result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result count="4"><attr luke="w2"/><attr mark="w0"/><attr west-attr-1="w1"/><attr west-attr-3="w3"/></result><result count="4"><attr center-attr-1="c1"/><attr center-attr-3="c3"/><attr luke="c2"/><attr mark="c0"/></result><result count="3"><attr luke="s2"/><attr mark="s0"/><attr south-attr-1="s1"/></result><result count="0"/><result count="3"><attr luke="c2"/><attr luke="s2"/><attr luke="w2"/></result>]]></assert-xml>
+      </result>
+   </test-case>
+</test-set>

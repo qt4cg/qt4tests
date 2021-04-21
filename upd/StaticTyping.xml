@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="upd-StaticTyping">
+   <description>XQuery Update - Update Facility Static Typing Feature</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <dependency type="feature" value="staticTyping"/>
+
+   <test-case name="stf-insert-001">
+      <description>insert: ST of SourceExpr is too vague.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-insert-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $source as node()* := (<status>on leave</status>, <!-- for 6 months -->), $target := $input-context/works[1]/employee[1] return insert nodes $source into $target]]></test>
+      <result>
+         <error code="XUTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-insert-002">
+      <description>insert: ST of SourceExpr has non-attribute before attribute.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-insert-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $source := ( element status {'active'}, attribute type {'PT'} ) for $target in $input-context/works/employee[@nonexistent] return insert nodes $source into $target]]></test>
+      <result>
+         <error code="XUTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-insert-into-001">
+      <description>insert-into: ST of TargetExpr has cardinality greater than
+               one.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-insert-into-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context as document-node(element(*, xs:untyped)) external; let $source := <status>active</status>, $target := $input-context/works/employee[@name='Jane Doe 1'] return insert node $source into $target]]></test>
+      <result>
+         <error code="XUTY0005"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-insert-into-002">
+      <description>insert-into: ST of TargetExpr is too vague.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-insert-into-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $source := <status>active</status> for $target in $input-context/works/node()[not(self::text())] return insert node $source into $target]]></test>
+      <result>
+         <error code="XUTY0005"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-insert-into-003">
+      <description>insert-into: ST of TargetExpr is attribute().</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-insert-into-03"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $source := <status>active</status> for $target in $input-context/works/employee/@nonexistent return insert node $source into $target]]></test>
+      <result>
+         <error code="XUTY0005"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-insert-into-004">
+      <description>insert-into: ST of TargetExpr is document() but ST of SourceExpr involves
+               attribute().</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-insert-into-04"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $source := $input-context/works/employee[1]/@nonexistent, $target := $input-context return insert node $source into $target]]></test>
+      <result>
+         <error code="XUTY0022"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-insert-after-001">
+      <description>insert-after: ST of TargetExpr has cardinality greater than
+               one.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-insert-after-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context as document-node(element(*, xs:untyped)) external; let $source := <employee name="John Q Public"/>, $target := $input-context/works/employee[@name='Jane Doe 1'] return insert node $source after $target]]></test>
+      <result>
+         <error code="XUTY0006"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-insert-after-002">
+      <description>insert-after: ST of TargetExpr is too vague.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-insert-after-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $source := <employee name="John Q Public"/>, $target as node()? := $input-context/works[1]/employee[1] return insert node $source after $target]]></test>
+      <result>
+         <error code="XUTY0006"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-insert-after-003">
+      <description>insert-after: ST of TargetExpr is attribute().</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-insert-after-03"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $source := attribute type {'PT'} for $target in $input-context/works/employee/@nonexistent return insert node $source after $target]]></test>
+      <result>
+         <error code="XUTY0006"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-delete-001">
+      <description>delete: ST of TargetExpr is too vague.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-delete-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $target as item()* := $input-context/works/employee return delete nodes $target]]></test>
+      <result>
+         <error code="XUTY0007"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-delete-002">
+      <description>delete: ST of TargetExpr is atomic type.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-delete-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $target in $input-context/works/employee/@nonexistent/fn:string() return delete node $target]]></test>
+      <result>
+         <error code="XUTY0007"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-replace-node-001">
+      <description>replace-node: ST of TargetExpr has cardinality greater than
+               one.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-replace-node-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context as document-node(element(*, xs:untyped)) external; let $target := $input-context/works/employee[@name='Jane Doe 1'] return replace node $target with <employee name='John Q Public'/>]]></test>
+      <result>
+         <error code="XUTY0008"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-replace-node-002">
+      <description>replace-node: ST of TargetExpr is too vague.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-replace-node-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $target as node()? := $input-context/works[1]/employee[1] return replace node $target with <employee name='John Q Public'/>]]></test>
+      <result>
+         <error code="XUTY0008"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-replace-node-003">
+      <description>replace-node: ST of TargetExpr is atomic type.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-replace-node-03"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $target in $input-context/works/employee/@nonexistent/fn:string() return replace node $target with ()]]></test>
+      <result>
+         <error code="XUTY0008"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-replace-node-004">
+      <description>replace-node: ST of TargetExpr is element()?, but ST of replacement expr is
+               too vague.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-replace-node-04"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $target := $input-context/works[1]/employee[1], $replacement as node()* := <employee name='John Q Public'/> return replace node $target with $replacement]]></test>
+      <result>
+         <error code="XUTY0010"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-replace-node-005">
+      <description>replace-node: ST of TargetExpr is element(), but ST of replacement expr is
+               attribute()</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-replace-node-05"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $target in $input-context/works/employee[@nonexistent] let $replacement := attribute type {'PT'} return replace node $target with $replacement]]></test>
+      <result>
+         <error code="XUTY0010"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-replace-node-006">
+      <description>replace-node: ST of TargetExpr is attribute()?, but ST of replacement expr
+               is too vague.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-replace-node-06"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $target := $input-context/works[1]/employee[1]/@name, $replacement as node()* := attribute name {'Jane X Doe'} return replace node $target with $replacement]]></test>
+      <result>
+         <error code="XUTY0011"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-replace-node-007">
+      <description>replace-node: ST of TargetExpr is attribute(), but ST of replacement expr
+               is element()</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-replace-node-07"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $replacement := element status {'active'} for $target in $input-context/works/employee/@nonexistent return replace node $target with $replacement]]></test>
+      <result>
+         <error code="XUTY0011"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-replace-value-of-node-001">
+      <description>replace-value-of-node: ST of TargetExpr has cardinality greater than
+               one.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-replace-value-of-node-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context as document-node(element(*, xs:untyped)) external; let $target := $input-context/works/employee[@name='Jane Doe 1']/hours return replace value of node $target with "30"]]></test>
+      <result>
+         <error code="XUTY0008"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-replace-value-of-node-002">
+      <description>replace-value-of-node: ST of TargetExpr is too vague.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-replace-value-of-node-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $target as node()? := $input-context/works[1]/employee[1]/hours[1] return replace value of node $target with "30"]]></test>
+      <result>
+         <error code="XUTY0008"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-rename-001">
+      <description>rename: ST of TargetExpr has cardinality greater than one.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-rename-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context as document-node(element(*, xs:untyped)) external; let $target := $input-context/works/employee[@name='Jane Doe 1'] return rename node $target as "emp"]]></test>
+      <result>
+         <error code="XUTY0012"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-rename-002">
+      <description>rename: ST of TargetExpr is too vague.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-rename-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $target in $input-context/works/node()[not(self::text())] return rename node $target as "emp"]]></test>
+      <result>
+         <error code="XUTY0012"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-rename-003">
+      <description>rename: ST of TargetExpr is comment.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-rename-03"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $target in $input-context/works/employee[1]/comment() return rename node $target as "foo"]]></test>
+      <result>
+         <error code="XUTY0012"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-rename-004">
+      <description>rename: ST of NewNameExpr is duration.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-rename-04"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $target in $input-context/works/employee/@nonexistent return rename node $target as xs:duration('P1M')]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-transform-001">
+      <description>transform: ST of source expression has cardinality greater than
+               one.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-transform-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context as document-node(element(*, xs:untyped)) external; copy $employee := $input-context/works/employee[@name='Jane Doe 1'] modify delete node $employee/hours return $employee]]></test>
+      <result>
+         <error code="XUTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-transform-002">
+      <description>transform: ST of source expression is too vague.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-transform-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $item as item() := <employee name='John Q Public'/> return copy $i := $item modify delete node $i/@name return $i]]></test>
+      <result>
+         <error code="XUTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="stf-transform-003">
+      <description>transform: ST of source expression is an atomic type.</description>
+      <created by="Michael Dyck" on="2008-12-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test stf-transform-03"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $employee in $input-context/works/employee[@nonexistent] return copy $name := $employee/@name/fn:string() modify () return $name]]></test>
+      <result>
+         <error code="XUTY0013"/>
+      </result>
+   </test-case>
+</test-set>

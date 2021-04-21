@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="upd-PartsUpdates">
+   <description>XQuery Update - Use Cases "Parts" - modifying recursive documents</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="parts-q1">
+      <description>Parts Use case # 1</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test parts-q1"/>
+      <environment>
+         <source role="$part-tree"
+                 file="TestSources/part-tree.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $part-tree external; delete node $part-tree//part]]></test>
+      <test><![CDATA[declare variable $part-tree external; $part-tree//part]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="parts-q2">
+      <description>Parts Use case # 2</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test parts-q2"/>
+      <environment>
+         <source role="$part-tree"
+                 file="TestSources/part-tree.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $part-tree external; delete node $part-tree//part[@name="car"]/part]]></test>
+      <test><![CDATA[declare variable $part-tree external; $part-tree//part[@name="car"]/part]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="parts-q3-1">
+      <description>Parts Use case # 3</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test parts-q3-1"/>
+      <environment>
+         <source role="$part-tree"
+                 file="TestSources/part-tree.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$part-list"
+                 file="TestSources/part-list.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $part-tree external; declare variable $part-list external; for $pt in $part-tree//part[@name="car"]//part, $pl in $part-list//part where $pt/@partid eq $pl/@partid return delete node $pl]]></test>
+      <test><![CDATA[declare variable $part-list external; $part-list//part]]></test>
+      <result>
+         <assert-xml><![CDATA[<part name="car" partid="0"/><part name="skateboard" partid="10"/><part name="board" partid="11" partof="10"/><part name="wheel" partid="12" partof="10"/><part name="canoe" partid="20"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="parts-q3-2">
+      <description>Parts Use case # 3 (alternate solution)</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test parts-q3-2"/>
+      <environment>
+         <source role="$part-list"
+                 file="TestSources/part-list.xml"
+                 mutable="true"
+                 declared="true"/>
+         <source role="$part-tree"
+                 file="TestSources/part-tree.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[
+          declare variable $part-tree external; 
+          declare variable $part-list external; 
+          declare updating function local:delete-subtree($p as element(part)) { 
+            for $child in $part-list//part 
+            where $p/@partid eq $child/@partof 
+            return ( local:delete-subtree($child), delete node $child ) 
+          }; 
+          for $p in $part-list//part[@name="car"] 
+          return local:delete-subtree($p)
+      ]]></test>
+      <test><![CDATA[
+          declare variable $part-list external; 
+          $part-list//part
+      ]]></test>
+      <result>
+         <any-of>
+             <error code="XPTY0004"/>
+             <all-of>
+                 <assert>$result/self::part[@name='car'][@partid='0']</assert>
+                 <assert>$result/self::part[@name='skateboard'][@partid='10']</assert> 
+                 <assert>$result/self::part[@name='board'][@partid='11'][@partof="10"]</assert> 
+                 <assert>$result/self::part[@name='wheel'][@partid='12'][@partof="10"]</assert> 
+                 <assert>$result/self::part[@name='canoe'][@partid='20']</assert> 
+             </all-of>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="parts-q4-1">
+      <description>Parts Use case # 4</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test parts-q4-1"/>
+      <environment>
+         <source role="$part-tree"
+                 file="TestSources/part-tree.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $part-tree external; let $next := max($part-tree//@partid) + 1 return insert node <part partid="{$next}" name="radio"/> into $part-tree//part[@partid=0 and @name="car"]]]></test>
+      <test><![CDATA[declare variable $part-tree external; $part-tree//part[@partid=0 and @name="car"]]]></test>
+      <result>
+         <assert-xml><![CDATA[<part name="car" partid="0">
+        <part name="engine" partid="1">
+            <part name="piston" partid="3"/>
+        </part>
+        <part name="door" partid="2">
+            <part name="window" partid="4"/>
+            <part name="lock" partid="5"/>
+        </part>
+    <part name="radio" partid="21"/></part>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="parts-q4-2">
+      <description>Parts Use case # 4. Alternate solution.</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test parts-q4-2"/>
+      <environment>
+         <source role="$part-tree"
+                 file="TestSources/part-tree.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $part-tree external; let $next := max($part-tree//@partid) + 1 return insert node <part partid="{$next}" name="radio"/> as last into $part-tree//part[@partid=0 and @name="car"]]]></test>
+      <test><![CDATA[declare variable $part-tree external; $part-tree//part[@partid=0 and @name="car"]]]></test>
+      <result>
+         <assert-xml><![CDATA[<part name="car" partid="0">
+        <part name="engine" partid="1">
+            <part name="piston" partid="3"/>
+        </part>
+        <part name="door" partid="2">
+            <part name="window" partid="4"/>
+            <part name="lock" partid="5"/>
+        </part>
+    <part name="radio" partid="21"/></part>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="parts-q6">
+      <description>Parts Use case # 6</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test parts-q6"/>
+      <environment>
+         <source role="$part-tree"
+                 file="TestSources/part-tree.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $part-tree external; for $keyword at $i in ("car", "skateboard", "canoe"), $parent in $part-tree//part[@name=$keyword] let $descendants := $parent//part for $p in ($parent, $descendants) return replace value of node $p/@partid with $i*1000+$p/@partid]]></test>
+      <test><![CDATA[declare variable $part-tree external; $part-tree//part]]></test>
+      <result>
+         <assert-xml><![CDATA[<part name="car" partid="1000">
+        <part name="engine" partid="1001">
+            <part name="piston" partid="1003"/>
+        </part>
+        <part name="door" partid="1002">
+            <part name="window" partid="1004"/>
+            <part name="lock" partid="1005"/>
+        </part>
+    </part><part name="engine" partid="1001">
+            <part name="piston" partid="1003"/>
+        </part><part name="piston" partid="1003"/><part name="door" partid="1002">
+            <part name="window" partid="1004"/>
+            <part name="lock" partid="1005"/>
+        </part><part name="window" partid="1004"/><part name="lock" partid="1005"/><part name="skateboard" partid="2010">
+        <part name="board" partid="2011"/>
+        <part name="wheel" partid="2012"/>
+    </part><part name="board" partid="2011"/><part name="wheel" partid="2012"/><part name="canoe" partid="3020"/>]]></assert-xml>
+      </result>
+   </test-case>
+</test-set>

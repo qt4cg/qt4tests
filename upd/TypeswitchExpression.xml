@@ -1,0 +1,855 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-TypeswitchExpression">
+   <description>XQuery Update - Typeswitch Expressions</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="id-typeswitch-expr-001">
+      <description>Evaluates an insert expression used with typeswitch expression where the
+                  operand is an updating expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(insert node <salary>23000</salary> into $input-context/employees[1]/employee[1]) case $i as xs:string return "test should fail" case $i as xs:double return "test should fail" default return "test should fail"]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-002">
+      <description>Evaluates an insert expression used with typeswitch expression where a
+                  branch (a "case") is an updating expression. Other branches return
+                  ().</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return (insert node <hours>20</hours> into $input-context/works[1]/employee[1]) case $i as xs:double return () default return ()]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]/hours]]></test>
+      <result>
+         <any-of>
+            <assert-xml><![CDATA[<hours>40</hours><hours>20</hours>]]></assert-xml>
+            <assert-xml><![CDATA[<hours>20</hours><hours>40</hours>]]></assert-xml>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-003">
+      <description>Evaluates an insert expression used with typeswitch expression where a
+                  branch (the "default") is an updating expression. Other branches return
+                  ().</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-03"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:string return () case $i as xs:double return () default return (insert node <hours>30</hours> into $input-context/works[1]/employee[1])]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]/hours]]></test>
+      <result>
+         <any-of>
+            <assert-xml><![CDATA[<hours>40</hours><hours>30</hours>]]></assert-xml>
+            <assert-xml><![CDATA[<hours>30</hours><hours>40</hours>]]></assert-xml>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-004">
+      <description>Evaluates an insert expression used with typeswitch expression where a
+                  branch (a "case") is an updating expression. Other branches return
+                  fn:error().</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-04"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return (insert node <hours>30</hours> into $input-context/works[1]/employee[1]) case $i as xs:double return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) default return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000'))]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  <hours>30</hours></employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-005">
+      <description>Evaluates an insert expression used with typeswitch expression where a
+                  branch (the "default") is an updating expression. Other branches return
+                  fn:error().</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-05"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) case $i as xs:double return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) default return (insert node <hours>34</hours> into $input-context/works[1]/employee[2])]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-006">
+      <description>Evaluates an insert expression used with typeswitch expression where a
+                  branch (a "case") is an updating expression. Other branches return a
+                  string.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-06"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return (insert node <salary>34000</salary> into $input-context/employees[1]/employee[2]) case $i as xs:double return "This test should fail" default return "This test should fail"]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-007">
+      <description>Evaluates an insert expression used with typeswitch expression where a
+                  branch (the "default") is an updating expression. Other branches return a
+                  string.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-07"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:string return "This test should fail" case $i as xs:double return "This test should fail" default return (insert node <salary>34000</salary> into $input-context/employees[1]/employee[2])]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-008">
+      <description>Evaluates a delete expression used with typeswitch expression where the
+                  operand is an updating expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-08"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(insert node <salary>34000</salary> into $input-context/employees[1]/employee[2]) case $i as xs:string return "test should fail" case $i as xs:double return "test should fail" default return "test should fail"]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-009">
+      <description>Evaluates a delete expression used with typeswitch expression where a
+                  branch (a case) is an updating expression. The other branches are set to
+                  "()".</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-09"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return (delete node $input-context/works[1]/employee[1]/hours[1]) case $i as xs:double return () default return ()]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-010">
+      <description>Evaluates a delete expression used with typeswitch expression where a
+                  branch (the default) is an updating expression. The other branches are set to
+                  "()".</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-010"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:string return () case $i as xs:double return () default return (delete node $input-context/works[1]/employee[1]/hours[1])]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-011">
+      <description>Evaluation of insert expression used with typeswitch expression where
+                  branch (a "case") is an updating expression. All other branches return
+                  "fn:error()".</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-011"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return (insert node <hours>150000</hours> into $input-context/works[1]/employee[2]) case $i as xs:double return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) default return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000'))]]></test>
+      <test><![CDATA[ ./works[1]/employee[2]]]></test>
+      <result>
+         <any-of>
+            <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>70</hours>
+   <hours>20</hours>Text data from Employee[2]
+  <hours>150000</hours></employee>]]></assert-xml>
+            <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male"><hours>150000</hours>
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>70</hours>
+   <hours>20</hours>Text data from Employee[2]
+  </employee>]]></assert-xml>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-012">
+      <description>Evaluation of insert expression used with typeswitch expression where
+                  branch (the "default") is an updating expression. All other branches return
+                  "fn:error()".</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-012"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) case $i as xs:double return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) default return insert node <hours>50</hours> into $input-context/works[1]/employee[2]]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-013">
+      <description>Evaluation of insert expression used with typeswitch expression where
+                  branch (the "case") is an updating expression. All other branches return a
+                  string.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-013"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := <hours><hour>10</hour><hour>20</hour></hours> return typeswitch(xs:int(1)) case $i as xs:int return (insert node <salary>50000</salary> into $input-context/employees[1]/employee[2]) case $i as xs:double return "This test should fail" default return "This test should fail"]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-014">
+      <description>Evaluation of insert expression used with typeswitch expression where
+                  branch (the "default") is an updating expression. All other branches return
+                  string.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-014"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := <hours><hour>10</hour><hour>20</hour></hours> return typeswitch(xs:int(1)) case $i as xs:string return "This test should fail" case $i as xs:double return "This test should fail" default return (insert node <salary>50000</salary> into $input-context/employees[1]/employee[2])]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-015">
+      <description>Evaluates a replace expression used together with a typeswitch
+                  expression where the operand is an updating (replace) expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-015"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(replace value of node $input-context/employees[1]/employee[1]/salary[1] with $input-context/employees[1]/employee[2]/salary[1]) case $i as xs:string return "test should fail" case $i as xs:double return "test should fail" default return "test should fail"]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-016">
+      <description>Evaluates a replace expression used together with a typeswitch
+                  expression where a branch (a case) is an updating (replace) expression. Other
+                  branches are the empty sequence.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-016"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return (replace value of node $input-context/works[1]/employee[1]/hours[1] with $input-context/works[1]/employee[2]/hours[1]) case $i as xs:double return () default return ()]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]/hours[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<hours>70</hours>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-017">
+      <description>Evaluates a replace expression used together with a typeswitch
+                  expression where a branch (the default) is an updating (replace) expression. Other
+                  branches are the empty sequence.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-017"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:string return () case $i as xs:double return () default return (replace value of node $input-context/works[1]/employee[1]/hours[1] with $input-context/works[1]/employee[2]/hours[1])]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]/hours[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<hours>70</hours>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-018">
+      <description>Evaluates a replace expression used together with a typeswitch
+                  expression where a branch (a case) is an updating (replace) expression. Other
+                  branches are a call to the fn:error function.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-018"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return (replace value of node $input-context/works[1]/employee[1]/hours[1] with $input-context/works[1]/employee[2]/hours[1]) case $i as xs:double return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) default return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000'))]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]/hours[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<hours>70</hours>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-019">
+      <description>Evaluates a replace expression used together with a typeswitch
+                  expression where a branch (the default) is an updating (replace) expression. Other
+                  branches are a call to the fn:error function.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-019"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return typeswitch("string") case $i as xs:int return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) case $i as xs:double return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) default return replace value of node $var/hours[1] with $var/hours[2]]]></test>
+      <test><![CDATA[ ./works[1]/employee[2]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+   <hours>20</hours>Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-020">
+      <description>Evaluates a replace expression used together with a typeswitch
+                  expression where a branch (a case) is an updating (replace) expression. Other
+                  branches return a string.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-020"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return (replace value of node $input-context/employees[1]/employee[1]/salary[1] with $input-context/employees[1]/employee[2]/salary[1]) case $i as xs:double return "This test should fail" default return "This test should fail"]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-021">
+      <description>Evaluates a replace expression used together with a typeswitch
+                  expression where a branch (the default) is an updating (transform) expression.
+                  Other branches return a string.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-021"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:string return "This test should fail" case $i as xs:double return "This test should fail" default return (replace value of node $input-context/employees[1]/employee[1]/salary[1] with $input-context/employees[1]/employee[2]/salary[1])]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-022">
+      <description>Evaluation of a rename expression use with a typeswitch expression where
+                  the operand is an updating expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-022"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(rename node $input-context/employees[1]/employee[1]/salary[1] as "salary1") case $i as xs:string return "test should fail" case $i as xs:double return "test should fail" default return "test should fail"]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-023">
+      <description>Evaluation of a rename expression use with a typeswitch expression where
+                  a branch (a case) is an updating expression. Other branches equal to the empty
+                  sequence</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-023"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return rename node $input-context/works[1]/employee[1]/hours[1] as "hours1" case $i as xs:double return () default return ()]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]/hours1[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<hours1>40</hours1>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-024">
+      <description>Evaluation of a rename expression use with a typeswitch expression where
+                  a branch (the default) is an updating expression. Other branches equal to the
+                  empty sequence.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-024"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:string return () case $i as xs:double return () default return (rename node $input-context/works[1]/employee[2]/hours[1] as "hours1")]]></test>
+      <test><![CDATA[ ./works[1]/employee[2]/hours1[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<hours1>70</hours1>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-025">
+      <description>Evaluation of a rename expression use with a typeswitch expression where
+                  a branch (a case) is an updating expression. Other branches are an invokation to
+                  "fn:error()" </description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-025"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return rename node $input-context/works[1]/employee[2]/hours[1] as "hours1" case $i as xs:double return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) default return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000'))]]></test>
+      <test><![CDATA[ ./works[1]/employee[2]/hours1[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<hours1>70</hours1>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-026">
+      <description>Evaluation of a rename expression use with a typeswitch expression where
+                  a branch (the default) is an updating expression. Other branches are an invokation
+                  to "fn:error()" </description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-026"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) case $i as xs:double return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) default return rename node $input-context/works[1]/employee[2]/hours[1] as "hours1"]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-027">
+      <description>Evaluation of a rename expression use with a typeswitch expression a
+                  branch (a case)is an updating expression. Other branches return a
+                  string</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-027"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:int return rename node $input-context/employees[1]/salary[1] as "salary1" case $i as xs:double return "This test should fail" default return "This test should fail"]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-028">
+      <description>Evaluation of a rename expression use with a typeswitch expression a
+                  branch (the default)is an updating expression. Other branches return a
+                  string</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-028"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; typeswitch(xs:int(1)) case $i as xs:string return "This test should fail" case $i as xs:double return "This test should fail" default return rename node $input-context/employees[1]/salary[1] as "salary1"]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-029">
+      <description>Evaluates a transform expression together with a typeswitch expression
+                  where the operand is a non updating (transform) expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-029"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return typeswitch(copy $newVar := $var modify delete node $newVar/salary[1] return $newVar) case $i as xs:string return "not this one" case $i as xs:double return "not this one" default $i return ($i, $var)]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee mgr="true" dept="Toys">
+    <name>Smith</name>
+    
+  </employee><employee mgr="true" dept="Toys">
+    <name>Smith</name>
+    <salary>100000</salary>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-030">
+      <description>Evaluates a transform expression together with a typeswitch expression
+                  where a branch (a case) is an updating (transform) expression. Other branches are
+                  "()"</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-030"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return typeswitch(xs:int(1)) case $i as xs:int return (copy $newVar := $var modify delete node $newVar/hours[1] return $newVar) case $i as xs:double return () default return ()]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   
+   <hours>20</hours>Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-031">
+      <description>Evaluates a transform expression together with a typeswitch expression
+                  where a branch (the default) is an updating (transform) expression. Other branches
+                  are "()".</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-031"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return typeswitch(xs:int(1)) case $i as xs:string return () case $i as xs:double return () default return (copy $newVar := $var modify delete node $newVar/hours[2] return $newVar)]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>70</hours>
+   Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-032">
+      <description>Evaluates a transform expression together with a typeswitch expression
+                  where a branch (a case) is a non updating (transform) expression and the other
+                  cases an invokation to fn:error.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-032"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return typeswitch(xs:int(1)) case $i as xs:int return (copy $newVar := $var modify delete node $newVar/hours[1] return $newVar) case $i as xs:double return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) default return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000'))]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   
+   <hours>20</hours>Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-033">
+      <description>Evaluates a transform expression together with a typeswitch expression
+                  where a branch (the default)is a non updating (transform) expression and the other
+                  cases an invokation to fn:error.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-033"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var :=$input-context/works[1]/employee[2] return typeswitch(xs:int(1)) case $i as xs:string return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) case $i as xs:double return fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) default return (copy $newVar := $var modify delete node $newVar/hours[2] return $newVar)]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>70</hours>
+   Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-034">
+      <description>Evaluates a transform expression together with a typeswitch expression
+                  where a branch (a case)is an updating (transform) and the other branches return a
+                  string.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-034"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return typeswitch(xs:int(1)) case $i as xs:int return (copy $newVar := $var modify delete node $newVar/salary[1] return $newVar) case $i as xs:double return "This test should not fail" default return "This test should not fail"]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee mgr="true" dept="Toys">
+    <name>Smith</name>
+    
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-035">
+      <description>Evaluates a transform expression together with a typeswitch expression
+                  where a branch (the default)is an updating (transform) and the other branches
+                  return a string.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-035"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return typeswitch(xs:int(1)) case $i as xs:string return "This test should not fail" case $i as xs:double return "This test should not fail" default return (copy $newVar := $var modify delete node $newVar/salary[1] return $newVar)]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee mgr="true" dept="Toys">
+    <name>Smith</name>
+    
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-036">
+      <description>Updating typeswitch expression in an updating typeswitch
+                  expression.
+Description: Updating typeswitch expression in an updating typeswitch expression.</description>
+      <created by="Andrew Eisenberg" on="2008-10-25"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-036"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[(: Description: Updating typeswitch expression in an updating typeswitch expression. :) declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return typeswitch(xs:int(10)) case $i as xs:int return typeswitch(xs:int(10)) case $i as xs:int return replace value of node $input-context/works[1]/employee[1]/hours[1] with 41 case $i as xs:double return replace value of node $input-context/works[1]/employee[1]/hours[1] with 42 default return replace value of node $input-context/works[1]/employee[1]/hours[1] with 43 case $i as xs:double return replace value of node $input-context/works[1]/employee[1]/hours[1] with 44 default return replace value of node $input-context/works[1]/employee[1]/hours[1] with 45]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>41</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-037">
+      <description>Vacuous typeswitch expression in an updating typeswitch
+                  expression.
+Description: Vacuous typeswitch expression in an updating typeswitch expression.</description>
+      <created by="Andrew Eisenberg" on="2008-10-25"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-037"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[(: Description: Vacuous typeswitch expression in an updating typeswitch expression. :) declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return typeswitch(xs:int(10)) case $i as xs:double return typeswitch(xs:int(10)) case $i as xs:int return () case $i as xs:double return () default return () case $i as xs:int return replace value of node $input-context/works[1]/employee[1]/hours[1] with 44 default return ()]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>44</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-typeswitch-expr-038">
+      <description>Simple typeswitch expression in an updating typeswitch
+                  expression.
+Description: Simple typeswitch expression in an updating typeswitch expression.</description>
+      <created by="Andrew Eisenberg" on="2008-10-25"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-typeswitch-expr-038"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[(: Description: Simple typeswitch expression in an updating typeswitch expression. :) declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return typeswitch(xs:int(10)) case $i as xs:double return typeswitch(xs:int(10)) case $i as xs:int return () case $i as xs:double return "Test" default return () case $i as xs:int return replace value of node $input-context/works[1]/employee[1]/hours[1] with 44 default return ()]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+</test-set>

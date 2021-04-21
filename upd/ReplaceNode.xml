@@ -1,0 +1,634 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="upd-ReplaceNode">
+   <description>XQuery Update - Replacing a Node</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="id-replace-expr-001">
+      <description>Evaluates a replace expression, which replaces an element
+                     node.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return replace node $var/hours[1] with <hours>25</hours>]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>25</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-002">
+      <description>Evaluates a replace expression, which replaces an attribute
+                     node.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return replace node $var/attribute::name with attribute name1 {"new name"}]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name1="new name" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-003">
+      <description>Evaluates a replace expression that replaces a comment
+                     node.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-03"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[13] return replace node $var/comment() with <!-- A new Comment -->]]></test>
+      <test><![CDATA[ ./works[1]/employee[13]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+   <!-- A new Comment -->
+   <?PI value="PIValue"?>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-004">
+      <description>Evaluates a replace expression that replaces Processing Instruction
+                     node.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-04"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[13] return replace node $var/processing-instruction() with processing-instruction {"target1"} {"content"}]]></test>
+      <test><![CDATA[ ./works[1]/employee[13]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+   <!-- A Comment on Employee # 13 -->
+   <?target1 content?>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-010">
+      <description>Evaluates a replace expression, which replaces an element node with a
+                     sequence of zero nodes.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-010"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return replace node $var/salary[1] with ()]]></test>
+      <test><![CDATA[ ./employees[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee mgr="true" dept="Toys">
+    <name>Smith</name>
+    
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-011">
+      <description>Evaluates a replace expression, where expression following the "with"
+                     clause is an updating expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-011"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var1 := $input-context/employees[1]/employee[1] let $var2 := <salaries><salary>10</salary></salaries> return replace node $var1/salary[1] with (rename node $var2/salary[1] as "salary1")]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-012">
+      <description>Evaluates a replace expression, where the target expression is an
+                     updating expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-012"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var1 := $input-context/employees[1]/employee[1] let $var2 := <salaries><salary>1250000</salary></salaries> return replace node (rename node $var1/salary[1] as "salary1") with $var2/salary[1]]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-013">
+      <description>Evaluates a replace expression, where the target expression results
+                     in more than one node.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-013"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var1 := $input-context/employees[1]/employee[1] let $var2 := <salaries><salary>10</salary></salaries> return replace node $var1/child::* with $var2/salary[1]]]></test>
+      <result>
+         <error code="XUTY0008"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-014">
+      <description>Evaluates a replace expression, where the target expression results
+                     in a single node with no parent property.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-014"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var1 := $input-context/employees[1]/employee[1] let $var2 := <hours></hours> return replace node $var2 with $var1/salary[1]]]></test>
+      <result>
+         <error code="XUDY0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-015">
+      <description>Evaluates a replace expression, where the target is a document
+                     node.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-015"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var1 := $input-context let $var2 := <salaries><salary>2</salary></salaries> return replace node $var1 with $var2]]></test>
+      <result>
+         <error code="XUTY0008"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-016">
+      <description>Evaluates a replace expression, where an attempt is made to replace
+                     an attribute node with an element node.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-016"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var1 := $input-context/employees[1]/employee[1] let $var2 := $input-context/employees[1]/employee[2]/salary[1] return replace node $var1/attribute::mgr with $var2]]></test>
+      <result>
+         <error code="XUTY0011"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-022">
+      <description>Evaluation of a replace expression where an Element node value is
+                     replaced with an attribute node.</description>
+      <created by="Carmelo Montanez" on="2007-08-01"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-022"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var1 := $input-context/works[1]/employee[1] let $var2 := $input-context/works[1]/employee[1]/@gender return replace node $var1/hours[1] with $var2]]></test>
+      <result>
+         <error code="XUTY0010"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-023">
+      <description> Evaluation of a replace expression, where the target node is an
+                     attribute and the replacement list is not exclusively attribute
+                     nodes.</description>
+      <created by="Carmelo Montanez" on="2007-08-01"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-023"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var1 := $input-context/employees[1]/employee[1]/@dept return replace node $var1 with (attribute name {"joe"}, <hours>10</hours>)]]></test>
+      <result>
+         <error code="XUTY0011"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-028">
+      <description>Evaluation of a replace expression where an empty traget is replaced
+                     with an attribute node.</description>
+      <created by="Andrew Eisenberg" on="2008-10-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-028"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var1 := $input-context/works[1]/employee[100] let $var2 := $input-context/works[1]/employee[1] return replace node $var1 with $var2]]></test>
+      <result>
+         <error code="XUDY0027"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-029">
+      <description>Replace the values of text nodes.</description>
+      <created by="Andrew Eisenberg" on="2008-10-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-029"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( replace node $var/empnum[1]/text() with "E1000", replace node $var/hours[1]/text() with 10 )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1000</empnum>
+   <pnum>P1</pnum>
+   <hours>10</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-030">
+      <description>Replace the values of text nodes.</description>
+      <created by="Andrew Eisenberg" on="2008-10-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-030"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return replace node $var/empnum[1]/text() with (text { "E" }, text { "1000" })]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1000</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-031">
+      <description>Replace the value of a element node with a sequence.</description>
+      <created by="Andrew Eisenberg" on="2008-10-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-031"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return replace node $var/hours[1] with (<hours>10</hours>, <hours>20</hours>)]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>10</hours><hours>20</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-032">
+      <description>Replace the value of a element node with a sequence.</description>
+      <created by="Andrew Eisenberg" on="2008-10-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-032"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return replace node $var/hours[1] with (<hours>10</hours>, comment { "even more hours" },<hours>20</hours>)]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>10</hours><!--even more hours--><hours>20</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-033">
+      <description>Replace the value of a element node with a document.</description>
+      <created by="Andrew Eisenberg" on="2008-10-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-033"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return replace node $var with $input-context]]></test>
+      <test><![CDATA[ .]]></test>
+      <result>
+         <assert-xml><![CDATA[<works>
+  <works>
+  <employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>
+  <employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>70</hours>
+   <hours>20</hours>Text data from Employee[2]
+  </employee>
+  <employee name = "Jane Doe 3" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P3</pnum>
+   <hours>80</hours>
+  </employee>
+  <employee name= "John Doe 4" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P4</pnum>
+   <hours>20</hours>
+   <hours>40</hours>
+  </employee>
+  <employee name= "Jane Doe 5" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P5</pnum>
+   <hours>20</hours>
+   <hours>30</hours>   
+  </employee>
+  <employee name= "John Doe 6" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P6</pnum>
+   <hours>12</hours>
+  </employee>
+  <employee name= "Jane Doe 7" gender="female">
+   <empnum>E2</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>
+  <employee name= "John Doe 8" gender="male">
+   <empnum>E2</empnum>
+   <pnum>P2</pnum>
+   <hours>80</hours>
+  </employee>
+  <employee name= "Jane Doe 9" gender="female">
+   <empnum>E3</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "John Doe 10" gender="male">
+   <empnum>E3</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "Jane Doe 11" gender="female">
+   <empnum>E4</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "John Doe 12" gender="male">
+   <empnum>E4</empnum>
+   <pnum>P4</pnum>
+   <hours>40</hours>
+   <overtime>
+     <day>Monday</day>
+     <day>Tuesday</day>
+   </overtime>
+  </employee>
+  <employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+   <!-- A Comment on Employee # 13 -->
+   <?PI value="PIValue"?>
+  </employee>
+ </works>
+  <employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>70</hours>
+   <hours>20</hours>Text data from Employee[2]
+  </employee>
+  <employee name = "Jane Doe 3" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P3</pnum>
+   <hours>80</hours>
+  </employee>
+  <employee name= "John Doe 4" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P4</pnum>
+   <hours>20</hours>
+   <hours>40</hours>
+  </employee>
+  <employee name= "Jane Doe 5" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P5</pnum>
+   <hours>20</hours>
+   <hours>30</hours>   
+  </employee>
+  <employee name= "John Doe 6" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P6</pnum>
+   <hours>12</hours>
+  </employee>
+  <employee name= "Jane Doe 7" gender="female">
+   <empnum>E2</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>
+  <employee name= "John Doe 8" gender="male">
+   <empnum>E2</empnum>
+   <pnum>P2</pnum>
+   <hours>80</hours>
+  </employee>
+  <employee name= "Jane Doe 9" gender="female">
+   <empnum>E3</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "John Doe 10" gender="male">
+   <empnum>E3</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "Jane Doe 11" gender="female">
+   <empnum>E4</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "John Doe 12" gender="male">
+   <empnum>E4</empnum>
+   <pnum>P4</pnum>
+   <hours>40</hours>
+   <overtime>
+     <day>Monday</day>
+     <day>Tuesday</day>
+   </overtime>
+  </employee>
+  <employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+   <!-- A Comment on Employee # 13 -->
+   <?PI value="PIValue"?>
+  </employee>
+ </works>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-034">
+      <description>Replace an attribute node with a sequence of attribute
+                     nodes.</description>
+      <created by="Andrew Eisenberg" on="2008-10-20"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-034"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return replace node $var/@name with (attribute fname {"D.C."}, attribute lname {"Fontana"})]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee lname="Fontana" fname="D.C." gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-045">
+      <description>Check namespace propagation when replacing an attribute.</description>
+      <created by="Andrew Eisenberg" on="2008-12-18"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-045"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[
+         declare copy-namespaces preserve, inherit; 
+         declare namespace myco="http://www.example.com/myco"; 
+         declare namespace hisco="http://www.example.com/hisco"; 
+         let $myemps := <myco:employees salaried="false"> <myco:employee id='100'> <myco:name>Samuel</myco:name> </myco:employee> </myco:employees> 
+         let $newemps := copy $e := $myemps 
+                         modify replace node $e/@salaried with attribute hisco:salaried {"true"} 
+                         return $e 
+         return namespace-uri-for-prefix("hisco", $newemps/myco:employee[1])
+      ]]></test>
+      <result>
+         <assert-string-value>http://www.example.com/hisco</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-045-no-inherit">
+      <description>Check namepsace propogation when replacing an
+                     attribute.</description>
+      <created by="Josh Spiegel" on="2010-04-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-replace-expr-045-no-inherit"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare copy-namespaces preserve, no-inherit; declare namespace myco="http://www.example.com/myco"; declare namespace hisco="http://www.example.com/hisco"; let $myemps := <myco:employees salaried="false"> <myco:employee id='100'> <myco:name>Samuel</myco:name> </myco:employee> </myco:employees> let $newemps := copy $e := $myemps modify replace node $e/@salaried with attribute hisco:salaried {"true"} return $e return namespace-uri-for-prefix("hisco", $newemps/myco:employee[1])]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+</test-set>

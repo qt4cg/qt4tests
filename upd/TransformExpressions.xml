@@ -1,0 +1,1385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-TransformExpressions">
+   <description>XQuery Update - Transform Expressions</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="id-transform-expr-001">
+      <description>Evaluates a transform expression with modify clause set to empty
+                  sequence.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var1 := $input-context/works[1]/employee[1] let $var2 := $input-context/works[1]/employee[2] return copy $var2 := $var1 modify () return $var2]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-002">
+      <description>Evaluates a transform expression with modify clause set to a delete
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return copy $newVar := $var modify delete node $newVar/pnum[1] return $newVar]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-003">
+      <description>Evaluates a transform expression with modify clause set to a rename
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-03"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return copy $newVar := $var modify rename node $newVar/pnum[1] as "pnum1" return $newVar]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum1>P1</pnum1>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-004">
+      <description>Evaluates a transform expression with modify clause set to an insert
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-04"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return copy $newVar := $var modify insert node <pnum1>P1-1</pnum1> after $newVar/pnum[1] return $newVar]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum><pnum1>P1-1</pnum1>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-005">
+      <description>Evaluates a transform expression with modify clause set to a replace
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-05"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] let $var1 := <pnum>P1-1</pnum> return copy $newVar := $var modify replace node $newVar/pnum[1] with $var1 return $newVar]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1-1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-006">
+      <description>Evaluates a transform expression where multiple element nodes are
+                  bounded.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-06"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/child::employee return copy $newVar := $var modify delete node $newVar[position() > 1] return $newVar]]></test>
+      <result>
+         <error code="XUTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-007">
+      <description>Evaluates a transform expression where an attribute is
+                  transformed.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-07"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return copy $newVar := $var modify delete node $newVar/attribute::name return $newVar]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-008">
+      <description>Evaluates a transform expression where a comment is
+                  transformed.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-08"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[13] return copy $newVar := $var modify delete node $newVar/child::comment() return $newVar]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+   
+   <?PI value="PIValue"?>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-009">
+      <description>Evaluates a transform expression where the modify clause contains a call
+                  to fn:error()</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-09"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[3] return copy $newVar := $var modify fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) return $newVar]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-010">
+      <description>Evaluates a transform expression where two variables are bounded and
+                  only one is transformed.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-010"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1] return copy $newVar1 := $var/employee[1], $newVar2 := $var/employee[2] modify delete node $newVar1/hours[1] return ($newVar1, $newVar2)]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   
+  </employee><employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>70</hours>
+   <hours>20</hours>Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-011">
+      <description>Evaluates a transform expression where two variables are bounded and
+                  both are transformed.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-011"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1] return copy $newVar1 := $var/employee[1], $newVar2 := $var/employee[2] modify delete node ($newVar1/hours[1], $newVar2/hours[1]) return ($newVar1, $newVar2)]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   
+  </employee><employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   
+   <hours>20</hours>Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-012">
+      <description>Evaluates a transform expression where the source expression is an
+                  updating expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-012"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return copy $newVar1 := delete node $var/salary[1] modify () return $newVar1]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-013">
+      <description>Evaluates a transform expression where the modify clause contains a
+                  non-updating expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-013"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[2] return copy $newVar := $var modify xs:integer(1) + xs:integer(2) return $newVar]]></test>
+      <result>
+         <error code="XUST0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-014">
+      <description>Evaluates a transform expression where the return expression contains an
+                  updating expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-014"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1] return copy $newVar := $var modify delete node $newVar/employee[1] return delete node $newVar/employee[2]]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-015">
+      <description>Evaluates a transform expression the pending update list contains a node
+                  that was not created within this transform expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-015"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var1 := $input-context/employees[1]/employee[1] let $var2 := $input-context/employees[1]/employee[2] return copy $newVar := $var1 modify delete node $var2/salary[1] return $newVar]]></test>
+      <result>
+         <error code="XUDY0014"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-016">
+      <description>Evaluates a transform expression, which inserts a node and deletes a
+                  node with the same name.</description>
+      <created by="Carmelo Montanez" on="2007-07-27"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-016"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return copy $newVar := $var modify (delete node $newVar/hours[1], insert node <hours>40</hours> as last into $newVar) return $newVar]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee gender="female" name="Jane Doe 1">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   
+  <hours>40</hours></employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-017">
+      <description>Evaluates a transform expression, which deletes a node and insert a node
+                  with the same name.</description>
+      <created by="Carmelo Montanez" on="2007-07-27"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-017"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return copy $newVar := $var modify (insert node <hours>40</hours> as last into $newVar, delete node $newVar/hours[1]) return $newVar]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   
+  <hours>40</hours></employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-018">
+      <description>Evaluates a transform expression, which contains an embedded Transform
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-07-31"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-018"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return copy $newVar := $var modify (copy $newVar1 := $newVar modify (insert node <hours>40</hours> as last into $newVar1) return $newVar1) return $newVar]]></test>
+      <result>
+         <error code="XUST0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-019">
+      <description>Evaluates a transform expression, where an element node is affected by
+                  more than one rename expression.</description>
+      <created by="Carmelo Montanez" on="2007-07-31"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-019"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return copy $newVar := $var modify (rename node $newVar/salary[1] as "salary1", rename node $newVar/salary[1] as "salary2") return $newVar]]></test>
+      <result>
+         <error code="XUDY0015"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-020">
+      <description>Evaluates a transform expression, where an element node is affected by
+                  more than one replace expression (no "value of" being specified.</description>
+      <created by="Carmelo Montanez" on="2007-07-31"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-020"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1] return copy $newVar := $var modify (replace node $newVar/employee[1]/salary[1] with $newVar/employee[2]/salary[1], replace node $newVar/employee[1]/salary[1] with $newVar/employee[3]/salary[1]) return $newVar]]></test>
+      <result>
+         <error code="XUDY0016"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-021">
+      <description>Evaluates a transform expression, where an attribute node is affected by
+                  more than one rename expression.</description>
+      <created by="Carmelo Montanez" on="2007-08-01"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-021"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return copy $newVar := $var modify (rename node $newVar/@dept as "dept1", rename node $newVar/@dept as "dept2") return $newVar]]></test>
+      <result>
+         <error code="XUDY0015"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-022">
+      <description>Evaluates a transform expression, where an attribute node is affected by
+                  more than one replace expression (no "value of" being specified.</description>
+      <created by="Carmelo Montanez" on="2007-08-01"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-022"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1] return copy $newVar := $var modify (replace node $newVar/employee[1]/@dept with $newVar/empoloyee[2]/@dept, replace node $newVar/employee[1]/@dept with $newVar/employee[3]/@dept) return $newVar]]></test>
+      <result>
+         <error code="XUDY0016"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-023">
+      <description>Evaluates a transform expression, where an attribute node is affected by
+                  more than one replace value expression.</description>
+      <created by="Carmelo Montanez" on="2007-08-01"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-023"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1] return copy $newVar := $var modify (replace value of node $newVar/employee[1]/@dept with $newVar/employee[2]/@dept, replace value of node $newVar/employee[1]/@dept with $newVar/employee[3]/@dept) return $newVar]]></test>
+      <result>
+         <error code="XUDY0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-024">
+      <description>Evaluates a transform expression, where an element node is affected by
+                  more than one replace value expression.</description>
+      <created by="Carmelo Montanez" on="2007-08-01"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-024"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1] return copy $newVar := $var modify (replace value of node $newVar/employee[1]/salary[1] with $newVar/employee[2]/salary[1], replace value of node $newVar/employee[1]/salary[1] with $newVar/employee[3]/salary[1]) return $newVar]]></test>
+      <result>
+         <error code="XUDY0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-025">
+      <description>Evaluates a transform expression, where an Element is modified by a
+                  "replace" expression and of its children is also updated by a "replace with value
+                  of" expression.</description>
+      <created by="Carmelo Montanez" on="2007-08-01"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-025"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return copy $newVar := $var modify (replace node $newVar/hours[1] with <hours>35</hours>, replace value of node $newVar with <newEmployee>New Employee</newEmployee>) return $newVar]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">New Employee</employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-026">
+      <description>Evaluates a transform expression, where the source expression results in
+                  more than one single element node.</description>
+      <created by="Carmelo Montanez" on="2007-08-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-026"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1] return copy $newVar := $var/employee[position() < 3] modify (delete node $newVar ) return $newVar]]></test>
+      <result>
+         <error code="XUTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-027">
+      <description>Evaluates a transform expression, where the source expression results in
+                  more than one single attribute node.</description>
+      <created by="Carmelo Montanez" on="2007-08-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-027"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1] return copy $newVar := $var/employee[1]/attribute::* modify (delete node $newVar) return $newVar]]></test>
+      <result>
+         <error code="XUTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-028">
+      <description>Evaluates a transform expression, which inserts a node to insure the
+                  original data is not modified.</description>
+      <created by="Jenise Reyes" on="2007-10-12"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-028"/>
+      <environment>
+         <source role="$in"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[
+         declare variable $in external; 
+         let $var := $in/works[1]/employee[1] 
+         return copy $newVar := $var 
+                modify insert node <id>0001</id> as first into $newVar 
+                return $newVar]]></test>
+      <test>declare variable $in external; $in/works[1]/employee[1]</test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-029">
+      <description>Evaluates a transform expression, which deletes a node to insure the
+                  original data is not modified.</description>
+      <created by="Jenise Reyes" on="2007-10-12"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-029"/>
+      <environment>
+         <source role="$in"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[
+         declare variable $in external; 
+         let $var := $in/works[1]/employee[2] 
+         return copy $newVar := $var 
+                modify delete node $newVar/pnum[1] 
+                return $newVar
+      ]]></test>
+      <test>declare variable $in external; $in/works[1]/employee[2]</test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>70</hours>
+   <hours>20</hours>Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-030">
+      <description>Evaluates a transform expression, which contains a replace expression to
+                  insure the original data is not modified.</description>
+      <created by="Jenise Reyes" on="2007-10-12"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-030"/>
+      <environment>
+         <source role="$in"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[
+         declare variable $in external; 
+         let $var := $in/works[1]/employee[1] 
+         return copy $newVar := $var 
+                modify replace value of node $newVar/hours[1] with text{"this value was replaced"} 
+                return $newVar
+      ]]></test>
+      <test>declare variable $in external; $in/works[1]/employee[1]</test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-031">
+      <description>Evaluates a transform expression, which contains a rename expression to
+                  insure the original data is not modified.</description>
+      <created by="Jenise Reyes" on="2007-10-12"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-031"/>
+      <environment>
+         <source role="$in"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[
+         declare variable $in external; 
+         let $var := $in/works[1]/employee[2] 
+         return copy $newVar := $var 
+                modify rename node $newVar/hours[2] as "newhours" 
+                return $newVar]]></test>
+      <test>declare variable $in external; $in/works[1]/employee[2]</test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>70</hours>
+   <hours>20</hours>Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-032">
+      <description>Transform with copy binding to an empty sequence.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-032"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return copy $newVar := $var/*[100] modify delete node $newVar/*[1] return $newVar]]></test>
+      <result>
+         <error code="XUTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-033">
+      <description>Transform with copy binding to an empty sequence.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-033"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1] return copy $var1 := $var/employee[1], $var2 := $var/employee[$var1/hours[1] div 20] modify delete node $var2/hours return $var2]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   
+   Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-034">
+      <description>Transform a document.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-034"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; copy $var1 := $input-context modify rename node $var1/works[1] as "workers" return $var1]]></test>
+      <result>
+         <assert-xml><![CDATA[<workers>
+  <employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>
+  <employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>70</hours>
+   <hours>20</hours>Text data from Employee[2]
+  </employee>
+  <employee name = "Jane Doe 3" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P3</pnum>
+   <hours>80</hours>
+  </employee>
+  <employee name= "John Doe 4" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P4</pnum>
+   <hours>20</hours>
+   <hours>40</hours>
+  </employee>
+  <employee name= "Jane Doe 5" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P5</pnum>
+   <hours>20</hours>
+   <hours>30</hours>   
+  </employee>
+  <employee name= "John Doe 6" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P6</pnum>
+   <hours>12</hours>
+  </employee>
+  <employee name= "Jane Doe 7" gender="female">
+   <empnum>E2</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>
+  <employee name= "John Doe 8" gender="male">
+   <empnum>E2</empnum>
+   <pnum>P2</pnum>
+   <hours>80</hours>
+  </employee>
+  <employee name= "Jane Doe 9" gender="female">
+   <empnum>E3</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "John Doe 10" gender="male">
+   <empnum>E3</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "Jane Doe 11" gender="female">
+   <empnum>E4</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "John Doe 12" gender="male">
+   <empnum>E4</empnum>
+   <pnum>P4</pnum>
+   <hours>40</hours>
+   <overtime>
+     <day>Monday</day>
+     <day>Tuesday</day>
+   </overtime>
+  </employee>
+  <employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+   <!-- A Comment on Employee # 13 -->
+   <?PI value="PIValue"?>
+  </employee>
+ </workers>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-035">
+      <description>Transform an attribute.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-035"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return copy $var1 := $var/@name modify replace value of node $var1 with "Ursla LeGuin" return <newemp> { $var1 } </newemp>]]></test>
+      <result>
+         <assert-xml><![CDATA[<newemp name="Ursla LeGuin"></newemp>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-036">
+      <description>Transform a text node.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-036"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return copy $var1 := $var/empnum[1]/text() modify replace value of node $var1 with "E43" return <newemp><empnum>{ $var1 }</empnum></newemp>]]></test>
+      <result>
+         <assert-xml><![CDATA[<newemp><empnum>E43</empnum></newemp>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-037">
+      <description>Transform a comment.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-037"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[13] return copy $var1 := $var/comment()[1] modify replace value of node $var1 with "testing" return <newemp> { $var1 } </newemp>]]></test>
+      <result>
+         <assert-xml><![CDATA[<newemp><!--testing--></newemp>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-038">
+      <description>Transform a PI.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-038"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[13] return copy $var1 := $var/processing-instruction() modify replace value of node $var1 with "testing" return <newemp> { $var1 } </newemp>]]></test>
+      <result>
+         <assert-xml><![CDATA[<newemp><?PI testing?></newemp>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-039">
+      <description>Transform two elements copied from the same element.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-039"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return copy $var1 := $var, $var2 := $var modify ( replace value of node $var1/@name with "Pamela Seargent", replace value of node $var2/@gender with "male" ) return <result> { $var1, $var2 } </result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result><employee name="Pamela Seargent" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee><employee name="Jane Doe 1" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee></result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-040">
+      <description>Transform a document by changing the namespaces of its
+                  elements.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-040"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; copy $var1 := $input-context modify for $e in $var1//* return rename node $e as fn:QName("http://www.example.com/xquery", concat("example:", local-name($e))) return $var1]]></test>
+      <result>
+         <assert-xml><![CDATA[<example:works xmlns:example="http://www.example.com/xquery">
+  <example:employee name="Jane Doe 1" gender="female">
+   <example:empnum>E1</example:empnum>
+   <example:pnum>P1</example:pnum>
+   <example:hours>40</example:hours>
+  </example:employee>
+  <example:employee name = "John Doe 2" gender="male">
+   <example:empnum>E1</example:empnum>
+   <example:pnum>P2</example:pnum>
+   <example:hours>70</example:hours>
+   <example:hours>20</example:hours>Text data from Employee[2]
+  </example:employee>
+  <example:employee name = "Jane Doe 3" gender="female">
+   <example:empnum>E1</example:empnum>
+   <example:pnum>P3</example:pnum>
+   <example:hours>80</example:hours>
+  </example:employee>
+  <example:employee name= "John Doe 4" gender="male">
+   <example:empnum>E1</example:empnum>
+   <example:pnum>P4</example:pnum>
+   <example:hours>20</example:hours>
+   <example:hours>40</example:hours>
+  </example:employee>
+  <example:employee name= "Jane Doe 5" gender="female">
+   <example:empnum>E1</example:empnum>
+   <example:pnum>P5</example:pnum>
+   <example:hours>20</example:hours>
+   <example:hours>30</example:hours>   
+  </example:employee>
+  <example:employee name= "John Doe 6" gender="male">
+   <example:empnum>E1</example:empnum>
+   <example:pnum>P6</example:pnum>
+   <example:hours>12</example:hours>
+  </example:employee>
+  <example:employee name= "Jane Doe 7" gender="female">
+   <example:empnum>E2</example:empnum>
+   <example:pnum>P1</example:pnum>
+   <example:hours>40</example:hours>
+  </example:employee>
+  <example:employee name= "John Doe 8" gender="male">
+   <example:empnum>E2</example:empnum>
+   <example:pnum>P2</example:pnum>
+   <example:hours>80</example:hours>
+  </example:employee>
+  <example:employee name= "Jane Doe 9" gender="female">
+   <example:empnum>E3</example:empnum>
+   <example:pnum>P2</example:pnum>
+   <example:hours>20</example:hours>
+  </example:employee>
+  <example:employee name= "John Doe 10" gender="male">
+   <example:empnum>E3</example:empnum>
+   <example:pnum>P2</example:pnum>
+   <example:hours>20</example:hours>
+  </example:employee>
+  <example:employee name= "Jane Doe 11" gender="female">
+   <example:empnum>E4</example:empnum>
+   <example:pnum>P2</example:pnum>
+   <example:hours>20</example:hours>
+  </example:employee>
+  <example:employee name= "John Doe 12" gender="male">
+   <example:empnum>E4</example:empnum>
+   <example:pnum>P4</example:pnum>
+   <example:hours>40</example:hours>
+   <example:overtime>
+     <example:day>Monday</example:day>
+     <example:day>Tuesday</example:day>
+   </example:overtime>
+  </example:employee>
+  <example:employee name= "Jane Doe 13" gender="female" type="FT">
+   <example:empnum>E4</example:empnum>
+   <example:pnum>P5</example:pnum>
+   <example:hours>80</example:hours>
+   <example:status>active</example:status>
+   <!-- A Comment on Employee # 13 -->
+   <?PI value="PIValue"?>
+  </example:employee>
+ </example:works>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-041">
+      <description>Transform a document by changing the namespaces of its
+                  elements.</description>
+      <created by="Andrew Eisenberg" on="2008-10-21"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-041"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; copy $var1 := $input-context/works[1]/employee[1] modify rename node $var1 as "emp" return $var1]]></test>
+      <result>
+         <assert-xml><![CDATA[<emp name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </emp>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-042">
+      <description>Copy clause creates a new element node.</description>
+      <created by="Andrew Eisenberg" on="2008-12-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-042"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test><![CDATA[declare default element namespace "http://ns.example.com/books"; declare variable $input-context external; copy $var1 := $input-context/BOOKLIST[1]/BOOKS[1] modify () return ($var1 is $input-context/BOOKLIST[1]/BOOKS[1])]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-043">
+      <description>Copy clause changes the type of the new element node.</description>
+      <created by="Andrew Eisenberg" on="2008-12-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-043"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test><![CDATA[declare default element namespace "http://ns.example.com/books"; declare variable $input-context external; copy $var1 := $input-context/BOOKLIST[1]/BOOKS[1]/ITEM[1] modify () return ($var1 instance of element(*, xs:untyped), $var1/TITLE[1] instance of element(*, xs:untyped))]]></test>
+      <result>
+         <assert-string-value>true true</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-044">
+      <description>Copy clause changes the nilled property of the new element
+                  node.</description>
+      <created by="Andrew Eisenberg" on="2008-12-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-044"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/books2.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books2" file="TestSources/books2.xsd"/>
+      </environment>
+      <test><![CDATA[declare default element namespace "http://ns.example.com/books2"; declare variable $input-context external; copy $var1 := $input-context/BOOKLIST[1]/BOOKS[1]/ITEM[1] modify () return empty(data($var1/LANGUAGE[1]))]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-045">
+      <description>Copy clause changes the is-idref property of the new element
+                  node.</description>
+      <created by="Andrew Eisenberg" on="2008-12-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-045"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/books2.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books2" file="TestSources/books2.xsd"/>
+      </environment>
+      <test><![CDATA[declare default element namespace "http://ns.example.com/books2"; declare variable $input-context external; copy $var1 := $input-context modify () return empty(idref("MMP", $var1/BOOKLIST[1]/BOOKS[1]/ITEM[1]))]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-046">
+      <description>Copy clause changes the is-id property of the new element
+                  node.</description>
+      <created by="Andrew Eisenberg" on="2008-12-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-046"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/books2.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books2" file="TestSources/books2.xsd"/>
+      </environment>
+      <test><![CDATA[declare default element namespace "http://ns.example.com/books2"; declare variable $input-context external; copy $var1 := $input-context modify () return empty(id("MMP", $var1/BOOKLIST[1]/CATEGORIES[1]))]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-047">
+      <description>Copy clause changes the id property of a new attribute
+                  node.</description>
+      <created by="Andrew Eisenberg" on="2008-12-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-047"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test><![CDATA[declare default element namespace "http://ns.example.com/books"; declare variable $input-context external; copy $var1 := $input-context modify () return empty(id("MMP", $var1/BOOKLIST[1]/CATEGORIES[1]))]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-048">
+      <description>Copy clause changes the is-idrefs property of a new attribute
+                  node.</description>
+      <created by="Andrew Eisenberg" on="2008-12-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-048"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test><![CDATA[declare default element namespace "http://ns.example.com/books"; declare variable $input-context external; copy $var1 := $input-context modify () return empty(idref("P", $var1/BOOKLIST[1]/BOOKS[1]))]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-049">
+      <description>Copy clause changes the type of a new attribute node.</description>
+      <created by="Andrew Eisenberg" on="2008-12-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-049"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test><![CDATA[declare default element namespace "http://ns.example.com/books"; declare variable $input-context external; copy $var1 := $input-context/BOOKLIST[1]/BOOKS[1] modify () return ($var1/ITEM[1]/DIMENSIONS[1]/@UNIT instance of attribute(*, xs:untypedAtomic))]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-050">
+      <description>Copy clause changes the type of an xml:id attribute node, but not the
+                  is-id property.</description>
+      <created by="Andrew Eisenberg" on="2008-12-02"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-050"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test><![CDATA[declare default element namespace "http://ns.example.com/books"; declare variable $input-context external; copy $var1 := $input-context modify () return ( $var1/BOOKLIST[1]/BOOKS[1]/ITEM[last()]/@xml:id instance of attribute(*, xs:untypedAtomic), empty(id("jff01", $var1/BOOKLIST[1]/BOOKS[1]/ITEM[last()])) )]]></test>
+      <result>
+         <assert-string-value>true true</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-051">
+      <description>The copy clause sometimes changes the in-scope-namespaces.</description>
+      <created by="Andrew Eisenberg" on="2008-12-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-051"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare copy-namespaces preserve, inherit; declare variable $input-context external; let $a := <x:a xmlns:x="http://www.example.com/a"><b/></x:a> let $copyb := copy $b := $a/b modify () return $b return empty(in-scope-prefixes($copyb)[.="x"])]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-052">
+      <description>The copy clause sometimes changes the in-scope-namespaces.</description>
+      <created by="Andrew Eisenberg" on="2008-12-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-052"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare copy-namespaces preserve, no-inherit; declare variable $input-context external; let $a := <x:a xmlns:x="http://www.example.com/a"><b/></x:a> let $copyb := copy $b := $a/b modify () return $b return empty(in-scope-prefixes($copyb)[.="x"])]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-053">
+      <description>The copy clause sometimes changes the in-scope-namespaces.</description>
+      <created by="Andrew Eisenberg" on="2008-12-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-053"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare copy-namespaces no-preserve, inherit; declare variable $input-context external; let $a := <x:a xmlns:x="http://www.example.com/a"><b/></x:a> let $copyb := copy $b := $a/b modify () return $b return empty(in-scope-prefixes($copyb)[.="x"])]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-054">
+      <description>The copy clause sometimes changes the in-scope-namespaces.</description>
+      <created by="Andrew Eisenberg" on="2008-12-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-054"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare copy-namespaces no-preserve, no-inherit; declare variable $input-context external; let $a := <x:a xmlns:x="http://www.example.com/a"><b/></x:a> let $copyb := copy $b := $a/b modify () return $b return empty(in-scope-prefixes($copyb)[.="x"])]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-055">
+      <description>Within a transform, an element node is renamed more than
+                  once.</description>
+      <created by="Andrew Eisenberg" on="2008-12-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-055"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; copy $var := $input-context/works[1]/employee[1] modify ( rename node $var as "newEmployee", rename node $var as "otherNewEmployee" ) return $var]]></test>
+      <result>
+         <error code="XUDY0015"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-056">
+      <description>Within a transform, an attribute node is renamed more than
+                  once.</description>
+      <created by="Andrew Eisenberg" on="2008-12-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-056"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; copy $var := $input-context/works[1]/employee[1] modify ( rename node $var/@name as "newName", rename node $var/@name as "otherNewName" ) return $var]]></test>
+      <result>
+         <error code="XUDY0015"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-057">
+      <description>Within a transform, an element node is replaced more than
+                  once.</description>
+      <created by="Andrew Eisenberg" on="2008-12-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-057"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $new1 := <employee/> let $new2 := <otherEmployee/> return copy $var := $input-context/works[1] modify ( replace node $var/employee[1] with $new1, replace node $var/employee[1] with $new2 ) return $var]]></test>
+      <result>
+         <error code="XUDY0016"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-058">
+      <description>Within a transform, the value of an element node is replaced more than
+                  once.</description>
+      <created by="Andrew Eisenberg" on="2008-12-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-transform-expr-058"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; copy $var := $input-context/works[1]/employee[1] modify ( replace value of node $var with "test", replace value of node $var with "otherTest" ) return $var]]></test>
+      <result>
+         <error code="XUDY0017"/>
+      </result>
+   </test-case>
+</test-set>

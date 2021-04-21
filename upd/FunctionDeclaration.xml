@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-FunctionDeclaration">
+   <description>XQuery Update - Function Declaration</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="id-function-declaration-001">
+      <description>Evaluates an insert expression used with an updating function and
+                  enclosed expression is also updating expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare updating function local:insertFunction($e as element()) { let $e1 := $e return insert node <hours>21</hours> as last into $e1 }; let $arg1 := $input-context/works[1]/employee[1] return local:insertFunction($arg1)]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  <hours>21</hours></employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-002">
+      <description>Evaluates an insert expression used with non updating/non external
+                  function and enclosed expression is also updating expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare function local:insertFunction($e as element()) { let $e1 := $e return insert node <hour>20</hour> into $e1 }; let $arg1 := $input-context/employees[1]/employee[1] return local:insertFunction($arg1)]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-003">
+      <description>Evaluates an insert expression used with an updating/non external
+                  function and enclosed expression is an empty sequence.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-03"/>
+      <environment>
+         <source role="$in"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[
+         declare variable $in external;
+         declare updating function local:insertFunction($e as element()) { () }; 
+         let $arg1 := $in/works[1]/employee[3] 
+         return local:insertFunction($arg1)
+      ]]></test>
+      <test><![CDATA[
+         declare variable $in external;
+         $in/works[1]/employee[3]
+      ]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "Jane Doe 3" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P3</pnum>
+   <hours>80</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-004">
+      <description>Evaluates an update expression used with an updating/non external
+                  function and enclosed expression is a call to fn:error.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-04"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare updating function local:insertFunction($e as element()) { fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')) }; let $arg1 := $input-context/works[1]/employee[3] return local:insertFunction($arg1)]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-005">
+      <description>Evaluates a mathematical expression used with an updating/non external
+                  function. Enclosed expression is a mathematical expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-05"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare updating function local:insertFunction($e as xs:integer) { let $e1 := $e return $e1 + $e }; let $arg1 := xs:integer($input-context/employees[1]/salary[1]) return local:insertFunction($arg1)]]></test>
+      <result>
+         <error code="XUST0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-006">
+      <description>Evaluates a delete expression used with an updating function and
+                  enclosed expression is also updating (delete) expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-06"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare updating function local:insertFunction($e as element()) { let $e1 := $e return delete node $e/hours[1] }; let $arg1 := $input-context/works[1]/employee[2] return local:insertFunction($arg1)]]></test>
+      <test><![CDATA[ ./works[1]/employee[2]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   
+   <hours>20</hours>Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-007">
+      <description>Evaluates a delete expression used with non updating/non external
+                  function and enclosed expression is an updating (delete)expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-07"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare function local:insertFunction($e as element()) { let $e1 := $e return delete node $e/salary[1] }; let $arg1 := $input-context/employees[1]/employee[1] return local:insertFunction($arg1)]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-008">
+      <description>Evaluates a replace expression used with an updating function and
+                  enclosed expression is also updating (replace) expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-08"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare updating function local:replaceFunction($e as element()) { let $e1 := $e return replace value of node $e1/hours[1] with $e1/hours[2] }; let $arg1 := $input-context/works[1]/employee[2] return local:replaceFunction($arg1)]]></test>
+      <test><![CDATA[ ./works[1]/employee[2]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+   <hours>20</hours>Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-009">
+      <description>Evaluates a replace expression used with non updating/non external
+                  function and enclosed expression is also updating
+                  (replace)expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-09"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare function local:replaceFunction($e as element()) { let $e1 := $e return replace value of node $e1/employee[1]/salary[1] with $e1/employee[2]/salary[1] }; let $arg1 := $input-context/employees[1] return local:replaceFunction($arg1)]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-010">
+      <description>Evaluates a rename expression used with an updating function and
+                  enclosed expression is also updating (rename) expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-010"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare updating function local:renameFunction($e as element()) { let $e1 := $e return rename node $e1/hours[1] as "hours-1" }; let $arg1 := $input-context/works[1]/employee[3] return local:renameFunction($arg1)]]></test>
+      <test><![CDATA[ ./works[1]/employee[3]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "Jane Doe 3" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P3</pnum>
+   <hours-1>80</hours-1>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-011">
+      <description>Evaluates a rename expression used with non updating/non external
+                  function and enclosed expression is also updating (rename)
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-011"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare function local:renameFunction($e as element()) { let $e1 := $e return rename node $e1/salary[1] as "salary-1" }; let $arg1 := $input-context/employees[1]/employee[3] return local:renameFunction($arg1)]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-012">
+      <description>Evaluates a transform expression used with an updating function and
+                  enclosed expression is also updating (transform) expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-012"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare updating function local:transformFunction($e as element()) { let $e1 := $e return copy $newVar := $e1 modify delete node $newVar/hours[1] return $newVar }; let $arg1 := $input-context/works[1]/employee[2] return local:transformFunction($arg1)]]></test>
+      <result>
+         <error code="XUST0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-013">
+      <description>Evaluates a transform expression used with non updating/non external
+                  function and enclosed expression is non updating (transform)
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-013"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; declare function local:transformFunction($e as element()) { copy $newVar := $e modify delete node $newVar/employee[4] return $newVar }; let $arg1 := $input-context/employees[1] return local:transformFunction($arg1)]]></test>
+      <result>
+         <assert-xml><![CDATA[<employees>
+  <employee dept="Toys" mgr="true">
+    <name>Smith</name>
+    <salary>100000</salary>
+  </employee>
+  <employee dept="Toys">
+    <name>Jones</name>
+    <salary>60000</salary>
+  </employee>
+  <employee dept="Shoes" mgr="true">
+    <name>Roberts</name>
+    <salary>150000</salary>
+  </employee>
+  
+</employees>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-014">
+      <description>Evaluation of a function declaration declared as updating and a return
+                  type is specified.</description>
+      <created by="Carmelo Montanez" on="2007-08-07"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-014"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare updating function local:transformFunction($e as element()) as element() { let $e1 := $e return copy $newVar := $e1 modify delete node $newVar/salary[1] return $newVar }; let $arg1 := $input-context/employees[1]/employee[1] return local:transformFunction($arg1)]]></test>
+      <result>
+         <any-of>
+            <error code="XUST0028"/>
+            <error code="XUST0002"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-015">
+      <description>Updating function contains updating expression in a disallowed
+                  place.</description>
+      <created by="Michael Kay" on="2009-05-30"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-015"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare updating function local:insertFunction($e as element()) { let $e1 := delete nodes $e/*/* return insert node <hours>21</hours> as last into $e }; let $arg1 := $input-context/works[1]/employee[1] return local:insertFunction($arg1)]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-016">
+      <description>Updating function returns a value on a non-executed
+                  branch.</description>
+      <created by="Michael Kay" on="2009-05-30"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-016"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; declare updating function local:insertFunction($e as element()) { if (current-date() gt xs:date('1900-01-01')) then insert node <hours>21</hours> as last into $e else 'exit' }; let $arg1 := $input-context/works[1]/employee[1] return local:insertFunction($arg1)]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-017">
+      <description>Recursive updating function.</description>
+      <created by="Michael Kay" on="2009-05-30"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-function-declaration-017"/>
+      <environment/>
+      <test><![CDATA[declare updating function local:increase($e as element(b)?, $amount as xs:integer) { if ($e) then ( replace value of node $e with ($e + $amount), local:increase($e/../b[.>>$e][1], $amount+1) ) else () }; let $a1 := <a>{for $i in 1 to 100 return <b>{$i}</b>}</a> let $a2 := copy $a3 := $a1 modify local:increase($a3/b[1], 1) return $a3 return <totals>{sum($a1/b/xs:integer(.)), sum($a2/b/xs:integer(.))}</totals>]]></test>
+      <result>
+         <assert-xml><![CDATA[<totals>5050 10100</totals>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-101">
+      <description>Function declaration, non-updating, with updating
+                  expression.</description>
+      <created by="Andrew Eisenberg" on="2008-10-17"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test function-declaration-01"/>
+      <environment>
+         <source role="$employees"
+                 file="TestSources/employees.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $employees external; declare function local:test ($emp) { replace value of node $emp/salary with 200000 }; local:test($employees/employees/*[1])]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-102">
+      <description>Function declaration, updating, with return type.</description>
+      <created by="Andrew Eisenberg" on="2008-10-17"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test function-declaration-02"/>
+      <environment>
+         <source role="$employees"
+                 file="TestSources/employees.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $employees external; declare updating function local:test ($emp) as xs:integer { replace value of node $emp/salary with 200000 }; local:test($employees/employees/*[1])]]></test>
+      <result>
+         <error code="XUST0028"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-103">
+      <description>Function declaration, updating, with simple expression.</description>
+      <created by="Andrew Eisenberg" on="2008-10-17"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test function-declaration-03"/>
+      <environment>
+         <source role="$employees"
+                 file="TestSources/employees.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $employees external; declare updating function local:test ($emp) { 12 }; local:test($employees/employees/*[1])]]></test>
+      <result>
+         <error code="XUST0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-104">
+      <description>Function declaration, updating, with vacuous expression.</description>
+      <created by="Andrew Eisenberg" on="2008-10-17"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test function-declaration-04"/>
+      <environment>
+         <source role="$employees"
+                 file="TestSources/employees.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $employees external; declare updating function local:test ($emp) { () }; local:test($employees/employees/*[1])]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+</test-set>

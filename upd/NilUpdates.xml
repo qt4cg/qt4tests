@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="upd-NilUpdates">
+   <description>XQuery Update - Use Cases "Nil"</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="nil-q1">
+      <description>Nil Use case # 1</description>
+      <created by="Update Task Force" on="2006-08-05"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test nil-q1"/>
+      <environment>
+         <source role="$employees"
+                 file="TestSources/employees.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $employees external; for $e in $employees//employee where $e/@mgr = true() return copy $emp := $e modify ( replace value of node $emp/salary with "" , insert node (attribute xsi:nil {"true"}) into $emp/salary ) return $emp]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee dept="Toys" mgr="true">
+    <name>Smith</name>
+    <salary xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+  </employee><employee dept="Shoes" mgr="true">
+    <name>Roberts</name>
+    <salary xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+</test-set>

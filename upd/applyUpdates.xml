@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="upd-applyUpdates">
+   <description>XQuery Update - upd:applyUpdates</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="applyUpdates-001">
+      <description>Apply insertInto then delete.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-001"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( insert node comment { "Testing" } into $var/hours, delete node $var/hours/text() )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours><!--Testing--></hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-002">
+      <description>Apply insertInto then delete.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-002"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( delete node $var/hours/text(), insert node comment { "Testing" } into $var/hours )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours><!--Testing--></hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-003">
+      <description>Apply insertBefore then replaceNode.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-003"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( insert node <exempt/> before $var/hours, replace node $var/hours with <overtime>10</overtime> )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <exempt/><overtime>10</overtime>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-004">
+      <description>Apply insertBefore then replaceNode.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-004"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( replace node $var/hours with <overtime>10</overtime>, insert node <exempt/> before $var/hours )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <exempt/><overtime>10</overtime>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-005">
+      <description>Apply insertAsFirst then replaceElementContent.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-005"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( insert node comment { "full week" } as first into $var/hours, replace value of node $var/hours with "50" )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>50</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-006">
+      <description>Apply insertAsFirst then replaceElementContent.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-006"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( replace value of node $var/hours with "50", insert node comment { "full week" } as first into $var/hours )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>50</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-007">
+      <description>Apply replaceNode then delete.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-007"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( replace node $var/hours with comment { "vacation" }, delete node $var/hours )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <!--vacation-->
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-008">
+      <description>Apply replaceNode then delete.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-008"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( delete node $var/hours, replace node $var/hours with comment { "vacation" } )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <!--vacation-->
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-009">
+      <description>Apply multiple operations to the same node.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-009"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( insert node attribute overtime { "false" } into $var/hours, insert node comment { "punctual" } into $var/hours, insert node <employeeOfTheWeek>true</employeeOfTheWeek> before $var/hours/text(), replace value of node $var/hours with "50", delete node $var/hours )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-010">
+      <description>Apply multiple operations to the same node.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-010"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( delete node $var/hours, replace value of node $var/hours with "50", insert node <employeeOfTheWeek>true</employeeOfTheWeek> before $var/hours/text(), insert node comment { "punctual" } into $var/hours, insert node attribute overtime { "false" } into $var/hours )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-011">
+      <description>Delete elements and merge text nodes.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-011"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return delete node $var/*]]></test>
+      <test><![CDATA[ count(./works[1]/employee[2]/text())]]></test>
+      <result>
+         <assert-string-value>1</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-012">
+      <description>Delete the content of a text node.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-012"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return replace value of node $var/hours/text() with ""]]></test>
+      <test><![CDATA[ count(./works[1]/employee[1]/hours/text())]]></test>
+      <result>
+         <assert-string-value>0</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-013">
+      <description>Insert and delete attributes with the same name.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-013"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( insert node attribute name {"Sylvia"} into $var, delete node $var/@name )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Sylvia" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-014">
+      <description>Insert and delete attributes with the same name.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-014"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( delete node $var/@name, insert node attribute name {"Sylvia"} into $var )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Sylvia" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-016">
+      <description>Check atomicity with a good operation and a bad
+                     operation.</description>
+      <created by="Andrew Eisenberg" on="2008-11-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-016"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( insert node comment {"my guy"} into $var, insert node attribute punctual {"true"} into $var, replace node $var/@gender with attribute punctual {"true"} )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-021">
+      <description>Insert and rename attributes with the same name.</description>
+      <created by="Michael Kay" on="2009-01-29"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-021"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( insert node attribute name {"Sylvia"} into $var, rename node $var/@name as "oldName" )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Sylvia" oldName="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-022">
+      <description>Insert and replace attributes with the same name.</description>
+      <created by="Michael Kay" on="2009-01-29"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-022"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( insert node attribute name {"Sylvia"} into $var, replace node $var/@name with <e oldName="{$var/@name}"/>/@oldName )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Sylvia" oldName="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-023">
+      <description>Insert two attributes with the same name and delete the containing
+                     element.</description>
+      <created by="Michael Kay" on="2009-01-29"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-023"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( insert node attribute name {"Sylvia"} into $var, insert node attribute name {"Gwynneth"} into $var, delete node $var )]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-024">
+      <description>Insert two attributes with the same name and delete the containing
+                     element's parent.</description>
+      <created by="Michael Kay" on="2009-01-29"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-024"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( insert node attribute name {"Sylvia"} into $var/empnum, insert node attribute name {"Gwynneth"} into $var/empnum, delete node $var )]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-025">
+      <description>Swap the names of two attribute nodes.</description>
+      <created by="Michael Kay" on="2009-01-29"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-025"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( rename node $var/@name as "gender", rename node $var/@gender as "name" )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee gender="Jane Doe 1" name="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-026">
+      <description>Rename one attribute node, replace another.</description>
+      <created by="Michael Kay" on="2009-01-29"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test applyUpdates-026"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ( rename node $var/@name as "gender", replace node $var/@gender with <e name="Sylvia"/>/@* )]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee gender="Jane Doe 1" name="Sylvia">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+</test-set>

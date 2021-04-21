@@ -1,0 +1,720 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-RevalidationDeclarationSkip">
+   <description>XQuery Update - Revalidation Declaration = skip</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="revalidation-declaration-005">
+      <description>One declare validation specifying skip</description>
+      <created by="Andrew Eisenberg" on="2008-10-16"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidation-declaration-05"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare revalidation skip; declare variable $input-context external; 12]]></test>
+      <result>
+         <assert-string-value>12</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="revalidation-declaration-006">
+      <description>Two declare validation specifying skip</description>
+      <created by="Andrew Eisenberg" on="2008-10-16"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidation-declaration-06"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare revalidation skip; declare revalidation skip; declare variable $input-context external; 12]]></test>
+      <result>
+         <error code="XUST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-001">
+      <description>insert before removes type from ancestors</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-001"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node <AUTHOR>Jasper Fforde</AUTHOR> before ($books//AUTHOR)[1]]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[1] instance of element(AUTHOR, xs:untyped)}</d> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[2] instance of element(AUTHOR, xs:string)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><d>true</d><d>true</d><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-002">
+      <description>insert after removes type from ancestors</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-002"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node <AUTHOR>Jasper Fforde</AUTHOR> after ($books//AUTHOR)[1]]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[2] instance of element(AUTHOR, xs:untyped)}</d> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[1] instance of element(AUTHOR, xs:string)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><d>true</d><d>true</d><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-003">
+      <description>insert into (of text node) removes type from ancestors</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-003"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node "abc" into ($books//AUTHOR)[1]]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[1] instance of element(AUTHOR, xs:string)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><d>false</d><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-004">
+      <description>insert as first into (of element node) removes type from
+                  ancestors</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-004"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node <by/> as first into ($books//AUTHOR)[1]]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[1] instance of element(AUTHOR, xs:untyped)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><d>false</d><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-005">
+      <description>insert as last into (of comment node) doesn't remove type from
+                  ancestors</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-005"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node <!-- yes, really --> as last into ($books//AUTHOR)[1]]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[1] instance of element(AUTHOR, xs:string)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>true</a><b>true</b><c>true</c><d>true</d><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-006">
+      <description>insert attributes removes type from ancestors</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-006"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node attribute famous {"yes"} into ($books//AUTHOR)[1]]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[1] instance of element(AUTHOR, xs:string)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><d>false</d><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-007">
+      <description>Description: with no validation, adding xsi:nil is not an
+                  error</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-007"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node attribute xsi:nil {"true"} into ($books//AUTHOR)[1]]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[1] instance of element(AUTHOR, xs:string)}</d> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[1]/@xsi:nil instance of attribute(*, xs:untypedAtomic)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><d>false</d><d>true</d><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-008">
+      <description>Description: with no validation, adding xml:id has is-ID property but
+                  not xs:ID type</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-008"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node attribute ids {count($books/id('jff001'))} into $books/BOOKLIST, insert node attribute xml:id {"unique"} into ($books//AUTHOR)[1]]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[1] instance of element(AUTHOR, xs:string)}</d> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[1]/@xml:id instance of attribute(*, xs:ID)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> <id>{$books//id("unique")/@xml:id}</id> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><d>false</d><d>false</d><e>true</e><f>true</f><id xml:id="unique"/></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-009">
+      <description>Description: with no validation, but construction mode preserve,
+                  inserted elements retain their type</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-009"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction preserve; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node $books//ITEM[1] as last into $books//BOOKS]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[1] instance of element(AUTHOR, xs:string)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[last()] instance of schema-element(ITEM)}</f> <g>{$books/BOOKLIST/BOOKS/ITEM[last()]/AUTHOR[1] instance of element(AUTHOR, xs:string)}</g> <h>{$books/BOOKLIST/BOOKS/ITEM[last()]/PRICE instance of element(*, xs:decimal)}</h> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>true</c><d>true</d><e>true</e><f>true</f><g>true</g><h>true</h></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-010">
+      <description>Description: with no validation, but construction mode strip, inserted
+                  elements lose their type</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-010"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node $books//ITEM[1] as last into $books//BOOKS]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR[1] instance of element(AUTHOR, xs:string)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[last()] instance of schema-element(ITEM)}</f> <g>{$books/BOOKLIST/BOOKS/ITEM[last()]/AUTHOR[1] instance of element(AUTHOR, xs:string)}</g> <h>{$books/BOOKLIST/BOOKS/ITEM[last()]/PRICE instance of element(*, xs:decimal)}</h> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>true</c><d>true</d><e>true</e><f>false</f><g>false</g><h>false</h></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-011">
+      <description>Description: with no validation, but construction mode preserve,
+                  inserted attributes retain their type</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-011"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction preserve; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node $books//ITEM[1]/DIMENSIONS/@UNIT into $books//ITEM[1]/PRICE]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE/@UNIT instance of attribute(*, lengthUnitType)}</e> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><d>false</d><e>true</e></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-012">
+      <description>Description: with no validation, but construction mode strip, inserted
+                  attributes lose their type</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-012"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node $books//ITEM[1]/DIMENSIONS/@UNIT into $books//ITEM[1]/PRICE]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE/@UNIT instance of attribute(*, lengthUnitType)}</e> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><d>false</d><e>false</e></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-013">
+      <description>Description: with no validation, but construction mode preserve, adding
+                  an IDREF attribute affects result of idref()</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-013"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction preserve; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node attribute iii {count($books/idref('P'))} into $books/BOOKLIST, insert node $books//ITEM[1]/@CAT into $books//ITEM[1]/PRICE]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <idrefs>{$books/idref('MMP')/parent::PRICE}</idrefs> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><idrefs><PRICE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CAT="MMP">4.95</PRICE></idrefs><a>false</a><b>false</b><c>false</c></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ins-014">
+      <description>Description: with no validation, but construction mode preserve, adding
+                  an IDREF attribute affects result of idref()</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ins-014"/>
+      <environment>
+         <source role="$users"
+                 file="TestSources/users.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction preserve; declare revalidation skip; declare variable $users as document-node(element(users, xs:untyped)) external; insert node <zzz/> into $users/users/user_tuple[1]/name]]></test>
+      <test><![CDATA[declare revalidation skip; declare variable $users as document-node(element(users)) external; <out> <a>{$users/users instance of element(*, xs:untyped)}</a> <b>{$users/users/user_tuple[1] instance of element(*, xs:untyped)}</b> <c>{$users/users/user_tuple[1]/name instance of element(*, xs:untyped)}</c> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out><a>true</a><b>true</b><c>true</c></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-del-001">
+      <description>Description: deleting an element removes type from
+                  ancestors</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-del-001"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; delete node ($books//AUTHOR)[1]]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-del-002">
+      <description>Description: deleting an attribute removes type from
+                  ancestors</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-del-002"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; delete node ($books//@UNIT)]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><e>true</e></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-del-003">
+      <description>Description: deleting an xml:id attribute affects result of
+                  id()</description>
+      <created by="Saxonica" on="2008-01-03"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-del-003"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node attribute ids {count($books/id('jff001'))} into $books/BOOKLIST, delete node ($books//@xml:id)]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <jff>{$books/id('jff001')}</jff> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><jff/></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-del-004">
+      <description>Description: deleting a text node removes type from
+                  ancestors</description>
+      <created by="Saxonica" on="2008-01-28"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-del-004"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; delete node ($books//AUTHOR)[1]/text()]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <b>{($books/BOOKLIST/BOOKS//AUTHOR)[1] instance of element(AUTHOR, xs:string)}</b> <b>{($books/BOOKLIST/BOOKS//AUTHOR)[1]/data(.) instance of xs:untypedAtomic}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><b>false</b><b>true</b><c>false</c><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-del-005">
+      <description>Description: deleting a comment node does not remove type from
+                  ancestors</description>
+      <created by="Saxonica" on="2008-01-28"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-del-005"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; delete nodes $books//comment()]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>true</a><b>true</b><c>true</c><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ren-001">
+      <description>Description: Renaming an element removes type from self and
+                  ancestors</description>
+      <created by="Saxonica" on="2008-01-28"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ren-001"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; rename node ($books//AUTHOR)[1] as "WRITER"]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <b>{$books//WRITER instance of element(*, xs:untypedAtomic)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><b>false</b><c>false</c><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ren-002">
+      <description>Description: Renaming an attribute removes type from
+                  ancestors</description>
+      <created by="Saxonica" on="2008-01-28"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ren-002"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; for $n in $books//@UNIT return rename node $n as "units"]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{every $a in $books//DIMENSIONS/@* satisfies ($a instance of attribute(*, xs:untypedAtomic))}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ren-003">
+      <description>Description: Renaming an xml:id attribute affects result of
+                  id()</description>
+      <created by="Saxonica" on="2008-01-28"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ren-003"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node attribute ids {count($books/id('jff001'))} into $books/BOOKLIST, for $a in $books//@xml:id return rename node $a as "ex-id"]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <jff>{$books/id('jff001')}</jff> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><jff/></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ren-004">
+      <description>Description: Renaming a text node is an error</description>
+      <created by="Saxonica" on="2008-01-28"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ren-004"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; rename node ($books//AUTHOR)[1]/text() as "text"]]></test>
+      <result>
+         <error code="XUTY0012"/>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ren-005">
+      <description>Description: Renaming a PI node does not remove type from
+                  ancestors</description>
+      <created by="Saxonica" on="2008-01-28"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ren-005"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; for $p in $books//processing-instruction(pi) return rename node $p as "theta"]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>true</a><b>true</b><c>true</c><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-ren-006">
+      <description>Description: two updates create conflicting namespace bindings, not
+                  detected until upd:rename() is executed, at which point it causes
+                  XUDY0024
+valskip-ren-006 - two updates create conflicting namespace bindings, not detected until upd:insert is executed, at which point it causes XUDY0024</description>
+      <created by="Saxonica" on="2008-04-07"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-ren-006"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[(: valskip-ren-006 - two updates create conflicting namespace bindings, not detected until upd:insert is executed, at which point it causes XUDY0024 :) declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; let $a := <ns1:a xmlns:ns1="http://ns1"><b/></ns1:a> return ( rename node $a as node-name(<ns2:a xmlns:ns2="http://ns2"/>), insert node <a xmlns:ns2="http://ns3" ns2:b="b"/>/@*:b after $a/b )]]></test>
+      <result>
+         <error code="XUDY0024"/>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-repnode-001">
+      <description>replace node on an element node removes type from
+                  ancestors</description>
+      <created by="Saxonica" on="2008-01-28"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-repnode-001"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; replace node ($books//AUTHOR)[1] with <WRITER>Jasper Fforde</WRITER>]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/WRITER instance of element(WRITER, xs:untyped)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><d>true</d><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-repnode-002">
+      <description>replace node on an attribute node removes type from
+                  ancestors</description>
+      <created by="Saxonica" on="2008-01-28"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-repnode-002"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; replace node ($books//@UNIT)[1] with attribute {"units"} {"furlongs"}]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/DIMENSIONS instance of element(DIMENSIONS, dimensionsType)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/DIMENSIONS/@units instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><d>false</d><e>false</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-repnode-003">
+      <description>replace node on an attribute node retains type of new attribute with
+                  construction=preserve</description>
+      <created by="Saxonica" on="2008-01-28"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-repnode-003"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction preserve; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; let $d := validate strict {<DIMENSIONS UNIT="cm">12.3 1.0 2.0</DIMENSIONS>} return replace node ($books//@UNIT)[1] with $d/@UNIT]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/DIMENSIONS instance of element(DIMENSIONS, dimensionsType)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[1]/DIMENSIONS/@UNIT instance of attribute(*, lengthUnitType)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[2] instance of schema-element(ITEM)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>false</a><b>false</b><c>false</c><d>false</d><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-repnode-004">
+      <description>replace node on an ID attribute with construction=strip drops the
+                  ID</description>
+      <created by="Saxonica" on="2008-01-28"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-repnode-004"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; let $old := id("P", $books)/@CODE return replace node ($books//CATEGORY)[1]/@CODE with attribute {"CODE"}{concat($old, "2")}]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out>{id("P", $books), id("P2", $books)}</out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-repnode-005">
+      <description>replace node on an ID attribute with construction=preserve drops the old
+                  ID and enables the new</description>
+      <created by="Saxonica" on="2008-01-28"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-repnode-005"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction preserve; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; let $old := id("P", $books)/@CODE let $p2 := validate strict {<CATEGORY CODE="{$old}2" DESC=""/>} return replace node ($books//CATEGORY)[1]/@CODE with $p2/@CODE]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out><old>{id("P", $books)}</old><new>{id("P2", $books)}</new></out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><old/><new><CATEGORY xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" DESC="Paperback" CODE="P2"/></new></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="removeType-valskip-repnode-006">
+      <description>replace node on an IDREF attribute with construction=strip drops the old
+                  ID</description>
+      <created by="Saxonica" on="2008-01-28"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test removeType-valskip-repnode-006"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; let $old := count(idref("P", $books)) let $pref := validate strict {<DUMMYREF CATREF="P"/>} return (replace node ($books//ITEM)[2]/@CAT with $pref/@CATREF, insert node comment{ $old } as first into $books)]]></test>
+      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out><old>{$books/comment()}</old><new>{count(idref("P", $books))}</new></out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><old><!--4--></old><new>3</new></out>]]></assert-xml>
+      </result>
+   </test-case>
+</test-set>

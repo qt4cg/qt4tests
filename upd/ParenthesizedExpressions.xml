@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-ParenthesizedExpressions">
+   <description>XQuery Update - Parenthesized Expression</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="parenthesized-expr-001">
+      <description>Parenthesized simple expression.</description>
+      <created by="Andrew Eisenberg" on="2008-10-25"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test parenthesized-expr-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; for $var in ( for $var in $input-context/works[1]/employee[1]/hours[1] return $var ) return $var]]></test>
+      <result>
+         <assert-xml><![CDATA[<hours>40</hours>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="parenthesized-expr-002">
+      <description>Parenthesized updating expression.</description>
+      <created by="Andrew Eisenberg" on="2008-10-25"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test parenthesized-expr-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; for $var in ( for $var in $input-context/works[1]/employee[1]/hours[1] return delete node $var ) return $var]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="parenthesized-expr-003">
+      <description>Parenthesized vacuous expression.</description>
+      <created by="Andrew Eisenberg" on="2008-10-25"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test parenthesized-expr-03"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; for $var in ( for $var in $input-context/works[1]/employee[1]/hours[1] return () ) return $var]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+</test-set>

@@ -1,0 +1,856 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-CommaExpression">
+   <description>XQuery Update - Comma Expressions</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="id-comma-expr-001">
+      <description>Evaluates an insert expression used with comma expression where a both
+                  expressions are updating expressions.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var :=$input-context/works[1]/employee[1] return (insert node <hours>20</hours> as last into $var, insert node <hours>25</hours> as last into $var)]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  <hours>20</hours><hours>25</hours></employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-002">
+      <description>Evaluates an insert expression used with comma expression where first
+                  expression is an updating expression and second one is ().</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return (insert node <hours>20</hours> as last into $var, ())]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  <hours>20</hours></employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-003">
+      <description>Evaluates an insert expression used with comma expression where first
+                  expression is () and second expression is an updating expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-03"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var :=$input-context/works[1]/employee[1] return ((),insert node <hours>20</hours> as last into $var)]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  <hours>20</hours></employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-004">
+      <description>Evaluates an insert expression used with comma expression where first
+                  expression is an updating expression and second one is call to
+                  fn:error().</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-04"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[3] return (insert node <hours>20</hours> as last into $var, fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')))]]></test>
+      <test update="true"><![CDATA[ ./works[1]/employee[3]]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-005">
+      <description>Evaluates an insert expression used with comma expression where first
+                  expression is a call to fn:error() and second expression is an updating
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-05"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[3] return (fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')),insert node <hours>20</hours> as last into $var)]]></test>
+      <test update="true"><![CDATA[ ./works[1]/employee[3]]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-006">
+      <description>Evaluates an insert expression used with comma expression where first
+                  expression is an updating expression and second one a mathematical
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-06"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return (insert node <salary>20600</salary> into $var, (6 idiv 2) + 1)]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-007">
+      <description>Evaluates an insert expression used with comma expression where first
+                  expression is mathematical expression and second one is an updating
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-07"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return ((6 idiv 2) + 1,insert node <salary>20</salary> into $var)]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-008">
+      <description>Evaluation a delete expression used with comma expression where both
+                  expressions are updating expressions.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-08"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return (delete node $var/hours[1], delete node $var/hours[2])]]></test>
+      <test><![CDATA[ ./works[1]/employee[2]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   
+   Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-009">
+      <description>Evaluation of a delete expression used with comma expression where first
+                  expression is an updating expression and the secon one is ().</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-09"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return (delete node $var/hours[1], ())]]></test>
+      <test><![CDATA[ ./works[1]/employee[2]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   
+   <hours>20</hours>Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-010">
+      <description>Evaluation of a delete expression used with comma expression where first
+                  expression is () and second expression is an updating expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-010"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return ((), delete node $var/hours[1])]]></test>
+      <test><![CDATA[ ./works[1]/employee[2]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   
+   <hours>20</hours>Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-011">
+      <description>Evaluation of a delete expression used with comma expression where first
+                  expression is an updating expression and the second one a call to
+                  fn:error().</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-011"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return (delete node $var/hours[1], fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')))]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-012">
+      <description>Evaluation of a delete expression used with comma expression where
+                  second expression is an updating expression and the first one a call to
+                  fn:error().</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-012"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return (fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')),delete node $var/hours[1])]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-013">
+      <description>Evaluation of a delete expression used with comma expression where first
+                  expression is an updating expression and the second one is a mathematical
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-013"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[2] return (delete node $var/salary[1], (6 idiv 2) + 1)]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-014">
+      <description>Evaluation of a delete expression used with comma expression where first
+                  expression is a mathematical expression and the second one is an updating
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-014"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[2] return ((6 idiv 2) + 1, delete node $var/salary[1])]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-015">
+      <description>Evaluation of a replace expression used with comma expression where both
+                  expressions are updating (replace) expressions.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-015"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var1 := $input-context/works[1]/employee[1] let $var2 := $input-context/works[1]/employee[2] return (replace value of node $var1/hours[1] with $var2/hours[1], replace value of node $var2/hours[2] with $var1/hours[1])]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]/hours,./works[1]/employee[2]/hours]]></test>
+      <result>
+         <assert-xml><![CDATA[<hours>70</hours><hours>70</hours><hours>40</hours>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-016">
+      <description>Evaluation of a replace expression used with comma expression where
+                  first expression is an updating (replace) expression and the second one is
+                  ().</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-016"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return (replace value of node $var/hours[1] with $var/hours[2], ())]]></test>
+      <test><![CDATA[ ./works[1]/employee[2]/hours[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<hours>20</hours>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-017">
+      <description>Evaluation of a replace expression used with comma expression where
+                  first expression is the empty sequence and the second one is an updating (replace)
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-017"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return ((), replace value of node $var/hours[1] with $var/hours[2])]]></test>
+      <test><![CDATA[ ./works[1]/employee[2]/hours[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<hours>20</hours>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-018">
+      <description>Evaluation of a replace expression used with comma expression where
+                  first expression is an updating (replace) expression and the second one a call to
+                  fn:error().</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-018"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return replace value of node $var/hours[1] with $var/hours[2], fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000'))]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-019">
+      <description>Evaluation of a replace expression used with comma expression where
+                  first expression is a call to fn:error() and the second one is an updating
+                  (replace) expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-019"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return (fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')),replace value of node $var/hours[1] with $var/hours[2])]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-020">
+      <description>Evaluation of a replace expression used with comma expression where
+                  first expression is an updating (replace) expression and the second one is a
+                  mathematical expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-020"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1] return (replace value of node $var/employee[1]/salary[1] with $var/employee[2]/salary[1], (6 idiv 2) + 1)]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-021">
+      <description>Evaluation of a replace expression used with comma expression where
+                  first expression is a mathematical expression and second one is an updating
+                  (replace) expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-021"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1] return ((6 idiv 2) + 1, replace value of node $var/employee[1]/salary[1] with $var/employee[2]/salary[1])]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-022">
+      <description>Evaluation of rename expression used with comma expression where both
+                  expressions are updating expressions. </description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-022"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return (rename node $var/hours[1] as "hour1", rename node $var/hours[2] as "hour2")]]></test>
+      <test><![CDATA[ ./works[1]/employee[2]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hour1>70</hour1>
+   <hour2>20</hour2>Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-023">
+      <description>Evaluation of a rename expression used with comma expression where first
+                  expression is an updating expression and the second one is ().</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-023"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/hours[1] as "hours1", ()]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours1>40</hours1>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-024">
+      <description>Evaluation of a rename expression used with comma expression where first
+                  expression is () and second expression is an updating expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-024"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ((), rename node $var/hours[1] as "hours1")]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours1>40</hours1>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-025">
+      <description>Evaluation of a rename expression used with comma expression where first
+                  expression is an updating expression and the second one a call to
+                  fn:error().</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-025"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return rename node $var/hours[1] as "hours1" , fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000'))]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-026">
+      <description>Evaluation of a rename expression used with comma expression where first
+                  expression is a call to fn:error() and the second one updating
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-026"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return (fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')),rename node $var/hours[1] as "hours1")]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-027">
+      <description>Evaluation of a rename expression used with comma expression where first
+                  expression is an updating expression and the second one is a mathematical
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-027"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return rename node $var/salary[1] as "salary1", (6 idiv 2) + 1]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-028">
+      <description>Evaluation of a rename expression used with comma expression where first
+                  expression is a mathematical expression and second one is an updating
+                  expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-028"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/employees[1]/employee[1] return ((6 idiv 2) + 1, rename node $var/salary[1] as "salary1")]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-029">
+      <description>Evaluates a transform expression together with a comma expression where
+                  both expressions are non-updating (transform) expressions.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-029"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return (copy $newVar1 := $var modify delete node $newVar1/hours[1] return $newVar1, copy $newVar2 := $var modify delete node $newVar2/hours[2] return $newVar2)]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee gender="male" name="John Doe 2">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   
+   <hours>20</hours>Text data from Employee[2]
+  </employee><employee gender="male" name="John Doe 2">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>70</hours>
+   Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-030">
+      <description>Evaluates a transform expression together with a comma expression where
+                  the first expression is an non-updating (transform) expression. The second one is
+                  the empty sequence.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-030"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[2] return (copy $newVar := $var modify delete node $newVar/hours[1] return $newVar,())]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   
+   <hours>20</hours>Text data from Employee[2]
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-031">
+      <description>Evaluates a transform expression together with a comma expression where
+                  the first expression is the empty sequence and the second one is an non-updating
+                  (transform) expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-031"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return ((), copy $newVar := $var modify delete node $newVar/hours[1] return $newVar)]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-032">
+      <description>Evaluates a transform expression together with a comma expression where
+                  the first expression is an non-updating (transform) expression and the second one
+                  an invokation to "fn:error()".</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-032"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return (copy $newVar := $var modify delete node $newVar/hours[1] return $newVar, fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')))]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-033">
+      <description>Evaluates a transform expression together with a comma expression where
+                  the first expression is an invokation to "fn:error()" and the second one is an
+                  non-updating (transform) expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-01"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-033"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[3] return (fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000')), copy $newVar := $var modify delete node $newVar/hours[1] return $newVar)]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-034">
+      <description>Evaluates a transform expression together with a comma expression where
+                  the first expression is an non-updating (transform) expression and the second one
+                  is a mathematical expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-034"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[
+         declare variable $input-context external; 
+         let $var := $input-context/employees[1]/employee[2] 
+         return (copy $newVar := $var 
+                 modify delete node $newVar/salary[1] 
+                 return $newVar, xs:integer(1) + xs:integer(2))]]></test>
+      <result>
+         <all-of>
+            <assert>$result[1]/self::employee/@dept="Toys"</assert>
+            <assert>$result[1]/self::employee/name="Jones"</assert>
+            <assert>empty($result[1]/self::employee/salary)</assert>
+            <assert>$result[2] = 3</assert>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-035">
+      <description>Evaluates a transform expression together with a comma expression where
+                  the first expression is a mathematical expression and the second one is an
+                  non-updating (transform) expression.</description>
+      <created by="Carmelo Montanez" on="2007-06-04"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-035"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[
+         declare variable $input-context external; 
+         let $var := $input-context/employees[1]/employee[3] 
+         return (xs:integer(1) + xs:integer(2), 
+            copy $newVar := $var 
+            modify delete node $newVar/salary[1] 
+            return $newVar)]]></test>
+      <result>
+         <all-of>
+            <assert>$result[2]/self::employee/@dept="Shoes"</assert>
+            <assert>$result[2]/self::employee/name="Roberts"</assert>
+            <assert>empty($result[2]/self::employee/salary)</assert>
+            <assert>$result[1] = 3</assert>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-036">
+      <description>Updating comma expression in a conditional expression.</description>
+      <created by="Andrew Eisenberg" on="2008-10-26"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-036"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return if ($var/hours = 41) then ( replace value of node $var/hours with 41, replace value of node $var/hours with 42 ) else replace value of node $var/hours with 43]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>43</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-037">
+      <description>Vacuous comma expression in a conditional expression.</description>
+      <created by="Andrew Eisenberg" on="2008-10-26"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-037"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return if ($var/hours = 41) then ( (), () ) else replace value of node $var/hours with 43]]></test>
+      <test><![CDATA[ ./works[1]/employee[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>43</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-comma-expr-038">
+      <description>Simple comma expression in a conditional expression.</description>
+      <created by="Andrew Eisenberg" on="2008-10-26"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test id-comma-expr-038"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/works-mod.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare variable $input-context external; let $var := $input-context/works[1]/employee[1] return if ($var/hours eq 41) then ( "Test", 123 ) else replace value of node $var/hours with 43]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+</test-set>

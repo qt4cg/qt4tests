@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-RevalidationDeclarationStrict">
+   <description>XQuery Update - Revalidation Declaration = strict</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <test-case name="revalidation-declaration-001">
+      <description>One declare validation specifying strict</description>
+      <created by="Andrew Eisenberg" on="2008-10-16"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidation-declaration-01"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test><![CDATA[declare revalidation strict; declare variable $input-context external; 12]]></test>
+      <result>
+         <assert-string-value>12</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="revalidation-declaration-002">
+      <description>Two declare validation specifying strict</description>
+      <created by="Andrew Eisenberg" on="2008-10-16"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidation-declaration-02"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/emptydoc.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <test update="true"><![CDATA[declare revalidation strict; declare revalidation strict; declare variable $input-context external; 12]]></test>
+      <result>
+         <error code="XUST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-del-001">
+      <description>deleting a mandatory element causes validation failure</description>
+      <created by="Saxonica" on="2008-02-14"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-del-001"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; delete node ($books//AUTHOR)[1]]]></test>
+      <result>
+         <error code="XQDY0027"/>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-del-002">
+      <description>deleting an optional element is fine</description>
+      <created by="Saxonica" on="2008-02-14"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-del-002"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; delete node ($books//PRICE)[1]]]></test>
+      <test><![CDATA[declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[2]/PRICE instance of element(*, xs:decimal)}</e> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>true</a><b>true</b><c>true</c><d>false</d><e>true</e></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-del-003">
+      <description>deleting a mandatory attribute causes validation failure</description>
+      <created by="Saxonica" on="2008-02-14"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-del-003"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; delete node ($books//ITEM[1]/@CAT)[1]]]></test>
+      <result>
+         <error code="XQDY0027"/>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-del-004">
+      <description>deleting an optional attribute is fine</description>
+      <created by="Saxonica" on="2008-02-14"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-del-004"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; delete node ($books//ITEM/@TAX)[1]]]></test>
+      <test><![CDATA[declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[2]/PRICE instance of element(*, xs:decimal)}</e> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>true</a><b>true</b><c>true</c><d>true</d><e>true</e></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-ins-001">
+      <description>inserting a disallowed element causes validation failure</description>
+      <created by="Saxonica" on="2008-03-26"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-ins-001"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node <garbage>rubbish</garbage> as first into ($books/BOOKLIST/BOOKS/ITEM)[1]]]></test>
+      <result>
+         <error code="XQDY0027"/>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-ins-002">
+      <description>inserting an element that exceeds maxOccurs causes validation
+                  failure</description>
+      <created by="Saxonica" on="2008-03-26"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-ins-002"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node <TITLE xmlns="http://ns.example.com/books">rubbish</TITLE> as first into ($books/BOOKLIST/BOOKS/ITEM)[1]]]></test>
+      <result>
+         <error code="XQDY0027"/>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-ins-003">
+      <description>Adding a second author to a book is fine (especially if it's Thursday
+                  Next...)</description>
+      <created by="Saxonica" on="2008-03-25"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-ins-003"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node <AUTHOR xmlns="http://ns.example.com/books">Thursday Next</AUTHOR> after ($books/BOOKLIST/BOOKS/ITEM/AUTHOR)[1]]]></test>
+      <test><![CDATA[declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[2]/PRICE instance of element(*, xs:decimal)}</e> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>true</a><b>true</b><c>true</c><d>true</d><e>true</e></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-ins-004">
+      <description>inserting a disallowed attribute causes validation failure</description>
+      <created by="Saxonica" on="2008-03-26"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-ins-004"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node <garbage trash="waste">rubbish</garbage>/@* as first into ($books/BOOKLIST/BOOKS/ITEM)[1]]]></test>
+      <result>
+         <error code="XQDY0027"/>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-ins-005">
+      <description>Adding an xml:id to a book is fine </description>
+      <created by="Saxonica" on="2008-03-25"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-ins-005"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node <garbage xml:id="waste">rubbish</garbage>/@* as first into ($books/BOOKLIST/BOOKS/ITEM)[1]]]></test>
+      <test><![CDATA[declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[2]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[1]/@xml:id instance of attribute(*, xs:ID)}</f> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>true</a><b>true</b><c>true</c><d>true</d><e>true</e><f>true</f></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-ins-006">
+      <description>Adding an xml:id to a book is an error if the ID isn't
+                  unique</description>
+      <created by="Saxonica" on="2008-03-26"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-ins-006"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node <garbage xml:id="jff001">rubbish</garbage>/@* as first into ($books/BOOKLIST/BOOKS/ITEM)[1]]]></test>
+      <result>
+         <error code="XQDY0027"/>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-ins-007">
+      <description>Adding a duplicate xml:id to a book is fine if we change the ID that it
+                  conflicts with</description>
+      <created by="Saxonica" on="2008-03-25"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-ins-007"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node <garbage xml:id="jff001">rubbish</garbage>/@* as first into ($books/BOOKLIST/BOOKS/ITEM)[1], replace value of node id('jff001', $books)/@xml:id with "jff002"]]></test>
+      <test><![CDATA[declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</d> <e>{$books/BOOKLIST/BOOKS/ITEM[2]/PRICE instance of element(*, xs:decimal)}</e> <f>{$books/BOOKLIST/BOOKS/ITEM[1]/@xml:id instance of attribute(*, xs:ID)}</f> <g>{$books/BOOKLIST/BOOKS/ITEM[6]/@xml:id instance of attribute(*, xs:ID)}</g> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>true</a><b>true</b><c>true</c><d>true</d><e>true</e><f>true</f><g>true</g></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-ren-001">
+      <description>renaming an element is bad news if the new name is not
+                  allowed</description>
+      <created by="Saxonica" on="2008-03-27"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-ren-001"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; rename node ($books//AUTHOR)[1] as "WRITER"]]></test>
+      <result>
+         <error code="XQDY0027"/>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-ren-002">
+      <description>renaming an attribute is bad news if the new name is not
+                  allowed</description>
+      <created by="Saxonica" on="2008-03-27"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-ren-002"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; rename node ($books//ITEM)[1]/@CAT as "cat"]]></test>
+      <result>
+         <error code="XQDY0027"/>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-ren-003">
+      <description>renaming an element is OK if the new name is in the substitution
+                  group</description>
+      <created by="Saxonica" on="2008-03-27"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-ren-003"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; for $e in $books//ITEM return rename node $e as "SUBITEM"]]></test>
+      <test><![CDATA[declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out count="{count($books/BOOKLIST/BOOKS/SUBITEM)}" name="{local-name($books/BOOKLIST/BOOKS/*[1])}" uri="{namespace-uri($books/BOOKLIST/BOOKS/*[1])}"> <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/SUBITEM[1] instance of schema-element(ITEM)}</c> <d>{$books/BOOKLIST/BOOKS/SUBITEM[1]/PRICE instance of element(*, xs:decimal)}</d> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books" count="6" name="SUBITEM" uri="http://ns.example.com/books"><a>true</a><b>true</b><c>true</c><d>true</d></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-repnode-001">
+      <description>replace element fails if the new node is invalid</description>
+      <created by="Saxonica" on="2008-03-27"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-repnode-001"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; replace node ($books//AUTHOR)[1] with <WRITER>Jasper Fforde</WRITER>]]></test>
+      <result>
+         <error code="XQDY0027"/>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-repnode-002">
+      <description>replace attribute fails if the new node is invalid</description>
+      <created by="Saxonica" on="2008-03-27"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-repnode-002"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; replace node ($books//ITEM)[1]/@CAT with <A cat="mmc"/>/@cat]]></test>
+      <result>
+         <error code="XQDY0027"/>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valstrict-repnode-003">
+      <description>replacing an element is OK if the new node is valid</description>
+      <created by="Saxonica" on="2008-03-27"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valstrict-repnode-003"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; replace node ($books//AUTHOR)[1] with <AUTHOR>Thursday Next</AUTHOR>]]></test>
+      <test><![CDATA[declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out > <a>{$books/BOOKLIST instance of schema-element(BOOKLIST)}</a> <b>{$books/BOOKLIST/BOOKS instance of schema-element(BOOKS)}</b> <c>{$books/BOOKLIST/BOOKS/ITEM[1]/AUTHOR instance of element(AUTHOR, xs:string)}</c> <d>{$books/BOOKLIST/BOOKS/ITEM[1]/PRICE instance of element(*, xs:decimal)}</d> </out>]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><a>true</a><b>true</b><c>true</c><d>true</d></out>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valtrans-ins-001">
+      <description>inserting a disallowed element causes validation failure</description>
+      <created by="Saxonica" on="2008-03-27"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valtrans-ins-001"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test update="true"><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; let $book1 := ($books/BOOKLIST/BOOKS/ITEM)[1] return copy $book1copy := $book1 modify insert node <garbage>rubbish</garbage> as first into $book1copy return $book1copy]]></test>
+      <result>
+         <error code="XQDY0027"/>
+      </result>
+   </test-case>
+
+   <test-case name="revalidate-valtrans-ins-002">
+      <description>inserting an element is OK if the new node is valid</description>
+      <created by="Saxonica" on="2008-03-27"/>
+      <modified by="Michael Kay"
+                on="2021-04-18"
+                change="converted from original XQUTS test revalidate-valtrans-ins-002"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="strict"/>
+         <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
+      </environment>
+      <test><![CDATA[declare construction strip; declare revalidation strict; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; let $book1 := ($books/BOOKLIST/BOOKS/ITEM)[1] return copy $book1copy := $book1 modify insert node <AUTHOR xmlns="http://ns.example.com/books">Thursday Next</AUTHOR> after ($book1copy/AUTHOR)[1] return $book1copy]]></test>
+      <result>
+         <assert-xml><![CDATA[<ITEM xmlns="http://ns.example.com/books" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CAT="MMP" TAX="V"><!-- the first book --><?pi data?><TITLE>Pride and Prejudice</TITLE><AUTHOR>Jane Austen</AUTHOR><AUTHOR>Thursday Next</AUTHOR><PUBLISHER>Modern Library</PUBLISHER><PUB-DATE>2002-12-31</PUB-DATE><LANGUAGE>English</LANGUAGE><PRICE>4.95</PRICE><QUANTITY>187</QUANTITY><ISBN>0679601686</ISBN><PAGES>352</PAGES><DIMENSIONS UNIT="in">8.3 5.7 1.1</DIMENSIONS><WEIGHT UNIT="oz">6.1</WEIGHT></ITEM>]]></assert-xml>
+      </result>
+   </test-case>
+</test-set>
