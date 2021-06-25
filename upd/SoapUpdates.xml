@@ -8,12 +8,23 @@
 
    <test-case name="soap-q1">
       <description>Soap Use case # 1
-A clarification is needed only if there are no : airports or more than one for a given city. If : there is precisely one, there is no need to : ask for information on that city.
-Make sure that each airport is unambiguous. If there is : more than one airport for a city, ask for clarification. : : The primer only shows the error condition, so it is not : clear what to do if there are no errors. Here, we simply : return the airports in the itinerary.</description>
+        The primer only shows the error condition, so it is not clear what to do if there are no errors. 
+        Here, we simply return the airports in the itinerary.
+      </description>
       <created by="Update Task Force" on="2006-08-05"/>
       <modified by="Michael Kay"
                 on="2021-04-18"
                 change="converted from original XQUTS test soap-q1"/>
+      <modified by="Michael Kay"
+                on="2021-04-21"
+                change="Avoid use of assert-xml because of irrelevant namespace complications."/>
+      <!--
+         The complications arise because in an XQuery element constructor <env:A><p:departures/></env:A>,
+         the element constructed by p:departures does not inherit the 'env' namespace, regardless of
+         inheritance mode. It therefore produces a different XDM tree from the XML document
+         <env:A><p:departures/></env:A>. The difference is not pertinent to this test, so we
+         side-step it.
+      -->   
       <environment>
          <source role="$airportsDoc"
                  file="TestSources/airports.xml"
@@ -24,21 +35,100 @@ Make sure that each airport is unambiguous. If there is : more than one airport 
                  mutable="true"
                  declared="true"/>
       </environment>
-      <test><![CDATA[declare namespace env="http://www.w3.org/2003/05/soap-envelope"; declare namespace m="http://travelcompany.example.org/reservation"; declare namespace n="http://mycompany.example.com/employees"; declare namespace p="http://travelcompany.example.org/reservation/travel"; declare variable $airportsDoc external; declare variable $msg external; declare variable $airports := $airportsDoc/AIRPORTS/AIRPORT; (: A clarification is needed only if there are no : airports or more than one for a given city. If : there is precisely one, there is no need to : ask for information on that city. :) declare function local:airportChoices($city as xs:string) { let $airports := $airports[CITY = $city] return if (count($airports) = 0) then <error> No airports found for {$city}!</error> else if (count($airports) > 1) then <airportChoices> { for $c in $airports/CODE return (string( $c ), " ") } </airportChoices> else () }; (: Make sure that each airport is unambiguous. If there is : more than one airport for a city, ask for clarification. : : The primer only shows the error condition, so it is not : clear what to do if there are no errors. Here, we simply : return the airports in the itinerary. :) declare function local:airports($in as element(env:Envelope)) { let $departureDeparting := $in//p:departure/p:departing let $departureDepartingAirports := $airports[CITY = $departureDeparting] let $departureArriving := $in//p:departure/p:arriving let $departureArrivingAirports := $airports[CITY = $departureArriving] let $returnDeparting := $in//p:return/p:departing let $returnDepartingAirports := $airports[CITY = $returnDeparting] let $returnArriving := $in//p:return/p:arriving let $returnArrivingAirports := $airports[CITY = $returnArriving] return if ( count($departureDepartingAirports)=0 or count($departureDepartingAirports)>1 or count($departureArrivingAirports)=0 or count($departureArrivingAirports)>1 or count($returnDepartingAirports)=0 or count($returnDepartingAirports)>1 or count($returnArrivingAirports)=0 or count($returnArrivingAirports)>1 ) then <p:itineraryClarification> <p:departure> <p:departing> { local:airportChoices($departureDeparting) } </p:departing> <p:arriving> { local:airportChoices($departureArriving) } </p:arriving> </p:departure> <p:return> <p:departing> { local:airportChoices($returnDeparting) } </p:departing> <p:arriving> { local:airportChoices($returnArriving) } </p:arriving> </p:return> </p:itineraryClarification> else <p:itinerary> <p:departure> <p:departing>{$departureDeparting}</p:departing> <p:arriving>{$departureArriving}</p:arriving> </p:departure> <p:return> <p:departing>{$returnDeparting}</p:departing> <p:arriving>{$returnArriving}</p:arriving> </p:return> </p:itinerary> }; copy $out := $msg/env:Envelope modify ( replace value of node $out//m:dateAndTime with xs:dateTime("2007-08-16T22:57:20+01:00"), replace node $out//env:Body with <env:Body> { local:airports($out) } </env:Body> ) return $out]]></test>
+      <test><![CDATA[
+         declare namespace env="http://www.w3.org/2003/05/soap-envelope"; 
+         declare namespace m="http://travelcompany.example.org/reservation"; 
+         declare namespace n="http://mycompany.example.com/employees"; 
+         declare namespace p="http://travelcompany.example.org/reservation/travel"; 
+         declare variable $airportsDoc external; 
+         declare variable $msg external; 
+         declare variable $airports := $airportsDoc/AIRPORTS/AIRPORT; 
+         (: A clarification is needed only if there are no 
+          : airports or more than one for a given city. 
+          : If there is precisely one, there is no need to 
+          : ask for information on that city. 
+          :) 
+          declare function local:airportChoices($city as xs:string) { 
+            let $airports := $airports[CITY = $city] 
+            return if (count($airports) = 0) 
+                   then <error> No airports found for {$city}!</error> 
+                   else if (count($airports) > 1) 
+                   then <airportChoices> { 
+                      for $c in $airports/CODE return (string( $c ), " ") 
+                   } </airportChoices> 
+                   else () 
+          }; 
+          (: Make sure that each airport is unambiguous. If there is 
+           : more than one airport for a city, ask for clarification. 
+           : 
+           : The primer only shows the error condition, so it is not 
+           : clear what to do if there are no errors. Here, we simply 
+           : return the airports in the itinerary. 
+           :) 
+           declare function local:airports($in as element(env:Envelope)) { 
+             let $departureDeparting := $in//p:departure/p:departing 
+             let $departureDepartingAirports := $airports[CITY = $departureDeparting] 
+             let $departureArriving := $in//p:departure/p:arriving 
+             let $departureArrivingAirports := $airports[CITY = $departureArriving] 
+             let $returnDeparting := $in//p:return/p:departing 
+             let $returnDepartingAirports := $airports[CITY = $returnDeparting] 
+             let $returnArriving := $in//p:return/p:arriving 
+             let $returnArrivingAirports := $airports[CITY = $returnArriving] 
+             return if ( count($departureDepartingAirports)=0 
+                         or count($departureDepartingAirports)>1 
+                         or count($departureArrivingAirports)=0 
+                         or count($departureArrivingAirports)>1 
+                         or count($returnDepartingAirports)=0 
+                         or count($returnDepartingAirports)>1 
+                         or count($returnArrivingAirports)=0 
+                         or count($returnArrivingAirports)>1 ) 
+                    then <p:itineraryClarification> 
+                           <p:departure> 
+                              <p:departing> { 
+                                 local:airportChoices($departureDeparting) 
+                              }</p:departing> 
+                              <p:arriving> { 
+                                 local:airportChoices($departureArriving) 
+                              }</p:arriving> 
+                            </p:departure> 
+                            <p:return> 
+                              <p:departing> { 
+                                 local:airportChoices($returnDeparting) 
+                              }</p:departing> 
+                              <p:arriving> { 
+                                 local:airportChoices($returnArriving) 
+                              }</p:arriving> 
+                            </p:return> 
+                          </p:itineraryClarification> 
+                     else <p:itinerary> 
+                            <p:departure> 
+                               <p:departing>{$departureDeparting}</p:departing> 
+                               <p:arriving>{$departureArriving}</p:arriving> 
+                            </p:departure> 
+                            <p:return> 
+                               <p:departing>{$returnDeparting}</p:departing> 
+                               <p:arriving>{$returnArriving}</p:arriving> 
+                            </p:return> 
+                           </p:itinerary> 
+          }; 
+          copy $out := $msg/env:Envelope 
+          modify ( replace value of node $out//m:dateAndTime 
+                           with xs:dateTime("2007-08-16T22:57:20+01:00"), 
+                   replace node $out//env:Body 
+                           with <env:Body> { local:airports($out) } </env:Body> 
+                 )
+          return $out
+      ]]></test>
       <result>
-         <assert-xml><![CDATA[<env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope"> 
- <env:Header>
-  <m:reservation xmlns:m="http://travelcompany.example.org/reservation" env:mustUnderstand="true" env:role="http://www.w3.org/2003/05/soap-envelope/role/next">
-   <m:reference>uuid:093a2da1-q345-739r-ba5d-pqff98fe8j7d
-   </m:reference>
-   <m:dateAndTime>2007-08-16T22:57:20+01:00</m:dateAndTime>
-  </m:reservation>
-  <n:passenger xmlns:n="http://mycompany.example.com/employees" env:mustUnderstand="true" env:role="http://www.w3.org/2003/05/soap-envelope/role/next">
-   <n:name>Åke Jógvan Øyvind</n:name>
-  </n:passenger>
- </env:Header>
- <env:Body><p:itineraryClarification xmlns:p="http://travelcompany.example.org/reservation/travel"><p:departure><p:departing><airportChoices>JFK   LGA   EWR  </airportChoices></p:departing><p:arriving/></p:departure><p:return><p:departing/><p:arriving><airportChoices>JFK   LGA   EWR  </airportChoices></p:arriving></p:return></p:itineraryClarification></env:Body>
-</env:Envelope>]]></assert-xml>
+         <all-of>
+            <assert>$result/self::Q{http://www.w3.org/2003/05/soap-envelope}Envelope</assert>
+            <assert>$result//*:Header/Q{http://travelcompany.example.org/reservation}reservation</assert>
+            <assert>$result//*:reservation/Q{http://travelcompany.example.org/reservation}dateAndTime</assert>
+            <assert>$result//*:dateAndTime = '2007-08-16T22:57:20+01:00'</assert>
+            <assert>$result//*:passenger/*:name='Åke Jógvan Øyvind'</assert>
+            <assert>$result//*:Body/Q{http://travelcompany.example.org/reservation/travel}itineraryClarification</assert>
+            <assert>$result//*:itineraryClarification/*:departure/*:departing/Q{}airportChoices = 'JFK   LGA   EWR  '</assert>
+         </all-of>
       </result>
    </test-case>
 </test-set>

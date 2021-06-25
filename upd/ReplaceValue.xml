@@ -597,8 +597,7 @@
    </test-case>
 
    <test-case name="complex-replacevalues-q5">
-      <description>Replace value of all text node children of element
-                     "south".</description>
+      <description>Replace value of all text node children of element "south".</description>
       <created by="John Snelson" on="2007-10-23"/>
       <modified by="Michael Kay"
                 on="2021-04-18"
@@ -609,15 +608,23 @@
                  mutable="true"
                  declared="true"/>
       </environment>
-      <test update="true"><![CDATA[declare variable $input-context external; for $a in $input-context//south/text() return replace value of node $a with " south "]]></test>
-      <test update="true"><![CDATA[ .]]></test>
-      <test><![CDATA[ let $a := .//near-south//text() return <result count="{count($a)}">{$a}</result>, let $a := .//near-south[. = " text-5A south south text-5B "] return <result count="{count($a)}">{$a}</result>]]></test>
+      <test update="true"><![CDATA[
+         declare variable $input-context external; 
+         for $a in $input-context//south/text() 
+         return replace value of node $a with " south "]]></test>
+      <test><![CDATA[
+         <out>{
+            let $a := .//near-south//text() 
+            return <result count="{count($a)}">{$a}</result>, 
+            let $a := .//near-south[normalize-space(.) = "text-5A south south text-5B"] 
+            return <result count="{count($a)}">{$a}</result>
+         }</out>   
+      ]]></test>
       <result>
-         <assert-xml><![CDATA[<result count="4"> text-5A
-           south  south  text-5B
-        </result><result count="1"><near-south> text-5A
-          <south mark="s0" south-attr-1="s1" south-attr-2="s2"> south <far-south/> south </south> text-5B
-        </near-south></result>]]></assert-xml>
+         <all-of>
+            <assert>$result/self::out/result[1][@count='4'][normalize-space(.)="text-5A south south text-5B"]</assert>
+            <assert>$result/self::out/result[2][@count='1']</assert>
+         </all-of>
       </result>
    </test-case>
 
