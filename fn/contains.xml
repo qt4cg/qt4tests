@@ -3,6 +3,18 @@
    <description>Tests for the contains() function</description>
    <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/"
          idref="func-contains"/>
+   
+   <environment name="dyn">
+      <param name="zls"
+         select="''"
+         declared="true"/>
+      <param name="empty"
+         select="()"
+         declared="true"/>
+      <param name="zero"
+         select="0"
+         declared="true"/>
+   </environment>
 
    <test-case name="fn-contains2args-1">
       <description> Evaluates The "contains" function with the arguments set as follows: $arg1 = xs:string(lower bound) $arg2 = xs:string(lower bound) </description>
@@ -57,6 +69,17 @@
          <assert-true/>
       </result>
    </test-case>
+   
+   <test-case name="fn-contains-1-dyn">
+      <description> contains, empty string, dynamic </description>
+      <created by="Michael Kay" on="2021-05-15"/>
+      <environment ref="dyn"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>declare variable $zls external; contains($zls, $zls)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
 
    <test-case name="fn-contains-2">
       <description> Evaluates The "contains" function with the arguments set as follows: $arg1 = "" $arg2 = "A Character String" </description>
@@ -84,6 +107,18 @@
          <assert-true/>
       </result>
    </test-case>
+   
+   <test-case name="fn-contains-4-dyn">
+      <description> contains, empty sequence, dynamic </description>
+      <created by="Michael Kay" on="2021-05-15"/>
+      <environment ref="dyn"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>declare variable $empty external; declare variable $zls external; 
+         contains($empty, $zls)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
 
    <test-case name="fn-contains-5">
       <description> Evaluates The "contains" function with the arguments set as follows: $arg1 = "" $arg2 = () </description>
@@ -93,6 +128,19 @@
          <assert-true/>
       </result>
    </test-case>
+   
+   <test-case name="fn-contains-5-dyn">
+      <description> contains, empty sequence, dynamic </description>
+      <created by="Michael Kay" on="2021-05-15"/>
+      <environment ref="dyn"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>declare variable $empty external; declare variable $zls external; 
+         contains($zls, $empty)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
 
    <test-case name="fn-contains-6">
       <description> Evaluates The "contains" function with the arguments set as follows: $arg1 = "A Character String" $arg2 = () </description>
@@ -143,6 +191,18 @@
       <description> Evaluates The "contains" function using it as a argument of a fn:not - returns false </description>
       <created by="Carmelo Montanez" on="2005-05-27"/>
       <test>fn:not(fn:contains("A","A"))</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-contains-11-dyn">
+      <description> contains, equal strings, dynamic </description>
+      <created by="Michael Kay" on="2021-05-15"/>
+      <environment ref="dyn"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>declare variable $zls external; 
+         fn:not(fn:contains("A",$zls||"A"))</test>
       <result>
          <assert-false/>
       </result>
@@ -203,11 +263,37 @@
       </result>
    </test-case>
    
+   <test-case name="fn-contains-17-dyn">
+      <description> contains, UCA collation, dynamic input</description>
+      <created by="Michael Kay" on="2021-05-15"/>
+      <environment ref="dyn"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>declare variable $zls external; 
+         fn:contains($zls || "banana", $zls || "ana", "http://www.w3.org/2013/collation/UCA?lang=en")
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
    <test-case name="fn-contains-18" covers="uca-collation">
       <description> Use contains() with a UCA collation </description>
       <created by="Michael Kay" on="2016-09-23"/>
       <dependency type="spec" value="XP31 XQ31"/>
       <test>fn:contains("banana", "bananas", "http://www.w3.org/2013/collation/UCA?lang=en")</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-contains-18-dyn">
+      <description> contains, UCA collation, dynamic collation</description>
+      <created by="Michael Kay" on="2021-05-15"/>
+      <environment ref="dyn"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>declare variable $zls external; 
+         fn:contains("banana", "bananas", $zls || "http://www.w3.org/2013/collation/UCA?lang=en")
+      </test>
       <result>
          <assert-false/>
       </result>
@@ -460,11 +546,34 @@
          <error code="XPST0017"/>
       </result>
    </test-case>
+   
+   <test-case name="K-ContainsFunc-3-dyn">
+      <description> contains, empty sequences, dynamic </description>
+      <created by="Michael Kay" on="2021-05-15"/>
+      <environment ref="dyn"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>declare variable $empty external; contains($empty, $empty)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
 
    <test-case name="K-ContainsFunc-4">
       <description> A test whose essence is: `contains("a string", "a string", "http://www.example.com/COLLATION/NOT/SUPPORTED")`. </description>
       <created by="Frans Englich" on="2007-11-26"/>
       <test>contains("a string", "a string", "http://www.example.com/COLLATION/NOT/SUPPORTED")</test>
+      <result>
+         <error code="FOCH0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K-ContainsFunc-4-dyn">
+      <description> contains, dynamic collation, unknown collation </description>
+      <created by="Michael Kay" on="2021-05-15"/>
+      <environment ref="dyn"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>declare variable $zls external; 
+         contains("another string", "a string", $zls || "http://www.example.com/COLLATION/NOT/SUPPORTED")</test>
       <result>
          <error code="FOCH0002"/>
       </result>
