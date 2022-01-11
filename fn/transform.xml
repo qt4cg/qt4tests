@@ -2572,6 +2572,26 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
             <assert>deep-equal($result, (1, 4, 9, 16, 25))</assert>
         </result>
     </test-case>
+    
+    <test-case name="fn-transform-401">
+        <description>Invoke an XSLT 4.0 stylesheet</description>
+        <created by="Michael Kay" on="2020-10-20"/>
+        <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[let $xsl  := "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' xmlns:xs='http://www.w3.org/2001/XMLSchema'
+            version='4.0'> 
+            <xsl:template match='.' as='xs:integer'>
+              <xsl:sequence select='() otherwise 10.'/>
+            </xsl:template> 
+        </xsl:stylesheet>" return
+        transform(map{"stylesheet-text":$xsl,
+            "delivery-format" : "raw",
+            "xslt-version" : 4.0,
+            "initial-match-selection": 1 to 5
+            })?output]]></test><result>
+            <assert>deep-equal($result, (10, 10, 10, 10, 10))</assert>
+        </result>
+    </test-case>
 
     <test-case name="fn-transform-err-1">
       <description>Loads a stylesheet from the location render.xsl, but fails to supply a source document</description>
@@ -2743,7 +2763,14 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
 
     <test-case name="fn-transform-err-9">
         <description>Error - transform using xsl:include with relative href, 
-            using option stylesheet-text, but without stylesheet-base-uri
+            using option stylesheet-text, but without stylesheet-base-uri.
+            Note [Michael Kay, 2022-01-11] I'm not convinced this has to be
+            an error. The spec seems to give latitude for the processor
+            to default stylesheet-base-uri, for example to the static base
+            URI of the fn:transform call. SaxonJ 11 defaults it to the
+            current working directory, which results in a failure to
+            resolve the xsl:include, but it might have succeeded if the
+            file actually existed.
         </description>
         <created by="Debbie Lockett" on="2015-03-11"/>
         <dependency type="spec" value="XQ31+"/>
