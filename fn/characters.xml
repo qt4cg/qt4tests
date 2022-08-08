@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-is-NaN">
+  <description>Tests for the fn:characters function (4.0 proposal)</description>
+  <link type="spec" document="http://www.w3.org/TR/xpath-functions-11/" idref="func-is-NaN"/>
+
+  <dependency type="spec" value="XP40+ XQ40+"/>
+
+  <test-case name="characters-001">
+    <description>Empty sequence</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>characters(())</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="characters-002">
+    <description>Empty sequence</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>characters('')</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="characters-003">
+    <description>Simple string</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>characters('UP')</test>
+    <result>
+      <assert-deep-eq>'U', 'P'</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="characters-004">
+    <description>Longer string</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>count(characters(string-join((1 to 10000) ! 'A')))</test>
+    <result>
+      <assert-eq>10000</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="characters-005">
+    <description>Non-ASCII string</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>characters('äöüßÄÖÜẞ')</test>
+    <result>
+      <assert-deep-eq>'ä', 'ö', 'ü', 'ß', 'Ä', 'Ö', 'Ü', 'ẞ'</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="characters-006">
+    <description>Atomized string</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test><![CDATA[ characters(<?_ UP?>) ]]></test>
+    <result>
+      <assert-deep-eq>'U', 'P'</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="characters-007">
+    <description>Atomized string, positional access</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test><![CDATA[ characters(<?_ ABC?>)[2] ]]></test>
+    <result>
+      <assert-string-value>B</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="characters-008">
+    <description>Atomized string, positional access</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test><![CDATA[ characters(<?_ ABC?>)[last()] ]]></test>
+    <result>
+      <assert-string-value>C</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="characters-009">
+    <description>Atomized string, subsequence</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test><![CDATA[ subsequence(characters(<?_ ?>), 3) ]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="characters-010">
+    <description>Non-ASCII string, subsequence</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>subsequence(characters('இ௵'), 2)</test>
+    <result>
+      <assert-string-value>௵</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="characters-011">
+    <description>Compare output with codepoint functions</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test><![CDATA[
+let $string := string-join(
+  (0 to 1000000) ! codepoints-to-string(97 + (. mod 26))
+)
+return deep-equal(
+  characters($string),
+  string-to-codepoints($string) ! codepoints-to-string(.)
+)
+    ]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="characters-901">
+    <description>Wrong argument type</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>characters(1)</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+</test-set>
