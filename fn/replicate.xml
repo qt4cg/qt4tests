@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-replicate">
+  <description>Tests for the fn:replicate function (4.0 proposal)</description>
+  <link type="spec" document="http://www.w3.org/TR/xpath-functions-11/" idref="func-replicate"/>
+
+  <dependency type="spec" value="XP40+ XQ40+"/>
+
+  <test-case name="replicate-001">
+    <description>Empty sequence</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>replicate((), 0)</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-002">
+    <description>Empty sequence</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>replicate((), 1)</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-003">
+    <description>Empty sequence</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>replicate((1 to 10), 0)</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-004">
+    <description>Single string</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>replicate('a', 1)</test>
+    <result>
+      <assert-string-value>a</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-005">
+    <description>Single string</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>replicate('a', 2)</test>
+    <result>
+      <assert-deep-eq>'a', 'a'</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-006">
+    <description>Multiple strings</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>replicate(('a', 'b'), 1)</test>
+    <result>
+      <assert-deep-eq>'a', 'b'</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-007">
+    <description>Multiple strings</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>replicate(('a', 'b'), 2)</test>
+    <result>
+      <assert-deep-eq>'a', 'b', 'a', 'b'</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-008">
+    <description>Count resulting items</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>count(replicate('a', 1984))</test>
+    <result>
+      <assert-eq>1984</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-009">
+    <description>Count resulting items</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>count(replicate(replicate('a', 1984), 1984))</test>
+    <result>
+      <assert-eq>3936256</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-010">
+    <description>Positional access to result</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>replicate(23432, 10000)[1]</test>
+    <result>
+      <assert-eq>23432</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-011">
+    <description>Positional access to result</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>replicate(23432, 10000)[last()]</test>
+    <result>
+      <assert-eq>23432</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-012">
+    <description>Positional access to result</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>replicate(34342, 11111)[5555]</test>
+    <result>
+      <assert-eq>34342</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-013">
+    <description>Positional access to result</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>replicate(('X', 'Y'), 100)[99]</test>
+    <result>
+      <assert-string-value>X</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-014">
+    <description>Positional access to result</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>for $i in 1 to 2 return replicate(3, $i)</test>
+    <result>
+      <assert-deep-eq>3, 3, 3</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-015">
+    <description>Node argument</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[ replicate(<_/>, 2) ! name() ]]></test>
+    <result>
+      <assert-deep-eq>'_', '_'</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-016">
+    <description>Node argument</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[ sum((1 to 10) ! replicate(<_>{ . }</_>, 1)) ]]></test>
+    <result>
+      <assert-eq>55</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-017">
+    <description>Node argument</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[ sum((1 to 10) ! replicate(1, <_>{ . }</_>)) ]]></test>
+    <result>
+      <assert-eq>55</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-018">
+    <description>Node arguments</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[ sum((1 to 10) ! replicate(<_>{ . }</_>, <_>{ . }</_>)) ]]></test>
+    <result>
+      <assert-eq>385</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-019">
+    <description>Arrays</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test><![CDATA[ replicate([ 1, 2 ], 3)?* ]]></test>
+    <result>
+      <assert-deep-eq>1, 2, 1, 2, 1, 2</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="replicate-020">
+    <description>Function items</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test><![CDATA[ replicate(false#0, 2)[.()] ]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+</test-set>
