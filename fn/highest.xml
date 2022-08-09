@@ -3,8 +3,6 @@
    <description>Tests for the fn:highest function (4.0 proposal)</description>
    
    <dependency type="spec" value="XP40+ XQ40+"/>
-   
-   <description>Tests fn:highest</description>
 
    <test-case name="highest-001">
       <description>test highest() - Saxon 9.2 version using higher-order functions</description>
@@ -82,7 +80,189 @@
          </all-of>
       </result>
    </test-case> 
-   
+
+   <test-case name="highest-100">
+      <description>Empty sequence</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest(())]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="highest-101">
+      <description>Filter yielding single string</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest(('a', 'b', 'c', 'd', 'e', 'f')[. = 'f'])]]></test>
+      <result>
+         <assert-string-value>f</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="highest-102">
+      <description>Filter yielding empty sequence</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest(('a', 'b', 'c', 'd', 'e', 'f')[. = 'g'])]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="highest-103">
+      <description>Single string</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest('x')]]></test>
+      <result>
+         <assert-string-value>x</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="highest-104">
+      <description>Doubles</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest((1e0, 2e0))]]></test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="highest-105">
+      <description>Integers</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest((8 to 11))]]></test>
+      <result>
+         <assert-eq>11</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="highest-106">
+      <description>Reversed integers</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest(reverse(8 to 11))]]></test>
+      <result>
+         <assert-eq>11</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="highest-107">
+      <description>Integers compared as strings</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest((8 to 11), (), string#1)]]></test>
+      <result>
+         <assert-eq>9</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="highest-108">
+      <description>Reversed integers compared as strings</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest(reverse(8 to 11), (), string#1)]]></test>
+      <result>
+         <assert-eq>9</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="highest-109">
+      <description>Integers ignored by the comparator</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest((3, 2, 1), (), function($k) { true() })]]></test>
+      <result>
+         <assert-deep-eq>3, 2, 1</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="highest-110">
+      <description>Integers compared by their string length</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest((8 to 11), (), function($k) { string-length(string($k)) })]]></test>
+      <result>
+         <assert-deep-eq>10, 11</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="highest-111">
+      <description>Reversed integers compared by their string length</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest(reverse(8 to 11), (), function($k) { string-length(string($k)) })]]></test>
+      <result>
+         <assert-deep-eq>11, 10</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="highest-112">
+      <description>Elements with numeric attribute comparison</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[fn:highest((<a _='1'/>, <b _='2'/>), (), function($k) { $k/@* }) ! name()]]></test>
+      <result>
+         <assert-string-value>b</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="highest-113">
+      <description>Element with numeric attribute comparison</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[fn:highest(<_ _='1'/>, (), function($a) { $a/@* })]]></test>
+      <result>
+         <assert-xml><![CDATA[<_ _="1"/>]]></assert-xml>
+      </result>
+   </test-case>
+   <test-case name="highest-114">
+      <description>Elements with numeric attribute comparison</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[fn:highest((<_ _='9'/>, <_ _='10'/>), (), function($a) { $a/@* })]]></test>
+      <result>
+         <assert-xml><![CDATA[<_ _="10"/>]]></assert-xml>
+      </result>
+   </test-case>
+   <test-case name="highest-115">
+      <description>Element with attribute string comparison</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[fn:highest((<_ _='9'/>, <_ _='10'/>), (), function($a) { string($a/@*) })]]></test>
+      <result>
+         <assert-xml><![CDATA[<_ _="9"/>]]></assert-xml>
+      </result>
+   </test-case>
+   <test-case name="highest-116">
+      <description>Replicated argument</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest(replicate('a', 2))]]></test>
+      <result>
+         <assert-deep-eq>'a', 'a'</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="highest-117">
+      <description>Replicated argument</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[fn:highest(replicate(<_/>, 2))]]></test>
+      <result>
+         <assert-xml><![CDATA[<_/><_/>]]></assert-xml>
+      </result>
+   </test-case>
+   <test-case name="highest-118">
+      <description>Reversed argument</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest(reverse( (1 to 6)[. > 3] ))]]></test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="highest-119">
+      <description>Arguments of different types</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest((1, 'x'))]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="highest-120">
+      <description>Arguments of the same type that cannot be compared</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest((xs:gYear('9998'), xs:gYear('9999')))]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="highest-121">
+      <description>Argument that cannot be compared</description>
+      <created by="Christian Gruen" on="2022-08-09"/>
+      <test><![CDATA[fn:highest(true#0)]]></test>
+      <result>
+         <error code="FOTY0013"/>
+      </result>
+   </test-case>
+
    <test-case name="highest-901">
       <description>test highest() second argument is a call on a function with the wrong signature</description>
       <created by="Michael Kay" on="2014-04-13"/>
