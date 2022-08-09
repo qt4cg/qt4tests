@@ -77,6 +77,54 @@
     </result>
   </test-case>
   
+  <test-case name="is-NaN-009">
+    <description>Argument: element</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[ is-NaN(<_/>) ]]></test>
+    <result>
+      <assert-false/>
+    </result>
+  </test-case>
+  
+  <test-case name="is-NaN-010">
+    <description>Argument: processing instruction</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[ is-NaN(<?_ ?>) ]]></test>
+    <result>
+      <assert-false/>
+    </result>
+  </test-case>
+  
+  <test-case name="is-NaN-011">
+    <description>Arguments: double values</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test><![CDATA[
+let $seq := (0 to 9) ! is-NaN(. div xs:double(.))
+return index-of($seq, true())
+    ]]></test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="is-NaN-012">
+    <description>Argument: numeric types</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test><![CDATA[
+for $i in (
+  xs:double('NaN'),
+  xs:float('NaN'),
+  xs:integer(1),
+  xs:short(1)
+)
+return is-NaN($i)
+    ]]></test>
+    <result>
+      <assert-deep-eq>true(), true(), false(), false()</assert-deep-eq>
+    </result>
+  </test-case>
 
   <test-case name="is-NaN-901">
     <description>Empty sequence not allowed</description>
@@ -87,8 +135,6 @@
     </result>
   </test-case>
 
-  
-  
   <test-case name="is-NaN-902">
     <description>Sequence not allowed</description>
     <created by="Michael Kay" on="2020-02-08"/>
@@ -98,8 +144,22 @@
     </result>
   </test-case>
 
+  <test-case name="is-NaN-903">
+    <description>Function item argument not allowed</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>is-NaN(true#0)</test>
+    <result>
+      <error code="FOTY0013"/>
+    </result>
+  </test-case>
 
-
-
+  <test-case name="is-NaN-904">
+    <description>Map argument not allowed</description>
+    <created by="Christian Gruen" on="2022-08-08"/>
+    <test>is-NaN(map { 0 div 0e0: 0 div 0e0 })</test>
+    <result>
+      <error code="FOTY0013"/>
+    </result>
+  </test-case>
 
 </test-set>
