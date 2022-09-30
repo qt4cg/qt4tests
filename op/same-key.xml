@@ -128,8 +128,9 @@
        <created by="Josh Spiegel" on="2015-07-22"/>
        <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/>
        <modified by="Tim Mills" on="2016-07-19" change="See bug 29678"/>
+       <modified by="Christian Gruen" on="2022-08-22" change="dependency changed"/>
        <environment ref="map" />
-       <dependency type="spec" value="XQ31+"/>    
+       <dependency type="spec" value="XQ31"/>
        <test>
              let $keys := (
                  xs:decimal("1.00000000000000001"),
@@ -149,6 +150,34 @@
              <assert>$result?1?(xs:double("1.0")) eq 3</assert>
              <assert>count($result?2) lt 3</assert>
              <assert>count($result?3) lt 3</assert>
+          </all-of>
+       </result>
+   </test-case>   
+   
+   <test-case name="same-key-006a">
+       <description>op:same-key over numerics</description>
+       <created by="Christian Gruen" on="2022-08-22" change="XQuery 4: comparison of numeric values changed"/>
+       <dependency type="spec" value="XP40+ XQ40+"/>
+       <environment ref="map" />
+       <test>
+             let $keys := (
+                 xs:decimal("1.00000000000000001"),
+                 xs:decimal("1.00000000000000002"),
+                 xs:double("1.0")
+             )
+             return [
+                 map:merge($keys ! map:entry(., position())),
+                 distinct-values($keys),
+                 for $k in $keys group by $k return $k              
+             ]
+       </test>
+       <result>
+          <all-of>
+             <assert>map:size($result?(1)) eq 3</assert>
+             <assert>$result?1?(xs:double("1.0") cast as xs:decimal) eq 3</assert>
+             <assert>$result?1?(xs:double("1.0")) eq 3</assert>
+             <assert>count($result?2) eq 3</assert>
+             <assert>count($result?3) eq 3</assert>
           </all-of>
        </result>
    </test-case>   
@@ -677,8 +706,9 @@
     <test-case name="same-key-027">
         <description>op:same-key values, times equal but in different timezones</description>
         <created by="Michael Kay" on="2016-07-28"/>
+        <modified by="Christian Gruen" on="2022-08-22" change="dependencies changed"/>
         <environment ref="map" />
-        <dependency type="spec" value="XP31+ XQ31"/>
+        <dependency type="spec" value="XP31+ XQ31+"/>
         <test>
             map{ xs:time('17:00:00Z'):1, xs:time('12:00:00-05:00'):2 }
         </test>
@@ -694,8 +724,9 @@
             for hash codes to be used.
         </description>
         <created by="Michael Kay" on="2018-06-13"/>
+        <modified by="Christian Gruen" on="2022-08-22" change="dependencies changed"/>
         <environment ref="map" />
-        <dependency type="spec" value="XP31+ XQ31"/>
+        <dependency type="spec" value="XP31+ XQ31+"/>
         <test>
             map{ xs:time('17:00:00Z'):1,
                 xs:time('17:00:01Z'):1,
