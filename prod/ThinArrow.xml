@@ -1,0 +1,450 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-ThinArrow">
+  <description>Tests for the thin arrow operator</description>
+
+  <dependency type="feature" value="higherOrderFunctions"/>
+  <dependency type="spec" value="XP40+ XQ40+"/>
+
+  <test-case name="ThinArrow-001">
+    <description>Empty sequence, function returning empty sequence</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[() -> { }]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-002">
+    <description>Integer argument, function returning empty sequence</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[1 -> { }]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-003">
+    <description>Empty sequence, function returning argument</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[() -> { . }]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-004">
+    <description>Integer argument, function returning argument</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[1 -> { . }]]></test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-005">
+    <description>Integer arguments, function returning empty sequence</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[(1, 2) -> { . }]]></test>
+    <result>
+      <assert-deep-eq>1, 2</assert-deep-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-006">
+    <description>Integer argument, function returning integers</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[0 -> { 1, 2 }]]></test>
+    <result>
+      <assert-deep-eq>1, 2</assert-deep-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-007">
+    <description>Integer argument, function returning incremented integers</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[(0 to 5) -> { . + 1 }]]></test>
+    <result>
+      <assert-deep-eq>1, 2, 3, 4, 5, 6</assert-deep-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-008">
+    <description>String argument, functions returning strings</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA['abc' -> upper-case() -> tokenize('\s+')]]></test>
+    <result>
+      <assert-string-value>ABC</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-009">
+    <description>Integer arguments, functions returning numbers</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[(1, 4, 9, 16, 25, 36) -> math:sqrt() -> { . + 1 } => sum()]]></test>
+    <result>
+      <assert-eq>27</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-010">
+    <description>String argument, partial function application</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[('$' -> concat(?))('x')]]></test>
+    <result>
+      <assert-string-value>$x</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-011">
+    <description>String argument, function returning string</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA['$' -> concat('x')]]></test>
+    <result>
+      <assert-string-value>$x</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-012">
+    <description>String argument, function in EQName notation</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[
+      'xyz' -> Q{http://www.w3.org/2005/xpath-functions}contains('x')
+    ]]></test>
+    <result>
+      <assert-string-value>true</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-013">
+    <description>String arguments, function in EQName notation</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[
+      ('a', 'b') -> (Q{http://www.w3.org/2005/xpath-functions}contains('abc', ?))()
+    ]]></test>
+    <result>
+      <assert-deep-eq>true(), true()</assert-deep-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-014">
+    <description>String arguments, identity function</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[('no', 'yes') -> identity()]]></test>
+    <result>
+      <assert-deep-eq>'no', 'yes'</assert-deep-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-015">
+    <description>String arguments, identity functions</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[('no', 'yes') -> identity() => identity()]]></test>
+    <result>
+      <assert-deep-eq>'no', 'yes'</assert-deep-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-016">
+    <description>Strings argument, identity functions</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[('no', 'yes') => identity() -> identity()]]></test>
+    <result>
+      <assert-deep-eq>'no', 'yes'</assert-deep-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-017">
+    <description>Integer arguments, count functions</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[(1 to 9) -> count() => count()]]></test>
+    <result>
+      <assert-eq>9</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-018">
+    <description>Integer argument, count functions</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[(1 to 9) => count() -> count()]]></test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-019">
+    <description>Precedence check: comparison</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[2 > 3 -> { 1 }]]></test>
+    <result>
+      <assert-string-value>true</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-020">
+    <description>Precedence check: arithmetics</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[1-->{.}(2)]]></test>
+    <result>
+      <assert-eq>-1</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-021">
+    <description>Precedence check: arithmetics, unary expression</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[1 - -> { . }(2)]]></test>
+    <result>
+      <assert-eq>-1</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-022">
+    <description>Precedence check: arithmetics, unary expression</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[1--->{.}(2)]]></test>
+    <result>
+      <assert-eq>3</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-023">
+    <description>Precedence check: arithmetics, unary expression</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[1 - - -> { . }(3)]]></test>
+    <result>
+      <assert-eq>4</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-024">
+    <description>Precedence check: unary expression</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[-5 -> abs()]]></test>
+    <result>
+      <assert-eq>5</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-025">
+    <description>Precedence check: unary expression</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[(-6) -> abs()]]></test>
+    <result>
+      <assert-eq>6</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-026">
+    <description>String argument, named function references</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA['abc' -> ((starts-with#2, ends-with#2) => head())('a')]]></test>
+    <result>
+      <assert-string-value>true</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-027">
+    <description>String argument, named function references</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA['abc' -> ((starts-with#2, ends-with#2) => tail())('a')]]></test>
+    <result>
+      <assert-string-value>false</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-028">
+    <description>String argument, named function reference</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[(-5 to 0) -> (abs#1)() => sum()]]></test>
+    <result>
+      <assert-eq>15</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-029">
+    <description>Let clause, named function reference bound to variable</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[
+      let $x := abs#1
+      return (-5 to 0) -> $x() => sum()
+    ]]></test>
+    <result>
+      <assert-eq>15</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-030">
+    <description>For clause, named function reference bound to variable</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[
+      for $x in abs#1
+      return (-5 to 0) -> $x() => sum()
+    ]]></test>
+    <result>
+      <assert-eq>15</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-031">
+    <description>Named function reference bound to global variable</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[
+      declare variable $ABS := abs#1;
+      (-5 to 0) -> $ABS() => sum()
+    ]]></test>
+    <result>
+      <assert-eq>15</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-032">
+    <description>Array invoked as function</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[1 -> ([ 'A' ])()]]></test>
+    <result>
+      <assert-string-value>A</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-033">
+    <description>Array invoked as function</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[1 -> (array { 'B' })()]]></test>
+    <result>
+      <assert-string-value>B</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-034">
+    <description>Array invoked as function</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[(1, 2) -> (array { 'C', 'D' })()]]></test>
+    <result>
+      <assert-deep-eq>'C', 'D'</assert-deep-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-035">
+    <description>Map invoked as function</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[1 -> (map { 1: 'V' })()]]></test>
+    <result>
+      <assert-string-value>V</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-036">
+    <description>Map invoked as function</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[(1, 2) -> (map { 1: 'W', 2: 'X' })()]]></test>
+    <result>
+      <assert-deep-eq>'W', 'X'</assert-deep-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-037">
+    <description>Map invoked as function</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[
+      let $map := map { 0: 'off', 1: 'on' }
+      return 1 -> $map()
+    ]]></test>
+    <result>
+      <assert-string-value>on</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-038">
+    <description>Array invoked as function</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[(1, 2) -> ([ 3[2], 1[0] ])()]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-039">
+    <description>Precedence checks: Simple map operator, numeric casts</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[256 ! 2 -> xs:byte()]]></test>
+    <result>
+      <assert-eq>2</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-040">
+    <description>Precedence checks: Simple map operator, numeric casts</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[(256 ! 2) -> xs:byte()]]></test>
+    <result>
+      <assert-eq>2</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-041">
+    <description>Precedence checks: Simple map operator, numeric casts</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[256 ! (2 -> xs:byte())]]></test>
+    <result>
+      <assert-eq>2</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-042">
+    <description>String operations</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[
+      'Jemand musste Josef K. verleumdet haben.'
+      => tokenize()
+      -> string-length()
+      -> { . + 1 }
+      => sum()
+    ]]></test>
+    <result>
+      <assert-eq>41</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-043">
+    <description>String operations</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[
+      'Happy families are all alike; every unhappy family is unhappy in its own way.'
+      => tokenize()
+      -> { upper-case(substring(., 1, 1)) || lower-case(substring(., 2)) }
+      => string-join(' ')
+    ]]></test>
+    <result>
+      <assert-string-value>Happy Families Are All Alike; Every Unhappy Family Is Unhappy In Its Own Way.</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-044">
+    <description>Error: numeric cast</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[2 ! 256 -> xs:byte()]]></test>
+    <result>
+      <error code="FORG0001"/>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-045">
+    <description>Error: reserved keyword</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[1 -> if()]]></test>
+    <result>
+      <error code="XPST0003"/>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-046">
+    <description>Error: unknown function in default namespace</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[0 -> unknown()]]></test>
+    <result>
+      <error code="XPST0017"/>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-047">
+    <description>Error: partial function application, default namespace</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[0 -> unknown(?)]]></test>
+    <result>
+      <error code="XPST0017"/>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-048">
+    <description>Error: unknown function in local function namespace</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[0 -> local:unknown()]]></test>
+    <result>
+      <error code="XPST0017"/>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-049">
+    <description>Error: partial function application, local function namespace</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[0 -> local:unknown(?)]]></test>
+    <result>
+      <error code="XPST0017"/>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-050">
+    <description>Error: EQName notation</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[0 -> Q{}unknown()]]></test>
+    <result>
+      <error code="XPST0017"/>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-051">
+    <description>Error: EQName notation</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[0 -> Q{}unknown(?)]]></test>
+    <result>
+      <error code="XPST0017"/>
+    </result>
+  </test-case>
+  <test-case name="ThinArrow-052">
+    <description>Error: Wrong type</description>
+    <created by="Christian Gruen" on="2022-08-16"/>
+    <test><![CDATA[let $_ := 0 return 0 -> $_()]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+</test-set>
