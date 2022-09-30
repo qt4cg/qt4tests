@@ -1,0 +1,115 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-intersperse">
+   <description>Tests for the fn:intersperse function</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-intersperse"/>
+   <test-case name="intersperse-001">
+      <description>Empty sequences</description>
+      <created by="Christian Gruen" on="2022-09-28"/>
+      <test><![CDATA[intersperse((), ())]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="intersperse-002">
+      <description>Empty sequence, integer separator</description>
+      <created by="Christian Gruen" on="2022-09-28"/>
+      <test><![CDATA[intersperse((), 1)]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="intersperse-003">
+      <description>Integer input, empty separator</description>
+      <created by="Christian Gruen" on="2022-09-28"/>
+      <test><![CDATA[intersperse(1, ())]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="intersperse-004">
+      <description>Sequence input, empty separator</description>
+      <created by="Christian Gruen" on="2022-09-28"/>
+      <test><![CDATA[intersperse((1, 2), ())]]></test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="intersperse-005">
+      <description>Integer input, string separator</description>
+      <created by="Christian Gruen" on="2022-09-28"/>
+      <test><![CDATA[intersperse(1, "a")]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="intersperse-006">
+      <description>Integer input, sequence separator</description>
+      <created by="Christian Gruen" on="2022-09-28"/>
+      <test><![CDATA[intersperse(1, ('a', 'b'))]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="intersperse-007">
+      <description>Sequence input, string separator</description>
+      <created by="Christian Gruen" on="2022-09-28"/>
+      <test><![CDATA[intersperse((1, 2), "a")]]></test>
+      <result>
+         <assert-deep-eq>1, 'a', 2</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="intersperse-008">
+      <description>Sequence input, sequence separator</description>
+      <created by="Christian Gruen" on="2022-09-28"/>
+      <test><![CDATA[intersperse((1, 2), ('a', 'b'))]]></test>
+      <result>
+         <assert-deep-eq>1, 'a', 'b', 2</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="intersperse-009">
+      <description>Count results</description>
+      <created by="Christian Gruen" on="2022-09-28"/>
+      <test><![CDATA[intersperse(1, "a") => count()]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="intersperse-010">
+      <description>Filter expression, string separator</description>
+      <created by="Christian Gruen" on="2022-09-28"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[intersperse(1[. = <_>1</_>], "a")]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="intersperse-011">
+      <description>Filter expression yielding empty sequence</description>
+      <created by="Christian Gruen" on="2022-09-28"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[intersperse((1, 2)[. = <_>3</_>], 'a')]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="intersperse-012">
+      <description>Sequence input, Separator with filter expression yielding empty sequence</description>
+      <created by="Christian Gruen" on="2022-09-28"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[intersperse((1, 2), 'a'[. = <_/>])]]></test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="intersperse-013">
+      <description>Various types, count results</description>
+      <created by="Christian Gruen" on="2022-09-28"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+let $seq := (1, 1.0, 1e0, '1', map {}, array {}, true#0, function() {})
+return intersperse($seq, $seq) => count()      
+      ]]></test>
+      <result>
+         <assert-deep-eq>64</assert-deep-eq>
+      </result>
+   </test-case>
+</test-set>
