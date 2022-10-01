@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" 
+          name="fn-op" covers-30="fn-op">
+   <description>Tests for the op() function</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-40/"
+         idref="func-op"/>
+
+
+   <test-case name="fn-op-001">
+      <description>Attempts to evaluate the "op" function with no arguments.</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:op()</test>
+      <result>
+         <error code="XPST0017" />
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-002">
+      <description>Test that all permitted operators work.</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[every $s in (",", "and", "or", 
+         "+", "-", "*", "div", "idiv", "mod",
+         "=", "<", "<=", ">", ">=", "!=",
+         "eq", "lt", "le", "gt", "ge", "ne",
+         "<<", ">>", "is", "||", "|",
+         "union", "except", "intersect", "to",
+         "otherwise") satisfies function-arity(op($s)) = 2]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-003">
+      <description>Test that unpermitted operators fail.</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>function-arity(op('!')) = 2</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-004">
+      <description>All permitted operators accept an empty sequence.</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[every $s in (",", "and", "or", 
+         "+", "-", "*", "div", "idiv", "mod",
+         "=", "<", "<=", ">", ">=", "!=",
+         "eq", "lt", "le", "gt", "ge", "ne",
+         "<<", ">>", "is", "||", "|",
+         "union", "except", "intersect", "to",
+         "otherwise") satisfies not(op($s)((),()))]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-005">
+      <description>Test that zero length string fails.</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>function-arity(op('')) = 2</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-006">
+      <description>Test that single space fails.</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>function-arity(op(' ')) = 2</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-007">
+      <description>Whitespace is not trimmed.</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>function-arity(op(' div ')) = 2</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-008">
+      <description>Test that '/' fails.</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>function-arity(op('/')) = 2</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-009">
+      <description>Repeated partial application of the result.</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[all(for $s in (",", "and", "or", 
+         "+", "-", "*", "div", "idiv", "mod",
+         "=", "<", "<=", ">", ">=", "!=",
+         "eq", "lt", "le", "gt", "ge", "ne",
+         "<<", ">>", "is", "||", "|",
+         "union", "except", "intersect", "to",
+         "otherwise") 
+         return let $f := op($s)((), ?) return ((() => $f() => $f() => $f()) ! not(.)))]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   
+   <test-case name="fn-op-arith-001">
+      <description>"op" plus, integers</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:op("+")(2, 2)</test>
+      <result>
+         <all-of>
+            <assert-eq>4</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>        
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-arith-002">
+      <description>"op" minus, doubles</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:op("-")(2e0, 1e0)</test>
+      <result>
+         <all-of>
+            <assert-eq>1e0</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of> 
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-arith-003">
+      <description>Arithmetic, decimals</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>("+", "-", "*", "div", "mod", "idiv")!fn:op(.)(1.2, 1.2)</test>
+      <result>
+         <assert-deep-eq>2.4, 0, 1.44, 1, 0, 1</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-arith-004">
+      <description>Arithmetic, mixed numeric</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>("+", "-", "*", "div", "mod", "idiv")!fn:op(.)(1.2e0, 1.2)</test>
+      <result>
+         <assert-deep-eq>2.4e0, 0e0, 1.44e0, 1e0, 0e0, 1e0</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-arith-005">
+      <description>Arithmetic: duration,double</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>sum(("*", "div")!fn:op(.)(xs:dayTimeDuration('PT300S'), 2))</test>
+      <result>
+         <assert-eq>xs:dayTimeDuration('PT750S')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-arith-006">
+      <description>Arithmetic: partial application</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>let $inc := op('+')(?, 1) return 5 => $inc() => $inc() => $inc()</test>
+      <result>
+         <assert-eq>8</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-arith-007">
+      <description>Arithmetic: atomization</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[op('div')(parse-xml('<a>10</a>'), parse-xml('<a>5</a>'))]]></test>
+      <result>
+         <all-of>
+            <assert-eq>2</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>        
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-vc-001">
+      <description>Value comparisons: numeric</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>for $s in ("eq", "ne", "gt", "ge", "lt", "le")
+            return array{for-each-pair((1,2,3), (2,2,2), op($s))}</test>
+      <result>
+         <assert-deep-eq>
+            [false(), true(), false()],
+            [true(), false(), true()],
+            [false(), false(), true()],
+            [false(), true(), true()],
+            [true(), false(), false()],
+            [true(), true(), false()]
+         </assert-deep-eq>       
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-vc-002">
+      <description>Value comparisons: strings; atomization</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[for $s in ("eq", "ne", "gt", "ge", "lt", "le")
+         return array{for-each-pair(('a','b','c'), replicate(parse-xml('<_>b</_>'),3), op($s))}
+         ]]></test>
+      <result>
+         <assert-deep-eq>
+            [false(), true(), false()],
+            [true(), false(), true()],
+            [false(), false(), true()],
+            [false(), true(), true()],
+            [true(), false(), false()],
+            [true(), true(), false()]
+         </assert-deep-eq>       
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-gc-001">
+      <description>General comparisons: numeric</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[for $s in ("=", "!=", ">", ">=", "<", "<=")
+         return array{for-each-pair((1,2,3), (2,2,2), op($s))}
+         ]]></test>
+      <result>
+         <assert-deep-eq>
+            [false(), true(), false()],
+            [true(), false(), true()],
+            [false(), false(), true()],
+            [false(), true(), true()],
+            [true(), false(), false()],
+            [true(), true(), false()]
+         </assert-deep-eq>       
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-gc-002">
+      <description>General comparisons: strings; atomization</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[for $s in ("=", "!=", ">", ">=", "<", "<=")
+         return array{for-each-pair(('a','b','c'), replicate(parse-xml('<_>b</_>'),3), op($s))}
+         ]]></test>
+      <result>
+         <assert-deep-eq>
+            [false(), true(), false()],
+            [true(), false(), true()],
+            [false(), false(), true()],
+            [false(), true(), true()],
+            [true(), false(), false()],
+            [true(), true(), false()]
+         </assert-deep-eq>       
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-boolean-001">
+      <description>and/or operators</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>for $s in ('and', 'or'), $x in (true(), false()), $y in (true(), false()) return op($s)($x, $y) </test>
+      <result>
+         <assert-deep-eq>true(), false(), false(), false(), true(), true(), true(), false()</assert-deep-eq>  
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-node-001">
+      <description>Node comparisons</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $in := parse-xml('<doc><a/><b/><c/></doc>') return
+         for $s in ("is", ">>", "<<")
+         return array{for-each-pair($in//doc/*, replicate($in//doc/b, 3), op($s))}
+         ]]>
+      </test>
+      <result>
+         <assert-deep-eq>
+            [false(), true(), false()],
+            [false(), false(), true()],
+            [true(), false(), false()]
+         </assert-deep-eq>       
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-venn-001">
+      <description>Union, intersect, except comparisons</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $in := parse-xml('<doc><a/><b/><c/></doc>') return
+         for $s in ("union", "|", "intersect", "except")
+         return array{op($s)($in//doc/(a,b), $in//doc/(b,c)) ! name()}
+         ]]>
+      </test>
+      <result>
+         <assert-deep-eq>
+            ['a', 'b', 'c'],
+            ['a', 'b', 'c'],
+            ['b'],
+            ['a']
+         </assert-deep-eq>       
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-concat-001">
+      <description>Concat</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>op('||')('abc', 'def')</test>
+      <result>
+         <assert-eq>'abcdef'</assert-eq>  
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-range-001">
+      <description>range (to) operator</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>count(op('to')(2, 20))</test>
+      <result>
+         <assert-eq>19</assert-eq>  
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-otherwise-001">
+      <description>otherwise operator</description>
+      <created by="Michael Kay" on="2022-09-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>op('otherwise')((), 42)</test>
+      <result>
+         <assert-eq>42</assert-eq>  
+      </result>
+   </test-case>
+   
+
+ 
+</test-set>
