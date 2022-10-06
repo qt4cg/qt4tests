@@ -494,6 +494,8 @@
    <test-case name="K-FunctionProlog-8">
       <description> Arguments in functions cannot have default values initialized with ':='(or in any other way). </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Michael Kay" on="2022-10-03" change="No longer an error in 4.0"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>
         declare function local:myFunction($arg := 1) {1};
         true()</test>
@@ -2182,5 +2184,361 @@
          <error code="XPST0003" />
       </result>
    </test-case>
+   
+   <test-case name="function-decl-40-001">
+      <description>XQ40: function with optional parameter, omitted</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := 1) { $x + $y };
+         local:f(3)
+      </test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-002">
+      <description>XQ40: function with optional parameter, included</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := 1) { $x + $y };
+         local:f(3,2)
+      </test>
+      <result>
+         <assert-eq>5</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-003">
+      <description>XQ40: function with optional parameter, keyword for second argument</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := 1) { $x + $y };
+         local:f(3, y := 2)
+      </test>
+      <result>
+         <assert-eq>5</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-004">
+      <description>XQ40: function with optional parameter, keyword for both arguments</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := 1) { $x + $y };
+         local:f(x := 3, y := 2)
+      </test>
+      <result>
+         <assert-eq>5</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-005">
+      <description>XQ40: function with optional parameter, keyword for both arguments, reversed order</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := 1) { $x + $y };
+         local:f(y := 2, x := 3)
+      </test>
+      <result>
+         <assert-eq>5</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-006">
+      <description>XQ40: function with all parameters optional</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer := 1, $y as xs:integer := 2, $z as xs:integer := 3) { $x + $y + $z };
+         local:f(), local:f(10), local:f(10, 10), local:f(10, 10, 10) 
+      </test>
+      <result>
+         <assert-deep-eq>6, 15, 23, 30</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-007">
+      <description>XQ40: optional parameter with undeclared type</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x := 1, $y := 2, $z := 3) { $x + $y + $z };
+         local:f(), local:f(10), local:f(10, 10), local:f(10, 10, 10) 
+      </test>
+      <result>
+         <assert-deep-eq>6, 15, 23, 30</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-008">
+      <description>XQ40: forwards reference to function with optional params</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:g() {
+             local:f(), local:f(10), local:f(10, 10), local:f(10, 10, 10) 
+         };
+         declare function local:f($x := 1, $y := 2, $z := 3) { $x + $y + $z };
+         local:g()
+      </test>
+      <result>
+         <assert-deep-eq>6, 15, 23, 30</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-009">
+      <description>XQ40: Use "." as default value</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:f($x := .) { "Q{" || namespace-uri($x) || "}" || local-name($x) };
+         (<a/>, <b/>) ! local:f()
+      ]]></test>
+      <result>
+         <assert-deep-eq>"Q{}a", "Q{}b"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-010">
+      <description>XQ40: Namespaced keyword argument</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare namespace p = "http://example.com/param";
+         declare namespace q = "http://example.com/param";
+         declare function local:f($p:x := 2) { $p:x + 1 };
+         local:f(q:x := 3)
+      </test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-011">
+      <description>XQ40: EQName keyword argument in call</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare namespace p = "http://example.com/param";
+         declare function local:f($p:x := 2) { $p:x + 1 };
+         local:f(Q{http://example.com/param}x := 3)
+      </test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-012">
+      <description>XQ40: EQName keyword argument in declaration</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare namespace p = "http://example.com/param";
+         declare function local:f($Q{http://example.com/param}x := 2) { $p:x + 1 };
+         local:f(p:x := 3)
+      </test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-013">
+      <description>XQ40: Keyword used for non-optional argument</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare namespace p = "http://example.com/param";
+         declare function local:f($x, $y) { $x + $y };
+         local:f(x := 3, y := 4)
+      </test>
+      <result>
+         <assert-eq>7</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-014">
+      <description>XQ40: function with optional parameter, omitted: function reference and dynamic call</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := 1) { $x + $y };
+         local:f#1(3)
+      </test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-015">
+      <description>XQ40: function with optional parameter, included: function reference and dynamic call</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := 1) { $x + $y };
+         local:f#2(3,2)
+      </test>
+      <result>
+         <assert-eq>5</assert-eq>
+      </result>
+   </test-case>
+   
+   
+   <test-case name="function-decl-40-901">
+      <description>XQ40: function with optional parameters, overlapping argument ranges</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := 1) { $x + $y };
+         declare function local:f($x as xs:integer) { $x + $y };
+         local:f(3)
+      </test>
+      <result>
+         <error code="XQST0034"/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-902">
+      <description>XQ40: function with optional parameters, overlapping argument ranges</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := 1) { $x + $y };
+         declare function local:f($x as xs:integer, $y as xs:integer) { $x + $y };
+         local:f(3)
+      </test>
+      <result>
+         <error code="XQST0034"/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-903">
+      <description>XQ40: function with optional parameters, overlapping argument ranges</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := 1, $z as xs:integer := 2) { $x + $y + $z };
+         declare function local:f($x as xs:integer, $y as xs:integer) { $x + $y };
+         local:f(3)
+      </test>
+      <result>
+         <error code="XQST0034"/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-904">
+      <description>XQ40: function with optional parameters, default value has wrong type</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := ()) { $x + $y};
+         local:f(3)
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-905">
+      <description>XQ40: function with optional parameters, default value has wrong type, but is not used</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := ()) { $x + $y};
+         local:f(3, 2)
+      </test>
+      <result>
+         <any-of>
+            <!-- TODO: the spec isn't explicit about this situation -->
+            <error code="XPTY0004"/>
+            <assert-eq>5</assert-eq>
+         </any-of>        
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-906">
+      <description>XQ40: cannot default a parameter by omitting it positionally [but see issue #174]</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer := 1, $y as xs:integer := 2, $z as xs:integer := 3) { $x + $y + $z };
+         local:f(1,,3)
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-907">
+      <description>XQ40: parameter supplied both positionally and by keyword</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer := 1, $y as xs:integer := 2, $z as xs:integer := 3) { $x + $y + $z };
+         local:f(42, x := 3)
+      </test>
+      <result>
+         <error code="XXXX9999"/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-908">
+      <description>XQ40: parameter supplied twice by keyword</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer := 1, $y as xs:integer := 2, $z as xs:integer := 3) { $x + $y + $z };
+         local:f(x := 42, x := 3)
+      </test>
+      <result>
+         <error code="XXXX9999"/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-909">
+      <description>XQ40: No value for mandatory argument, when keywords in use</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x, $y := 3) { $x + $y };
+         local:f(y := 4)
+      </test>
+      <result>
+         <error code="XXXX9999"/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-910">
+      <description>XQ40: No value for mandatory argument, when keywords in use</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x, $y) { $x + $y };
+         local:f(x := 4)
+      </test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-911">
+      <description>XQ40: Function call uses unknown keyword</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x, $y := 3) { $x + $y };
+         local:f(z := 4)
+      </test>
+      <result>
+         <error code="XXXX9999"/>
+      </result>
+   </test-case>
+   
+   
 
 </test-set>
