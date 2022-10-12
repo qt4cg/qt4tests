@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="map-build"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" covers="map-build">
+    <description>Tests for the map:contains function proposed for XPath 4.0</description>
+    <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-map-build"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+
+    <test-case name="map-build-001">
+        <description>Trivial call</description>
+        <created by="Michael Kay, Saxonica" on="2022-10-12"/>
+        <environment ref="map"/>
+        <test>map:build(()) => map:size()</test>
+        <result>
+            <assert-eq>0</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-002">
+        <description>Both key and value functions present</description>
+        <created by="Michael Kay, Saxonica" on="2022-10-12"/>
+        <environment ref="map"/>
+        <test>
+            let $days := ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
+            return map:build(1 to 7, ->($i){$days[$i]}, ->{.})?Wednesday
+        </test>
+        <result>
+            <assert-eq>4</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-003">
+        <description>Key function present, value defaulted</description>
+        <created by="Michael Kay, Saxonica" on="2022-10-12"/>
+        <environment ref="map"/>
+        <test>
+            let $days := ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
+            return map:build(1 to 7, ->($i){$days[$i]})?Wednesday
+        </test>
+        <result>
+            <assert-eq>4</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-004">
+        <description>Key function defaulted, value present</description>
+        <created by="Michael Kay, Saxonica" on="2022-10-12"/>
+        <environment ref="map"/>
+        <test>
+            let $days := ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
+            return map:build($days, value := ->($n){$days => index-of($n)})?Wednesday
+        </test>
+        <result>
+            <assert-eq>4</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-005">
+        <description>Key function defaulted, value present, duplicates</description>
+        <created by="Michael Kay, Saxonica" on="2022-10-12"/>
+        <environment ref="map"/>
+        <test>
+            let $days := ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"),
+                $fortnight := ($days, reverse($days))
+            return map:build($fortnight, value := ->($n){$days => index-of($n)}, combine := op('*')?Tuesday
+        </test>
+        <result>
+            <assert-eq>36</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-101">
+        <description>Empty sequence, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((), boolean#1)]]></test>
+        <result>
+            <assert-deep-eq>map{}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-102">
+        <description>Integer, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build(0, boolean#1)]]></test>
+        <result>
+            <assert-deep-eq>map{false():0}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-103">
+        <description>Integer, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build(1, boolean#1)]]></test>
+        <result>
+            <assert-deep-eq>map{true():1}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-104">
+        <description>Integers, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((0, 1), boolean#1) => map:size()]]></test>
+        <result>
+            <assert-eq>2</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-105">
+        <description>Integers, function item</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((0, 1), function($i) { boolean($i)[.] })]]></test>
+        <result>
+            <assert-deep-eq>map{true():1}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-106">
+        <description>Integer range, function yielding empty sequence</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((1 to 100), function($i) { })]]></test>
+        <result>
+            <assert-deep-eq>map{}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-107">
+        <description>Integer range, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((1 to 100), boolean#1) => map:size()]]></test>
+        <result>
+            <assert-eq>1</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-108">
+        <description>Integer range, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((1 to 100), string#1) => map:size()]]></test>
+        <result>
+            <assert-eq>100</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-109">
+        <description>Integer range, function item</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((1 to 100), function($i) { $i mod 10 }) => map:size()]]></test>
+        <result>
+            <assert-eq>10</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-110">
+        <description>Strings, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build(('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+      'September', 'October', 'November', 'December'), string-length#1) => map:size()]]></test>
+        <result>
+            <assert-eq>7</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-111">
+        <description>Integer range, function item</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((1 to 100), function($i) { $i mod 10 }) => map:size()]]></test>
+        <result>
+            <assert-eq>10</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-112">
+        <description>Nodes, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[map:build(<xml>{ (1 to 9) ! <sub>{ . }</sub> }</xml>/*, string-length#1) => map:keys()]]></test>
+        <result>
+            <assert-eq>1</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-113">
+        <description>Filter expression selecting appropriate functions</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[for $f in (true#0, false#0, concat#2, substring#2, contains#2, identity#1)[function-arity(.) = 1]
+      return map:build(5, $f)]]></test>
+        <result>
+            <assert-deep-eq>map{5:5}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-114">
+        <description>Filter expression selecting appropriate functions</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[for $f in (1, 2, 3, 4, string#1, 6)[. instance of function(*)] return  map:build(8, $f)]]></test>
+        <result>
+            <assert-deep-eq>map{"8":8}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+ 
+
+</test-set>
