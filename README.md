@@ -20,3 +20,9 @@ The metadata defines the expected results of each test, as a set of one or more 
 The test suite does not include test drivers for particular XQuery implementations.
 
 Further information about the test suite is available in various documents in the "guide" directory.
+
+Change control on the test suite is based on informal consensus. Adding new tests is always
+welcome (but please make sure they pass on at least one implementation first). Existing tests
+should not be modified (except in trivial ways such as improving the description) without some
+attempt to ensure that the change has consensus. Submitting a PR is an appropriate way of
+doing this.
