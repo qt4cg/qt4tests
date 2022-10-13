@@ -4,7 +4,7 @@
   <test-case name="while-001">
     <description>Test successful at first call (no error)</description>
     <created by="Christian Gruen" on="2022-10-13"/>
-    <test><![CDATA[fn:while(1, not#1, ->($_) { error() })]]></test>
+    <test><![CDATA[fn:while(1, not#1, function($_) { error() })]]></test>
     <result>
       <assert-eq>1</assert-eq>
     </result>
@@ -12,7 +12,7 @@
   <test-case name="while-002">
     <description>Test fails</description>
     <created by="Christian Gruen" on="2022-10-13"/>
-    <test><![CDATA[fn:while(1, boolean#1, ->($_) { error() })]]></test>
+    <test><![CDATA[fn:while(1, boolean#1, function($_) { error() })]]></test>
     <result>
       <error code="FOER0000"/>
     </result>
@@ -115,8 +115,8 @@
     <test><![CDATA[
       fn:while(
         1e0,
-        -> { . instance of xs:float },
-        -> { if(. instance of xs:double) then xs:float(.) else xs:double(.) }
+        function($x) { $x instance of xs:float },
+        function($x) { if($x instance of xs:double) then xs:float($x) else xs:double($x) }
       )
     ]]></test>
     <result>
@@ -129,8 +129,8 @@
     <test><![CDATA[
       fn:while(
         1,
-        -> { not(. instance of xs:byte) },
-        -> { if(. instance of xs:short) then xs:byte(.) else xs:short(.) }
+        function($x) { not($x instance of xs:byte) },
+        function($x) { if($x instance of xs:short) then xs:byte($x) else xs:short($x) }
       )
     ]]></test>
     <result>
@@ -143,11 +143,11 @@
     <test><![CDATA[
       fn:while(
         map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' },
-        -> { characters(?string) = ?remove },
-        -> { map {
-          'string': replace(?string, ?remove, ''),
-          'remove': ?remove -> string-to-codepoints() -> { . + 2 } -> codepoints-to-string() }
-        }
+        function($x) { characters($x?string) = $x?remove },
+        function($x) { map {
+          'string': replace($x?string, $x?remove, ''),
+          'remove': codepoints-to-string(string-to-codepoints($x?remove) ! (. + 2))
+        } }
       )?string
     ]]></test>
     <result>
@@ -159,7 +159,7 @@
     <created by="Christian Gruen" on="2022-10-13"/>
     <test><![CDATA[
       let $s := (1 to 1000)
-      return fn:while(1, -> { . = $s }, -> { . + 1 })
+      return fn:while(1, function($x) { $x = $s }, function($x) { $x + 1 })
     ]]></test>
     <result>
       <assert-eq>1001</assert-eq>
@@ -170,7 +170,11 @@
     <created by="Christian Gruen" on="2022-10-13"/>
     <test><![CDATA[
       let $i := 3936256
-      return fn:while($i, -> { abs(. * . - $i) >= 0.0000000001 }, -> { (. + $i div .) div 2 })
+      return fn:while(
+        $i,
+        function($x) { abs($x * $x - $i) >= 0.0000000001 },
+        function($x) { ($x + $i div $x) div 2 }
+      ) => round()
     ]]></test>
     <result>
       <assert-eq>1984</assert-eq>

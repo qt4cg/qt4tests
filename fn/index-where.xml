@@ -9,7 +9,7 @@
   <test-case name="index-where-01">
     <description>Empty sequence</description>
     <created by="Michael Kay" on="2020-02-09"/>
-    <test>index-where((), ->{true()})</test>
+    <test>index-where((), function($x) {true()})</test>
     <result>
       <assert-empty/>
     </result>
@@ -18,7 +18,7 @@
   <test-case name="index-where-02">
     <description>No matches</description>
     <created by="Michael Kay" on="2020-02-09"/>
-    <test>index-where(1 to 100, ->{. lt 0})</test>
+    <test>index-where(1 to 100, function($x) {$x lt 0})</test>
     <result>
       <assert-empty/>
     </result>
@@ -27,7 +27,7 @@
   <test-case name="index-where-03">
     <description>All matches</description>
     <created by="Michael Kay" on="2020-02-09"/>
-    <test>index-where(1 to 100, ->{. gt 0})</test>
+    <test>index-where(1 to 100, function($x) {$x gt 0})</test>
     <result>
       <assert-deep-eq>1 to 100</assert-deep-eq>
     </result>
@@ -36,7 +36,7 @@
   <test-case name="index-where-04">
     <description>Selective matches</description>
     <created by="Michael Kay" on="2020-02-09"/>
-    <test>index-where(1 to 100, ->{. mod 30 = 0})</test>
+    <test>index-where(1 to 100, function($x) {$x mod 30 = 0})</test>
     <result>
       <assert-deep-eq>30, 60, 90</assert-deep-eq>
     </result>
@@ -51,10 +51,10 @@
           $E := function($n, $x){element{$n}{$x}},
           $input := parse-xml("<doc><p/><q/><r/><h1/><p/><q/><h1/><p/></doc>"),
           $seq := $input/doc/*,
-          $headings := trace(index-where($seq, ->{local-name()='h1'}), 'headings')
+          $headings := trace(index-where($seq, function($x) {local-name($x)='h1'}), 'headings')
       return $D($E('result',(
           if (head($headings) != 1) then $E('preface', subsequence($seq, 1, head($headings)-1)) else (),
-          for-each-pair($headings, tail($headings), ->($x, $y){$E('section', subsequence($seq, $x, $y - $x))}),
+          for-each-pair($headings, tail($headings), function($x, $y){$E('section', subsequence($seq, $x, $y - $x))}),
           $E('section', subsequence($seq, $headings[last()])))))  
       ]]></test>
     <result>
