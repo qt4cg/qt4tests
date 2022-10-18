@@ -8,8 +8,9 @@
     <test-case name="map-build-001">
         <description>Trivial call</description>
         <created by="Michael Kay, Saxonica" on="2022-10-12"/>
+        <modified by="Christian Gruen" on="2022-10-18" change="key argument added"/>
         <environment ref="map"/>
-        <test>map:build(()) => map:size()</test>
+        <test>map:build((), identity#1) => map:size()</test>
         <result>
             <assert-eq>0</assert-eq>
         </result>
@@ -44,10 +45,15 @@
     <test-case name="map-build-004">
         <description>Key function defaulted, value present</description>
         <created by="Michael Kay, Saxonica" on="2022-10-12"/>
+        <modified by="Christian Gruen" on="2022-10-08" change="classical notation"/>
         <environment ref="map"/>
         <test>
             let $days := ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
-            return map:build($days, value := function($n){$days => index-of($n)})?Wednesday
+            return map:build(
+              $days,
+              identity#1,
+              function($n){$days => index-of($n)}
+            )?Wednesday
         </test>
         <result>
             <assert-eq>4</assert-eq>
@@ -57,14 +63,20 @@
     <test-case name="map-build-005">
         <description>Key function defaulted, value present, duplicates</description>
         <created by="Michael Kay, Saxonica" on="2022-10-12"/>
+        <modified by="Christian Gruen" on="2022-10-08" change="classical notation; result fixed"/>
         <environment ref="map"/>
         <test>
             let $days := ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"),
                 $fortnight := ($days, reverse($days))
-            return map:build($fortnight, value := function($n){$days => index-of($n)}, combine := op('*')?Tuesday
+            return map:build(
+              $fortnight,
+              identity#1,
+              function($n){$days => index-of($n)},
+              op('*')
+            )?Tuesday
         </test>
         <result>
-            <assert-eq>36</assert-eq>
+            <assert-eq>9</assert-eq>
         </result>
     </test-case>
     
