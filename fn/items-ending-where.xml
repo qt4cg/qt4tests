@@ -1,91 +1,91 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-items-from">
-   <description>Tests for the fn:items-from function (4.0 proposal)</description>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-items-ending-where">
+   <description>Tests for the fn:items-ending-where function (4.0 proposal)</description>
    <link type="spec" document="http://www.w3.org/TR/xpath-functions-11/"
-         idref="func-items-from"/>
+         idref="func-items-ending-where"/>
          
     <dependency type="spec" value="XP40+ XQ40+"/>  
 
-   <test-case name="items-from-001">
+   <test-case name="items-ending-where-001">
        <description>Basic example</description>
       <created by="Michael Kay" on="2019-06-09"/>
-      <test>items-from(1 to 29, function($x){$x=10})</test>
+      <test>items-ending-where(1 to 29, function($x){$x=10})</test>
       <result>
-          <assert-deep-eq>10 to 29</assert-deep-eq>
+          <assert-deep-eq>1 to 10</assert-deep-eq>
       </result>
    </test-case>
     
-    <test-case name="items-from-002">
+    <test-case name="items-ending-where-002">
         <description>No match</description>
         <created by="Michael Kay" on="2019-06-09"/>
-        <test>items-from(1 to 29, function($x){$x=100})</test>
-        <result>
-            <assert-empty/>
-        </result>
-    </test-case>
-    
-    <test-case name="items-from-003">
-        <description>Match on first</description>
-        <created by="Michael Kay" on="2019-06-09"/>
-        <test>items-from(1 to 29, function($x){true()})</test>
+        <test>items-ending-where(1 to 29, function($x){$x=100})</test>
         <result>
             <assert-deep-eq>1 to 29</assert-deep-eq>
         </result>
     </test-case>
     
-    <test-case name="items-from-004">
+    <test-case name="items-ending-where-003">
+        <description>Match on first</description>
+        <created by="Michael Kay" on="2019-06-09"/>
+        <test>items-ending-where(1 to 29, function($x){true()})</test>
+        <result>
+            <assert-eq>1</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="items-ending-where-004">
         <description>Empty input</description>
         <created by="Michael Kay" on="2019-06-09"/>
-        <test>items-from((), function($x){$x = 3})</test>
+        <test>items-ending-where((), function($x){$x = 3})</test>
         <result>
             <assert-empty/>
         </result>
     </test-case>
     
-    <test-case name="items-from-005">
+    <test-case name="items-ending-where-005">
         <description>Match at end of sequence</description>
         <created by="Michael Kay" on="2019-06-09"/>
-        <test>items-from(1 to 29, function($x){$x eq 29})</test>
+        <test>items-ending-where(1 to 29, function($x){$x eq 29})</test>
         <result>
-            <assert-eq>29</assert-eq>
+            <assert-deep-eq>1 to 29</assert-deep-eq>
         </result>
     </test-case>
     
-    <test-case name="items-from-006">
+    <test-case name="items-ending-where-006">
         <description>Map as argument</description>
         <created by="Michael Kay" on="2019-06-09"/>
-        <test>items-from(1 to 5, map{1:false(), 2:false(), 3:true(), 4:true(), 5:true()})</test>
+        <test>items-ending-where(1 to 5, map{1:false(), 2:false(), 3:true(), 4:true(), 5:true()})</test>
         <result>
-            <assert-deep-eq>3 to 5</assert-deep-eq>
+            <assert-deep-eq>1 to 3</assert-deep-eq>
         </result>
     </test-case>
     
-    <test-case name="items-from-007">
+    <test-case name="items-ending-where-007">
         <description>Sequence of nodes</description>
         <created by="Michael Kay" on="2019-06-09"/>
         <dependency type="spec" value="XQ31+"/>
         <test><![CDATA[
             let $nodes := document{<x><a/><b/><c/><d/><e/></x>}
-            return items-from($nodes/x/*, function($node){exists($node[self::c])})!local-name()
+            return items-ending-where($nodes/x/*, function($node){exists($node[self::c])})!local-name()
             ]]></test>
         <result>
-            <assert-deep-eq>'c', 'd', 'e'</assert-deep-eq>
+            <assert-deep-eq>'a', 'b', 'c'</assert-deep-eq>
         </result>
     </test-case>
     
-    <test-case name="items-from-901">
+    <test-case name="items-ending-where-901">
         <description>Test use of EBV is disallowed</description>
         <created by="Michael Kay" on="2019-06-09"/>
-        <test>items-from(1 to 100, function($x){$x - 1})</test>
+        <test>items-ending-where(1 to 100, function($x){$x - 1})</test>
         <result>
             <error code="XPTY0004"/>
         </result>
     </test-case>
     
-    <test-case name="items-from-902">
+    <test-case name="items-ending-where-902">
         <description>Wrong arity of function</description>
         <created by="Michael Kay" on="2019-06-09"/>
-        <test>items-from(1 to 100, function($x, $y){$x - 1})</test>
+        <test>items-ending-where(1 to 100, function($x, $y){$x - 1})</test>
         <result>
             <error code="XPTY0004"/>
         </result>
