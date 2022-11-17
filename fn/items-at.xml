@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-items-at">
+   <description>Tests for the items-at() function</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-40/"
+         idref="func-items-at"/>
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+   
+
+   <test-case name="fn-items-at-001">
+      <description> arg1: sequence of string, arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at( ("a", "b", "c"), 1)</test>
+      <result>
+         <assert-deep-eq>"a"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-002">
+      <description> arg1: sequence of string, arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at( ("a", "b", "c"), 3 to 12)</test>
+      <result>
+         <assert-deep-eq>"c"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-003">
+      <description> arg1: sequence of string, arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at( ("a", xs:string(""),"b", "c"), 1 to 3)</test>
+      <result>
+         <assert-deep-eq>"a", "", "b"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-004">
+      <description> arg1: sequence of string, arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at( ("a", xs:string("hello"),"b", "c"), 1 to 3)</test>
+      <result>
+         <assert-deep-eq>"a", "hello", "b"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-005">
+      <description> arg1: sequence of string &amp; anyURI, arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at( ("a", xs:anyURI("www.example.com"),"b", "c"), 1 to 3)</test>
+      <result>
+         <assert-deep-eq>"a", "www.example.com", "b"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-006">
+      <description> arg1: sequence of string, arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at( ("a", (), (), "b", "c"), (1, 3))</test>
+      <result>
+         <assert-deep-eq>"a", "c"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-007">
+      <description> arg1: sequence of string &amp; integer, arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at( ("a", xs:integer("100"), xs:integer("-100"), "b", "c"), (3,4,5))</test>
+      <result>
+         <assert-deep-eq>-100, "b", "c"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-008">
+      <description> arg1: sequence of string,decimal &amp; integer, arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at( ("a", xs:decimal("-1.000000000001"), xs:integer("-100"), "b", "c"), (4, 2, 3))</test>
+      <result>
+         <assert-deep-eq>"b", -1.000000000001, -100</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-009">
+      <description> arg1: sequence of string &amp; float , arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at( ("a", xs:float("INF"), "b", "c"), -2 to 0)</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-010">
+      <description> arg1: sequence of string &amp; float , arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at ( ("a", xs:float("-INF"), "b", "c"), (1,2))</test>
+      <result>
+         <assert-deep-eq>"a", xs:float("-INF")</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-011">
+      <description> arg1: sequence of string &amp; float , arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at ( ("a", xs:float("NaN"), "b", "c"), (0, 1))</test>
+      <result>
+         <assert-eq>"a"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-012">
+      <description> arg1: sequence of string &amp; float , arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at ( ("a", xs:float("1.01"), "b", "c"), (2,4))</test>
+      <result>
+         <assert-deep-eq>xs:float("1.01"), "c"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-013">
+      <description> arg1: sequence of string &amp; double , arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at ( ("a", xs:double("NaN"), "b", "c"), (2 to 20))</test>
+      <result>
+         <assert-deep-eq>xs:double('NaN'), "b", "c"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-014">
+      <description> arg1: sequence of string &amp; double , arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at ( ("a", xs:double("1.01"), "b", "c"), (3, 2))</test>
+      <result>
+         <assert-deep-eq>"b", xs:double("1.01")</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-015">
+      <description> arg1: sequence of string &amp; double , arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at ( ("a", xs:double("-INF"), "b", "c"), (3, 3, 3))</test>
+      <result>
+         <assert-deep-eq>"b", "b", "b"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-016">
+      <description> arg1: sequence of string &amp; double , arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at ( ("a", xs:double("INF"), "b", "c"), (2, 2))</test>
+      <result>
+         <assert-deep-eq>xs:double("INF"), xs:double("INF")</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-017">
+      <description> arg1: sequence of string &amp; boolean, arg2 &amp; arg3: integer </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>fn:items-at ( ("a", xs:boolean("1"), "b", "c"), (1,2))</test>
+      <result>
+         <assert-deep-eq>"a", true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+ 
+
+   <test-case name="fn-items-at-031">
+      <description> A test whose essence is: `items-at()`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at()</test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-032">
+      <description> A test whose essence is: `items-at(1)`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at(1)</test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-033">
+      <description> A test whose essence is: `items-at(1, 1, 1, 1)`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at(1, 1, 1, 1)</test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-034">
+      <description> A test whose essence is: `empty(items-at((), 2, 3))`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>empty(items-at((), 2, 3))</test>
+      <result>
+         <any-of>
+            <assert-true/>
+            <error code="XPST0005"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-035">
+      <description> A test whose essence is: `empty(items-at((1, 2, 3), 2, -10))`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>empty(items-at((1, 2, 3), 2, -10))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-036">
+      <description> A test whose essence is: `count(items-at((1, 2, 3, "four"), 4)) eq 1`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(items-at((1, 2, 3, "four"), 4)) eq 1</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-037">
+      <description> A test whose essence is: `count(items-at((1, 2, 3, "four"), 4, 1)) eq 1`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(items-at((1, 2, 3, "four"), 4, 1)) eq 1</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-038">
+      <description> A test whose essence is: `items-at((1, 2, 3.1, "four"), 4)`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at((1, 2, 3.1, "four"), 4)</test>
+      <result>
+         <assert-eq>"four"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-039">
+      <description> A test whose essence is: `items-at((1, 2, 3.1, "four"), 4, 1)`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at((1, 2, 3.1, "four"), 4, 1)</test>
+      <result>
+         <assert-eq>"four"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-110">
+      <description> A test whose essence is: `items-at((1, 2, 3.1, "four"), 3, 1) instance of xs:decimal`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at((1, 2, 3.1, "four"), 3, 1) instance of xs:decimal</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-111">
+      <description> A test whose essence is: `items-at((1, 2, 3.1, "four"), 1, 1)`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at((1, 2, 3.1, "four"), 1, 1)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-112">
+      <description> A test whose essence is: `empty(items-at((1, 2, 3, "four"), 4, -3))`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>empty(items-at((1, 2, 3, "four"), 4, -3))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-113">
+      <description> A test whose essence is: `empty(items-at((1, 2, 3, "four"), -4, -3))`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>empty(items-at((1, 2, 3, "four"), -4, -3))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-114">
+      <description> A test whose essence is: `items-at((1, 2, 3), 1, 1) eq 1`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at((1, 2, 3), 1, 1) eq 1</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-115">
+      <description> A test whose essence is: `items-at((1, 2, 3), 1, 1) eq 1`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at((1, 2, 3), 1, 1) eq 1</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-116">
+      <description> A test whose essence is: `items-at((1, 2, 3), 3) eq 3`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at((1, 2, 3), 3) eq 3</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-117">
+      <description> A test whose essence is: `count(items-at((1, 2, 3), 1, 1)) eq 1`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(items-at((1, 2, 3), 1, 1)) eq 1</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-118">
+      <description> A test whose essence is: `count(items-at((1, 2, 3), 1, 3)) eq 3`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(items-at((1, 2, 3), 1, 3)) eq 3</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-119">
+      <description> A test whose essence is: `count(items-at((1, 2, 3, "four"), 4)) eq 1`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(items-at((1, 2, 3, "four"), 4)) eq 1</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-120">
+      <description> A test whose essence is: `count(items-at(1 to 3, 1, 1)) eq 1`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(items-at(1 to 3, 1, 1)) eq 1</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-121">
+      <description> A test whose essence is: `empty(items-at((1, 2), 4))`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>empty(items-at((1, 2), 4))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-122">
+      <description> A test whose essence is: `items-at((5, 6, 7, 8), 2, 1) eq 6`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at((5, 6, 7, 8), 2, 1) eq 6</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-123">
+      <description> A test whose essence is: `count(items-at((1, 2), 2)) eq 1`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(items-at((1, 2), 2)) eq 1</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-124">
+      <description> A test whose essence is: `count(items-at((1, 2, 3, "four"), 2)) eq 3`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(items-at((1, 2, 3, "four"), 2)) eq 3</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-125">
+      <description> A test whose essence is: `count(items-at((1, 2, 3, "four"), 2, 2)) eq 2`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(items-at((1, 2, 3, "four"), 2, 2)) eq 2</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-126">
+      <description> A test whose essence is: `items-at((1, 2, 3.1, "four"), 1, 1)`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at((1, 2, 3.1, "four"), 1, 1)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-127">
+      <description> A test whose essence is: `1 eq "a string"`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>1 eq "a string"</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-128">
+      <description> A test whose essence is: `1 eq items-at(("1", 2, 3.1, "four"), 1, 1)`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>1 eq items-at(("1", 2, 3.1, "four"), 1, 1)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-129">
+      <description> A test whose essence is: `items-at(("1", 2, 3.1, "four"), 1, 1) eq 1`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at(("1", 2, 3.1, "four"), 1, 1) eq 1</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-130">
+      <description> A test whose essence is: `items-at(error(), 1, 1)`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>items-at(error(), 1, 1)</test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-131">
+      <description> A test whose essence is: `count(items-at((1, 2, 2, current-time()), 2, 2)) eq 2`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(items-at((1, 2, 2, current-time()), 2, 2)) eq 2</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-132">
+      <description> A test whose essence is: `count(items-at(remove(current-time(), 1), 1, 1)) eq 0`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(items-at(remove(current-time(), 1), 1, 1)) eq 0</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-133">
+      <description> A test whose essence is: `deep-equal(1, items-at((1, 2, current-time()), 1, 1))`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>deep-equal(1, items-at((1, 2, current-time()), 1, 1))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-134">
+      <description> Using items-at inside a predicate. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>(1)[deep-equal(1, items-at((1, 2, current-time()), 1, 1))] eq 1</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-135">
+      <description> A test whose essence is: `empty(items-at((current-time(), 1), 4))`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>empty(items-at((current-time(), 1), 4))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-136">
+      <description> A test whose essence is: `count(items-at((current-time(), 1), 4)) eq 0`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(items-at((current-time(), 1), 4)) eq 0</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-items-at-137">
+      <description> A test whose essence is: `count(items-at((current-time(), 2 , 3), 1)) eq 3`. </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(items-at((current-time(), 2 , 3), 1)) eq 3</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+ 
+</test-set>
