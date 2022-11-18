@@ -2432,12 +2432,79 @@
       <created by="Michael Kay" on="2022-11-04"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
-         declare function local:f($x as xs:integer, $y as xs:integer := $x) { $x * $y };
-         declare variable $x := 7
+         declare function local:f($x as xs:integer, $y as xs:integer := $v) { $x * $y };
+         declare variable $v := 7;
          local:f(4)
       </test>
       <result>
          <assert-eq>28</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-020">
+      <description>XQ40: function with optional parameter, default value is misleadingly named global variable reference</description>
+      <created by="Michael Kay" on="2022-11-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := $x) { $x * $y };
+         declare variable $x := 7;
+         local:f(4)
+      </test>
+      <result>
+         <assert-eq>28</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-021">
+      <description>XQ40: function with optional parameter, included: function lookup and dynamic call</description>
+      <created by="Michael Kay" on="2022-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := 1) { $x + $y };
+         function-lookup(xs:QName('local:f'), 2)(3,2)
+      </test>
+      <result>
+         <assert-eq>5</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-022">
+      <description>XQ40: function with optional parameter, excluded: function lookup and dynamic call</description>
+      <created by="Michael Kay" on="2022-11-17"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := 1) { $x + $y };
+         function-lookup(xs:QName('local:f'), 1)(3)
+      </test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-023">
+      <description>XQ40: function with optional parameter, default invokes the function recursively</description>
+      <created by="Michael Kay" on="2022-11-17"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := local:f(3, 4)) { $x + $y };
+         local:f(3)
+      </test>
+      <result>
+         <assert-eq>10</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-024">
+      <description>XQ40: function with optional parameter, default invokes another function recursively</description>
+      <created by="Michael Kay" on="2022-11-17"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := local:g(3)) { $x + $y };
+         declare function local:g($x as xs:integer, $y as xs:integer := local:f(3, 4)) { $x + $y };
+         local:f(5)
+      </test>
+      <result>
+         <assert-eq>15</assert-eq>
       </result>
    </test-case>
    
@@ -2536,7 +2603,7 @@
          local:f(42, x := 3)
       </test>
       <result>
-         <error code="XXXX9999"/>
+         <error code="XPST0141"/>
       </result>
    </test-case>
    
@@ -2549,7 +2616,7 @@
          local:f(x := 42, x := 3)
       </test>
       <result>
-         <error code="XXXX9999"/>
+         <error code="XPST0141"/>
       </result>
    </test-case>
    
@@ -2562,7 +2629,7 @@
          local:f(y := 4)
       </test>
       <result>
-         <error code="XXXX9999"/>
+         <error code="XPST0141"/>
       </result>
    </test-case>
    
@@ -2588,7 +2655,20 @@
          local:f(z := 4)
       </test>
       <result>
-         <error code="XXXX9999"/>
+         <error code="XPST0142"/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-912">
+      <description>XQ40: Default value for parameter attempts to reference another parameter</description>
+      <created by="Michael Kay" on="2022-11-17"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x, $y := $x + 1) { $x + $y };
+         local:f(4)
+      </test>
+      <result>
+         <error code="XPST0008"/>
       </result>
    </test-case>
    
