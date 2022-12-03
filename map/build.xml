@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="map-build"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" covers="map-build">
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="map-build" covers="map-build">
     <description>Tests for the map:contains function proposed for XPath 4.0</description>
     <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-map-build"/>
     <dependency type="spec" value="XP40+ XQ40+"/>
@@ -57,11 +56,16 @@
     <test-case name="map-build-005">
         <description>Key function defaulted, value present, duplicates</description>
         <created by="Michael Kay, Saxonica" on="2022-10-12"/>
+        <modified by="Michael Kay, Saxonica" on="2022-11-23" change="change test to deliver expected result"/>
         <environment ref="map"/>
         <test>
             let $days := ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"),
                 $fortnight := ($days, reverse($days))
-            return map:build($fortnight, value := function($n){$days => index-of($n)}, combine := op('*')?Tuesday
+            return map:build(1 to count($fortnight), 
+                             key := function($n){$fortnight[$n]},
+                             value := identity#1, 
+                             combine := op('*'))
+                   ?Tuesday
         </test>
         <result>
             <assert-eq>36</assert-eq>
