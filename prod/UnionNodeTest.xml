@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-UnionNodeTest" covers40="union-node-test">
+   <description>Tests for the NodeTest production</description>
+   <link type="spec" document="http://www.w3.org/TR/xquery-30/"
+         idref="doc-xquery30-NodeTest"/>
+   <link type="spec" document="XQuery" section-number="3.2.1.2" idref="node-tests"/>
+   
+   
+   <environment name="bib2">
+      <source role="." file="../op/union/bib2.xml">
+         <description>Bibliography example with extra comments and PIs.</description>
+         <created by="spec-authors" on="2000-01-01"/>
+      </source>
+   </environment>    
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+   
+   
+
+   <test-case name="UnionNodeTest001">
+      <description> Simple test for comment() node type, parenthesized </description>
+      <created by="Michael Kay" on="2022-12-13"/>
+      <environment ref="bib2"/>
+      <test>/child::(comment())</test>
+      <result>
+         <assert-xml><![CDATA[<!-- this file is a copy of bib.xml; just adds a few comments and PI nodes for testing --><!-- Comment 1 --><!-- Comment 2 -->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="UnionNodeTest002">
+      <description> Simple test for comment() or processing-instruction() node test </description>
+      <created by="Michael Kay" on="2022-12-13"/>
+      <environment ref="bib2"/>
+      <test>/child::(comment()|processing-instruction())</test>
+      <result>
+         <assert-xml><![CDATA[<!-- this file is a copy of bib.xml; just adds a few comments and PI nodes for testing --><!-- Comment 1 --><?PI1 Processing Instruction 1?><!-- Comment 2 --><?PI2 Processing Instruction 2?>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="UnionNodeTest003">
+      <description> "Union" keyword disallowed </description>
+      <created by="Michael Kay" on="2022-12-13"/>
+      <environment ref="bib2"/>
+      <test>/child::(comment() union processing-instruction())</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="UnionNodeTest006">
+      <description> Simple test for node type text(), duplicated </description>
+      <created by="Michael Kay" on="2022-12-13"/>
+      <environment ref="bib2"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<result> {/bib/book/editor/affiliation/(text()|text())} </result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result>CITI</result>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="UnionNodeTest007">
+      <description> Simple test for union of two element names</description>
+      <created by="Michael Kay" on="2022-12-13"/>
+      <environment ref="bib2"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<result> {/bib/book[1]/child::(title|author)} </result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result><title>TCP/IP Illustrated</title><author><last>Stevens</last><first>W.</first></author></result>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="UnionNodeTest008">
+      <description> Simple test for union of two element names</description>
+      <created by="Michael Kay" on="2022-12-13"/>
+      <environment ref="bib2"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<result> {/bib/book[1]/child::(author|title)} </result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result><title>TCP/IP Illustrated</title><author><last>Stevens</last><first>W.</first></author></result>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="UnionNodeTest009">
+      <description> Simple test for union of two element names with numeric predicate</description>
+      <created by="Michael Kay" on="2022-12-13"/>
+      <environment ref="bib2"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<result> {/bib/book[1]/child::(author|title)[1]} </result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result><title>TCP/IP Illustrated</title></result>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="UnionNodeTest010">
+      <description> Simple test for union of two attribute names</description>
+      <created by="Michael Kay" on="2022-12-13"/>
+      <environment ref="bib2"/>
+      <test>/bib/book[1]/attribute::(year|month)/string()</test>
+      <result>
+         <assert-eq>"1994"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="UnionNodeTest011">
+      <description> Simple test for union of two attribute names</description>
+      <created by="Michael Kay" on="2022-12-13"/>
+      <environment ref="bib2"/>
+      <test>/bib/book[1]/@(year|month)/string()</test>
+      <result>
+         <assert-eq>"1994"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="UnionNodeTest012">
+      <description> Numeric predicate with reverse axis</description>
+      <created by="Michael Kay" on="2022-12-13"/>
+      <environment ref="bib2"/>
+      <test>(.//author)[1]/ancestor::(bib|book)[1]/name()</test>
+      <result>
+         <assert-eq>"book"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="UnionNodeTest013">
+      <description> Simple test for union of multiple element names</description>
+      <created by="Michael Kay" on="2022-12-13"/>
+      <environment ref="bib2"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<result> {/bib/book[1]/child::(title|author|foo|bar|baz)} </result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result><title>TCP/IP Illustrated</title><author><last>Stevens</last><first>W.</first></author></result>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="UnionNodeTest014">
+      <description> Simple test for union of multiple element names</description>
+      <created by="Michael Kay" on="2022-12-13"/>
+      <environment ref="bib2"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<result> {/bib/book[1]/child::(*:title|*:author|*:foo|*:bar|*:baz)} </result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result><title>TCP/IP Illustrated</title><author><last>Stevens</last><first>W.</first></author></result>]]></assert-xml>
+      </result>
+   </test-case>
+
+ 
+</test-set>
