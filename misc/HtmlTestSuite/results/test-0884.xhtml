@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>Hit-testing on pseudo elements of inert nodes</title>
+<link href="https://github.com/nt1m" rel="author" title="Tim Nguyen"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+<script src="/resources/testdriver-actions.js"/>
+<style>
+#target::before {
+    content: "";
+    width: 50px;
+    height: 50px;
+    background-color: green;
+    display: inline-block;
+}
+
+#target:hover::before,
+#target:active::before {
+    background-color: red;
+}
+</style>
+</head><body><p>Manual test: hover the green square, pass if it does not turn red.</p>
+<div id="target" inert=""/>
+<script>
+const events = [
+    "mousedown", "mouseenter", "mousemove", "mouseover",
+    "pointerdown", "pointerenter", "pointermove", "pointerover",
+];
+async function mouseDownAndGetEvents(test) {
+    const receivedEvents = [];
+    for (let event of events) {
+        target.addEventListener(event, () =&gt; {
+            receivedEvents.push(event);
+        }, { once: true, capture: true });
+    }
+
+    await new test_driver.Actions()
+        .pointerMove(0, 0, { origin: target })
+        .pointerDown()
+        .send();
+    test.add_cleanup(() =&gt; test_driver.click(document.body));
+
+    // Exact order of events is not interoperable.
+    receivedEvents.sort();
+    return receivedEvents;
+}
+promise_test(async function() {
+    const receivedEvents = await mouseDownAndGetEvents(this);
+    assert_array_equals(receivedEvents, [], "target got no event");
+    assert_false(target.matches(":active"), "target is not active");
+    assert_false(target.matches(":hover"), "target is not hovered");
+    assert_equals(getComputedStyle(target, "::before").backgroundColor, "rgb(0, 128, 0)", "#target::before has no hover style");
+}, "Hit-testing cannot reach pseudo elements of inert nodes");
+
+promise_test(async function() {
+    target.inert = false;
+    const receivedEvents = await mouseDownAndGetEvents(this);
+    assert_array_equals(receivedEvents, events, "target got all events");
+    assert_true(target.matches(":active"), "target is active");
+    assert_true(target.matches(":hover"), "target is hovered");
+    assert_equals(getComputedStyle(target, "::before").backgroundColor, "rgb(255, 0, 0)", "#target::before has hover style");
+}, "Hit-testing can reach pseudo elements of non-inert nodes");
+</script>
+</body></html>

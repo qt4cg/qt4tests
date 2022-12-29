@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>HTML Templates: In body insertion mode: Template contains a start tag whose tag name is body</title>
+<meta href="mailto:sgrekhov@unipro.ru" name="author" title="Sergey G. Grekhov"/>
+<meta content="If the stack of open elements has a template element in html scope then ignore &lt;body&gt; the token. (fragment or template contents case)" name="assert"/>
+<link href="http://www.w3.org/TR/2013/WD-html-templates-20130214/#in-body-addition" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/html/resources/common.js"/>
+</head>
+<body>
+<div id="log"/>
+<script type="text/javascript">
+
+
+test(function () {
+    var doc = newHTMLDocument();
+
+    doc.body.innerHTML = '&lt;template id="tmpl"&gt;&lt;body&gt;&lt;/template&gt;';
+
+    var template = doc.querySelector('#tmpl');
+
+    assert_equals(template.content.childNodes.length, 0, 'Element must be ignored');
+
+}, 'In body insertion mode: Template contains a start tag whose tag name is body.'
+    + 'Test &lt;body&gt; tag only');
+
+
+
+test(function () {
+    var doc = newHTMLDocument();
+
+    doc.body.innerHTML = '&lt;template id="tmpl"&gt;&lt;body&gt;Body text content&lt;/body&gt;&lt;/template&gt;';
+
+    var template = doc.querySelector('#tmpl');
+
+    assert_equals(template.content.querySelector('body'), null,
+            '&lt;body&gt; element must be ignored');
+    assert_equals(template.content.childNodes.length, 1, 'Text shouldn\'t be ignored');
+    assert_equals(template.content.firstChild.nodeType, Node.TEXT_NODE,
+            'Text shouldn\'t be ignored');
+
+}, 'In body insertion mode: Template contains a start tag whose tag name is body. '
+    + 'Test &lt;body&gt; tag containing some text');
+
+
+
+test(function () {
+    var doc = newHTMLDocument();
+
+    doc.body.innerHTML = '&lt;template id="tmpl"&gt;&lt;body&gt;'
+        + '&lt;div id="div1"&gt;DIV 1&lt;/div&gt;'
+        + '&lt;div id="div2"&gt;DIV 2&lt;/div&gt;'
+        + '&lt;/body&gt;&lt;/template&gt;';
+
+    var template = doc.querySelector('#tmpl');
+
+    assert_equals(template.content.querySelector('body'), null,
+            '&lt;body&gt; element must be ignored');
+    assert_equals(template.content.childNodes.length, 2,
+            'Only body tag should be ignored');
+    assert_not_equals(template.content.querySelector('#div1'), null,
+            'Children of &lt;body tag shouldn\'t be ignored');
+    assert_not_equals(template.content.querySelector('#div2'), null,
+            'Children of &lt;body tag shouldn\'t be ignored');
+
+}, 'In body insertion mode: Template contains a start tag whose tag name is body. '
+    + 'Test &lt;body&gt; tag containing some other elements');
+
+
+
+test(function () {
+    var doc = newHTMLDocument();
+
+    doc.body.innerHTML = '&lt;template id="tmpl1"&gt;&lt;template id="tmpl2"&gt;&lt;body&gt;'
+        + '&lt;div id="div1"&gt;DIV 1&lt;/div&gt;'
+        + '&lt;div id="div2"&gt;DIV 2&lt;/div&gt;'
+        + '&lt;/body&gt;&lt;/template&gt;&lt;/template&gt;';
+
+    var template = doc.querySelector('#tmpl1').content.querySelector('#tmpl2');
+
+    assert_equals(template.content.querySelector('body'), null,
+            '&lt;body&gt; element must be ignored');
+    assert_equals(template.content.childNodes.length, 2,
+            'Only body tag should be ignored');
+    assert_not_equals(template.content.querySelector('#div1'), null,
+            'Children of &lt;body tag shouldn\'t be ignored');
+    assert_not_equals(template.content.querySelector('#div2'), null,
+            'Children of &lt;body tag shouldn\'t be ignored');
+
+}, 'In body insertion mode: Template contains a start tag whose tag name is body. '
+    + 'Test nested template tag containing &lt;body&gt; tag with some other elements');
+
+</script>
+</body>
+</html>

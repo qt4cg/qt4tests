@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Test AudioContext construction when document is not fully active</title>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/common/get-host-info.sub.js"/>
+</head><body><script>
+const dir = location.pathname.replace(/\/[^\/]*$/, '/');
+const helper = dir + 'resources/not-fully-active-helper.sub.html?childsrc=';
+const remote_helper = get_host_info().HTTP_NOTSAMESITE_ORIGIN + helper;
+const blank_url = get_host_info().ORIGIN + '/common/blank.html';
+
+const load_content = (frame, src) =&gt; {
+  if (src == undefined) {
+    frame.srcdoc = '&lt;html&gt;&lt;/html&gt;';
+  } else {
+    frame.src = src;
+  }
+  return new Promise(resolve =&gt; frame.onload = () =&gt; resolve(frame));
+};
+const append_iframe = (src) =&gt; {
+  const frame = document.createElement('iframe');
+  document.body.appendChild(frame);
+  return load_content(frame, src);
+};
+const remote_op = (win, op) =&gt; {
+  win.postMessage(op, '*');
+  return new Promise(resolve =&gt; window.onmessage = e =&gt; {
+    if (e.data == 'DONE ' + op) resolve();
+  });
+};
+const test_constructor_throws = async (win, deactivate) =&gt; {
+  const {AudioContext, DOMException} = win;
+  await deactivate();
+  assert_throws_dom("InvalidStateError", DOMException,
+                    () =&gt; new AudioContext());
+};
+
+promise_test(async () =&gt; {
+  const frame = await append_iframe();
+  return test_constructor_throws(frame.contentWindow, () =&gt; frame.remove());
+}, "removed frame");
+promise_test(async () =&gt; {
+  const frame = await append_iframe();
+  return test_constructor_throws(frame.contentWindow,
+                                 () =&gt; load_content(frame));
+}, "navigated frame");
+promise_test(async () =&gt; {
+  const frame = await append_iframe(helper + blank_url);
+  const inner = frame.contentWindow.frames[0];
+  return test_constructor_throws(inner, () =&gt; frame.remove());
+}, "frame in removed frame");
+promise_test(async () =&gt; {
+  const frame = await append_iframe(helper + blank_url);
+  const inner = frame.contentWindow.frames[0];
+  return test_constructor_throws(inner, () =&gt; load_content(frame));
+}, "frame in navigated frame");
+promise_test(async () =&gt; {
+  const frame = await append_iframe(remote_helper + blank_url);
+  const inner = frame.contentWindow.frames[0];
+  return test_constructor_throws(inner, () =&gt; frame.remove());
+}, "frame in removed remote-site frame");
+promise_test(async () =&gt; {
+  const frame = await append_iframe(remote_helper + blank_url);
+  const inner = frame.contentWindow.frames[0];
+  return test_constructor_throws(inner, () =&gt; load_content(frame));
+}, "frame in navigated remote-site frame");
+promise_test(async () =&gt; {
+  const outer = (await append_iframe(remote_helper + blank_url)).contentWindow;
+  const inner = outer.frames[0];
+  return test_constructor_throws(inner,
+                                 () =&gt; remote_op(outer, 'REMOVE FRAME'));
+}, "removed frame in remote-site frame");
+promise_test(async () =&gt; {
+  const outer = (await append_iframe(remote_helper + blank_url)).contentWindow;
+  const inner = outer.frames[0];
+  return test_constructor_throws(inner,
+                                 () =&gt; remote_op(outer, 'NAVIGATE FRAME'));
+}, "navigated frame in remote-site frame");
+promise_test(async () =&gt; {
+  const url = remote_helper + helper + blank_url;
+  const outer = (await append_iframe(url)).contentWindow;
+  const inner = outer.frames[0].frames[0];
+  return test_constructor_throws(inner,
+                                 () =&gt; remote_op(outer, 'REMOVE FRAME'));
+}, "frame in removed remote-site frame in remote-site frame");
+promise_test(async () =&gt; {
+  const url = remote_helper + helper + blank_url;
+  const outer = (await append_iframe(url)).contentWindow;
+  const inner = outer.frames[0].frames[0];
+  return test_constructor_throws(inner,
+                                 () =&gt; remote_op(outer, 'NAVIGATE FRAME'));
+}, "frame in navigated remote-site frame in remote-site frame");
+</script>
+</body>
+</html>

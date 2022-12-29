@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+</head><body><iframe id="testframe" src="/common/blank.html"/>
+<script>
+var simple_tests = [
+  {
+    name: "text.simple",
+    input: "&lt;input name=foo value=bara&gt;",
+    output: "foo=bara"
+  },
+  {
+    name: "textarea.simple",
+    input: "&lt;textarea name=foo&gt;bar&lt;/textarea&gt;",
+    output: "foo=bar"
+  },
+  {
+    name: "nokeygen.simple",
+    input: "&lt;input name=foo value=barb&gt;&lt;keygen&gt;",
+    output: "foo=barb"
+  }
+];
+simple_tests.forEach(function(test_obj) {
+  test_obj.test = async_test(test_obj.name);
+});
+function run_simple_test() {
+  if (simple_tests.length == 0) {
+    return;
+  }
+  test_obj = simple_tests.pop();
+  var t = test_obj.test;
+  var testframe = document.getElementById("testframe");
+  var testdocument = testframe.contentWindow.document;
+  testdocument.body.innerHTML =
+    "&lt;form id=testform action=\"/common/blank.html\"&gt;" +
+    test_obj.input +
+    "&lt;/form&gt;";
+  testframe.onload = function() {
+    t.step(function (){
+      var get_url = testframe.contentWindow.location.toString();
+      var encoded = get_url.substr(get_url.indexOf("?") + 1);
+      assert_equals(encoded, test_obj.output);
+    });
+    t.done();
+    run_simple_test();
+  };
+  testdocument.getElementById("testform").submit();
+}
+document.getElementById("testframe").onload = run_simple_test;
+</script>
+</body></html>

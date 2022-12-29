@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Container-relative units in @media</title>
+<link href="https://drafts.csswg.org/css-contain-3/#container-lengths" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="support/cq-testcommon.js"/>
+
+<style>
+  iframe {
+    width: 200px;
+    height: 100px;
+  }
+</style>
+
+</head><body><iframe id="iframe"/>
+
+<script>
+setup(() =&gt; assert_implements_container_queries());
+
+const doc = iframe.contentDocument;
+const win = iframe.contentWindow;
+
+function test_media_query(feature, result, description) {
+  test((t) =&gt; {
+    t.add_cleanup(() =&gt; { doc.body.innerHTML = ''; })
+    doc.body.innerHTML = `
+      &lt;style&gt;
+        body {
+          color: red;
+        }
+        @media (${feature}) {
+          body {
+            color: green;
+          }
+        }
+      &lt;/style&gt;
+      `;
+    assert_equals(win.getComputedStyle(doc.body).color, result);
+  }, description);
+}
+
+function test_media_query_applies(feature) {
+  test_media_query(feature, 'rgb(0, 128, 0)', `@media(${feature}) applies`);
+}
+
+function test_media_query_does_not_apply(feature) {
+  test_media_query(feature, 'rgb(255, 0, 0)', `@media(${feature}) does not apply`);
+}
+
+// Container-relative units resolve against the "small viewport size" for
+// media queries.
+test_media_query_applies('width:100cqw');
+test_media_query_applies('width:100cqi');
+test_media_query_applies('width:100cqmax');
+test_media_query_applies('height:100cqh');
+test_media_query_applies('height:100cqb');
+test_media_query_applies('height:100cqmin');
+test_media_query_does_not_apply('width:90cqw');
+test_media_query_does_not_apply('height:90cqh');
+
+</script>
+</body></html>

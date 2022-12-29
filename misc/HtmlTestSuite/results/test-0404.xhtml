@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="reftest-wait">
+<head><link href="https://drafts.csswg.org/css-backgrounds-3/#background-color" rel="help"/>
+<link href="background-color-scroll-into-viewport-ref.html" rel="match"/>
+<style>
+.container {
+  width: 100vw;
+  height: 100vh;
+  overflow:  hidden;
+  position:  relative;
+}
+.spacer {
+  height: 1000vh;
+}
+#target {
+  width:  50vw;
+  height:  50vh;
+  background-color: green;
+  animation: bgcolor 1000000s cubic-bezier(0,1,1,0) -500000s;
+}
+@keyframes bgcolor {
+  0% { background-color: rgb(0, 200, 0); }
+  100% { background-color: rgb(200, 0, 0); }
+}
+</style>
+<script src="/common/reftest-wait.js"/>
+</head><body>
+  <div class="container">
+    <div class="spacer"/>
+    <div id="target"/>
+  </div>
+<script>
+async function raf() {
+  return new Promise((resolve) =&gt; {
+    requestAnimationFrame(() =&gt; {
+      resolve();
+    });
+  })
+}
+
+document.getAnimations()[0].ready.then(async () =&gt; {
+  await raf();
+  await raf();
+  target.scrollIntoView();
+  takeScreenshot();
+});
+</script>
+
+</body>
+</html>

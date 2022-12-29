@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>RTCPeerConnection Simulcast Tests - setParameters/active</title>
+<meta content="long" name="timeout"/>
+<script src="../third_party/sdp/sdp.js"/>
+<script src="simulcast.js"/>
+<script src="../RTCPeerConnection-helper.js"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+<script src="../../mediacapture-streams/permission-helper.js"/>
+<script>
+async function queryReceiverStats(pc) {
+  const inboundStats = [];
+  await Promise.all(pc.getReceivers().map(async receiver =&gt; {
+    const receiverStats = await receiver.getStats();
+    receiverStats.forEach(stat =&gt; {
+      if (stat.type === 'inbound-rtp') {
+        inboundStats.push(stat);
+      }
+    });
+  }));
+  return inboundStats.map(s =&gt; s.framesDecoded);
+}
+
+promise_test(async t =&gt; {
+  const rids = [0, 1];
+  const pc1 = new RTCPeerConnection();
+  t.add_cleanup(() =&gt; pc1.close());
+  const pc2 = new RTCPeerConnection();
+  t.add_cleanup(() =&gt; pc2.close());
+
+  await negotiateSimulcastAndWaitForVideo(t, rids, pc1, pc2);
+
+  // Deactivate first sender.
+  const parameters = pc1.getSenders()[0].getParameters();
+  parameters.encodings[0].active = false;
+  await pc1.getSenders()[0].setParameters(parameters);
+
+  // Assert (almost) no new frames are received on the first encoding.
+  // Without any action we would expect to have received around 30fps.
+  await new Promise(resolve =&gt; t.step_timeout(resolve, 100)); // Wait a bit.
+  const initialStats = await queryReceiverStats(pc2);
+  await new Promise(resolve =&gt; t.step_timeout(resolve, 1000)); // Wait more.
+  const subsequentStats = await queryReceiverStats(pc2);
+
+  assert_equals(subsequentStats[0], initialStats[0]);
+  assert_greater_than(subsequentStats[1], initialStats[1]);
+}, 'Simulcast setParameters active=false on first encoding stops sending frames for that encoding');
+
+promise_test(async t =&gt; {
+  const rids = [0, 1];
+  const pc1 = new RTCPeerConnection();
+  t.add_cleanup(() =&gt; pc1.close());
+  const pc2 = new RTCPeerConnection();
+  t.add_cleanup(() =&gt; pc2.close());
+
+  await negotiateSimulcastAndWaitForVideo(t, rids, pc1, pc2);
+
+  // Deactivate second sender.
+  const parameters = pc1.getSenders()[0].getParameters();
+  parameters.encodings[1].active = false;
+  await pc1.getSenders()[0].setParameters(parameters);
+
+  // Assert (almost) no new frames are received on the second encoding.
+  // Without any action we would expect to have received around 30fps.
+  await new Promise(resolve =&gt; t.step_timeout(resolve, 100)); // Wait a bit.
+  const initialStats = await queryReceiverStats(pc2);
+  await new Promise(resolve =&gt; t.step_timeout(resolve, 1000)); // Wait more.
+  const subsequentStats = await queryReceiverStats(pc2);
+
+  assert_equals(subsequentStats[1], initialStats[1]);
+  assert_greater_than(subsequentStats[0], initialStats[0]);
+}, 'Simulcast setParameters active=false on second encoding stops sending frames for that encoding');
+
+promise_test(async t =&gt; {
+  const rids = [0, 1];
+  const pc1 = new RTCPeerConnection();
+  t.add_cleanup(() =&gt; pc1.close());
+  const pc2 = new RTCPeerConnection();
+  t.add_cleanup(() =&gt; pc2.close());
+
+  await negotiateSimulcastAndWaitForVideo(t, rids, pc1, pc2);
+
+  // Deactivate all senders.
+  const parameters = pc1.getSenders()[0].getParameters();
+  parameters.encodings.forEach(e =&gt; {
+    e.active = false;
+  });
+  await pc1.getSenders()[0].setParameters(parameters);
+
+  // Assert (almost) no new frames are received.
+  // Without any action we would expect to have received around 30fps.
+  await new Promise(resolve =&gt; t.step_timeout(resolve, 100)); // Wait a bit.
+  const initialStats = await queryReceiverStats(pc2);
+  await new Promise(resolve =&gt; t.step_timeout(resolve, 1000)); // Wait more.
+  const subsequentStats = await queryReceiverStats(pc2);
+
+  subsequentStats.forEach((framesDecoded, idx) =&gt; {
+    assert_equals(framesDecoded, initialStats[idx]);
+  });
+}, 'Simulcast setParameters active=false stops sending frames');
+</script>
+</head><body/></html>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head><script src="/common/get-host-info.sub.js"/>
+<script>
+
+function remote(path) {
+  const REMOTE_ORIGIN = get_host_info().HTTPS_REMOTE_ORIGIN;
+  return new URL(path, REMOTE_ORIGIN);
+}
+
+let params = new URLSearchParams(location.search);
+let token = params.get('token');
+let revalidate = params.get('revalidate');
+
+let image_path = `/html/cross-origin-embedder-policy/resources/corp-image.py?token=${token}&amp;revalidate=${revalidate}`;
+
+window.addEventListener("load", async () =&gt; {
+  await new Promise(resolve =&gt; {
+    let img = document.createElement("img");
+    img.src = remote(image_path);
+    img.onload = () =&gt; { window.parent.postMessage({corp: false, loaded: true}, "*"); resolve(); };
+    img.onerror = (e) =&gt; { window.parent.postMessage({corp: false, loaded: false}, "*"); resolve(); };
+    document.body.appendChild(img);
+  });
+
+  await new Promise(resolve =&gt; {
+    let img = document.createElement("img");
+    img.src = remote(image_path + "&amp;corp-cross-origin=1");
+    img.onload = () =&gt; { window.parent.postMessage({corp: true, loaded: true}, "*"); resolve(); };
+    img.onerror = (e) =&gt; { window.parent.postMessage({corp: true, loaded: false}, "*"); resolve(); };
+    document.body.appendChild(img);
+  });
+
+  window.parent.postMessage({done: true}, "*")
+});
+
+</script>
+</head><body/></html>

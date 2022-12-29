@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/check-layout-th.js"/>
+<meta content="ahem" name="flags"/>
+<title>TD baseline</title>
+<link href="/fonts/ahem.css" rel="stylesheet" type="text/css"/>
+<link href="./support/table-tentative.css" rel="stylesheet" type="text/css"/>
+<link href="atotic@chromium.org" rel="author" title="Aleks Totic"/>
+<link href="https://drafts.csswg.org/css-tables-3/" rel="help"/>
+<link href="https://www.w3.org/TR/CSS2/visudet.html#propdef-vertical-align" rel="help"/>
+<style>
+  table {
+    background: #AAA;
+    border-spacing: 8px 0px;
+  }
+  td {
+    padding: 0;
+    background: #BFB;
+  }
+  .ahem {
+    font: 25px/2 Ahem;
+  }
+  .ahem td, .ahem .display-cell {
+    font: 25px/2 Ahem;
+    color: rgba(0,120,0, 0.5);
+  }
+  .vgrad {
+    background: linear-gradient(180deg, #DDD 0%, #DDD 60%, #999 60%, #999 100%) !important;
+  }
+  .m {
+    display:inline-block;
+  }
+  .display-table {
+    display:table;
+    background: #AAA;
+    border-spacing: 8px 0px;
+  }
+  .display-cell {
+    display:table-cell;
+    padding: 0;
+  }
+</style>
+</head><body><main>
+<h2>&lt;TD&gt; baseline tests</h2>
+
+<p class="testdesc">All the baseline values.
+Many text values map to plain baseline. </p>
+<table class="ahem vgrad" style="height:100px">
+  <tbody><tr><td style="font: 75px/1 Ahem;vertical-align:baseline;"><div class="m" data-offset-y="0">Xp</div></td>
+  <td style="" title="default"><div class="m" data-offset-y="25">Xp</div></td>
+  <td style="vertical-align: top"><div class="m" data-offset-y="0">Xp</div></td>
+  <td style="vertical-align: middle"><div class="m" data-offset-y="25">Xp</div></td>
+  <td style="vertical-align: bottom"><div class="m" data-offset-y="50">Xp</div></td>
+  <td style="vertical-align: baseline"><div class="m" data-offset-y="28">Xp</div></td>
+  <td style="vertical-align: sub"><div class="m" data-offset-y="28">Xp</div></td>
+  <td style="vertical-align: super"><div class="m" data-offset-y="28">Xp</div></td>
+  <td style="vertical-align: text-top"><div class="m" data-offset-y="28">Xp</div></td>
+  <td style="vertical-align: text-bottom"><div class="m" data-offset-y="28">Xp</div></td>
+  <td style="vertical-align: 100px"><div class="m" data-offset-y="28">Xp</div></td>
+  <td style="vertical-align: 100%"><div class="m" data-offset-y="28">Xp</div></td>
+</tr></tbody></table>
+
+<p class="testdesc">All the baseline values.
+Same as test before, but use display:table/table-cell. Default td alignment is baseline, not middle.</p>
+<div class="ahem vgrad display-table" style="height:100px;position:relative">
+  <div class="display-cell" style="font: 75px/1 Ahem;vertical-align:baseline;"><div class="m" data-offset-y="0">Xp</div></div>
+  <div class="display-cell" style="" title="default"><div class="m" data-offset-y="28">Xp</div></div>
+  <div class="display-cell" style="vertical-align: top"><div class="m" data-offset-y="0">Xp</div></div>
+  <div class="display-cell" style="vertical-align: middle"><div class="m" data-offset-y="25">Xp</div></div>
+  <div class="display-cell" style="vertical-align: bottom"><div class="m" data-offset-y="50">Xp</div></div>
+  <div class="display-cell" style="vertical-align: baseline"><div class="m" data-offset-y="28">Xp</div></div>
+  <div class="display-cell" style="vertical-align: sub"><div class="m" data-offset-y="28">Xp</div></div>
+  <div class="display-cell" style="vertical-align: super"><div class="m" data-offset-y="28">Xp</div></div>
+  <div class="display-cell" style="vertical-align: text-top"><div class="m" data-offset-y="28">Xp</div></div>
+  <div class="display-cell" style="vertical-align: text-bottom"><div class="m" data-offset-y="28">Xp</div></div>
+  <div class="display-cell" style="vertical-align: 100px"><div class="m" data-offset-y="28">Xp</div></div>
+  <div class="display-cell" style="vertical-align: 100%"><div class="m" data-offset-y="28">Xp</div></div>
+</div>
+
+
+<p class="testdesc">Baselines with %ge children</p>
+<p class="error">FF/Edge fails here</p>
+<div>
+  inline table
+  <table style="height:100px;position:relative;display:inline-table">
+    <tbody><tr><td style="vertical-align:baseline">
+      <div data-offset-y="30" style="width:100px;height:50%;background:rgba(0,120,0, 0.5)"/>
+    </td>
+     <td style="vertical-align:baseline">
+      <div data-offset-y="0" style="width:100px;height:80%;background:rgba(0,120,0, 0.5)"/>
+    </td>
+  </tr></tbody></table>
+</div>
+<p class="testdesc">Baseline and td height
+If td is baseline aligned, and has a height, how tall should the td be?
+</p>
+<p class="error">Legacy/FF apply height to below baseline?. With baseline alignment, this makes the cell taller.</p>
+<table data-expected-height="202" style="border: 1px solid black">
+  <tbody><tr>
+    <td style="vertical-align:baseline;height:200px">base</td>
+    <td style="vertical-align:baseline">
+      <div style="background:yellow;width:50px;height:100px"/>
+    </td>
+  </tr>
+</tbody></table>
+
+<p class="testdesc">Baseline of rowspanned cell
+rowspanned td's should contribute to baseline, but not to the row height.</p>
+<table class="ahem">
+  <tbody><tr data-expected-height="100">
+    <td style="vertical-align:baseline;height:100px;background-color:#DFD;">Xp</td>
+    <td rowspan="2" style="vertical-align:baseline;font-size:40px;line-height:1.5"><div class="m">Xp</div><br/>Xp<br/>Xp</td>
+  </tr>
+  <tr data-expected-height="100">
+    <td style="vertical-align:baseline;height:100px">Xp</td>
+  </tr>
+</tbody></table>
+
+</main>
+<script>
+  checkLayout("table, .display-table");
+</script>
+
+</body></html>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>DOMParser encoding test</title>
+<meta charset="windows-1252"/> <!-- intentional to make sure the results are UTF-8 anyway -->
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+
+<script>
+"use strict";
+
+function assertEncoding(doc) {
+  assert_equals(doc.charset, "UTF-8", "document.charset");
+  assert_equals(doc.characterSet, "UTF-8", "document.characterSet");
+  assert_equals(doc.inputEncoding, "UTF-8", "document.characterSet");
+}
+
+setup(() =&gt; {
+  assert_equals(document.characterSet, "windows-1252", "the meta charset must be in effect, making the main document windows-1252");
+});
+
+test(() =&gt; {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString("", "text/html");
+
+  assertEncoding(doc);
+}, "HTML: empty");
+
+test(() =&gt; {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString("", "text/xml");
+
+  assertEncoding(doc);
+}, "XML: empty");
+
+test(() =&gt; {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`&lt;meta charset="latin2"&gt;`, "text/html");
+
+  assertEncoding(doc);
+}, "HTML: meta charset");
+
+test(() =&gt; {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`&lt;?xml version="1.0" encoding="latin2"?&gt;&lt;x/&gt;`, "text/xml");
+
+  assertEncoding(doc);
+}, "XML: XML declaration");
+</script>
+</head><body/></html>

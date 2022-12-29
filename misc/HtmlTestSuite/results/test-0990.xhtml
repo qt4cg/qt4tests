@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head>
+  <title>Iframes with loading='lazy' load when in the viewport</title>
+  <link href="mailto:sclittle@chromium.org" rel="author" title="Scott Little"/>
+  <link href="mailto:dom@chromium.org" rel="author" title="Dom Farolino"/>
+  <link href="https://github.com/whatwg/html/pull/5579" rel="help"/>
+  <script src="/resources/testharness.js"/>
+  <script src="/resources/testharnessreport.js"/>
+<script>
+  const t_in_viewport =
+    async_test('In-viewport iframes load eagerly');
+  const t_below_viewport =
+    async_test('Below-viewport iframes load lazily');
+  const t_below_viewport_srcdoc =
+    async_test('Below-viewport srcdoc iframes load lazily');
+  const t_below_viewport_data_url =
+    async_test('Below-viewport data: url iframes load lazily');
+  const t_below_viewport_blob_url =
+    async_test('Below-viewport blob url iframes load lazily');
+
+
+  document.addEventListener('DOMContentLoaded', e =&gt; {
+    const blob_url_iframe = document.querySelector('#below_viewport_blob_url');
+    const blob = new Blob(['&lt;p&gt;Blob subframe&lt;/p&gt;'], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    blob_url_iframe.src = url;
+  });
+
+  let has_window_loaded = false;
+
+  const in_viewport_iframe_onload = t_in_viewport.step_func_done(() =&gt; {
+    assert_false(has_window_loaded,
+      "The in_viewport iframe should not block the load event");
+  });
+
+  window.addEventListener("load", () =&gt; {
+    has_window_loaded = true;
+    document.getElementById("below_viewport_srcdoc").scrollIntoView();
+  });
+
+  const below_viewport_iframe_onload = t_below_viewport.step_func_done(() =&gt; {
+    assert_true(has_window_loaded,
+                "The window load event should have fired before " +
+                "the below-viewport iframe loads");
+  });
+
+  // Onload handlers for below-viewport srcdoc iframe.
+  // Must make this accessible to the srcdoc iframe's body.
+  window.below_viewport_srcdoc_iframe_subresource_onload = t_below_viewport_srcdoc.step_func(() =&gt; {
+    assert_true(has_window_loaded,
+                "The window load event should have fired before " +
+                "the below-viewport srcdoc iframe's subresource loads");
+  });
+
+  const below_viewport_srcdoc_iframe_onload = t_below_viewport_srcdoc.step_func_done(() =&gt; {
+    assert_true(has_window_loaded,
+                "The window load event should have fired before " +
+                "the below-viewport srcdoc iframe loads");
+  });
+
+  // Onload handler for below-viewport data url iframe.
+  const below_viewport_data_url_iframe_onload = t_below_viewport_data_url.step_func_done(() =&gt; {
+    assert_true(has_window_loaded,
+                "The window load event should have fired before " +
+                "the below-viewport data url iframe loads");
+  });
+
+  // Onload handler for below-viewport blob url iframe.
+  const below_viewport_blob_url_iframe_onload = t_below_viewport_blob_url.step_func_done(() =&gt; {
+    assert_true(has_window_loaded,
+                "The window load event should have fired before " +
+                "the below-viewport blob url iframe loads");
+  });
+
+</script></head>
+
+
+
+<body>
+  <iframe height="100px" id="in_viewport" loading="lazy" onload="in_viewport_iframe_onload();" src="resources/subframe.html?in-viewport" width="200px"/>
+
+  <div style="height:2000vh;"/>
+  <iframe height="100px" id="below_viewport" loading="lazy" onload="below_viewport_iframe_onload();" src="resources/subframe.html?below-viewport" width="200px"/>
+  <iframe height="100px" id="below_viewport_srcdoc" loading="lazy" onload="below_viewport_srcdoc_iframe_onload();" srcdoc="&lt;body&gt;&lt;img src='/common/square.png?below-viewport'&#xA;                  onload='parent.below_viewport_srcdoc_iframe_subresource_onload();'&gt;&lt;/body&gt;" width="200px"/>
+  <iframe height="100px" id="below_viewport_data_url" loading="lazy" onload="below_viewport_data_url_iframe_onload();" src="data:text/html,&lt;p&gt;Subframe&lt;/p&gt;" width="200px"/>
+  <!-- This iframe has its `src` set to a blob URL dynamically above -->
+  <iframe height="100px" id="below_viewport_blob_url" loading="lazy" onload="below_viewport_blob_url_iframe_onload();" width="200px"/>
+
+
+
+  <!-- This async script loads very slowly in order to ensure that, if the
+       below_viewport* elements have started loading, it has a chance to finish
+       loading before window load event fires, so that the test will dependably
+       fail in that case instead of potentially passing depending on how long
+       different resource fetches take. -->
+  <script async="" src="/common/slow.py"/>
+</body>
+</html>

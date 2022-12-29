@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta content="long" name="timeout"/>
+<meta content="?target=ContentEditable" name="variant"/>
+<meta content="?target=ContentEditable&amp;parent=b" name="variant"/>
+<meta content="?target=ContentEditable&amp;child=b" name="variant"/>
+<meta content="?target=ContentEditable&amp;parent=b&amp;child=i" name="variant"/>
+<meta content="?target=DesignMode" name="variant"/>
+<meta content="?target=DesignMode&amp;parent=b" name="variant"/>
+<meta content="?target=DesignMode&amp;child=b" name="variant"/>
+<meta content="?target=DesignMode&amp;parent=b&amp;child=i" name="variant"/>
+<title>Testing inserting content at non-collapsed selection around link element</title>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+<script src="/resources/testdriver-actions.js"/>
+<script src="../include/editor-test-utils.js"/>
+</head>
+<body>
+<div contenteditable=""/>
+<iframe srcdoc="&#xA;  &lt;!doctype html&gt;&#xA;  &lt;html&gt;&#xA;    &lt;script&gt;document.designMode='on';&lt;/script&gt;&#xA;    &lt;script src='/resources/testdriver.js'&gt;&lt;/script&gt;&#xA;    &lt;script src='/resources/testdriver-vendor.js'&gt;&lt;/script&gt;&#xA;    &lt;script src='/resources/testdriver-actions.js'&gt;&lt;/script&gt;&#xA;    &lt;body&gt;&lt;/body&gt;&#xA;  &lt;/html&gt;"/>
+<script>
+"use strict";
+
+const params = new URLSearchParams(location.search.substring(1));
+const kTarget = params.get("target");
+const kParentTag = params.get("parent") === null
+  ? ["", ""]
+  : [`&lt;${params.get("parent")}&gt;`, `&lt;/${params.get("parent")}&gt;`];
+const kChildTag = params.get("child") === null
+  ? ["", ""]
+  : [`&lt;${params.get("child")}&gt;`, `&lt;/${params.get("child")}&gt;`];
+const kLinkDesc = (() =&gt; {
+  let result = ""
+  if (kParentTag[0] !== "") {
+    result += `in ${kParentTag[0]} `;
+    if (kChildTag[0] !== "") {
+      result += "and ";
+    }
+  }
+  if (kChildTag[0] !== "") {
+    result += `containing ${kChildTag[0]} `;
+  }
+  return result;
+})();
+const kNewContainerOfLink = (() =&gt; {
+  if (kParentTag !== "" &amp;&amp; kChildTag !== "") {
+    return [`${kParentTag[0]}${kChildTag[0]}`, `${kChildTag[1]}${kParentTag[1]}`];
+  }
+  if (kParentTag !== "") {
+    return kParentTag;
+  }
+  if (kChildTag !== "") {
+    return kChildTag;
+  }
+  return ["", ""];
+})();
+
+function getEditingHost() {
+  return kTarget === "ContentEditable"
+    ? document.querySelector("div[contenteditable]")
+    : document.querySelector("iframe").contentDocument.body;
+}
+
+function addPromiseTest(test) {
+  promise_test(async () =&gt; {
+    let editingHost = getEditingHost();
+    let utils = new EditorTestUtils(editingHost);
+    utils.setupEditingHost(test.innerHTML);
+    utils.window.focus();
+    utils.document.body.focus();
+    editingHost.focus();
+    await test.run(utils);
+    if (Array.isArray(test.expectedResult)) {
+      assert_in_array(editingHost.innerHTML, test.expectedResult);
+    } else {
+      assert_equals(editingHost.innerHTML, test.expectedResult);
+    }
+  }, `${test.description} in ${test.innerHTML}`);
+}
+
+promise_test(async () =&gt; {
+  await new Promise(resolve =&gt; {
+    addEventListener("load", resolve, { once: true });
+  });
+}, "");
+
+for (const test of [
+    ["Direct typing", utils =&gt; {}],
+    ["Backspace", utils =&gt; { return utils.sendBackspaceKey(); }],
+    ["Delete", utils =&gt; { return utils.sendDeleteKey(); }],
+    ["execCommand(\"delete\")", utils =&gt; { utils.document.execCommand("delete", false); }],
+    ["execCommand(\"forwarddelete\")", utils =&gt; { utils.document.execCommand("forwarddelete", false); }],
+  ]) {
+
+  addPromiseTest({
+    description: `Inserting "XY" after deleting first character of a link ${kLinkDesc}(${test[0]})`,
+    innerHTML: `&lt;p&gt;${kParentTag[0]}&lt;a href="about:blank"&gt;${kChildTag[0]}[z]abc${kChildTag[1]}&lt;/a&gt;${kParentTag[1]}&lt;/p&gt;`,
+    run: async (utils) =&gt; {
+      await test[1](utils);
+      await utils.sendKey("X", utils.kShiftKey);
+      await utils.sendKey("Y", utils.kShiftKey);
+    },
+    expectedResult: (() =&gt; {
+      if (test[0] === "Direct typing") {
+        return [
+          `&lt;p&gt;${kParentTag[0]}&lt;a href="about:blank"&gt;${kChildTag[0]}XYabc${kChildTag[1]}&lt;/a&gt;${kParentTag[1]}&lt;/p&gt;`,
+          `&lt;p&gt;${kParentTag[0]}&lt;a href="about:blank"&gt;${kChildTag[0]}XYabc${kChildTag[1]}&lt;/a&gt;${kParentTag[1]}&lt;br&gt;&lt;/p&gt;`,
+        ];
+      }
+      return [
+        `&lt;p&gt;${kNewContainerOfLink[0]}XY&lt;a href="about:blank"&gt;abc&lt;/a&gt;${kNewContainerOfLink[1]}&lt;/p&gt;`,
+        `&lt;p&gt;${kNewContainerOfLink[0]}XY&lt;a href="about:blank"&gt;abc&lt;/a&gt;${kNewContainerOfLink[1]}&lt;br&gt;&lt;/p&gt;`,
+      ];
+    })(),
+  });
+
+  addPromiseTest({
+    description: `Inserting "XY" after deleting last character in a non-collapsed range of a link ${kLinkDesc}(${test[0]})`,
+    innerHTML: `&lt;p&gt;${kParentTag[0]}&lt;a href="about:blank"&gt;${kChildTag[0]}abc[d]${kChildTag[1]}&lt;/a&gt;${kParentTag[1]}&lt;/p&gt;`,
+    run: async (utils) =&gt; {
+      await test[1](utils);
+      await utils.sendKey("X", utils.kShiftKey);
+      await utils.sendKey("Y", utils.kShiftKey);
+    },
+    expectedResult: (() =&gt; {
+      if (test[0] === "Direct typing") {
+        return [
+          `&lt;p&gt;${kParentTag[0]}&lt;a href="about:blank"&gt;${kChildTag[0]}abcXY${kChildTag[1]}&lt;/a&gt;${kParentTag[1]}&lt;/p&gt;`,
+          `&lt;p&gt;${kParentTag[0]}&lt;a href="about:blank"&gt;${kChildTag[0]}abcXY${kChildTag[1]}&lt;/a&gt;${kParentTag[1]}&lt;br&gt;&lt;/p&gt;`,
+        ];
+      }
+      return [
+        `&lt;p&gt;${kNewContainerOfLink[0]}&lt;a href="about:blank"&gt;abc&lt;/a&gt;XY${kNewContainerOfLink[1]}&lt;/p&gt;`,
+        `&lt;p&gt;${kNewContainerOfLink[0]}&lt;a href="about:blank"&gt;abc&lt;/a&gt;XY${kNewContainerOfLink[1]}&lt;br&gt;&lt;/p&gt;`,
+      ];
+    })(),
+  });
+
+  addPromiseTest({
+    description: `Inserting "XY" after deleting text after middle of a link ${kLinkDesc}(${test[0]})`,
+    innerHTML: `&lt;p&gt;${kParentTag[0]}&lt;a href="about:blank"&gt;${kChildTag[0]}ab[cd${kChildTag[1]}&lt;/a&gt;de]f${kParentTag[1]}&lt;/p&gt;`,
+    run: async (utils) =&gt; {
+      await test[1](utils);
+      await utils.sendKey("X", utils.kShiftKey);
+      await utils.sendKey("Y", utils.kShiftKey);
+    },
+    expectedResult: [
+      `&lt;p&gt;${kNewContainerOfLink[0]}&lt;a href="about:blank"&gt;ab&lt;/a&gt;XY${kChildTag[1]}f${kParentTag[1]}&lt;/p&gt;`,
+      `&lt;p&gt;${kNewContainerOfLink[0]}&lt;a href="about:blank"&gt;ab&lt;/a&gt;XY${kChildTag[1]}f${kParentTag[1]}&lt;br&gt;&lt;/p&gt;`,
+    ],
+  });
+
+  addPromiseTest({
+    description: `Inserting "XY" after deleting text before middle of a link ${kLinkDesc}(${test[0]})`,
+    innerHTML: `&lt;p&gt;${kParentTag[0]}a[bc&lt;a href="about:blank"&gt;${kChildTag[0]}de]f${kChildTag[1]}&lt;/a&gt;${kParentTag[1]}&lt;/p&gt;`,
+    run: async (utils) =&gt; {
+      await test[1](utils);
+      await utils.sendKey("X", utils.kShiftKey);
+      await utils.sendKey("Y", utils.kShiftKey);
+    },
+    expectedResult: [
+      `&lt;p&gt;${kParentTag[0]}aXY&lt;a href="about:blank"&gt;${kChildTag[0]}f${kChildTag[1]}&lt;/a&gt;${kParentTag[1]}&lt;/p&gt;`,
+      `&lt;p&gt;${kParentTag[0]}aXY&lt;a href="about:blank"&gt;${kChildTag[0]}f${kChildTag[1]}&lt;/a&gt;${kParentTag[1]}&lt;br&gt;&lt;/p&gt;`,
+    ],
+  });
+
+  if (kParentTag[0] !== "" || kChildTag[0] !== "") {
+    continue;
+  }
+
+  addPromiseTest({
+    description: `Inserting "XY" after deleting text between 2 same links (${test[0]})`,
+    innerHTML: '&lt;p&gt;&lt;a href="about:blank"&gt;a[bc&lt;/a&gt;&lt;a href="about:blank"&gt;de]f&lt;/a&gt;&lt;/p&gt;',
+    run: async (utils) =&gt; {
+      await test[1](utils);
+      await utils.sendKey("X", utils.kShiftKey);
+      await utils.sendKey("Y", utils.kShiftKey);
+    },
+    expectedResult: [
+      '&lt;p&gt;&lt;a href="about:blank"&gt;a&lt;/a&gt;XY&lt;a href="about:blank"&gt;f&lt;/a&gt;&lt;/p&gt;',
+      '&lt;p&gt;&lt;a href="about:blank"&gt;a&lt;/a&gt;XY&lt;a href="about:blank"&gt;f&lt;/a&gt;&lt;br&gt;&lt;/p&gt;',
+    ],
+  });
+
+  addPromiseTest({
+    description: `Inserting "XY" after deleting text between 2 different links (${test[0]})`,
+    innerHTML: '&lt;p&gt;&lt;a href="about:blank"&gt;a[bc&lt;/a&gt;&lt;a href="http://example.com/"&gt;de]f&lt;/a&gt;&lt;/p&gt;',
+    run: async (utils) =&gt; {
+      await test[1](utils);
+      await utils.sendKey("X", utils.kShiftKey);
+      await utils.sendKey("Y", utils.kShiftKey);
+    },
+    expectedResult: [
+      '&lt;p&gt;&lt;a href="about:blank"&gt;a&lt;/a&gt;XY&lt;a href="http://example.com/"&gt;f&lt;/a&gt;&lt;/p&gt;',
+      '&lt;p&gt;&lt;a href="about:blank"&gt;a&lt;/a&gt;XY&lt;a href="http://example.com/"&gt;f&lt;/a&gt;&lt;br&gt;&lt;/p&gt;',
+    ],
+  });
+}
+
+</script>
+</body>
+</html>

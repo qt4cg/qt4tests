@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="test-wait">
+<head><title>Mutating a filter primitive in a filter that isn't used doesn't crash</title>
+<link href="https://drafts.fxtf.org/filter-effects/#FilterProperty" rel="help"/>
+<link href="https://crbug.com/1151610" rel="bookmark"/>
+<script src="/common/rendering-utils.js"/>
+</head><body><svg xmlns="http://www.w3.org/2000/svg">
+  <filter id="f">
+    <fediffuselighting id="dl" lighting-color="currentcolor"/>
+  </filter>
+  <clippath filter="url(#f)" id="c">
+    <rect height="100" width="100"/>
+  </clippath>
+  <rect clip-path="url(#c)" fill="green" height="500" width="500"/>
+</svg>
+<script>
+waitForAtLeastOneFrame().then(() =&gt; {
+  var primitive = document.getElementById('dl');
+  primitive.parentNode.appendChild(primitive);
+  primitive.setAttribute('lighting-color', 'blue');
+  document.documentElement.classList.remove('test-wait');
+});
+</script>
+</body></html>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>XMLHttpRequest: template element parsing</title>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+</head><body><div id="log"/>
+<script>
+async_test(t =&gt; {
+  const client = new XMLHttpRequest
+  client.open("GET", "data:text/xml,&lt;template xmlns='http://www.w3.org/1999/xhtml'&gt;&lt;test/&gt;&lt;/template&gt;")
+  client.send()
+  client.onload = t.step_func_done(() =&gt; {
+    assert_equals(client.responseXML.documentElement.childElementCount, 0)
+    assert_equals(client.responseXML.documentElement.content.firstChild.localName, "test")
+  })
+})
+
+async_test(t =&gt; {
+  const client = new XMLHttpRequest
+  client.open("GET", "data:text/xml,&lt;template&gt;&lt;test/&gt;&lt;/template&gt;")
+  client.send()
+  client.onload = t.step_func_done(() =&gt; {
+    assert_equals(client.responseXML.documentElement.childElementCount, 1)
+    assert_equals(client.responseXML.documentElement.firstChild.localName, "test")
+  })
+})
+
+async_test(t =&gt; {
+  const client = new XMLHttpRequest
+  client.open("GET", "data:text/xml,&lt;template xmlns='http://www.w3.org/2000/svg'&gt;&lt;test/&gt;&lt;/template&gt;")
+  client.send()
+  client.onload = t.step_func_done(() =&gt; {
+    assert_equals(client.responseXML.documentElement.childElementCount, 1)
+    assert_equals(client.responseXML.documentElement.firstChild.localName, "test")
+  })
+})
+</script>
+</body></html>

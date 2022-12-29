@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Length unit 'ch' should be recalculated after loading a web font</title>
+<link href="https://www.w3.org/TR/css-font-loading-3/#font-face-load" rel="help"/>
+<link href="https://www.w3.org/TR/css-values-3/#font-relative-lengths" rel="help"/>
+<link href="mailto:xiaochengh@chromium.org" rel="author"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<style>
+.container {
+  font: 25px/1 "custom font", monospace;
+}
+
+.test {
+  width: 1ch;
+}
+</style>
+
+</head><body><div class="container">
+  <div class="test"/>
+</div>
+
+<div class="container" style="display: contents">
+  <div class="test"/>
+</div>
+
+<div class="container" style="display: none">
+  <div class="test"/>
+</div>
+
+<script>
+function parseWidthInPx(element) {
+  const value = getComputedStyle(element).width;
+  if (!value.endsWith('px'))
+    return NaN;
+  return parseFloat(value);
+}
+
+const testCases = document.querySelectorAll('.test');
+
+const asyncTests = [
+  async_test('ch in a normal div should be recalculated after loading a web font'),
+  async_test('ch in display:contents should be recalculated after loading a web font'),
+  async_test('ch in display:none should be recalculated after loading a web font')
+];
+
+// Before loading custom font, tests should be rendered with monospace
+// fallback and have a '1ch' measurement much shorter than 25px.
+for (let i = 0; i &lt; testCases.length; ++i) {
+  asyncTests[i].step(() =&gt; {
+    const widthPx = parseWidthInPx(testCases[i]);
+    assert_less_than(widthPx, 24);
+  });
+}
+
+// Insert custom font into style sheet and load it
+const customFont = new FontFace('custom font', 'url(/fonts/Ahem.ttf)');
+document.fonts.add(customFont);
+
+// After loading custom font, tests should be rendered with the custom font,
+// which is Ahem, and have a '1ch' measurement that equals 25px.
+customFont.load().then(
+    () =&gt; {
+      for (let i = 0; i &lt; testCases.length; ++i) {
+        asyncTests[i].step(() =&gt; {
+          const widthPx = parseWidthInPx(testCases[i]);
+          assert_approx_equals(widthPx, 25, 0.1);
+          asyncTests[i].done();
+        });
+      }
+    },
+    () =&gt; {
+      for (let i = 0; i &lt; testCases.length; ++i) {
+        asyncTests[i].step(() =&gt; {
+          assert_unreached('Failed to load font');
+        });
+      }
+    }
+);
+</script>
+</body></html>

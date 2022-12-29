@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head>
+  <title>Images with loading='lazy' in picture elements load when near the viewport</title>
+  <link href="mailto:rajendrant@chromium.org" rel="author" title="Raj T"/>
+  <link href="https://github.com/scott-little/lazyload" rel="help"/>
+  <script src="/resources/testharness.js"/>
+  <script src="/resources/testharnessreport.js"/>
+  <script src="../resources/common.js"/>
+<script>
+const in_viewport_img = new ElementLoadPromise("in_viewport_img");
+const lazy_attribute_img = new ElementLoadPromise("lazy_attribute_img");
+const eager_attribute_img = new ElementLoadPromise("eager_attribute_img");
+
+const document_load_promise = new Promise(resolve =&gt; {
+  window.addEventListener("load", resolve);
+});
+
+async_test(function(t) {
+  document_load_promise.then(t.step_func_done(function() {
+    assert_false(lazy_attribute_img.element().complete);
+    lazy_attribute_img.element().scrollIntoView();
+  }));
+}, "Test that the loading=lazy &lt;picture&gt; element below viewport was deferred, on document load.");
+
+async_test(function(t) {
+  in_viewport_img.promise.then(t.step_func_done());
+}, "Test that in viewport &lt;picture&gt; element was loaded");
+
+async_test(function(t) {
+  eager_attribute_img.promise.then(t.step_func_done());
+}, "Test that eager &lt;picture&gt; element was loaded");
+
+async_test(function(t) {
+  lazy_attribute_img.promise.then(t.step_func_done());
+}, "Test that deferred &lt;picture&gt; element was loaded-in as well, after scrolled down");
+
+</script></head>
+
+
+
+<body>
+<picture>
+  <source sizes="50vw" srcset="resources/image.png?in_viewport_img"/>
+  <img id="in_viewport_img" loading="lazy" onload="in_viewport_img.resolve();" src="img-not-loaded.png"/>
+</picture>
+<div style="height:10000px;"/>
+<picture>
+  <source sizes="50vw" srcset="resources/image.png?lazy_attribute_img"/>
+  <img id="lazy_attribute_img" loading="lazy" onload="lazy_attribute_img.resolve();" src="img-not-loaded.png"/>
+</picture>
+<picture>
+  <source sizes="50vw" srcset="resources/image.png?eager_attribute_img"/>
+  <img id="eager_attribute_img" loading="eager" onload="eager_attribute_img.resolve();" src="img-not-loaded.png"/>
+</picture>
+
+<!--
+  This async script loads very slowly in order to ensure that, if the
+  below_viewport image has started loading, it has a chance to finish
+  loading before window.load() happens, so that the test will dependably fail
+  in that case instead of potentially passing depending on how long different
+  resource fetches take.
+-->
+<script async="" src="/common/slow.py"/>
+</body>
+</html>

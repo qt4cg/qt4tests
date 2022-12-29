@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="reftest-wait">
+<head><title>Animation Worklet should have access to effect timing from within the worklet thread</title>
+<link href="https://drafts.css-houdini.org/css-animationworklet/" rel="help"/>
+<meta content="Animation Worklet should have access to effect timing from within the worklet thread" name="assert"/>
+<link href="references/translated-box-ref.html" rel="match"/>
+
+<script src="/web-animations/testcommon.js"/>
+<script src="/common/reftest-wait.js"/>
+<script src="common.js"/>
+
+<style>
+  #box{
+    height: 100px;
+    width: 100px;
+    background-color: green;
+  }
+</style>
+
+</head><body><div id="box"/>
+
+<script id="get_timing_animator" type="text/worklet">
+  registerAnimator('get_timing', class {
+    animate(currentTime, effect){
+      effect.localTime = effect.getTiming().delay + (effect.getTiming().duration / 2);
+    }
+  });
+</script>
+
+<script>
+  runInAnimationWorklet(
+    document.getElementById('get_timing_animator').textContent
+  ).then(() =&gt; {
+    const box = document.getElementById("box");
+    const effect = new KeyframeEffect(
+      box,
+      [
+        {transform: 'translateY(0)'},
+        {transform: 'translateY(200px)'}
+      ],
+      {
+        delay: 2000,
+        duration: 1000
+      }
+    );
+
+    const animation = new WorkletAnimation('get_timing', effect);
+    animation.play();
+
+    waitForAsyncAnimationFrames(1).then(_ =&gt; {
+      takeScreenshot();
+    });
+  });
+</script>
+</body></html>

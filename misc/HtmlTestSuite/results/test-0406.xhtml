@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<style>
+
+#space { height: 4000px; }
+#ancestor { position: relative; }
+#before, #anchor { height: 100px; }
+#anchor { background-color: green; }
+
+.layout1 { padding-top: 20px; }
+.layout2 { margin-right: 20px; }
+.layout3 { max-width: 100px; }
+.layout4 { min-height: 400px; }
+.layout5 { position: static !important; }
+.layout6 { left: 20px; }
+.layout7 { transform: matrix(1, 0, 0, 1, 50, 50); }
+.nonLayout1 { color: red; }
+.nonLayout2 { font-size: 200%; }
+.nonLayout3 { box-shadow: 10px 10px 10px gray; }
+.nonLayout4 { opacity: 0.5; }
+.nonLayout5 { z-index: -1; }
+
+.scroller {
+  overflow: scroll;
+  width: 600px;
+  height: 600px;
+}
+
+</style>
+</head><body><div id="maybeScroller">
+  <div id="space">
+    <div id="ancestor">
+      <div id="before"/>
+      <div id="anchor"/>
+    </div>
+  </div>
+</div>
+<script>
+
+// Tests that scroll anchoring is suppressed when one of the "layout-affecting"
+// properties is modified on an ancestor of the anchor node.
+
+var scroller;
+var ancestor = document.querySelector("#ancestor");
+var before = document.querySelector("#before");
+
+function runCase(classToApply, expectSuppression) {
+  // Reset.
+  scroller.scrollTop = 0;
+  ancestor.className = "";
+  before.style.height = "";
+  scroller.scrollTop = 150;
+
+  ancestor.className = classToApply;
+  before.style.height = "150px";
+
+  var expectedTop = expectSuppression ? 150 : 200;
+  assert_equals(scroller.scrollTop, expectedTop);
+}
+
+function runAll() {
+  for (var i = 1; i &lt;= 7; i++)
+    runCase("layout" + i, true);
+  for (var i = 1; i &lt;= 5; i++)
+    runCase("nonLayout" + i, false);
+}
+
+test(() =&gt; {
+  document.querySelector("#maybeScroller").className = "";
+  scroller = document.scrollingElement;
+  runAll();
+}, "Ancestor changes in document scroller.");
+
+test(() =&gt; {
+  scroller = document.querySelector("#maybeScroller");
+  scroller.className = "scroller";
+  runAll();
+}, "Ancestor changes in scrollable &lt;div&gt;.");
+
+</script>
+</body></html>

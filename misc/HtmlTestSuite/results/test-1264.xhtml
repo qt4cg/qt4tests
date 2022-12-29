@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>Append child writable stream demo</title>
+
+<script src="transforms/transform-stream-polyfill.js"/>
+<script src="transforms/text-encode-transform.js"/>
+<script src="transforms/parse-json.js"/>
+<script src="transforms/split-stream.js"/>
+<script src="resources/highlight.pack.js"/>
+<script src="resources/web-animations.min.js"/>
+<script src="tags/view-source.js"/>
+
+<link href="resources/common.css" rel="stylesheet"/>
+<link href="resources/commits.css" rel="stylesheet"/>
+
+</head><body><h1>Append child writable stream demo</h1>
+<a href="index.html" id="back-to-index">Back to demo index</a>
+<view-source/>
+
+<div id="buttons">
+  <button id="load">Load JSON stream</button>
+  <button id="reset">Reset</button>
+</div>
+
+<div id="target"/>
+
+<script>
+'use strict';
+const loadButton = document.querySelector('#load');
+const resetButton = document.querySelector('#reset');
+const targetDiv = document.querySelector('#target');
+const FIELDS =  ['Hash', 'Date', 'Author', 'Subject'];
+const FIELDS_LOWERCASE = FIELDS.map(string =&gt; string.toLowerCase());
+
+function createTable(parentElement) {
+  const table = document.createElement('table');
+  table.id = 'commits';
+  const tr = document.createElement('tr');
+  for (const heading of FIELDS) {
+    const th = document.createElement('th');
+    th.textContent = heading;
+    tr.appendChild(th);
+  }
+  table.appendChild(tr);
+  parentElement.appendChild(table);
+  return table;
+}
+
+// BEGIN SOURCE TO VIEW
+function appendChildWritableStream(parentNode) {
+  return new WritableStream({
+    write(chunk) {
+      parentNode.appendChild(chunk);
+    }
+  });
+}
+
+async function fetchThenJSONToDOM() {
+  const jsonToElementTransform = new TransformStream({
+    transform(chunk, controller) {
+      const tr = document.createElement('tr');
+      for (const cell of FIELDS_LOWERCASE) {
+        const td = document.createElement('td');
+        td.textContent = chunk[cell];
+        tr.appendChild(td);
+      }
+      controller.enqueue(tr);
+    }
+  });
+
+  const response = await fetch('data/commits.json',
+                               {
+                                 mode: 'same-origin',
+                                 headers: {
+                                   'Cache-Control': 'no-cache, no-store'
+                                 }
+                               });
+
+  const table = createTable(targetDiv);
+  return response.body
+    .pipeThrough(new TextDecoder())
+    .pipeThrough(splitStream('\n'))
+    .pipeThrough(parseJSON())
+    .pipeThrough(jsonToElementTransform)
+    .pipeTo(appendChildWritableStream(table));
+}
+// END SOURCE TO VIEW
+
+loadButton.onclick = () =&gt; {
+  loadButton.disabled = true;
+  setTimeout(fetchThenJSONToDOM, 0);
+};
+
+resetButton.onclick = () =&gt; {
+  targetDiv.innerHTML = '';
+  loadButton.disabled = false;
+};
+</script>
+</body></html>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Quote scope Shadow DOM and SLOT</title>
+    <link href="mailto:mrobinson@igalia.com" rel="author" title="Martin Robinson"/>
+    <link href="https://www.w3.org/TR/css-content-3/#quote-values" rel="help"/>
+    <link href="quotes-slot-scoping-ref.html" rel="match"/>
+  </head>
+
+  <body>
+    <div id="host">
+      <q slot="quote">Quote</q>
+    </div>
+
+    <script>
+      function makeStyle() {
+        let style = document.createElement('style');
+        style.textContent = `
+            q {
+              quotes: '1' '1' '2' '2' '3' '3';
+            }
+        `;
+         return style;
+      }
+      document.body.appendChild(makeStyle());
+
+      const shadowRoot = document
+           .getElementById('host')
+           .attachShadow({mode: 'open'});
+      shadowRoot.innerHTML = `
+      &lt;q&gt;
+        &lt;slot name="quote"&gt;&lt;/slot&gt;
+      &lt;/q&gt;
+      `;
+      shadowRoot.appendChild(makeStyle());
+    </script>
+  </body>
+</html>

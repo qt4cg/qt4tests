@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>Largest Contentful Paint: same-origin service worker should not be treated as TAO-fail</title>
+
+</head><body>
+  <script src="/resources/testharness.js"/>
+  <script src="/resources/testharnessreport.js"/>
+  <script src="resources/largest-contentful-paint-helpers.js"/>
+  <script src="/service-workers/service-worker/resources/test-helpers.sub.js"/>
+  <script>
+    setup(() =&gt; {
+      assert_implements(window.LargestContentfulPaint, "LargestContentfulPaint is not implemented");
+    });
+
+    promise_test(async t =&gt; {
+      const scope = "resources/lcp-sw.https.html";
+
+      const registration =
+          await service_worker_unregister_and_register(t, "resources/lcp-sw-from-cache.js", "resources/");
+
+      await wait_for_state(t, registration.installing, "activated");
+      t.add_cleanup(() =&gt; registration.unregister());
+      const iframe = document.createElement("iframe");
+      iframe.src = scope;
+      document.body.appendChild(iframe);
+      t.add_cleanup(() =&gt; iframe.remove());
+      const entry = await new Promise(resolve =&gt; window.addEventListener("message", e =&gt; resolve(e.data)));
+
+      assert_equals(entry.id, "theImage");
+      assert_not_equals(entry.renderTime, 0);
+    }, "Same-origin images served from a service-worker should have a correct renderTime");
+</script>
+</body>
+</html>

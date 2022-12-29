@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="reftest-wait"><head><meta content="long" name="timeout"/>
+
+<title>Shared transitions: object-view-box</title>
+<link href="https://github.com/WICG/view-transitions" rel="help"/>
+<link href="mailto:khushalsagar@chromium.org" rel="author"/>
+<link href="content-with-transform-ref.html" rel="match"/>
+<meta content="content-with-transform-ref.html:0-1;0-400" name="fuzzy"/>
+
+<script src="/common/reftest-wait.js"/>
+<style>
+.target {
+  contain: paint;
+  width: 100px;
+  height: 100px;
+  transform: scale(2.0, 3.0);
+  view-transition-name: target;
+}
+
+.embedded {
+  width: 100px;
+  height: 50px;
+}
+
+.hidden {
+  contain: paint;
+  width: 10px;
+  height: 10px;
+  background: grey;
+  view-transition-name: hidden;
+}
+
+html::view-transition-group(hidden) { animation-duration: 300s; }
+html::view-transition-image-pair(hidden) { animation: unset; opacity: 0; }
+
+html::view-transition-old(target) {
+  animation: unset;
+  opacity: 1;
+}
+html::view-transition-new(target) { animation: unset; opacity: 0; }
+
+</style>
+
+</head><body><div class="target" id="target">
+  <div class="embedded" style="background: green;">Shared</div>
+  <div class="embedded" style="background: blue">Element</div>
+</div>
+<div class="hidden" id="hidden"/>
+
+<script>
+failIfNot(document.startViewTransition, "Missing document.startViewTransition");
+
+async function runTest() {
+  document.startViewTransition(() =&gt; {
+    requestAnimationFrame(() =&gt;  requestAnimationFrame(takeScreenshot));
+  });
+}
+onload = () =&gt; requestAnimationFrame(runTest);
+</script>
+
+</body></html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>history.replaceState before onload</title>
+    <script src="/resources/testharness.js" type="text/javascript"/>
+    <script src="/resources/testharnessreport.js" type="text/javascript"/>
+  </head>
+  <body>
+
+    <noscript><p>Enable JavaScript and reload</p></noscript>
+    <div id="log"/>
+    <script type="text/javascript">
+var newUrl = location.href.replace(/\/[^\/]*$/,'\/011-1.html');
+setup({explicit_done:true});
+test(function () {
+  history.replaceState('','','011-1.html');
+}, 'replaceState should be able to set the location state');
+test(function () {
+  assert_equals( location.href, newUrl );
+}, 'replaced location should be reflected immediately');
+window.onload = function () {
+  setTimeout(function () {
+    test(function () {
+      assert_equals( location.href, newUrl );
+    }, 'replaced location should be retained after the page has loaded');
+    done();
+  },10);
+};
+    </script>
+
+  </body>
+</html>

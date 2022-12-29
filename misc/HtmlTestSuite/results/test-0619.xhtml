@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="reftest-wait">
+<head><title>Mutating filter primitive in &lt;filter&gt; referenced by &lt;mask&gt;</title>
+<script src="/common/reftest-wait.js"/>
+<script src="/common/rendering-utils.js"/>
+<link href="https://drafts.fxtf.org/filter-effects/#FilterElement" rel="help"/>
+<link href="https://drafts.fxtf.org/filter-effects/#feColorMatrixElement" rel="help"/>
+<link href="https://drafts.fxtf.org/filter-effects/#feComponentTransferElement" rel="help"/>
+<link href="https://drafts.fxtf.org/css-masking-1/#svg-masks" rel="help"/>
+<link href="reference/green-100x100.html" rel="match"/>
+</head><body><svg xmlns="http://www.w3.org/2000/svg">
+  <filter color-interpolation-filters="sRGB" id="filter">
+    <fecolormatrix type="hueRotate" values="0"/>
+    <fecomponenttransfer>
+      <fefuncg slope="10000" type="linear"/>
+    </fecomponenttransfer>
+    <fecolormatrix type="matrix" values="0 1 0 0 0, 0 1 0 0 0, 0 1 0 0 0, 0 0 0 1 0"/>
+  </filter>
+
+  <mask id="mask">
+    <rect fill="red" filter="url(#filter)" height="100%" width="100%"/>
+  </mask>
+
+  <rect fill="red" height="100" width="100"/>
+  <rect fill="green" height="100" mask="url(#mask)" width="100"/>
+</svg>
+<script>
+  waitForAtLeastOneFrame().then(() =&gt; {
+    document.querySelector('svg &gt; filter &gt; feColorMatrix').setAttribute('values', 90);
+    takeScreenshot();
+  });
+</script>
+</body></html>

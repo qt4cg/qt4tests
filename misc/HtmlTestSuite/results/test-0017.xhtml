@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8"/>
+<title>This tests multiple additive='sum' animations running at the same time</title>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/SVGAnimationTestCase-testharness.js"/>
+
+<!--?xml version="1.0" encoding="UTF-8"?-->
+
+</head><body><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<!-- an1: Change width from 10 to 50 in 4s -->
+<!-- an2: Change width from 10 to 25 + additive=sum. This results in a change from 20 to 75 -->
+<!-- an3: Change width from 0 to 25 + additve=sum. This results in a final change from 20 to 100 -->
+<rect fill="green" height="100" width="10">
+    <animate attributename="width" attributetype="XML" begin="0s" dur="4s" fill="freeze" from="10" id="an1" to="50"/>
+    <animate additive="sum" attributename="width" attributetype="XML" begin="0s" dur="4s" fill="freeze" from="10" id="an2" to="25"/>
+    <animate additive="sum" attributename="width" attributetype="XML" begin="0s" dur="4s" fill="freeze" from="0" id="an3" to="25"/>
+</rect>
+
+</svg>
+
+<script>
+var rootSVGElement = document.querySelector("svg");
+var epsilon = 1.0;
+
+// Setup animation test
+function sample1() {
+    assert_approx_equals(rect.width.animVal.value, 20, epsilon);
+    assert_equals(rect.width.baseVal.value, 10);
+}
+
+function sample2() {
+    assert_approx_equals(rect.width.animVal.value, 60, epsilon);
+    assert_equals(rect.width.baseVal.value, 10);
+}
+
+function sample3() {
+    assert_approx_equals(rect.width.animVal.value, 100, epsilon);
+    assert_equals(rect.width.baseVal.value, 10);
+}
+
+smil_async_test((t) =&gt; {
+    rect = rootSVGElement.ownerDocument.getElementsByTagName("rect")[0];
+
+    // All animations in the test file use the same duration, so it's not needed to list all sample points individually for an5/an6/an7/an8.
+    const expectedValues = [
+        // [animationId, time, sampleCallback]
+        ["an1", 0.0,  sample1],
+        ["an1", 2.0,  sample2],
+        ["an1", 4.0,  sample3],
+        ["an1", 60.0, sample3]
+    ];
+
+    runAnimationTest(t, expectedValues);
+});
+
+window.animationStartsImmediately = true;
+
+</script></body></html>

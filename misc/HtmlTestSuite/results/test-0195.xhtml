@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>`intended direction` scroll snaps only at points ahead of the scroll direction</title>
+<link href="https://drafts.csswg.org/css-scroll-snap-1/#scroll-snap-type" rel="help"/>
+<link href="https://bugzilla.mozilla.org/show_bug.cgi?id=1766805" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<style>
+div {
+  position: absolute;
+  margin: 0px;
+}
+#scroller {
+  width: 200px;
+  height: 100px;
+  overflow: scroll;
+  scroll-snap-type: x mandatory;
+}
+.snap {
+  scroll-snap-align: start;
+  background: green;
+}
+</style>
+
+</head><body><div id="scroller">
+  <div style="width: 2000px; height: 100px;"/>
+  <div class="snap" style="left:   0px; width: 20px; height: 100px;">1</div>
+  <div class="snap" style="left: 100px; width: 20px; height: 100px;">2</div>
+  <div class="snap" style="left: 120px; width: 20px; height: 100px;">3</div>
+  <div class="snap" style="left: 300px; width: 20px; height: 100px;">4</div>
+  <div class="snap" style="left: 400px; width: 20px; height: 100px;">5</div>
+</div>
+
+<script>
+test(() =&gt; {
+  scroller.scrollBy(10, 0);
+  assert_equals(scroller.scrollLeft, 100);
+
+  scroller.scrollBy(10, 0);
+  assert_equals(scroller.scrollLeft, 120);
+
+  scroller.scrollBy(10, 0);
+  // Snaps to the next snap point even if the previous snap point is closer to
+  // the current position.
+  assert_equals(scroller.scrollLeft, 300);
+}, "`intended direction` scroll snaps only at points ahead of the scroll " +
+   "direction");
+
+</script>
+</body></html>

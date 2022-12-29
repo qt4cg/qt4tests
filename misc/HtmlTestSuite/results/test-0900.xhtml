@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-actions.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+<script src="/resources/accesskey.js"/>
+
+</head><body><p>Tests that a keyboard access key to press a button will fire only the click event</p>
+<button accesskey="g" id="button">Click Me with Shift+Alt+g or on Mac with Control+Option+g</button>
+<input accesskey="b" id="inputbutton" type="button" value="Click me with Shift+Alt+b or on Mac with Control+Option+b"/>
+<label accesskey="l" id="label">Click Me with Shift+Alt+l or on Mac with Control+Option+l</label>
+
+<script>
+let button = document.getElementById("button");
+let inputbutton = document.getElementById("inputbutton");
+let radiobutton = document.getElementById("radiobutton");
+let label = document.getElementById("label");
+let elementList = [button, inputbutton, label];
+let eventLog = [];
+const eventList = ["pointerdown", "pointerup", "mousedown", "mouseup", "click"];
+elementList.forEach((el)=&gt;{eventList.forEach((ev)=&gt;el.addEventListener(ev, (e)=&gt;{
+  eventLog.push(`${ev}_${el.id}`);
+  if(ev === "click" &amp;&amp; currentTest){
+    currentTest.step(()=&gt;{
+      if(e instanceof PointerEvent){
+        // We want the test to run on all browsers even if click is not a PointerEvent.
+        assert_equals(e.pointerId, 0, "Click's pointerId has default value");
+        assert_equals(e.pointerType, "", "Click's pointerType has default value");
+      }
+      assert_equals(e.screenX, 0, "Click's screenX has default value");
+      assert_equals(e.screenY, 0, "Click's screenY has default value");
+      assert_equals(e.clientX, 0, "Click's clientX has default value");
+      assert_equals(e.clientY, 0, "Click's clientY has default value");
+      assert_equals(e.pageX, 0, "Click's pageX has default value");
+      assert_equals(e.pageY, 0, "Click's pageY has default value");
+      // https://github.com/w3c/csswg-drafts/issues/1070
+      assert_equals(e.offsetX, 0, "Click's offsetX should have default value");
+      assert_equals(e.offsetY, 0, "Click's offsetY should have default value");
+    });
+  }
+}));});
+let currentTest;
+let testElements = [button, inputbutton, label];
+let accesskeyMap = new Map([[button, "g"], [inputbutton, "b"], [label, "l"]]);
+testElements.forEach((el)=&gt;promise_test((test)=&gt; new Promise(async (resolve,reject)=&gt;{
+  currentTest = test;
+  eventLog = [];
+  var eventWatcher = new EventWatcher(test, el, ['click']);
+  let waitForClick = eventWatcher.wait_for('click');
+  await pressAccessKey(accesskeyMap.get(el));
+  await waitForClick;
+
+  assert_array_equals(eventLog, [`click_${el.id}`], "The Keyboard generated click only sends the click event.");
+  resolve();
+}), `Test that the Keyboard generated click does not fire pointer or mouse events for ${el.id}`));
+</script>
+</body></html>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>Test that modal dialogs have visibility: visible set from the UA sheet</title>
+<meta charset="utf-8"/>
+<link href="https://github.com/nt1m" rel="author" title="Tim Nguyen"/>
+<link href="https://html.spec.whatwg.org/multipage/rendering.html#flow-content-3:is-modal" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+
+</head><body><div style="visibility: hidden">
+    <dialog>This is a dialog</dialog>
+</div>
+
+<script>
+let dialog = document.querySelector("dialog");
+
+test(t =&gt; {
+    dialog.show();
+    t.add_cleanup(() =&gt; dialog.close());
+    assert_equals(getComputedStyle(dialog).visibility, "hidden");
+}, "Non-modal dialog should let parent visibility inherit");
+
+test(t =&gt; {
+    dialog.showModal();
+    t.add_cleanup(() =&gt; dialog.close());
+    assert_equals(getComputedStyle(dialog).visibility, "visible");
+}, "Modal dialog should have visibility: visible by default in UA sheet");
+
+test(t =&gt; {
+    dialog.style.visibility = "hidden";
+    dialog.showModal();
+    t.add_cleanup(() =&gt; {
+        dialog.style.removeProperty("visibility");
+        dialog.close();
+    });
+    assert_equals(getComputedStyle(dialog).visibility, "hidden");
+}, "Modal dialog visibility should be overridable");
+</script>
+</body></html>

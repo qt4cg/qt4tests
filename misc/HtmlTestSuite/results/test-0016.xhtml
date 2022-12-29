@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Check correct event bases for onclick</title>
+<meta charset="utf-8"/>
+<link href="https://svgwg.org/svg2-draft/single-page.html#interact-EventAttributes" rel="help"/>
+<link href="mailto:edvardt@opera.com" rel="author" title="Edvard Thörnros"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+</head><body><svg xmlns="http://www.w3.org/2000/svg" height="100" width="200">
+  <rect fill="#0AA" height="100" id="a" width="100" x="0" y="0">
+    <set attributename="display" begin="a.click" fill="freeze" to="none"/>
+    <set attributename="display" begin="b.click" fill="freeze" to="block"/>
+  </rect>
+  <rect display="none" fill="#A0A" height="100" id="b" width="100" x="100" y="0">
+    <set attributename="display" begin="a.click" fill="freeze" to="block"/>
+    <set attributename="display" begin="b.click" fill="freeze" to="none"/>
+  </rect>
+</svg>
+<script>
+  let clicks_remaining = 2;
+  let a = document.querySelector("#a");
+  let b = document.querySelector("#b");
+  function perform_clicks(t) {
+    t.step_timeout(function() {
+      a.dispatchEvent(new Event("click"));
+      t.step_timeout(function() {
+        b.dispatchEvent(new Event("click"));
+      }, 20);
+    }, 20);
+  }
+  async_test(t =&gt; {
+    let observer = document.querySelector("#b &gt; set + set");
+    observer.addEventListener('beginEvent', t.step_func(function() {
+      if (clicks_remaining == 0) {
+        assert_equals(window.getComputedStyle(a).display, "block");
+        assert_equals(window.getComputedStyle(b).display, "none");
+        t.done();
+        return;
+      }
+      perform_clicks(t);
+      clicks_remaining--;
+    }));
+    window.onload = t.step_func(() =&gt; {
+      perform_clicks(t);
+      clicks_remaining--;
+    });
+  });
+</script>
+</body></html>

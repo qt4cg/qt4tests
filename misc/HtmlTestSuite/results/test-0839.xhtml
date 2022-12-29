@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta content="long" name="timeout"/>
+<title>Media Loading State: the :buffering and :stalled pseudo-classes</title>
+<link href="https://w3c.github.io/csswg-drafts/selectors/#media-loading-state" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+</head><body>
+  <video controls="" height="300" loop="" muted="" width="300"/>
+  <script type="module">
+    test((t) =&gt; {
+      for (const pseudo of [":buffering", ":stalled"]) {
+        try {
+          document.querySelector(`.not-a-thing${pseudo}`);
+        } catch (e) {
+          assert_unreached(`${pseudo} is not supported`);
+        }
+      }
+    }, "Test :pseudo-class syntax is supported without throwing a SyntaxError");
+
+    promise_test(async (t) =&gt; {
+      const video = document.querySelector("video");
+      await new Promise((r) =&gt; {
+        video.addEventListener("stalled", r, { once: true });
+        video.src = `/media/counting.mp4?pipe=trickle(100:d1:r2)&amp;random=${Math.random()}`;
+      });
+      const promise = video.play();
+      assert_equals(
+        document.querySelector("video:stalled"),
+        video,
+        "video is stalled"
+      );
+      video.src = "";
+      // Wait for the video to abort trying to play
+      try {
+        await promise;
+      } catch (err) {}
+    }, "Test :stalled pseudo-class");
+
+    promise_test(async (t) =&gt; {
+      const video = document.querySelector("video");
+      await new Promise((r) =&gt; {
+        video.addEventListener("stalled", r, { once: true });
+        video.src = `/media/counting.mp4?pipe=trickle(100:d1:r2)&amp;random=${Math.random()}`;
+      });
+      video.currentTime = 10;
+      const promise = video.play();
+      assert_equals(
+        document.querySelector("video:buffering"),
+        video,
+        "video is buffering"
+      );
+      video.src = "";
+      // Wait for the video to abort trying to play
+      try {
+        await promise;
+      } catch (err) {}
+    }, "Test :buffering pseudo-class");
+  </script>
+</body>
+</html>

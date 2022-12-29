@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>HTML Test: focusgroup - Focus ascends to parent focusgroup successfully.</title>
+<link href="http://www.microsoft.com/" rel="author" title="Microsoft"/>
+<link href="https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/Focusgroup/explainer.md" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+<script src="/resources/testdriver-actions.js"/>
+<script src="../../resources/focusgroup-utils.js"/>
+
+</head><body><div focusgroup="horizontal">
+  <span id="item1" tabindex="0">item1</span>
+  <div id="item2" tabindex="-1">
+    <div>
+      <div focusgroup="extend vertical">
+        <span id="item3" tabindex="-1">item3</span>
+        <span id="item4" tabindex="-1">item4</span>
+      </div>
+    </div>
+  </div>
+  <span id="item5" tabindex="-1">item5</span>
+</div>
+
+<script>
+
+  promise_test(async t =&gt; {
+    var item2 = document.getElementById("item2");
+    var item3 = document.getElementById("item3");
+
+    await focusAndKeyPress(item3, kArrowLeft);
+    assert_equals(document.activeElement, item2);
+  }, "When the focus is set on the first item of an extending focusgroup that doesn't support the axis of the arrow key pressed but the parent focusgroup does, ascend to that focusgroup. This should work whether the extending focusgroup is the child of the other focusgroup or a distant descendant.");
+
+</script></body></html>

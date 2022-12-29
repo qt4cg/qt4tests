@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="reftest-wait">
+<head><link href="https://drafts.csswg.org/css-position/#fixed-pos" rel="help"/>
+<link href="https://crbug.com/1274414" rel="help"/>
+<link href="position-fixed-scroll-overlap-ref.html" rel="match"/>
+<meta content="The red fixed-position element should be always invisible&#xA;    (covered by the green elements), regardless of viewport scroll offset" name="assert"/>
+<script src="/common/rendering-utils.js"/>
+<script src="/common/reftest-wait.js"/>
+<style>
+.section {
+  width: 100px;
+  height: 2000px;
+  background: green;
+  position: relative;
+  z-index: 2;
+}
+</style>
+</head><body><svg xmlns="http://www.w3.org/2000/svg" style="width: 100px; height: 1000px; position: fixed">
+  <rect fill="red" height="2000" width="200"/>
+</svg>
+<div class="section"/>
+<div class="section"/>
+<div class="section"/>
+<div class="section"/>
+<script>
+  waitForAtLeastOneFrame().then(() =&gt; {
+    window.scrollTo(0, 4000);
+    waitForAtLeastOneFrame().then(() =&gt; {
+      window.scrollTo(0, 0);
+      takeScreenshot();
+    });
+  });
+</script>
+</body></html>

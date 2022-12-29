@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+</head><body>
+  <script src="/resources/testharness.js" type="text/javascript{{GET[in-iframe]}}"/>
+  <script src="/resources/testharnessreport.js" type="text/javascript{{GET[in-iframe]}}"/>
+  <script src="/common/get-host-info.sub.js"/>
+  <script src="/permissions-policy/resources/permissions-policy.js"/>
+  <script>
+  'use strict';
+
+  async function testSetSinkId() {
+    const audio = new Audio();
+    const p = audio.setSinkId('');
+    // Race a settled promise to check that the returned promise is already
+    // settled.
+    return Promise.race([
+      p,
+      Promise.reject(Error('setSinkId() promise not already settled')),
+    ]);
+  }
+
+  const cross_domain = get_host_info().HTTPS_REMOTE_ORIGIN;
+  run_all_fp_tests_allow_self(
+    cross_domain,
+    'speaker-selection',
+    'NotAllowedError',
+    testSetSinkId
+  );
+  </script>
+</body>
+</html>

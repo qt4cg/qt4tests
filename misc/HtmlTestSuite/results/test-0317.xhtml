@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="reftest-wait" lang="en-US">
+  <head>
+  <meta charset="utf-8"/>
+  <title>CSS Test: CSS display:contents; in Shadow DOM</title>
+  <link href="https://bugzilla.mozilla.org/show_bug.cgi?id=907396" rel="author" title="Mats Palmgren"/>
+  <link href="https://drafts.csswg.org/css-display/" rel="help"/>
+  <link href="display-contents-shadow-dom-1-ref.html" rel="match"/>
+<style>
+html,body {
+  color:black; background-color:white; font:12px/1 monospace; padding:0; margin:0;
+}
+.before::before, ::slotted(.before)::before {content: "a ";}
+.after::after, ::slotted(.after)::after {content: " c";}
+div.before::before {content: "X ";}
+div.after::after {content: " Y";}
+.b, .c, ::slotted(.b), ::slotted(.c) { display:contents; }
+</style>
+  </head>
+  <body>
+    <div class="before" id="host1"/>
+    <span id="host2"/>
+    <div class="after" id="host3"/>
+    <div class="before after" id="host4"/>
+    <div class="after" id="host5"/>
+    <div class="before" id="host6"/>
+    <div id="host7"/>
+    <div class="after" id="host8"/>
+    <div class="before after" id="host9"/>
+    <div class="after" id="hostA"/>
+    <div id="hostB"/>
+    <div id="hostC"/>
+    <div id="hostD"/>
+    <div id="hostE"/>
+    <div class="before" id="hostF"/>
+    <div id="hostG"/>
+    <span id="hostH"/>
+    <div id="hostI"/>
+    <div id="hostJ"/>
+    <span id="hostK"/>
+    <div id="hostL"/>
+    <div id="hostM"><i slot="i">Two</i><b slot="b">One</b></div>
+    <div id="hostN"><i class="c" slot="i">Two</i><b slot="b">One</b></div>
+    <div id="hostO"><i slot="i">Two</i><b class="c" slot="b">One</b></div>
+    <div id="hostP"><i class="c" slot="i">Two</i><b class="c" slot="b">One</b></div>
+    <div class="c" id="hostQ" style="color:blue"><i class="c" slot="i">Two</i><b class="c" slot="b">One</b></div>Three
+    <div class="c" id="hostS"><span class="c">S</span></div>
+    <div class="c" id="hostT">T</div>
+    <div id="hostU"><span slot="c">U</span></div>
+    <div class="c" id="hostV" style="color:red"><b class="c" slot="b" style="color:inherit">V</b></div>
+
+   <script>
+      function shadow(id) {
+        return document.getElementById(id).attachShadow({mode:"open"});
+      }
+      function span(s) {
+        var e = document.createElement("span");
+        var t = document.createTextNode(s);
+        e.appendChild(t);
+        return e;
+      }
+      function text(s) {
+        return document.createTextNode(s);
+      }
+      function contents(n, slotName) {
+        var e = document.createElement("z");
+        e.style.display = "contents";
+        e.style.color = "blue";
+        if (n) e.appendChild(n);
+        if (slotName) e.setAttribute("slot", slotName);
+        return e;
+      }
+
+      function run() {
+        document.body.offsetHeight;
+
+        shadow("host1").innerHTML = '&lt;slot style="display:inline"&gt;&lt;/slot&gt; c';
+        shadow("host2").innerHTML = 'a &lt;slot style="display:contents"&gt;&lt;/slot&gt; c';
+        shadow("host3").innerHTML = 'a &lt;slot style="display:contents"&gt;&lt;/slot&gt;';
+        shadow("host4").innerHTML = '&lt;slot style="display:contents"&gt;&lt;/slot&gt;';
+        shadow("host5").innerHTML = 'a &lt;slot style="display:contents"&gt;&lt;/slot&gt;';
+        shadow("host6").innerHTML = '&lt;z style="color:blue; display:contents"&gt;&lt;slot style="display:inline"&gt;&lt;/slot&gt;&lt;/z&gt; c';
+        shadow("host7").innerHTML = 'a &lt;slot style="display:contents"&gt;&lt;/slot&gt; c';
+        shadow("host8").innerHTML = 'a &lt;z style="color:blue; display:contents"&gt;&lt;slot style="display:contents"&gt;&lt;/z&gt;&lt;/slot&gt;';
+        shadow("host9").innerHTML = '&lt;slot style="display:contents"&gt;&lt;/slot&gt;';
+        shadow("hostA").innerHTML = 'a &lt;slot style="display:contents"&gt;&lt;/slot&gt;';
+        shadow("hostB").innerHTML = 'a &lt;slot name="c" style="display:contents"&gt;&lt;/slot&gt; &lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt; B';
+        shadow("hostC").innerHTML = 'A &lt;slot name="c" style="display:contents"&gt;&lt;/slot&gt; &lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt; B';
+        shadow("hostD").innerHTML = 'A &lt;slot name="c" style="display:contents"&gt;&lt;/slot&gt; &lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt; B &lt;slot name="b"&gt;&lt;/slot&gt;';
+        shadow("hostE").innerHTML = 'A &lt;slot name="c" style="display:contents"&gt;&lt;/slot&gt; &lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt; B';
+        shadow("hostF").innerHTML = '&lt;slot name="c" style="display:contents"&gt;&lt;/slot&gt; &lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt; B';
+        shadow("hostG").innerHTML = '&lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt;';
+        shadow("hostH").innerHTML = '&lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt;';
+        shadow("hostI").innerHTML = 'A&lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt;';
+        shadow("hostJ").innerHTML = 'A&lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt;';
+        shadow("hostK").innerHTML = '&lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt;';
+        shadow("hostL").innerHTML = '&lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt;';
+        shadow("hostM").innerHTML = '&lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt;&lt;slot name="i" style="display:inline"&gt;&lt;/slot&gt;';
+        shadow("hostN").innerHTML = '&lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt;&lt;slot name="i" style="display:inline"&gt;&lt;/slot&gt;';
+        shadow("hostO").innerHTML = '&lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt;&lt;slot name="i" style="display:inline"&gt;&lt;/slot&gt;';
+        shadow("hostP").innerHTML = '&lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt;&lt;slot name="i" style="display:inline"&gt;&lt;/slot&gt;';
+        shadow("hostQ").innerHTML = '&lt;slot name="b" style="display:contents"&gt;&lt;/slot&gt;&lt;slot name="i" style="display:inline"&gt;&lt;/slot&gt;';
+      }
+
+      function tweak() {
+        document.body.offsetHeight;
+
+        host1.appendChild(span("1"));
+        host2.appendChild(text("2"));
+        host3.appendChild(span("3"));
+        host4.appendChild(text("4"));
+
+        var e = span("5");
+        e.style.display = "contents";
+        host5.appendChild(e);
+
+        host6.appendChild(span("6"));
+        host7.appendChild(contents(text("7")));
+        host8.appendChild(contents(span("8")));
+        host9.appendChild(contents(text("9")));
+
+        var e = contents(span("A"));
+        hostA.appendChild(e);
+
+        var e = contents(text("2"), "b");
+        hostB.appendChild(e);
+        var e = contents(text("1"), "c");
+        hostB.appendChild(e);
+
+        var e = contents(text("2"), "b");
+        e.className = "after";
+        hostC.appendChild(e);
+        var e = contents(text("1"), "c");
+        e.className = "before";
+        hostC.appendChild(e);
+
+        var e = contents(text("2"), "b");
+        e.className = "before after";
+        hostD.appendChild(e);
+        var e = contents(text(" 3"), "b");
+        e.className = "before after";
+        hostD.appendChild(e);
+        var e = contents(text("1"), "c");
+        e.className = "before";
+        hostD.appendChild(e);
+
+        var e = contents(contents(text("2")), "b");
+        e.className = "before after";
+        hostE.appendChild(e);
+        var e2 = contents(text("1"), "c");
+        e2.className = "before after";
+        hostE.insertBefore(e2, e);
+
+        var e = contents(text("2"), "b");
+        e.className = "before after";
+        hostF.appendChild(e);
+        var e2 = contents(text("1"), "c");
+        e2.className = "before after";
+        hostF.insertBefore(e2, e);
+
+        var e = contents(contents(text("1")), "b");
+        hostG.appendChild(e);
+        var e = contents(text("2"), "b");
+        e.className = "before after";
+        hostG.appendChild(e);
+
+        var e = contents(contents(text("2")), "b");
+        hostH.appendChild(e);
+        var e2 = contents(text("1"), "b");
+        e2.className = "before after";
+        hostH.insertBefore(e2, e);
+
+        var e = contents(text("b"), "b");
+        hostI.appendChild(e);
+        var e = span("c");
+        e.setAttribute("slot", "b");
+        hostI.appendChild(e);
+
+        var e = contents(contents(text("b")), "b");
+        hostJ.appendChild(e);
+        var e = span("c");
+        e.setAttribute("slot", "b");
+        hostJ.appendChild(e);
+
+        var inner = span("b");
+        inner.className = "after";
+        var e = contents(contents(inner), "b");
+        hostK.appendChild(e);
+        var e = span("d");
+        e.setAttribute("slot", "b");
+        hostK.appendChild(e);
+
+        var inner = contents(null);
+        inner.className = "before";
+        var e = contents(inner, "b");
+        hostL.appendChild(e);
+        var e = span("b");
+        e.setAttribute("slot", "b");
+        hostL.appendChild(e);
+
+        document.body.offsetHeight;
+        setTimeout(function() {
+            shadow("hostS");
+            shadow("hostT");
+            shadow("hostU");
+            shadow("hostV").innerHTML = '&lt;z style="color:green"&gt;&lt;slot name="b"&gt;&lt;/slot&gt;&lt;/z&gt;';
+
+            document.body.offsetHeight;
+            document.documentElement.removeAttribute("class");
+          },0);
+      }
+
+      run();
+      setTimeout(tweak, 0);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>CSS Test (Selectors): Script focus on keyboard event handler matches :focus-visible</title>
+<link href="mailto:rego@igalia.com" rel="author" title="Manuel Rego Casasnovas"/>
+<link href="https://drafts.csswg.org/selectors-4/#the-focus-visible-pseudo" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-actions.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+<script src="/css/support/parsing-testcommon.js"/>
+<style>
+  #warning {
+    display: none;
+    background: red;
+  }
+
+  @supports not selector(:focus-visible) {
+    #instructions {
+      display: none;
+    }
+
+    #warning {
+      display: block;
+    }
+  }
+
+  :focus-visible {
+    outline: green solid 5px;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: 0;
+    background-color: red;
+  }
+</style>
+
+</head><body><p>This test checks that changing focus via script on keyboard event handler matches <code>:focus-visible</code>.</p>
+<ol id="instructions">
+  <li>Type any letter with the keyboard without having done anything before.</li>
+  <li>If the element that says "Focused" has a red background, then the test result is FAILURE. If the element has a green outline, then the test result is SUCCESS.</li>
+</ol>
+<p id="warning">Your user-agent does not support <code>:focus-visible</code> pseudo-class, please SKIP this test.</p>
+<div id="target" tabindex="0">Focused.</div>
+<script>
+  // Check that :focus-visible is supported.
+  test_valid_selector(':focus-visible');
+
+  document.addEventListener("keydown", () =&gt; {
+    target.focus();
+  });
+
+  async_test(function(t) {
+    test_driver.send_keys(document.body, "a").then(t.step_func_done(function() {
+      assert_equals(getComputedStyle(target).outlineColor, "rgb(0, 128, 0)", `outlineColor for ${target.tagName}#${target.id} should be green`);
+      assert_not_equals(getComputedStyle(target).backgroundColor, "rgb(255, 0, 0)", `backgroundColor for ${target.tagName}#${target.id} should NOT be red`);
+
+      let focusVisiblePseudoAll = document.querySelectorAll(':focus-visible');
+      assert_equals(focusVisiblePseudoAll.length, 1, "Only 1 element matches ':focus-visible'");
+      let focusVisiblePseudo = document.querySelector(':focus-visible');
+      assert_equals(target, focusVisiblePseudo, "${target.tagName}#${target.id} matches ':focus-visible'");
+    }));
+  }, "Focus via script on keyboard event handler matches ':focus-visible'");
+</script>
+</body></html>

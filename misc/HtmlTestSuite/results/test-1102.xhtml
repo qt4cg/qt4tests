@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>Speculative parsing, document.write(): script-src-defer</title>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/common/utils.js"/>
+<script src="/html/syntax/speculative-parsing/resources/speculative-parsing-util.js"/>
+<script>
+  setup({single_test: true});
+  const uuid = token();
+  expect_fetched_onload(uuid, true)
+    .then(compare_with_nonspeculative(uuid, 'script-src-defer', true))
+    .then(done);
+  document.write(`
+    &lt;script src="/common/slow.py?delay=1500"&gt;&lt;\/script&gt;
+    &lt;script&gt;
+     document.write('&lt;plaintext&gt;');
+    &lt;\/script&gt;
+    &lt;\!-- speculative case in document.write --&gt;
+    &lt;script src="/html/syntax/speculative-parsing/resources/stash.py?action=put&amp;amp;uuid=${uuid}&amp;amp;encodingcheck=&amp;Gbreve;" defer&gt;&lt;\/script&gt;
+  `);
+</script>
+</head><body/></html>

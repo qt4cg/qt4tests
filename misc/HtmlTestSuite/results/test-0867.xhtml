@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Test advertised required document policy</title>
+    <script src="/resources/testharness.js"/>
+    <script src="/resources/testharnessreport.js"/>  </head>
+  <body>
+    <h1>Test advertised required document policy</h1>
+<script>
+// The top-level document has no required document policy. Its child frames may,
+// though, and those policies should be set for any subframes.
+
+callbacks = {};
+
+window.addEventListener('message', ev =&gt; {
+  var id = ev.data.id;
+  if (id &amp;&amp; callbacks[id]) {
+    callbacks[id](ev.data.requiredPolicy || null);
+  }
+});
+
+// Frame tree should be:
+// Top:
+//  &lt;iframe&gt;
+//    &lt;iframe&gt;
+async_test(t =&gt; {
+  var iframe = document.createElement('iframe');
+  iframe.src = "/document-policy/echo-policy-nested.html?id=1";
+  callbacks["1"] = t.step_func_done(result =&gt; {
+    assert_equals(result, null);
+  });
+  document.body.appendChild(iframe);
+}, "test nested required document policy");
+
+// Frame tree should be:
+// Top:
+//  &lt;iframe policy="lossless-images-max-bpp=1.1"&gt;
+//    &lt;iframe&gt;
+async_test(t =&gt; {
+  var iframe = document.createElement('iframe');
+  iframe.src = "/document-policy/echo-policy-nested.html?id=2";
+  iframe.policy = "lossless-images-max-bpp=1.1";
+  callbacks["2"] = t.step_func_done(result =&gt; {
+    assert_equals(result, "lossless-images-max-bpp=1.1");
+  });
+  document.body.appendChild(iframe);
+}, "test nested required document policy when set by nested frame");
+
+// Frame tree should be:
+// Top:
+//  &lt;iframe policy="lossless-images-max-bpp=1.1"&gt;
+//    &lt;iframe&gt;
+//      &lt;iframe&gt;
+async_test(t =&gt; {
+  var iframe = document.createElement('iframe');
+  iframe.src = "/document-policy/echo-policy-nested.html?id=3&amp;level=1";
+  iframe.policy = "lossless-images-max-bpp=1.1";
+  callbacks["3"] = t.step_func_done(result =&gt; {
+    assert_equals(result, "lossless-images-max-bpp=1.1");
+  });
+  document.body.appendChild(iframe);
+}, "test nested required document policy when set by intermediate nested frame");
+    </script>
+  </body>
+</html>

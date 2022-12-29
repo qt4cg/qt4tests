@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Container Relative Units: Invalidation</title>
+<link href="https://drafts.csswg.org/css-contain-3/#container-lengths" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="support/cq-testcommon.js"/>
+<style>
+  #inline { container-type: inline-size; }
+  #size, #outer { container-type: size; }
+  .h600 { height: 600px; }
+  .w500 { width: 500px; }
+  .h400 { height: 400px; }
+  .w300 { width: 300px; }
+  .child {
+    padding-left: 10cqi;
+    padding-right: 10cqb;
+  }
+</style>
+</head><body><div id="ref"/>
+<div class="h600" id="outer">
+  <div class="w500 h400" id="size">
+    <div class="w300" id="inline">
+      <div class="child" id="child">Test</div>
+      <div><div class="child" id="deeper">Test</div></div>
+    </div>
+  </div>
+</div>
+<script>
+  setup(() =&gt; assert_implements_container_queries());
+
+  function assert_cqi_equals(element, expected) {
+    assert_equals(getComputedStyle(element).paddingLeft, expected);
+  }
+
+  function assert_cqb_equals(element, expected) {
+    assert_equals(getComputedStyle(element).paddingRight, expected);
+  }
+
+  test(function(t) {
+    assert_cqi_equals(child, '30px');
+    assert_cqi_equals(deeper, '30px');
+
+    try {
+      inline.style.containerType = 'normal';
+      assert_cqi_equals(child, '50px');
+      assert_cqi_equals(deeper, '50px');
+    } finally {
+      inline.style = '';
+    }
+
+    assert_cqi_equals(child, '30px');
+    assert_cqi_equals(deeper, '30px');
+  }, `cqi respond when selected container changes type (inline-size -&gt; normal)`);
+
+  test(function() {
+    assert_cqb_equals(child, '40px');
+    assert_cqb_equals(deeper, '40px');
+
+    try {
+      size.style.containerType = 'normal';
+      assert_cqb_equals(child, '60px');
+      assert_cqb_equals(deeper, '60px');
+    } finally {
+      size.style = '';
+    }
+
+    assert_cqb_equals(child, '40px');
+    assert_cqb_equals(deeper, '40px');
+  }, `cqb respond when selected container changes type (size -&gt; normal)`);
+
+  test(function() {
+    assert_cqb_equals(child, '40px');
+    assert_cqb_equals(deeper, '40px');
+
+    try {
+      inline.style.containerType = 'size';
+      inline.style.height = '200px';
+      assert_cqb_equals(child, '20px');
+      assert_cqb_equals(deeper, '20px');
+    } finally {
+      inline.style = '';
+    }
+
+    assert_cqb_equals(child, '40px');
+    assert_cqb_equals(deeper, '40px');
+  }, `cqb respond when intermediate container changes type (inline-size -&gt; size)`);
+
+  test(function() {
+    assert_cqi_equals(child, '30px');
+    assert_cqi_equals(deeper, '30px');
+
+    try {
+      inline.style.width = '50px';
+      assert_cqi_equals(child, '5px');
+      assert_cqi_equals(deeper, '5px');
+    } finally {
+      inline.style = '';
+    }
+
+    assert_cqi_equals(child, '30px');
+    assert_cqi_equals(deeper, '30px');
+  }, 'cqi respond when selected container changes inline-size');
+
+  test(function() {
+    assert_cqb_equals(child, '40px');
+    assert_cqb_equals(deeper, '40px');
+
+    try {
+      size.style.height = '50px';
+      assert_cqb_equals(child, '5px');
+      assert_cqb_equals(deeper, '5px');
+    } finally {
+      size.style = '';
+    }
+
+    assert_cqb_equals(child, '40px');
+    assert_cqb_equals(deeper, '40px');
+  }, 'cqb respond when selected container changes block-size');
+</script>
+</body></html>

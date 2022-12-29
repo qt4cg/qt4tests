@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Element ready check for containing iframe</title>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+<script src="../trusted-click.js"/>
+</head><body><div id="log"/>
+<iframe allowfullscreen=""/>
+<iframe allowfullscreen=""/>
+<script>
+    // wait for load event to avoid https://bugzil.la/1493878
+    window.onload = function () {
+        promise_test(async function (t) {
+            const [iframe1, iframe2] = document.getElementsByTagName("iframe");
+
+            iframe2.contentDocument.onfullscreenerror = t.unreached_func(
+                "fullscreenerror event"
+            );
+
+            await Promise.all([
+                trusted_request(
+                    iframe1.contentDocument.body,
+                    iframe1.contentDocument.body
+                ),
+                fullScreenChange(),
+            ]);
+
+            assert_equals(document.fullscreenElement, iframe1);
+
+            await Promise.all([
+                trusted_request(
+                    iframe2.contentDocument.body,
+                    iframe1.contentDocument.body
+                ),
+                fullScreenChange(iframe2.contentDocument),
+            ]);
+        }, "Element ready check for containing iframe");
+    };
+</script>
+</body></html>

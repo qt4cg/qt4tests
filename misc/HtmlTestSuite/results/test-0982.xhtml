@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>HTMLImageElement.prototype.decode(), image document tests.</title>
+<link href="https://html.spec.whatwg.org/multipage/embedded-content.html#dom-img-decode" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+</head><body><iframe id="frame_imgdoc" src="about:blank"/>
+<script>
+"use strict";
+
+promise_test(function() {
+  return new Promise(function(resolve) {
+    var frame = document.getElementById("frame_imgdoc");
+    // Load an image in the iframe and then replace that.
+    frame.src = "/images/red.png";
+    frame.onload = function() {
+      let img = frame.contentDocument.body.firstElementChild;
+      img.src = "/images/green.png";
+      img.decode().then(function() {
+        resolve();
+      });
+    };
+  });
+}, document.title + " Decode from iframe with image document, succeeds (img not loaded)");
+</script>
+
+</body></html>

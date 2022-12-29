@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>FileAPI Test: Verify behavior of Blob URL in unique origins</title>
+<meta content="long" name="timeout"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+
+</head><body><iframe id="sandboxed-iframe" sandbox="allow-scripts"/>
+
+<script>
+
+const iframe_scripts = [
+  'resources/fetch-tests.js',
+  'url-format.any.js',
+  'url-in-tags.window.js',
+  'url-with-xhr.any.js',
+  'url-with-fetch.any.js',
+];
+
+let html = '&lt;!doctype html&gt;\n&lt;meta charset="utf-8"&gt;\n&lt;body&gt;\n';
+html = html + '&lt;script src="/resources/testharness.js"&gt;&lt;/' + 'script&gt;\n';
+html = html + '&lt;script&gt;setup({"explicit_timeout": true});&lt;/' + 'script&gt;\n';
+for (const script of iframe_scripts)
+  html = html + '&lt;script src="' + script + '"&gt;&lt;/' + 'script&gt;\n';
+
+const frame = document.querySelector('#sandboxed-iframe');
+frame.setAttribute('srcdoc', html);
+frame.setAttribute('style', 'display:none;');
+
+fetch_tests_from_window(frame.contentWindow);
+
+</script>
+</body></html>

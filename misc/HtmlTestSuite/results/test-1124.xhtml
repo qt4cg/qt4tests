@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<title>This test validates the parsing of content-type of resources.</title>
+<link href="https://www.w3.org/TR/resource-timing-2/#sec-performanceresourcetiming" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+</head>
+<body>
+<script>
+
+// Utility function picked from https://github.com/web-platform-tests/wpt/blob/master/mimesniff/mime-types/charset-parameter.window.js
+function isByteCompatible(str) {
+  // see https://fetch.spec.whatwg.org/#concept-header-value-normalize
+  if(/^[\u0009\u0020\u000A\u000D]+|[\u0009\u0020\u000A\u000D]+$/.test(str)) {
+    return "header-value-incompatible";
+  }
+
+  for(let i = 0; i &lt; str.length; i++) {
+    const charCode = str.charCodeAt(i);
+    // See https://fetch.spec.whatwg.org/#concept-header-value
+    if(charCode &gt; 0xFF) {
+      return "incompatible";
+    } else if(charCode === 0x00 || charCode === 0x0A || charCode === 0x0D) {
+      return "header-value-incompatible";
+    }
+  }
+  return "compatible";
+}
+
+// Test for content-type parsing.
+const run_content_type_parsing_tests = (json_entries) =&gt; {
+  json_entries.forEach( (json_entry, i) =&gt; {
+    promise_test(async t =&gt; {
+        let url = "/fetch/content-type/resources/content-type.py?single_header&amp;";
+        json_entry.contentType.forEach(val =&gt; {
+          url += "value=" + encodeURIComponent(val) + "&amp;";
+        });
+        fetch(url);
+        const entry = await new Promise(resolve =&gt; new PerformanceObserver((entryList, observer) =&gt; {
+            observer.disconnect();
+            resolve(entryList.getEntries()[0]);
+        }).observe({entryTypes: ['resource']}));
+        assert_equals(entry.contentType, json_entry["mimeType"]);
+    }, "content-type " + i + " : " + json_entry.contentType);
+  });
+}
+
+// Test for mime-type parsing.
+const run_mime_type_parsing_tests = (json_entries) =&gt; {
+  json_entries.forEach( (val, i) =&gt; {
+    if(typeof val === "string" || val.navigable === undefined || isByteCompatible(val.input) !== "compatible") {
+      return;
+    }
+    const output = val.output === null ? "" : val.output
+    promise_test(async t =&gt; {
+        let url = `/fetch/content-type/resources/content-type.py?single_header&amp;value=${val.input}`;
+        fetch(url);
+        const entry = await new Promise(resolve =&gt; new PerformanceObserver((entryList, observer) =&gt; {
+            observer.disconnect();
+            resolve(entryList.getEntries()[0]);
+        }).observe({entryTypes: ['resource']}));
+        assert_equals(entry.contentType, output);
+    }, "mime-type " + i + " : " + val.input);
+  });
+}
+
+Promise.all([
+    fetch("/fetch/content-type/resources/content-types.json"),
+    fetch("/mimesniff/mime-types/resources/mime-types.json")
+  ]).then(([res, res2]) =&gt; res.json().then(run_content_type_parsing_tests)
+    .then(() =&gt; res2.json().then(run_mime_type_parsing_tests)));
+
+</script>
+</body>
+</html>

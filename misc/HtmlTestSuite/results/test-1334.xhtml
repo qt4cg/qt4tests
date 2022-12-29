@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>TestDriver actions on a document in an iframe</title>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+<script src="/resources/testdriver-actions.js"/>
+
+</head><body><iframe src="iframeChild.html"/>
+
+<script>
+setup({single_test: true});
+addEventListener("load", async () =&gt; {
+  let input = frames[0].document.getElementsByTagName("input")[0];
+  await new test_driver.Actions()
+   .pointerMove(0, 0, {origin: input})
+   .pointerDown()
+   .pointerUp()
+   .send();
+  await new test_driver.Actions()
+   .setContext(frames[0])
+   .keyDown("P")
+   .keyUp("P")
+   .keyDown("A")
+   .keyUp("A")
+   .keyDown("S")
+   .keyUp("S")
+   .keyDown("S")
+   .keyUp("S")
+   .send();
+  assert_equals(input.value, "PASS");
+  done();
+});
+</script>
+</body></html>

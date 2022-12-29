@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>HTMLTrackElement 'src' attribute changed, load pending, 'error' handler mutates</title>
+<link href="https://html.spec.whatwg.org/multipage/media.html#start-the-track-processing-model" rel="help"/>
+<link href="https://crbug.com/1374341" rel="help"/>
+</head><body><video/>
+<script>
+  const video = document.querySelector('video');
+  video.style.visibility = 'collapse';
+  video.setAttribute('crossorigin', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+  const track = document.createElement('track');
+  track.src = 'x';
+  track.track.mode = 'hidden';
+  video.appendChild(track);
+  track.onerror = () =&gt; {
+    for (let i = 0; i &lt; 10; ++i)
+      video.setAttribute('foo' + i, 'bar');
+  };
+  setTimeout(() =&gt; {
+    track.src = 'y';
+  }, 0);
+</script>
+</body></html>

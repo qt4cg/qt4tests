@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="reftest-wait">
+<head><meta charset="UTF-8"/>
+<title>CSS Highlight API Test: </title>
+<link href="https://drafts.csswg.org/css-highlight-api-1/" rel="help"/>
+<link href="custom-highlight-painting-001-ref.html" rel="match"/>
+<meta name="assert" value="::highlight overlay is correctly invalidated and repainted after inserting a new node inside one of its ranges"/>
+<script src="resources/run-after-layout-and-paint.js"/>
+<style>
+  ::highlight(example-highlight) {
+    background-color: yellow;
+    color: blue;
+  }
+</style>
+</head><body><span>two </span><span>three…</span>
+<script>
+  let r = new Range();
+  r.setStart(document.body, 0);
+  r.setEnd(document.body, 1);
+  CSS.highlights.set("example-highlight", new Highlight(r));
+  let newNode = document.createElement("span");
+  newNode.innerText = "One ";
+
+  // Force frame paint before inserting a new node.
+  runAfterLayoutAndPaint(()=&gt;{
+    document.body.insertBefore(newNode, document.body.firstChild);
+    document.documentElement.removeAttribute("class");
+  });
+</script>
+</body></html>

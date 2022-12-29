@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="reftest-wait">
+<head><title>Transform animation under large scale</title>
+<link href="mailto:kevers@chromium.org" rel="author" title="Kevin Ellis"/>
+<link href="https://crbug.com/1221622" rel="help"/>
+<link href="flip-running-animation-via-variable-ref.html" rel="match"/>
+<script src="/common/reftest-wait.js"/>
+<style>
+@keyframes spin {
+  0%   { transform: scaleX(var(--scale)) rotate(0deg); }
+  100% { transform: scaleX(var(--scale)) rotate(180deg); }
+}
+
+html {
+  --scale:  1;
+}
+
+html.tweaked {
+  --scale:  -1;
+}
+
+#container {
+  display: inline-block;
+  margin-left:  150px;
+  padding:  0;
+  /* Force animation to be effectively frozen at 50% progress. */
+  animation: spin 1000000s cubic-bezier(0, 1, 1, 0)  -500000s;
+}
+
+#block-1 {
+  background: blue;
+  height: 200px;
+  width:  100px;
+}
+
+#block-2 {
+  background: green;
+  height: 100px;
+  width: 100px;
+}
+</style>
+
+</head><body>
+  <div id="container">
+    <div id="block-1"/>
+    <div id="block-2"/>
+  </div>
+<script>
+window.onload = () =&gt; {
+  const anim = document.getAnimations()[0];
+  anim.ready.then(() =&gt; {
+    requestAnimationFrame(() =&gt; {
+      requestAnimationFrame(() =&gt; {
+        document.querySelector('html').classList.add('tweaked');
+        requestAnimationFrame(() =&gt; {
+          requestAnimationFrame(() =&gt; {
+            takeScreenshot();
+          });
+        });
+      });
+    });
+  });
+};
+</script>
+</body>
+
+</html>
