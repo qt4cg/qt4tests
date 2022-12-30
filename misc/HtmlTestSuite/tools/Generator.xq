@@ -18,8 +18,11 @@ xquery version "3.1";
    <test-case name="html-{$name}">
       <description>HtmlTestSuite test case {$name}</description>
       <created by="Michael Kay, Saxonica" on="{current-date()}"/>
+      <module uri="http://www.w3.org/qt4cg/compare" file="HtmlTestSuite/modules/compare.xquery"/>
       <dependency type="spec" value="XQ40+"/>
-      <test>deep-equal(parse-html(unparsed-text('HtmlTestSuite/files/{$name}.html')), doc('HtmlTestSuite/results/{$name}.xhtml'))</test>
+      <test>
+         import module namespace cmp="http://www.w3.org/qt4cg/compare";
+         cmp:compare(parse-html(unparsed-text('HtmlTestSuite/files/{$name}.html')), doc('HtmlTestSuite/results/{$name}.xhtml'))</test>
       <result>
          <assert-true/>
       </result>
