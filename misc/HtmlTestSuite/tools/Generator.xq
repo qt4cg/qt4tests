@@ -6,7 +6,7 @@ xquery version "3.1";
  :)
 
 
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="misc-HtmlTestSuite" covers40="fn-parse-html">
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="misc-HtmlTestSuite" covers-40="fn-parse-html">
    <description>Tests selected from the Html5 Test Suite (https://github.com/web-platform-tests/wpt). See tools/readme.md.</description>
    <link type="spec" document="FuncOps" section-number="7.1" idref="string-types"/>
    
