@@ -1,0 +1,378 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-atomic-equal"
+    covers40="fn-atomic-equal">
+    <description>Tests for fn:atomic-equal (derived from tests for op:same-key)</description>
+    <link type="spec" document="http://www.w3.org/TR/xpath-functions-31/" idref="op-atomic-equal"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+
+    <test-case name="atomic-equal-001">
+        <description>fn:atomic-equal over xs:string, xs:anyURI, and xs:untypedAtomic</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+           let $keys := (xs:untypedAtomic("abc"), xs:string("abc"), xs:anyURI("abc"),
+              xs:string("xyz"), xs:untypedAtomic("xyz"))
+           return every $i in 1 to 5, $j in 1 to 5
+           satisfies (atomic-equal($keys[$i], $keys[$j]) eq (($i lt 4) eq ($j lt 4))) 
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-002">
+        <description>fn:atomic-equal should not use the default collation</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <dependency type="spec" value="XQ31+"/>
+        <test>
+           declare default collation "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
+           let $keys := ("ABC", "abc", "aBc")
+           return every $i in 1 to 3, $j in 1 to 3 
+           satisfies ($i eq $j) eq atomic-equal($keys[$i], $keys[$j])
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-003">
+        <description>fn:atomic-equal over xs:string, xs:anyURI, and xs:untypedAtomic</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+           atomic-equal("ab" || "c", xs:anyURI("abc"))
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-005a">
+        <description>fn:atomic-equal over numerics: NaN and Infinity</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>atomic-equal(xs:double('NaN'), xs:double('NaN'))</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-005b">
+        <description>fn:atomic-equal over numerics: NaN and Infinity</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>atomic-equal(xs:double('NaN'), xs:float('NaN'))</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-005c">
+        <description>fn:atomic-equal over numerics: NaN and Infinity</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>atomic-equal(xs:double('NaN'), xs:double('INF'))</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-005d">
+        <description>fn:atomic-equal over numerics: NaN and Infinity</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>atomic-equal(xs:double('-INF'), xs:double('+INF'))</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-005e">
+        <description>fn:atomic-equal over numerics: NaN and Infinity</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>atomic-equal(xs:float('-INF'), xs:double('-INF'))</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-005f">
+        <description>fn:atomic-equal over numerics: NaN and Infinity</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>atomic-equal(xs:float('+INF'), xs:double('+INF'))</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-005g">
+        <description>fn:atomic-equal over numerics: NaN and Infinity</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>atomic-equal(xs:float('+INF'), xs:float('+INF'))</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-006">
+        <description>fn:atomic-equal over numerics</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <dependency type="spec" value="XQ31"/>
+        <test>
+             let $keys := (
+                 xs:decimal("1.00000000000000001"),
+                 xs:decimal("1.00000000000000002"),
+                 xs:double("1.0")
+             )
+             return every $i in 1 to 3, $j in 1 to 3 
+                    satisfies ($i eq $j) eq atomic-equal($keys[$i], $keys[$j])
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-007">
+        <description>fn:atomic-equal over numerics</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>atomic-equal(1.1, 1.1e0)</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-009">
+        <description>fn:atomic-equal over numerics</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+           all((
+                atomic-equal(16777218, xs:double("16777218")),
+                atomic-equal(16777218, xs:decimal("16777218")),
+                atomic-equal(16777218, xs:float("16777218")),
+                atomic-equal(xs:double(16777218), xs:decimal("16777218"))))
+           
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-010">
+        <description>fn:atomic-equal over numerics</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+           for-each-pair(-100000 to 100000, -99999 to 100001,
+              ->($x, $y) {atomic-equal($x+1, xs:double($y))}) => all() 
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+
+    <test-case name="atomic-equal-013">
+        <description>fn:atomic-equal values with timezones</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+           let $without_tz := xs:dateTime('2015-04-08T01:30:00'), 
+               $with_tz := adjust-dateTime-to-timezone($without_tz, implicit-timezone()),
+               $keys := (xs:dateTime('2015-04-08T02:30:00'), $without_tz, $with_tz)
+           return every $i in 1 to 3, $j in 1 to 3 
+                  satisfies ($i eq $j) eq atomic-equal($keys[$i], $keys[$j])
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-014">
+        <description>fn:atomic-equal values with timezones</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+           let $without_tz := xs:date('2015-04-08'), 
+               $with_tz := adjust-date-to-timezone($without_tz, implicit-timezone()),
+               $keys := (xs:date('2015-04-09'), $without_tz, $with_tz)
+           return every $i in 1 to 3, $j in 1 to 3 
+                    satisfies ($i eq $j) eq atomic-equal($keys[$i], $keys[$j])
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-015">
+        <description>fn:atomic-equal values with timezones</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+           let $without_tz := xs:time('01:30:00') 
+           ,   $with_tz := adjust-time-to-timezone($without_tz, implicit-timezone())
+           ,   $keys := (xs:time('02:30:00'), $without_tz, $with_tz)
+           return every $i in 1 to 3, $j in 1 to 3 
+           satisfies ($i eq $j) eq atomic-equal($keys[$i], $keys[$j])
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-016">
+        <description>fn:atomic-equal values with timezones</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+           let $date := adjust-date-to-timezone(xs:date("2015-10-10"), implicit-timezone())
+           ,   $keys := ($date cast as xs:gYear, xs:gYear("2015"), xs:gYear("2014"))
+           return every $i in 1 to 3, $j in 1 to 3 
+           satisfies ($i eq $j) eq atomic-equal($keys[$i], $keys[$j])
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-017">
+        <description>fn:atomic-equal values with timezones</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+           let $date := adjust-date-to-timezone(xs:date("2015-10-10"), implicit-timezone())
+           ,   $keys := ($date cast as xs:gYearMonth, xs:gYearMonth("2015-10"), xs:gYearMonth("2015-11"))
+           return every $i in 1 to 3, $j in 1 to 3 
+                  satisfies ($i eq $j) eq atomic-equal($keys[$i], $keys[$j])
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-018">
+        <description>fn:atomic-equal values with timezones</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+           let $date := adjust-date-to-timezone(xs:date("2015-10-10"), implicit-timezone())
+           ,   $keys := ($date cast as xs:gMonth, xs:gMonth("--10"), xs:gMonth("--11"))
+           return every $i in 1 to 3, $j in 1 to 3 
+           satisfies ($i eq $j) eq atomic-equal($keys[$i], $keys[$j])
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-019">
+        <description>fn:atomic-equal values with timezones</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+           let $date := adjust-date-to-timezone(xs:date("2015-10-10"), implicit-timezone())
+           ,  $keys := ($date cast as xs:gMonthDay, xs:gMonthDay("--10-10"), xs:gMonthDay("--11-11"))
+           return every $i in 1 to 3, $j in 1 to 3 
+           satisfies ($i eq $j) eq atomic-equal($keys[$i], $keys[$j])
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-020">
+        <description>fn:atomic-equal values with timezones</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+           let $date := adjust-date-to-timezone(xs:date("2015-10-10"), implicit-timezone())
+           ,   $keys := ($date cast as xs:gDay, xs:gDay("---10"), xs:gDay("---11"))
+           return every $i in 1 to 3, $j in 1 to 3 
+           satisfies ($i eq $j) eq atomic-equal($keys[$i], $keys[$j])
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-021">
+        <description>fn:atomic-equal over xs:boolean, xs:hexBinary, xs:base64Binary, xs:duration, and xs:QName</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+            let $values := (
+               fn:true(),
+               fn:false(),
+               xs:hexBinary("ff"),
+               xs:base64Binary(xs:hexBinary("ff")),
+               xs:duration("P12M"),
+               QName((), "abc"),
+               QName("http://example.org", "abc")
+            ) return
+            every $i in 1 to 7, $j in 1 to 7
+            satisfies (($i eq $j) eq atomic-equal($values[$i], $values[$j]))
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-022a">
+        <description>fn:atomic-equal over xs:QName</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+            let $ns := "http://example.org" 
+            return atomic-equal(QName($ns, "foo"), QName($ns, "ns:foo"))           
+        </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="atomic-equal-022b">
+        <description>fn:atomic-equal over xs:QName</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+            let $ns := "http://example.org" 
+            return atomic-equal(QName($ns, "ns1:foo"), QName($ns, "ns2:foo"))           
+        </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="atomic-equal-022c">
+        <description>fn:atomic-equal over xs:QName</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+            let $ns := "http://example.org" 
+            return atomic-equal(QName($ns, "foo"), QName("", "foo"))           
+        </test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="atomic-equal-022d">
+        <description>fn:atomic-equal over xs:QName</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+            let $ns := "http://example.org" 
+            return atomic-equal(QName($ns, "ns1:foo"), QName($ns, "ns1:bar"))           
+        </test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+
+    <test-case name="atomic-equal-023">
+        <description>fn:atomic-equal over strings.</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+           let $values := ("abc", "def", "xyz")
+           return
+           every $i in 1 to 3, $j in 1 to 3
+           satisfies ($i eq $j) eq atomic-equal($values[$i], xs:untypedAtomic($values[$j]))
+       </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+
+
+    <test-case name="atomic-equal-027">
+        <description>fn:atomic-equal values, times equal but in different timezones</description>
+        <created by="Michael Kay" on="2023-02-07"/>
+        <test>
+            atomic-equal( xs:time('17:00:00Z'), xs:time('12:00:00-05:00'))
+        </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+
+</test-set>
