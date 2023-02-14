@@ -1427,11 +1427,13 @@
       <description> A test whose essence is: `deep-equal("a string", "a string", "http://www.w3.org/2005/xpath-functions/collation/codepoint", "wrong param")`. </description>
       <created by="Frans Englich" on="2007-11-26"/>
       <modified by="Michael Kay" on="2023-02-08" change="Different error code for a 4.0 processor"/>
+      <modified by="Christian Gruen" on="2023-02-14" change="Options may be ignored if input strings are identical"/>
       <test>deep-equal("a string", "a string", "http://www.w3.org/2005/xpath-functions/collation/codepoint", "wrong param")</test>
       <result>
          <any-of>
             <error code="XPST0017"/><!-- 3.1 -->
             <error code="XPTY0004"/><!-- 4.0 -->
+            <assert-true/>
          </any-of>
       </result>
    </test-case>
@@ -3328,10 +3330,14 @@
    <test-case name="deep-equal-40-normalize-unicode-006" covers-40="fn-deep-equal">
       <description> Test normalize-unicode option of deep equal - invalid normalization form</description>
       <created by="Michael Kay" on="2023-02-03"/>
+      <modified by="Christian Gruen" on="2023-02-14" change="Alternative error code added"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>deep-equal('&#506;', 'A&#778;&#769;', options := map{'normalization-form':'KFC'})</test>
       <result>
-         <error code="FOJS0005"/>
+         <any-of>
+           <error code="XPTY0004"/>
+           <error code="FOJS0005"/>
+         </any-of>
       </result>
    </test-case>
    
@@ -3710,6 +3716,8 @@
    <test-case name="deep-equal-40-type-annotations-003" covers-40="fn-deep-equal">
       <description> Test type-annotations option with atomic values - true - numeric</description>
       <created by="Michael Kay" on="2023-02-03"/>
+      <modified by="Christian Gruen" on="2023-02-14" change="typedData dependency added"/>
+      <dependency type="feature" value="typedData"/>
       <test>deep-equal(1e3, xs:float(1e3), (), map{'type-annotations':true()})</test>
       <result>
          <assert-false/>
@@ -3738,6 +3746,8 @@
    <test-case name="deep-equal-40-type-annotations-006" covers-40="fn-deep-equal">
       <description> Test type-annotations option with atomic values - true - strings</description>
       <created by="Michael Kay" on="2023-02-03"/>
+      <modified by="Christian Gruen" on="2023-02-14" change="typedData dependency added"/>
+      <dependency type="feature" value="typedData"/>
       <test>deep-equal("foo", local-name-from-QName(parse-QName("foo")), 
          (), map{'type-annotations':true()})</test>
       <result>
