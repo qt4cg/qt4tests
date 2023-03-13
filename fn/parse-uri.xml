@@ -1,0 +1,592 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="fn-parse-uri" covers="fn-parse-uri">
+  <description>fn:parse-uri() tests</description>
+
+  <link type="spec" document="https://qt4cg.org/specifications/xpath-functions-40/"
+        idref="func-parse-uri"/>
+
+  <dependency type="spec" value="XQ40+ XP40+"/>
+
+  <test-case name="fn-parse-uri-001">
+    <description>Parses a simple URI</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-09"/>
+    <test>fn:parse-uri("https://example.com\path\to\file")</test>
+    <result>
+      <assert-deep-eq>map {
+        "authority": "example.com",
+        "host": "example.com",
+        "path": "/path/to/file",
+        "path-segments": [ "", "path", "to", "file" ],
+        "scheme": "https",
+        "hierarchical": true(),
+        "uri": "https://example.com\path\to\file"
+      }</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-002">
+    <description>Parses a URI with a complicated authority</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-09"/>
+    <test>fn:parse-uri("https://user:password@example.com:443/path")</test>
+    <result>
+      <assert-deep-eq>map {'uri': 'https://user:password@example.com:443/path',
+                           'scheme': 'https',
+                           "hierarchical": true(),
+                           'authority': 'user:password@example.com:443',
+                           'host': 'example.com',
+                           'port': '443',
+                           'path-segments': ['', 'path'],
+                           'path': '/path'}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-003">
+    <description>Parses a URI with a escaped path components</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-09"/>
+    <test>fn:parse-uri("http://foo")</test>
+    <result>
+      <assert-deep-eq>map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'foo',
+                           'host': 'foo',
+                           'uri': 'http://foo'
+                           }</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-004">
+    <description>Parses a URI with a escaped path components</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-09"/>
+    <test>fn:parse-uri("https://user:password@example.com:443/path/a%2fb/a+b")</test>
+    <result>
+      <assert-deep-eq>map {'scheme': 'https',
+                           "hierarchical": true(),
+                           'uri': 'https://user:password@example.com:443/path/a%2fb/a+b',
+                           'authority': 'user:password@example.com:443',
+                           'port': '443',
+                           'host': 'example.com',
+                           'path-segments': ['','path','a/b','a b'],
+                           'path': '/path/a%2fb/a+b'}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-005">
+    <description>Parses a URI with a fragment identifier</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("https://qt4cg.org/specifications/xpath-functions-40/Overview.html#parse-uri")</test>
+    <result>
+      <assert-deep-eq>map {
+        "authority": "qt4cg.org",
+        "fragment": "parse-uri",
+        "host": "qt4cg.org",
+        "path": "/specifications/xpath-functions-40/Overview.html",
+        "path-segments": [ "", "specifications", "xpath-functions-40", "Overview.html" ],
+        "scheme": "https",
+        "hierarchical": true(),
+        "uri": "https://qt4cg.org/specifications/xpath-functions-40/Overview.html#parse-uri"
+      }</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-006">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("http://www.ietf.org/rfc/rfc2396.txt")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "http://www.ietf.org/rfc/rfc2396.txt",
+  "scheme": "http",
+  "hierarchical": true(),
+  "authority": "www.ietf.org",
+  "host": "www.ietf.org",
+  "path": "/rfc/rfc2396.txt",
+  "path-segments": array { "", "rfc", "rfc2396.txt" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-007">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("https://example.com/path/to/file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "https://example.com/path/to/file",
+  "scheme": "https",
+  "hierarchical": true(),
+  "authority": "example.com",
+  "host": "example.com",
+  "path": "/path/to/file",
+  "path-segments": array { "", "path", "to", "file" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-008">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("https://example.com:8080/path?s=%22hello world%22&amp;sort=relevance")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "https://example.com:8080/path?s=%22hello world%22&amp;sort=relevance",
+  "scheme": "https",
+  "hierarchical": true(),
+  "authority": "example.com:8080",
+  "host": "example.com",
+  "port": "8080",
+  "path": "/path",
+  "query": "s=%22hello world%22&amp;sort=relevance",
+  "query-segments": array {
+    map { "key": "s", "value": """hello world""" },
+    map { "key": "sort", "value": "relevance" }
+  },
+  "path-segments": array { "", "path" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-009">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("https://user@example.com/path/to/file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "https://user@example.com/path/to/file",
+  "scheme": "https",
+  "hierarchical": true(),
+  "authority": "user@example.com",
+  "userinfo": "user",
+  "host": "example.com",
+  "path": "/path/to/file",
+  "path-segments": array { "", "path", "to", "file" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-010">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("ftp://ftp.is.co.za/rfc/rfc1808.txt")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "ftp://ftp.is.co.za/rfc/rfc1808.txt",
+  "scheme": "ftp",
+  "hierarchical": true(),
+  "authority": "ftp.is.co.za",
+  "host": "ftp.is.co.za",
+  "path": "/rfc/rfc1808.txt",
+  "path-segments": array { "", "rfc", "rfc1808.txt" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+<!-- T.B.D.
+  <test-case name="fn-parse-uri-011">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("file:////uncname/path/to/file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "file:////uncname/path/to/file",
+  "scheme": "file",
+  "hierarchical": true(),
+  "authority": "uncname",
+  "host": "uncname",
+  "path": "/path/to/file",
+  "path-segments": array { "", "path", "to", "file" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+-->
+
+  <test-case name="fn-parse-uri-012">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("file:///c:/path/to/file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "file:///c:/path/to/file",
+  "scheme": "file",
+  "hierarchical": true(),
+  "path": "/c:/path/to/file",
+  "path-segments": array { "", "c:", "path", "to", "file" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-013">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("file:/C:/Program%20Files/test.jar")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "file:/C:/Program%20Files/test.jar",
+  "scheme": "file",
+  "hierarchical": true(),
+  "path": "/C:/Program%20Files/test.jar",
+  "path-segments": array { "", "C:", "Program Files", "test.jar" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-014">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("file:\\c:\path\to\file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "file:\\c:\path\to\file",
+  "scheme": "file",
+  "hierarchical": true(),
+  "path": "/c:/path/to/file",
+  "path-segments": array { "", "c:", "path", "to", "file" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-015">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("file:\c:\path\to\file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "file:\c:\path\to\file",
+  "scheme": "file",
+  "hierarchical": true(),
+  "path": "/c:/path/to/file",
+  "path-segments": array { "", "c:", "path", "to", "file" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-016">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("c:\path\to\file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "c:\path\to\file",
+  "scheme": "file",
+  "hierarchical": true(),
+  "path": "/c:/path/to/file",
+  "path-segments": array { "", "c:", "path", "to", "file" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-017">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("/path/to/file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "hierarchical": true(),
+  "uri": "/path/to/file",
+  "path": "/path/to/file",
+  "path-segments": array { "", "path", "to", "file" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-018">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("#testing")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "#testing",
+  "fragment": "testing"
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-019">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("?q=1")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "?q=1",
+  "query": "q=1",
+  "query-segments": array {
+    map { "key": "q", "value": "1" }
+  }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-020">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("ldap://[2001:db8::7]/c=GB?objectClass?one")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "ldap://[2001:db8::7]/c=GB?objectClass?one",
+  "scheme": "ldap",
+  "hierarchical": true(),
+  "authority": "[2001:db8::7]",
+  "host": "[2001:db8::7]",
+  "path": "/c=GB",
+  "query": "objectClass?one",
+  "query-segments": array {
+    map { "value": "objectClass?one" }
+  },
+  "path-segments": array { "", "c=GB" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-021">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("mailto:John.Doe@example.com")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "mailto:John.Doe@example.com",
+  "scheme": "mailto",
+  "hierarchical": false(),
+  "path": "John.Doe@example.com",
+  "path-segments": array { "John.Doe@example.com" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-022">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("news:comp.infosystems.www.servers.unix")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "news:comp.infosystems.www.servers.unix",
+  "scheme": "news",
+  "hierarchical": false(),
+  "path": "comp.infosystems.www.servers.unix",
+  "path-segments": array { "comp.infosystems.www.servers.unix" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-023">
+    <description>Parses an example from the specification. Note that
+    this one is odd; the tel: scheme uses a literal “+” in the URI.</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("tel:+1-816-555-1212")</test>
+    <result>
+      <any-of>
+        <assert-deep-eq>map {
+           "uri": "tel:+1-816-555-1212",
+           "scheme": "tel",
+           "hierarchical": false(),
+           "path": "+1-816-555-1212",
+           "path-segments": array { "+1-816-555-1212" }
+        }</assert-deep-eq>
+        <assert-deep-eq>map {
+           "uri": "tel:+1-816-555-1212",
+           "scheme": "tel",
+           "hierarchical": false(),
+           "path": "+1-816-555-1212",
+           "path-segments": array { " 1-816-555-1212" }
+        }</assert-deep-eq>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-024">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("telnet://192.0.2.16:80/")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "telnet://192.0.2.16:80/",
+  "scheme": "telnet",
+  "hierarchical": true(),
+  "authority": "192.0.2.16:80",
+  "host": "192.0.2.16",
+  "port": "80",
+  "path": "/",
+  "path-segments": array { "", "" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-025">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("urn:oasis:names:specification:docbook:dtd:xml:4.1.2")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "urn:oasis:names:specification:docbook:dtd:xml:4.1.2",
+  "scheme": "urn",
+  "hierarchical": false(),
+  "path": "oasis:names:specification:docbook:dtd:xml:4.1.2",
+  "path-segments": array { "oasis:names:specification:docbook:dtd:xml:4.1.2" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-026">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("tag:textalign.net,2015:ns")</test>
+    <result>
+      <assert-deep-eq>map {
+    "uri": "tag:textalign.net,2015:ns",
+    "scheme": "tag",
+    "hierarchical": false(),
+    "path": "textalign.net,2015:ns",
+    "path-segments": [ "textalign.net,2015:ns" ]
+  }</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-027">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("tag:jan@example.com,1999-01-31:my-uri")</test>
+    <result>
+      <assert-deep-eq>map {
+    "uri": "tag:jan@example.com,1999-01-31:my-uri",
+    "scheme": "tag",
+    "hierarchical": false(),
+    "path": "jan@example.com,1999-01-31:my-uri",
+    "path-segments": [ "jan@example.com,1999-01-31:my-uri" ]
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-028">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("jar:file:/C:/Program%20Files/test.jar!/foo/bar")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "jar:file:/C:/Program%20Files/test.jar!/foo/bar",
+  "scheme": "jar",
+  "hierarchical": false(),
+  "path": "file:/C:/Program%20Files/test.jar!/foo/bar",
+  "path-segments": array { "file:", "C:", "Program Files", "test.jar!", "foo", "bar" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-029">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("http://www.example.org/Dürst")</test>
+    <result>
+      <assert-deep-eq>map {
+    "uri": "http://www.example.org/Dürst",
+    "scheme": "http",
+    "hierarchical": true(),
+    "authority": "www.example.org",
+    "host": "www.example.org",
+    "path": "/Dürst",
+    "path-segments": [ "","Dürst" ]
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-030">
+    <description>Parses an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("https://example.com:8080/path?s=%22hello world%22;sort=relevance", map { "query-separator": ";" })</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "https://example.com:8080/path?s=%22hello world%22;sort=relevance",
+  "scheme": "https",
+  "hierarchical": true(),
+  "authority": "example.com:8080",
+  "host": "example.com",
+  "port": "8080",
+  "path": "/path",
+  "query": "s=%22hello world%22;sort=relevance",
+  "query-segments": array {
+    map { "key": "s", "value": """hello world""" },
+    map { "key": "sort", "value": "relevance" }
+  },
+  "path-segments": array { "", "path" }
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-031">
+    <description>Parses a URI preserving deprecated features</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("https://user:password@example.com:443/path",
+                       map { "allow-deprecated-features": true() })</test>
+    <result>
+      <assert-deep-eq>map {'uri': 'https://user:password@example.com:443/path',
+                           'scheme': 'https',
+                           "hierarchical": true(),
+                           'authority': 'user:password@example.com:443',
+                           'userinfo': 'user:password',
+                           'host': 'example.com',
+                           'port': '443',
+                           'path-segments': ['', 'path'],
+                           'path': '/path'}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-032">
+    <description>Parses a URI omitting known ports</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("https://user:password@example.com:443/path",
+                       map { "omit-default-ports": true() })</test>
+    <result>
+      <assert-deep-eq>map {'uri': 'https://user:password@example.com:443/path',
+                           'scheme': 'https',
+                           "hierarchical": true(),
+                           'authority': 'user:password@example.com:443',
+                           'host': 'example.com',
+                           'path-segments': ['', 'path'],
+                           'path': '/path'}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-033">
+    <description>Parses a URI preserving deprecated features and
+    omitting known ports</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:parse-uri("https://user:password@example.com:443/path",
+                       map { "allow-deprecated-features": true(),
+                             "omit-default-ports": true() })</test>
+    <result>
+      <assert-deep-eq>map {'uri': 'https://user:password@example.com:443/path',
+                           'scheme': 'https',
+                           "hierarchical": true(),
+                           'authority': 'user:password@example.com:443',
+                           'userinfo': 'user:password',
+                           'host': 'example.com',
+                           'path-segments': ['', 'path'],
+                           'path': '/path'}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-034">
+    <description>Parses an unknown non-hierarchical scheme</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-13"/>
+    <test>fn:parse-uri("querty:abc")</test>
+    <result>
+      <assert-deep-eq>map {'uri': 'querty:abc',
+                           'scheme': 'querty',
+                           'hierarchical': false(),
+                           'path-segments': ['abc'],
+                           'path': 'abc'}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-035">
+    <description>Parses an unknown hierarchical scheme</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-13"/>
+    <test>fn:parse-uri("querty:///abc")</test>
+    <result>
+      <assert-deep-eq>map {'uri': 'querty:///abc',
+                           'scheme': 'querty',
+                           "hierarchical": true(),
+                           'path-segments': ['', 'abc'],
+                           'path': '/abc'}</assert-deep-eq>
+    </result>
+  </test-case>
+
+</test-set>
+
