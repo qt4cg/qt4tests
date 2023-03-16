@@ -125,9 +125,13 @@
   <test-case name="fn-parse-uri-008">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
-    <test>fn:parse-uri("https://example.com:8080/path?s=%22hello world%22&amp;sort=relevance")</test>
+    <modified by="Michael Kay" on="2023-03-16" change="run both on XPath and XQuery"/>
+    <test>
+      let $amp := codepoints-to-string(38) return
+      fn:parse-uri("https://example.com:8080/path?s=%22hello world%22" || $amp || "sort=relevance")</test>
     <result>
-      <assert-deep-eq>map {
+      <assert-deep-eq>
+        map {
   "uri": "https://example.com:8080/path?s=%22hello world%22&amp;sort=relevance",
   "scheme": "https",
   "hierarchical": true(),
@@ -580,11 +584,18 @@
     <created by="Norm Tovey-Walsh" on="2023-03-13"/>
     <test>fn:parse-uri("querty:///abc")</test>
     <result>
-      <assert-deep-eq>map {'uri': 'querty:///abc',
+      <all-of>
+        <assert>$result?uri eq 'querty:///abc'</assert>
+        <assert>$result?scheme eq 'querty'</assert>
+        <assert>$result?hierarchical</assert>
+        <assert>deep-equal($result?path-segments, ['', 'abc'])</assert>
+        <assert>$result?path eq '/abc'</assert>
+      </all-of>
+      <!--<assert-deep-eq>map {'uri': 'querty:///abc',
                            'scheme': 'querty',
                            "hierarchical": true(),
                            'path-segments': ['', 'abc'],
-                           'path': '/abc'}</assert-deep-eq>
+                           'path': '/abc'}</assert-deep-eq>-->
     </result>
   </test-case>
 
