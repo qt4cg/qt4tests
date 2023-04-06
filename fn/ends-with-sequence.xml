@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-ends-with-sequence" covers-40="fn-ends-with-sequence">
+    <description>Tests for the fn:ends-with-sequence function (4.0 proposal)</description>
+    <link type="spec" document="http://www.w3.org/TR/xpath-functions-11/"
+        idref="func-ends-with-sequence"/>
+
+    <dependency type="spec" value="XP40+ XQ40+"/>
+
+    <test-case name="ends-with-sequence-001">
+        <description>Basic example, true</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(1 to 29, 18 to 29)</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="ends-with-sequence-002">
+        <description>Basic example, false</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(1 to 29, 18 to 30)</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-003">
+        <description>Second arg empty</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(1 to 29, ())</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-004">
+        <description>First arg empty</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence((), 1 to 29)</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-005">
+        <description>Both args empty</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence((), ())</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-006">
+        <description>NaNs compare equal</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(number('NaN'), number('NaN'))</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-007">
+        <description>Numerics of different types compare equal</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(1 to 10, (9e0, 10e0))</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-008">
+        <description>Non-comparables don't cause an error</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(1 to 10, ("a", "b", "c"))</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-009">
+        <description>Second sequence is longer</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(10 to 20, 1 to 20)</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-010">
+        <description>Sequences are equal</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(1 to 10, 1 to 10)</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-011">
+        <description>Timezone is ignored</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence((current-dateTime(), xs:dateTime('2022-10-27T12:00:00Z')), xs:dateTime('2022-10-27T13:00:00+01:00'))</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-012">
+        <description>This shouldn't take long, in theory...</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(1 to 1000000000, (1000000000-10) to 1000000000)</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-013">
+        <description>This shouldn't take long</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(1 to 1000000000, -1)</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-014">
+        <description>Compare nodes deep-equal</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test><![CDATA[ends-with-sequence(replicate(parse-xml('<a><b/><c/></a>'), 4), replicate(parse-xml('<a><b/><c/></a>'), 2))]]></test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-015">
+        <description>Compare nodes deep-equal (namespaces are ignored)</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test><![CDATA[ends-with-sequence(replicate(parse-xml('<a><b xmlns:p="q"/><c/></a>'), 4), replicate(parse-xml('<a><b/><c/></a>'), 2))]]></test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-016">
+        <description>Compare maps, true</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence((map{true():8, false():9}, map{true():3, false():4}), map{false():4, true():3})</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-017">
+        <description>Compare maps, false</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence((map{true():3, false():4}, map{true():8, false():9}), map{false():4, true():3, 'maybe':'not'})</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-018">
+        <description>Compare arrays, true</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence((['x', 'y', 'z'], ['a', 'b', 'c'], ['c', 'b', 'a']), (['a', 'b', 'c'], ['c', 'b', 'a']))</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-019">
+        <description>Compare arrays, false</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence((['a', 'b', 'c'], ['c', 'b', 'a'], ['x', 'y', 'z']), (['a', 'b', 'c'], ['x', 'y', 'z']))</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-020">
+        <description>Starts well, ends badly</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(1 to 10000, (235, 9999, 10000))</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-021">
+        <description>Use default collation</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test>
+            declare default collation "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"; 
+            ends-with-sequence(("A", "B", "C"), ("b", "c"))</test>
+        <result>
+            <assert-true/>  
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-101">
+        <description>Compare with user function</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(1 to 100, 290 to 300, function($x, $y){$x mod 100 = $y mod 100})</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-102">
+        <description>Compare with "is" operator</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test><![CDATA[let $doc := parse-xml('<doc><a/></doc>')
+                       return ends-with-sequence(($doc, $doc), $doc, op("is")) ]]></test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-103">
+        <description>Compare nodes by identity </description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test><![CDATA[ends-with-sequence(replicate(parse-xml('<a><b/><c/></a>'), 4), replicate(parse-xml('<a><b/><c/></a>'), 2), op("is"))]]></test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-104">
+        <description>Compare with fn:starts-with </description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(("Alpha", "Beta", "Gamma"), ("B", "G"), fn:starts-with#2)</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-105">
+        <description>Second item ignored (tests whether the last 10 items are positive) - true</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(1000 to 5000, 1 to 10, function($x, $y){$x ge 0})</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-106">
+        <description>Second item ignored (tests whether the last 10 items are positive) - false</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(-5000 to -1000, 1 to 10, function($x, $y){$x gt 0})</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    
+    <test-case name="ends-with-sequence-901">
+        <description>Comparison function throws error</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(-10 to 10, -10 to 10, function($x, $y){$x div $y le 1})</test>
+        <result>
+            <error code="FOAR0001"/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-902">
+        <description>Comparison function has wrong arity</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(-10 to 10, -10 to 10, function($x, $y, $z){$x div $y eq $z})</test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-903">
+        <description>Comparison function returns non-boolean</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(-10 to 10, -10 to 10, function($x, $y){if ($x eq $y) then 1 else 0})</test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
+    <test-case name="ends-with-sequence-904">
+        <description>Comparison function can't handle supplied types</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>ends-with-sequence(1 to 10, 1 to 10, fn:lang#2)</test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+
+
+
+
+
+
+</test-set>

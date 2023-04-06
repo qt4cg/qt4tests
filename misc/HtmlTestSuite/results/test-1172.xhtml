@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Capturing boundary event handler at UA Shadow DOM</title>
+<meta content="?mouse" name="variant"/>
+<meta content="?touch" name="variant"/>
+<meta content="?pen" name="variant"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-actions.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+<script src="pointerevent_support.js"/>
+
+<style>
+  .target {
+    width: 100px;
+    height: 50px;
+    border: 1px solid red;
+  }
+</style>
+<!-- This div has no shadow dom, serves only as a "control" group. -->
+</head><body><div class="target"/>
+<video class="target"/>
+<input class="target"/>
+<div id="done">done</div>
+
+<script>
+  "use strict";
+  const pointer_type = location.search.substring(1);
+
+  const targets = document.getElementsByClassName("target");
+  const done = document.getElementById("done");
+
+  let event_log = [];
+  function logEventAndPhase(e) {
+    event_log.push(`${e.type}-${e.eventPhase}`);
+  }
+
+  const logged_events = [
+    "pointerenter", "pointerleave", "pointerover", "pointerout"
+  ];
+  const expected_events_and_phases = [
+    "pointerover-2", "pointerenter-2", "pointerout-2", "pointerleave-2"
+  ];
+
+  function addPromiseTest(target) {
+    const test_name = `Capturing boundary event handler at ${target.tagName}`;
+    promise_test(async () =&gt; {
+      event_log = [];
+
+      logged_events.forEach(ename =&gt; {
+        target.addEventListener(ename, logEventAndPhase, {capture:true});
+      });
+
+      let done_click_promise = getEvent("click", done);
+
+      let actions = new test_driver.Actions()
+          .addPointer("TestPointer", pointer_type)
+          .pointerMove(0, 0, {origin: target})
+          .pointerDown()
+          .pointerUp()
+          .pointerMove(0, 0, {origin: done})
+          .pointerDown()
+          .pointerUp();
+
+      await actions.send();
+      await done_click_promise;
+
+      logged_events.forEach(ename =&gt; {
+        target.removeEventListener(ename, logEventAndPhase, {capture:true});
+      });
+
+      assert_equals(event_log.toString(),
+          expected_events_and_phases.toString(),
+          "received events with phases");
+    }, test_name);
+  }
+
+  for (let i = 0; i &lt; targets.length; i++)
+    addPromiseTest(targets.item(i));
+</script>
+</body></html>

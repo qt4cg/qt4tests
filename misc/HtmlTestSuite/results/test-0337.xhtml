@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Tests position fallback with scrollers with mixed writing modes</title>
+<link href="mailto:xiaochengh@chromium.org" rel="author"/>
+<link href="https://drafts.csswg.org/css-anchor-1/#scroll" rel="help"/>
+<link href="https://drafts.csswg.org/css-anchor-1/#fallback-apply" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="support/test-common.js"/>
+
+<style>
+body {
+  margin: 0;
+}
+
+#vrl-scroller {
+  writing-mode: vertical-rl;
+  overflow-x: scroll;
+  width: calc(100vw - 90px);
+  height: 400px;
+  outline: 1px solid black;
+}
+
+#anchor {
+  anchor-name: --a;
+  width: 100px;
+  height: 100px;
+  margin-left: 1000px;
+  background: orange;
+}
+
+#anchored {
+  position: fixed;
+  width: 100px;
+  height: 100px;
+  background: green;
+  anchor-scroll: --a;
+  position-fallback: --pf;
+}
+
+@position-fallback --pf {
+  /* Top of the anchor */
+  @try { bottom: anchor(--a top); left: anchor(--a left); }
+  /* Bottom of the anchor */
+  @try { top: anchor(--a bottom); left: anchor(--a left); }
+  /* Left of the anchor */
+  @try { top: anchor(--a top); right: anchor(--a left); }
+}
+</style>
+
+</head><body><div style="height: 200px"/>
+<div id="vrl-scroller">
+  <div id="anchor"/>
+</div>
+<div style="height: 1000px"/>
+<div id="anchored"/>
+
+<script>
+promise_test(async () =&gt; {
+  await waitUntilNextAnimationFrame();
+  assert_fallback_position(anchored, anchor, 'top');
+}, 'Should use the first fallback position at the initial scroll offsets');
+
+promise_test(async () =&gt; {
+  document.documentElement.scrollTop = 101;
+  await waitUntilNextAnimationFrame();
+  assert_fallback_position(anchored, anchor, 'bottom');
+}, 'Should use the second fallback position after scrolling viewport down');
+
+promise_test(async () =&gt; {
+  let vrlScroller = document.getElementById('vrl-scroller');
+  vrlScroller.scrollLeft = -100;
+  await waitUntilNextAnimationFrame();
+  assert_fallback_position(anchored, anchor, 'left');
+}, 'Should use the third fallback position after scrolling the vrl scroller left');
+</script>
+</body></html>

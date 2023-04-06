@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<meta content="width=device-width,minimum-scale=1" name="viewport"/>
+<title>CSSOM View - scrollIntoView doesn't consider scroll-padding when target is stuck</title>
+<link href="mailto:emilio@crisal.io" rel="author" title="Emilio Cobos Álvarez"/>
+<link href="https://mozilla.org" rel="author" title="Mozilla"/>
+<link href="https://drafts.csswg.org/cssom-view/#dom-element-scrollintoview" rel="help"/>
+<link href="https://drafts.csswg.org/css-scroll-snap-1/#scroll-padding" rel="help"/>
+<link href="https://bugzilla.mozilla.org/show_bug.cgi?id=1795661" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<style>
+body { margin: 0 }
+:root { overflow: hidden }
+#container {
+  height: 100vh;
+  overflow: auto;
+  scroll-padding-top: 100px;
+}
+#sticky {
+  position: sticky;
+  background: Canvas;
+  top: 0;
+}
+#content {
+  height: 500vh;
+  background-image: linear-gradient(green, purple);
+}
+</style>
+</head><body><div id="container">
+  <div id="sticky">
+    <input type="text"/>
+  </div>
+  <div id="content"/>
+</div>
+<script>
+let container = document.getElementById("container");
+let sticky = document.getElementById("sticky");
+test(() =&gt; {
+  // Scroll to the bottom.
+  container.scrollTo(0, 100000);
+
+  let scrollTop = container.scrollTop;
+
+  assert_not_equals(scrollTop, 0, "Should have scrolled");
+
+  // Focus on the stuck input. We shouldn't scroll up.
+  sticky.querySelector("input").scrollIntoView();
+
+  assert_equals(scrollTop, container.scrollTop, "Shouldn't have scrolled");
+});
+</script>
+</body></html>

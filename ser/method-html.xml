@@ -1477,6 +1477,26 @@ return [ $html ]
       </all-of>
     </result>
   </test-case>
+  
+  <test-case name="Serialization-html-60" covers-30="html-output">
+    <description>Test that existing meta elements with charset attribute are dropped. QT4 issue 318.</description>
+    <created by="Michael Kay" on="2023-01-25"/>
+    <dependency type="feature" value="serialization" satisfied="true"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method  "html";
+      declare option output:indent  "no";
+      declare option output:version  "5";
+      <html><head><meta charset="utf-8"/></head><body><p>Content</p></body></html>
+    ]]></test>
+    <result>
+      <any-of>
+        <serialization-matches flags="i"><![CDATA[<head><meta charset="utf-8"></head>]]></serialization-matches>
+        <serialization-matches flags="i"><![CDATA[<head><meta +(?:(?:http-equiv=(['"])content-type\1 +content=(['"])text/html; *charset=UTF-8\2)|(?:content=(['"])text/html; *charset=UTF-8\3 +http-equiv=(['"])content-type\4)) *></head>]]></serialization-matches>
+      </any-of>
+    </result>
+  </test-case>
 
 
 </test-set>

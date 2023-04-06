@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<title>writing mode</title>
+<link href="https://w3c.github.io/mathml-core/#layout-algorithms" rel="help"/>
+<meta content="Verify CSS writing mode (writing-mode and direction properties) for mrow." name="assert"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/mathml/support/feature-detection.js"/>
+<script src="/mathml/support/layout-comparison.js"/>
+<script src="/mathml/support/mathml-fragments.js"/>
+<script>
+  var epsilon = 1;
+
+  setup({ explicit_done: true });
+  window.addEventListener("load", runTests);
+
+  function runTests() {
+      for (tag in MathMLFragments) {
+          if (tag == "annotation" || tag == "annotation-xml")
+              continue; // These tags have display: none.
+
+          ["horizontal-tb_rtl"].forEach(id =&gt; {
+               var writingMode = id.split("_");
+               var writingModeString = `writing-mode: ${writingMode[0]}; direction: ${writingMode[1]};`;
+
+               document.body.insertAdjacentHTML("beforeend", `&lt;div&gt;\
+&lt;math&gt;${MathMLFragments[tag]}&lt;/math&gt;\
+&lt;math&gt;${MathMLFragments[tag]}&lt;/math&gt;\
+&lt;/div&gt;`);
+               var div = document.body.lastElementChild;
+
+               var styleMath = div.firstElementChild;
+               styleMath.setAttribute("style", writingModeString);
+               var styleElement = FragmentHelper.element(styleMath);
+
+               var referenceMath = div.lastElementChild;
+               var referenceElement = FragmentHelper.element(referenceMath);
+
+               [styleMath, referenceMath].forEach(math =&gt; {
+                   Array.from(math.getElementsByClassName("mathml-container")).forEach(container =&gt; {
+                       container.insertAdjacentHTML("beforeend", "\
+&lt;mspace style='background: blue'\
+        width='20px' height='30px' depth='40px'&gt;&lt;/mspace&gt;\
+&lt;mspace style='background: black'\
+        width='50px' depth='60px'&gt;&lt;/mspace&gt;\
+&lt;mspace style='background: yellow'\
+        width='70px' height='80px'&gt;&lt;/mspace&gt;");
+                   });
+                   Array.from(math.getElementsByClassName("foreign-container")).forEach(container =&gt; {
+                       container.insertAdjacentHTML("beforeend", "\
+&lt;span style='display: inline-block; background: lightblue;\
+             inline-size: 20px; block-size: 30px;\
+             vertical-align: bottom;'&gt;&lt;/span&gt;\
+&lt;span style='display: inline-block; background: pink;\
+             inline-size: 40px; block-size: 50px;\
+             vertical-align: bottom;'&gt;&lt;/span&gt;");
+                   });
+               });
+
+               test(function() {
+                   assert_true(MathMLFeatureDetection.has_mspace());
+                   var style = window.getComputedStyle(styleElement);
+                   assert_equals(style.getPropertyValue("writing-mode"),
+                                 writingMode[0], "writing-mode");
+                   assert_equals(style.getPropertyValue("direction"),
+                             writingMode[1], "direction");
+                   compareLayout(styleElement, referenceElement, epsilon);
+               }, `Layout of ${tag} (${writingModeString})`);
+
+               div.style = "display: none;"; // Hide the div after testing.
+           });
+      }
+      done();
+  }
+</script>
+</head>
+<body>
+  <div id="log"/>
+</body>
+</html>

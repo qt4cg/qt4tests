@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<title>This test validates the values in resource timing for cross-origin
+redirects.</title>
+<meta content="long" name="timeout"/>
+<link href="noam@webkit.org" rel="author" title="Noam Rosenthal"/>
+<link href="https://www.w3.org/TR/resource-timing-2/#sec-performanceresourcetiming" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/common/get-host-info.sub.js"/>
+<script src="resources/resource-loaders.js"/>
+<script src="resources/entry-invariants.js"/>
+</head>
+<body>
+<script>
+const {REMOTE_ORIGIN} = get_host_info();
+const delay = 2
+const not_found_page = encodeURIComponent("/resource-timing/resources/status-code.py?status=404");
+const load_null_object = async path =&gt; {
+  return load.object(path, null);
+}
+const destUrl = `/common/slow-redirect.py?delay=${delay}&amp;location=${REMOTE_ORIGIN}/${not_found_page}`;
+
+const timeBefore = performance.now()
+attribute_test(load_null_object, destUrl, entry =&gt; {
+    assert_equals(entry.startTime, entry.fetchStart, 'startTime and fetchStart should be equal');
+    assert_greater_than(entry.startTime, timeBefore, 'startTime and fetchStart should be greater than the time before fetching');
+    // See https://github.com/w3c/resource-timing/issues/264
+    assert_less_than(Math.round(entry.startTime - timeBefore), delay * 1000, 'startTime should not expose redirect delays');
+}, "Verify that cross-origin object resources don't implicitly expose their redirect timings")
+
+</script>
+</body>
+</html>

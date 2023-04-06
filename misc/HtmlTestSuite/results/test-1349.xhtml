@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="reftest-wait">
+<head><title>Resize Observer: observed elements and ResizeObserver object are in the
+  differnt documents</title>
+<link href="iframe-same-origin-ref.html" rel="match"/>
+<meta content="The resize observer callback should be notified&#xA;  when the observed element inside an sub document while the resize observer&#xA;  is registed in the outer document" name="assert"/>
+
+<script src="/common/reftest-wait.js"/>
+
+</head><body>
+  <iframe id="container" srcdoc="&lt;div style='background: green; height: 30px; width: 50px;'&gt;&lt;/div" style="width: 100px; height: 100px;">
+  </iframe>
+  <br/>
+  Observer callbacks: <span id="callbackReport">0</span>
+<script>
+  function load() {
+    return new Promise(resolve =&gt; {
+      container.onload = resolve;
+    });
+  }
+
+  let target;
+  let resolvePromise;
+  load().then(() =&gt; {
+    // Get target after loaded.
+    target = container.contentWindow.document.body.firstElementChild;
+
+    let observerCallbacks = 0;
+    const resizeObserver = new ResizeObserver(entries =&gt; {
+      callbackReport.innerText = ++observerCallbacks;
+      resolvePromise();
+    });
+    return new Promise(resolve =&gt; {
+      resolvePromise = resolve;
+      resizeObserver.observe(target);
+      // |observerCallbacks| will be increased by one here because we need to
+      // trigger notification in the event loop that contains ResizeObserver
+      // observe() call even when resize/reflow does not happen.
+    });
+  }).then(() =&gt; {
+    return new Promise(resolve =&gt; {
+      // Use requestAnimationFrame() to make sure we handle the callback in
+      // the following event loop. (This makes sure we schedule the
+      // ResizeObserver event properly for the following event loop after
+      // handling the previous one.)
+      window.requestAnimationFrame(() =&gt; {
+        resolvePromise = resolve;
+        target.style.height = "40px";
+        target.offsetHeight; // force to reflow the iframe document.
+        // |observerCallbacks| is 2 now.
+      });
+    });
+  }).then(() =&gt; {
+    return new Promise(resolve =&gt; {
+      window.requestAnimationFrame(() =&gt; {
+        resolvePromise = resolve;
+        target.style.height = "50px";
+        target.offsetHeight; // force to reflow the iframe document.
+        // |observerCallbacks| is 3 now.
+      });
+    });
+  }).then(() =&gt; {
+    // This is needed to workaround a Chromium test infrastructure bug.
+    // See https://crbug.com/1270820#c8 for details.
+    return new Promise((resolve) =&gt; window.requestAnimationFrame(resolve));
+  }).then(() =&gt; {
+    document.body.offsetHeight; // force to reflow the outer document.
+    takeScreenshot();
+  });
+</script>
+</body>
+
+</html>

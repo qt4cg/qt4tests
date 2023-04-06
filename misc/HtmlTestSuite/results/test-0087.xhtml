@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<title>Underscripts and Overscripts parameters</title>
+<link href="https://w3c.github.io/mathml-core/#underscripts-and-overscripts-munder-mover-munderover" rel="help"/>
+<meta content="Elements munder, mover, munderover correctly ." name="assert"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/mathml/support/feature-detection.js"/>
+<script src="/mathml/support/fonts.js"/>
+<link href="/fonts/ahem.css" rel="stylesheet" type="text/css"/>
+<style>
+  math, mspace, mo {
+    font-family: Ahem;
+    font-size: 10px;
+  }
+</style>
+<script>
+  /* This test does not use any specific fonts and so the exact rules are not
+  specified precisely. We assume reasonable values for script shifts and
+  spacing. */
+
+  function getBox(aId) {
+    var box = document.getElementById(aId).getBoundingClientRect();
+    box.middle = (box.bottom + box.top) / 2;
+    box.center = (box.left + box.right) / 2;
+    return box;
+  }
+
+  setup({ explicit_done: true });
+  window.addEventListener("load", () =&gt; { loadAllFonts().then(runTests); });
+
+  function runTests() {
+    test(function() {
+      assert_true(MathMLFeatureDetection.has_mspace());
+
+      var e = 1;
+      for (var i = 0; i &lt;= 3; i++) {
+        assert_approx_equals(getBox("under" + i + "base").middle, getBox("baseline").bottom, e, "munder " + i + ": base is placed on the baseline");
+        assert_approx_equals(getBox("over" + i + "base").middle, getBox("baseline").bottom, e, "mover " + i + ": base is placed on the baseline");
+      }
+      for (var i = 0; i &lt;= 5; i++) {
+        assert_approx_equals(getBox("underover" + i + "base").middle, getBox("baseline").bottom, e, "munderover " + i + ": base is placed on the baseline");
+      }
+    }, "Alignment of the base on the baseline");
+
+    test(function() {
+      assert_true(MathMLFeatureDetection.has_mspace());
+
+      var e = 1;
+      for (var i = 0; i &lt;= 3; i++) {
+        assert_approx_equals(getBox("under" + i + "under").center, getBox("under" + i + "base").center, e, "munder " + i + ": base and script are horizontally centered");
+        assert_approx_equals(getBox("over" + i + "over").center, getBox("over" + i + "base").center, e, "mover " + i + ": base and script are horizontally centered");
+      }
+      for (var i = 0; i &lt;= 5; i++) {
+        assert_approx_equals(getBox("underover" + i + "under").center, getBox("underover" + i + "base").center, e, "munderover " + i + ": base and underscript are horizontally centered");
+        assert_approx_equals(getBox("underover" + i + "over").center, getBox("underover" + i + "base").center, e, "munderover " + i + ": base and overscript are horizontally centered");
+      }
+    }, "Horizontal alignments of base and scripts");
+
+    test(function() {
+      assert_true(MathMLFeatureDetection.has_mspace());
+
+      for (var i = 0; i &lt;= 3; i++) {
+        assert_greater_than_equal(getBox("under" + i + "under").top, getBox("under" + i + "base").bottom, "munder " + i + ": script is under base");
+        assert_less_than_equal(getBox("over" + i + "over").bottom, getBox("over" + i + "base").top, "mover " + i + ": script is over base");
+      }
+      for (var i = 0; i &lt;= 5; i++) {
+        assert_greater_than_equal(getBox("underover" + i + "under").top, getBox("underover" + i + "base").bottom, "munderover " + i + ": underscript is under base");
+        assert_less_than_equal(getBox("underover" + i + "over").bottom, getBox("underover" + i + "base").top, "munderover " + i + ": overscript is over base");
+      }
+    }, "Relative vertical positions of base and scripts");
+
+    test(function() {
+      assert_true(MathMLFeatureDetection.has_mspace());
+
+      var e = 1;
+      for (var i = 0; i &lt;= 3; i++) {
+        assert_approx_equals(getBox("under" + i).width, Math.max(getBox("under" + i + "base").width, getBox("under" + i + "under").width), e, "munder " + i + ": width is determined by the maximum of width of base and script");
+        assert_approx_equals(getBox("over" + i).width, Math.max(getBox("over" + i + "base").width, getBox("over" + i + "over").width), e, "mover " + i + ": width is determined by the maximum of width of base and script");
+      }
+      for (var i = 0; i &lt;= 5; i++) {
+        assert_approx_equals(getBox("underover" + i).width, Math.max(getBox("underover" + i + "base").width, getBox("underover" + i + "under").width, getBox("underover" + i + "over").width), e, "munderover " + i + ": width is determined by the maximum of width of base and scripts");
+      }
+    }, "Width of scripted elements");
+
+    test(function() {
+      assert_true(MathMLFeatureDetection.has_mspace());
+
+      var e = 4;
+      for (var i = 0; i &lt;= 3; i++) {
+        assert_approx_equals(getBox("under" + i).height, getBox("under" + i + "base").height + getBox("under" + i + "under").height, e, "munder " + i + ": height is determined by the sum of heights of base and script plus some spacing.");
+        assert_approx_equals(getBox("over" + i).height, getBox("over" + i + "base").height + getBox("over" + i + "over").height, e, "mover " + i + ": height is determined by the sum of heights of base and script plus some spacing.");
+      }
+      for (var i = 0; i &lt;= 5; i++) {
+        assert_approx_equals(getBox("underover" + i).height, getBox("underover" + i + "base").height + getBox("underover" + i + "under").height + getBox("underover" + i + "over").height, e, "munderover " + i + ": height is determined by the sum heights of base and scripts");
+      }
+    }, "Height of scripted elements");
+
+    done();
+  }
+</script>
+</head>
+<body>
+  <div id="log"/>
+  <p>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <mspace depth="0px" height="2px" id="baseline" style="background: blue" width="30px"/>
+      <munder id="under0">
+        <mspace depth="5px" height="5px" id="under0base" style="background: black" width="30px"/>
+        <mspace depth="5px" height="5px" id="under0under" style="background: black" width="10px"/>
+      </munder>
+      <munder id="under1">
+        <mspace depth="5px" height="5px" id="under1base" style="background: black" width="10px"/>
+        <mspace depth="5px" height="5px" id="under1under" style="background: black" width="30px"/>
+      </munder>
+      <munder id="under2">
+        <mspace depth="15px" height="15px" id="under2base" style="background: black" width="10px"/>
+        <mspace depth="5px" height="5px" id="under2under" style="background: black" width="10px"/>
+      </munder>
+      <munder id="under3">
+        <mspace depth="5px" height="5px" id="under3base" style="background: black" width="10px"/>
+        <mspace depth="15px" height="15px" id="under3under" style="background: black" width="10px"/>
+      </munder>
+      <mover id="over0">
+        <mspace depth="5px" height="5px" id="over0base" style="background: black" width="30px"/>
+        <mspace depth="5px" height="5px" id="over0over" style="background: black" width="10px"/>
+      </mover>
+      <mover id="over1">
+        <mspace depth="5px" height="5px" id="over1base" style="background: black" width="10px"/>
+        <mspace depth="5px" height="5px" id="over1over" style="background: black" width="30px"/>
+      </mover>
+      <mover id="over2">
+        <mspace depth="15px" height="15px" id="over2base" style="background: black" width="10px"/>
+        <mspace depth="5px" height="5px" id="over2over" style="background: black" width="10px"/>
+      </mover>
+      <mover id="over3">
+        <mspace depth="5px" height="5px" id="over3base" style="background: black" width="10px"/>
+        <mspace depth="15px" height="15px" id="over3over" style="background: black" width="10px"/>
+      </mover>
+      <munderover id="underover0">
+        <mspace depth="5px" height="5px" id="underover0base" style="background: black" width="30px"/>
+        <mspace depth="5px" height="5px" id="underover0under" style="background: black" width="10px"/>
+        <mspace depth="5px" height="5px" id="underover0over" style="background: black" width="10px"/>
+      </munderover>
+      <munderover id="underover1">
+        <mspace depth="5px" height="5px" id="underover1base" style="background: black" width="10px"/>
+        <mspace depth="5px" height="5px" id="underover1under" style="background: black" width="30px"/>
+        <mspace depth="5px" height="5px" id="underover1over" style="background: black" width="10px"/>
+      </munderover>
+      <munderover id="underover2">
+        <mspace depth="5px" height="5px" id="underover2base" style="background: black" width="10px"/>
+        <mspace depth="5px" height="5px" id="underover2under" style="background: black" width="10px"/>
+        <mspace depth="5px" height="5px" id="underover2over" style="background: black" width="30px"/>
+      </munderover>
+      <munderover id="underover3">
+        <mspace depth="15px" height="15px" id="underover3base" style="background: black" width="10px"/>
+        <mspace depth="5px" height="5px" id="underover3under" style="background: black" width="10px"/>
+        <mspace depth="5px" height="5px" id="underover3over" style="background: black" width="10px"/>
+      </munderover>
+      <munderover id="underover4">
+        <mspace depth="5px" height="5px" id="underover4base" style="background: black" width="10px"/>
+        <mspace depth="15px" height="15px" id="underover4under" style="background: black" width="10px"/>
+        <mspace depth="5px" height="5px" id="underover4over" style="background: black" width="10px"/>
+      </munderover>
+      <munderover id="underover5">
+        <mspace depth="5px" height="5px" id="underover5base" style="background: black" width="10px"/>
+        <mspace depth="5px" height="5px" id="underover5under" style="background: black" width="10px"/>
+        <mspace depth="15px" height="15px" id="underover5over" style="background: black" width="10px"/>
+      </munderover>
+    </math>
+  </p>
+</body>
+</html>

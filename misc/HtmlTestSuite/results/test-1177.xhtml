@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>Test execCommand with selection around select element</title>
+<meta content="long" name="timeout"/>
+<meta content="?delete" name="variant"/>
+<meta content="?forwardDelete" name="variant"/>
+<meta content="?insertText" name="variant"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script>
+"use strict";
+
+const command = document.location.search.substring(1);
+const insertText = command === "insertText" ? "XYZ" : "";
+
+/**
+ * Typically, browsers do not allow to move caret or select part of &lt;select&gt;,
+ * &lt;option&gt; and &lt;optgroup&gt;, but Selection API can do it (but browsers don't
+ * show the result).  In this case, any elements under `&lt;select&gt;` element
+ * shouldn't be modified (deleted) for avoiding unexpected data loss for the
+ * users.
+ */
+
+promise_test(async () =&gt; {
+  await new Promise(resolve =&gt; {
+    addEventListener("load", resolve, {once: true});
+  });
+});
+
+function addPromiseTest(desc, initFunc, expectedResults) {
+  promise_test(async () =&gt; {
+    initFunc();
+    document.execCommand(command, false, insertText);
+    if (Array.isArray(expectedResults)) {
+      assert_in_array(document.body.innerHTML.replace(/(=""|&lt;br&gt;)/g, ""), expectedResults);
+    } else {
+      assert_equals(document.body.innerHTML.replace(/(=""|&lt;br&gt;)/g, ""), expectedResults);
+    }
+  }, `execCommand(${command}, false, "${insertText}") in ${desc}`);
+}
+
+for (const multiple of ["", " multiple"]) {
+  addPromiseTest(
+    `&lt;div contenteditable&gt;&lt;p&gt;ab[c&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;d]ef&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;: shouldn't modify in &lt;option&gt;`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;`;
+      getSelection().setBaseAndExtent(
+        document.querySelector("p").firstChild,
+        2,
+        document.querySelector("option").firstChild,
+        1
+      );
+    },
+    [
+      `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;`,
+      `&lt;div contenteditable&gt;&lt;p&gt;ab${insertText}&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;`,
+    ]
+  );
+
+  addPromiseTest(
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;d[]ef&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;: shouldn't modify in &lt;option&gt;`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;`;
+      getSelection().collapse(
+        document.querySelector("option").firstChild,
+        1
+      );
+    },
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;`,
+  );
+
+  addPromiseTest(
+    `&lt;div contenteditable&gt;&lt;select${multiple}&gt;&lt;option&gt;ab[c&lt;/option&gt;&lt;/select&gt;&lt;p&gt;d]ef&lt;/p&gt;&lt;/div&gt;: shouldn't modify in &lt;option&gt;`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;div contenteditable&gt;&lt;select${multiple}&gt;&lt;option&gt;abc&lt;/option&gt;&lt;/select&gt;&lt;p&gt;def&lt;/p&gt;&lt;/div&gt;`;
+      getSelection().setBaseAndExtent(
+        document.querySelector("option").firstChild,
+        2,
+        document.querySelector("p").firstChild,
+        1
+      );
+    },
+    [
+      `&lt;div contenteditable&gt;&lt;select${multiple}&gt;&lt;option&gt;abc&lt;/option&gt;&lt;/select&gt;&lt;p&gt;def&lt;/p&gt;&lt;/div&gt;`,
+      `&lt;div contenteditable&gt;&lt;select${multiple}&gt;&lt;option&gt;abc&lt;/option&gt;&lt;/select&gt;&lt;p&gt;${insertText}ef&lt;/p&gt;&lt;/div&gt;`,
+    ]
+  );
+
+  addPromiseTest(
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;{}def&lt;/option&gt;&lt;/select&gt;&lt;p&gt;ghi&lt;/p&gt;&lt;/div&gt;: shouldn't modify in &lt;option&gt;`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;&lt;p&gt;ghi&lt;/p&gt;&lt;/div&gt;`;
+      getSelection().collapse(
+        document.querySelector("option"),
+        0
+      );
+    },
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;&lt;p&gt;ghi&lt;/p&gt;&lt;/div&gt;`
+  );
+
+  addPromiseTest(
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def{}&lt;/option&gt;&lt;/select&gt;&lt;p&gt;ghi&lt;/p&gt;&lt;/div&gt;: shouldn't modify in &lt;option&gt;`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;&lt;p&gt;ghi&lt;/p&gt;&lt;/div&gt;`;
+      getSelection().collapse(
+        document.querySelector("option"),
+        1
+      );
+    },
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;&lt;p&gt;ghi&lt;/p&gt;&lt;/div&gt;`
+  );
+
+  addPromiseTest(
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;{def}&lt;/option&gt;&lt;/select&gt;&lt;p&gt;ghi&lt;/p&gt;&lt;/div&gt;: shouldn't modify in &lt;option&gt;`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;&lt;p&gt;ghi&lt;/p&gt;&lt;/div&gt;`;
+      getSelection().selectAllChildren(
+        document.querySelector("option")
+      );
+    },
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;&lt;p&gt;ghi&lt;/p&gt;&lt;/div&gt;`
+  );
+
+  addPromiseTest(
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;{def&lt;/option&gt;&lt;option&gt;ghi}&lt;/option&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;: shouldn't join &lt;option&gt;s`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`;
+      getSelection().setBaseAndExtent(
+        document.querySelector("option"),
+        0,
+        document.querySelector("option + option"),
+        1,
+      );
+    },
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`
+  );
+
+  addPromiseTest(
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;{&lt;option&gt;def&lt;/option&gt;}&lt;option&gt;ghi&lt;/option&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;: shouldn't delete &lt;option&gt;`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`;
+      getSelection().setBaseAndExtent(
+        document.querySelector("select"),
+        0,
+        document.querySelector("select"),
+        1,
+      );
+    },
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`
+  );
+
+  addPromiseTest(
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;{&lt;option&gt;ghi&lt;/option&gt;}&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;: shouldn't delete &lt;option&gt;`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`;
+      getSelection().setBaseAndExtent(
+        document.querySelector("select"),
+        1,
+        document.querySelector("select"),
+        2,
+      );
+    },
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`
+  );
+
+  addPromiseTest(
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;{&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;}&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;: shouldn't delete &lt;option&gt;s nor &lt;select${multiple}&gt;`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`;
+      getSelection().selectAllChildren(
+        document.querySelector("select")
+      );
+    },
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`
+  );
+
+  addPromiseTest(
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;optgroup&gt;{&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;}&lt;/optgroup&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;: shouldn't delete &lt;option&gt;, &lt;optgroup&gt; nor &lt;select${multiple}&gt;`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;optgroup&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/optgroup&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`;
+      getSelection().selectAllChildren(
+        document.querySelector("optgroup")
+      );
+    },
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;optgroup&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/optgroup&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`
+  );
+
+  addPromiseTest(
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;{&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/select&gt;}&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;: &lt;select${multiple}&gt; element itself should be removable`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`;
+      getSelection().setBaseAndExtent(
+        document.querySelector("div"),
+        1,
+        document.querySelector("div"),
+        2,
+      );
+    },
+    [
+      `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;${insertText}&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`,
+      `&lt;div contenteditable&gt;&lt;p&gt;abc${insertText}&lt;/p&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`,
+      `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;p&gt;${insertText}jkl&lt;/p&gt;&lt;/div&gt;`,
+    ]
+  );
+
+  addPromiseTest(
+    `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;{&lt;select${multiple}&gt;&lt;optgroup&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/optgroup&gt;&lt;/select&gt;}&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;: &lt;select${multiple}&gt; element itself should be removable`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;select${multiple}&gt;&lt;option&gt;def&lt;/option&gt;&lt;option&gt;ghi&lt;/option&gt;&lt;/select&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`;
+      getSelection().setBaseAndExtent(
+        document.querySelector("div"),
+        1,
+        document.querySelector("div"),
+        2,
+      );
+    },
+    [
+      `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;${insertText}&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`,
+      `&lt;div contenteditable&gt;&lt;p&gt;abc${insertText}&lt;/p&gt;&lt;p&gt;jkl&lt;/p&gt;&lt;/div&gt;`,
+      `&lt;div contenteditable&gt;&lt;p&gt;abc&lt;/p&gt;&lt;p&gt;${insertText}jkl&lt;/p&gt;&lt;/div&gt;`,
+    ]
+  );
+
+  addPromiseTest(
+    `&lt;select${multiple} contenteditable&gt;{&lt;option&gt;abc&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;}&lt;/select&gt;: shouldn't delete &lt;option&gt;s`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;select${multiple} contenteditable&gt;&lt;option&gt;abc&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;`;
+      getSelection().selectAllChildren(
+        document.querySelector("select")
+      );
+    },
+    `&lt;select${multiple} contenteditable&gt;&lt;option&gt;abc&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;`
+  );
+
+  addPromiseTest(
+    `&lt;select${multiple}&gt;&lt;option contenteditable&gt;{abc}&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;: shouldn't modify &lt;option&gt;`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;select${multiple}&gt;&lt;option contenteditable&gt;abc&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;`;
+      getSelection().selectAllChildren(
+        document.querySelector("option")
+      );
+    },
+    `&lt;select${multiple}&gt;&lt;option contenteditable&gt;abc&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;&lt;/select&gt;`
+  );
+
+  addPromiseTest(
+    `&lt;select${multiple}&gt;&lt;optgroup contenteditable&gt;{&lt;option&gt;abc&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;}&lt;/optgroup&gt;&lt;/select&gt;: shouldn't delete &lt;option&gt;s`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;select${multiple}&gt;&lt;optgroup contenteditable&gt;&lt;option&gt;abc&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;&lt;/optgroup&gt;&lt;/select&gt;`;
+      getSelection().selectAllChildren(
+        document.querySelector("optgroup")
+      );
+    },
+    `&lt;select${multiple}&gt;&lt;optgroup contenteditable&gt;&lt;option&gt;abc&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;&lt;/optgroup&gt;&lt;/select&gt;`
+  );
+
+  addPromiseTest(
+    `&lt;select${multiple}&gt;&lt;optgroup contenteditable&gt;&lt;option&gt;{abc}&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;&lt;/optgroup&gt;&lt;/select&gt;: shouldn't delete &lt;option&gt;s nor optgroup`,
+    () =&gt; {
+      document.body.innerHTML =
+        `&lt;select${multiple}&gt;&lt;optgroup contenteditable&gt;&lt;option&gt;abc&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;&lt;/optgroup&gt;&lt;/select&gt;`;
+      getSelection().selectAllChildren(
+        document.querySelector("option")
+      );
+    },
+    `&lt;select${multiple}&gt;&lt;optgroup contenteditable&gt;&lt;option&gt;abc&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;&lt;/optgroup&gt;&lt;/select&gt;`
+  );
+}
+
+addPromiseTest(
+  "&lt;optgroup contenteditable&gt;&lt;option&gt;{abc}&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;&lt;/optgroup&gt;: shouldn't delete &lt;option&gt;s nor optgroup",
+  () =&gt; {
+    document.body.innerHTML =
+      "&lt;optgroup contenteditable&gt;&lt;option&gt;abc&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;&lt;/optgroup&gt;";
+    getSelection().selectAllChildren(
+      document.querySelector("option")
+    );
+  },
+  `&lt;optgroup contenteditable&gt;&lt;option&gt;abc&lt;/option&gt;&lt;option&gt;def&lt;/option&gt;&lt;/optgroup&gt;`
+);
+
+addPromiseTest(
+  "&lt;option contenteditable&gt;{abc}&lt;/option&gt;: shouldn't modify &lt;option&gt;",
+  () =&gt; {
+    document.body.innerHTML =
+      "&lt;option contenteditable&gt;abc&lt;/option&gt;";
+    getSelection().selectAllChildren(
+      document.querySelector("option")
+    );
+  },
+  `&lt;option contenteditable&gt;abc&lt;/option&gt;`
+);
+</script>
+</head><body/></html>

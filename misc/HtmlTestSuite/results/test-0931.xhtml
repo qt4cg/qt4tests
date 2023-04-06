@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<link href="mailto:jarhar@chromium.org" rel="author" title="Joey Arhar"/>
+
+<!-- The expected behavior of this test is not explicitly specified. -->
+
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+
+</head><body><form action="/formaction.html" id="myform" name="myform"/>
+<iframe id="frame1" name="target1"/>
+<iframe id="frame2" name="target2"/>
+<iframe id="frame3" name="target3"/>
+
+<script>
+
+promise_test(async () =&gt; {
+  const frame1LoadPromise = new Promise(resolve =&gt; frame1.onload = resolve);
+  const frame2LoadPromise = new Promise(resolve =&gt; frame2.onload = resolve);
+  const frame3LoadPromise = new Promise(resolve =&gt; frame3.onload = resolve);
+
+  myform.target = 'target1';
+  myform.submit();
+  myform.target = 'target2';
+  myform.submit();
+  myform.target = 'target3';
+  myform.submit();
+
+  await Promise.all([frame1LoadPromise, frame2LoadPromise, frame3LoadPromise]);
+
+  assert_equals(frame1.contentDocument.location.pathname, '/formaction.html');
+  assert_equals(frame2.contentDocument.location.pathname, '/formaction.html');
+  assert_equals(frame3.contentDocument.location.pathname, '/formaction.html');
+
+}, 'Verifies that one form used to target multiple frames in succession navigates all of them.');
+
+</script>
+</body></html>

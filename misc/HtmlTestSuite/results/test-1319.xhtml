@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="test-wait">
+<head><link href="mailto:m.cooolie@gmail.com" rel="author"/>
+<link href="mailto:jarhar@chromium.org" rel="author"/>
+<link href="https://bugs.chromium.org/p/chromium/issues/detail?id=1338135" rel="help"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+</head><body>
+<script>
+async function crash() {
+  const col = document.createElement("col");
+  document.body.appendChild(col);
+
+  let fullscreenPromise = null;
+  await test_driver.bless('open fullscreen', () =&gt; {
+    fullscreenPromise = col.requestFullscreen({navigationUI: 'hide'});
+  });
+  await fullscreenPromise;
+
+  const a = document.createElement("a");
+  document.body.appendChild(a);
+
+  document.body.style.all = 'unset';
+  document.body.style.contentVisibility = 'hidden';
+
+  a.offsetParent;
+
+  document.documentElement.classList.remove('test-wait');
+}
+crash();
+</script>
+</body></html>

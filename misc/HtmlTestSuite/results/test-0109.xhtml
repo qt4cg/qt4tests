@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head/><body>
+<script src="/common/get-host-info.sub.js"/>
+<script>
+
+// This test checks if browser attaches the device-memory client hint in the
+// HTTP request headers --- while requesting it from 3P context after
+// settings feature policy to allow it; with Accept-CH coming from a sticky
+// source.
+
+// echo-client-hints-received.py sets the response headers depending on the set
+// of client hints it receives in the request headers.
+
+fetch(get_host_info()["HTTPS_REMOTE_ORIGIN"] + "/client-hints/accept-ch-stickiness/resources/echo-client-hints-received.py").then(r =&gt; {
+  if(r.status == 200 &amp;&amp; r.headers.has("device-memory-received") &amp;&amp; r.headers.has("device-memory-deprecated-received")) {
+    window.top.opener.postMessage('PASS', '*');
+  }
+  else {
+    window.top.opener.postMessage('FAIL', '*');
+  }
+});
+
+</script>
+</body>
+</html>

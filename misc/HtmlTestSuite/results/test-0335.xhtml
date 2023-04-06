@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>anchor-name is a tree scoped reference</title>
+<link href="https://drafts.csswg.org/css-anchor-1/#target-anchor-element" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<style>
+  body { margin-top: 0; }
+  #anchor {
+    anchor-name: --anchor;
+  }
+  #filler {
+    height: 100px;
+  }
+  #anchored {
+    position: absolute;
+    top: anchor(--anchor top);
+  }
+</style>
+</head><body><div id="host"/>
+<div id="filler"/>
+<div id="anchor"/>
+<div id="anchored"/>
+<script>
+  const host_root = host.attachShadow({mode:"open"});
+  host_root.innerHTML = `
+    &lt;style&gt;
+      div { anchor-name: --anchor; }
+    &lt;/style&gt;
+    &lt;div&gt;&lt;/div&gt;
+  `;
+
+  test(() =&gt; {
+    assert_equals(anchored.offsetTop, 100, "#anchored is positioned against #anchor");
+  }, "anchor-name should not leak out of a shadow tree");
+</script>
+
+<div id="anchor_host" style="anchor-name: --anchor-host"/>
+<script>
+  const anchor_host_root = anchor_host.attachShadow({mode:"open"});
+  anchor_host_root.innerHTML = `
+    &lt;style&gt;
+      div {
+        position: absolute;
+        left: anchor(--anchor-host left, 37px);
+      }
+    &lt;/style&gt;
+    &lt;div id="anchored"&gt;&lt;/div&gt;
+  `;
+
+  test(() =&gt; {
+    assert_equals(anchor_host_root.querySelector("#anchored").offsetLeft, 37, "#anchored is positioned using fallback");
+  }, "anchor() in shadow tree should not match host anchor-name");
+</script>
+</body></html>

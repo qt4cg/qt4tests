@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<title>Testing normalizing white-space sequence after execCommand("insertparagraph", false, "foo")</title>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+</head>
+<body>
+<script>
+"use strict";
+
+setup({explicit_done: true});
+
+function runTests() {
+  // README:
+  // These tests based on the behavior of Chrome 83.  This test does NOT define
+  // nor suggest any standard behavior (actually, some expected results might
+  // look odd), but this test must help you to understand how other browsers
+  // use different logic to normalize white-space sequence.
+
+  document.body.innerHTML = "&lt;div contenteditable&gt;&lt;/div&gt;";
+  let editor = document.querySelector("div[contenteditable]");
+  editor.focus();
+  let selection = document.getSelection();
+
+  function escape(str) {
+    return typeof(str) === "string" ? str.replace(/\u00A0/ig, "&amp;nbsp;") : "";
+  }
+
+  function generateWhiteSpaces(num, lastIsAlwaysNBSP) {
+    let str = "";
+    for (let i = 0; i &lt; num - 1; i++) {
+      str += i % 2 ? " " : "\u00A0";
+    }
+    str += lastIsAlwaysNBSP || num % 2 ? "\u00A0" : " ";
+    return escape(str);
+  }
+  function getDescriptionForTextNode(textNode) {
+    return selection.focusNode === textNode ?
+      `${escape(textNode.data.slice(0, selection.focusOffset))}[]${escape(textNode.data.slice(selection.focusOffset))}` :
+      escape(textNode);
+  }
+
+  editor.innerHTML = "&lt;div&gt;a&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;b&lt;/div&gt;";
+  selection.collapse(editor.firstChild.firstChild, 0);
+  test(function () {
+    document.execCommand("insertparagraph", false, "");
+    assert_equals(editor.innerHTML,
+                  `&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;a&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;b&lt;/div&gt;`,
+                  "Modified text is wrong");
+  }, `execCommand("insertparagraph", false, "") at "&lt;div&gt;${getDescriptionForTextNode(editor.firstChild.firstChild)}&lt;/div&gt;"`);
+
+  for (let i = 1; i &lt;= 10; i++) {
+    editor.innerHTML = "&lt;div&gt;a&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;b&lt;/div&gt;";
+    selection.collapse(editor.firstChild.firstChild, i);
+    test(function () {
+      let text = editor.firstChild.firstChild.data;
+      document.execCommand("insertparagraph", false, "");
+      assert_equals(editor.innerHTML,
+                    `&lt;div&gt;${escape(text.slice(0, i))}&lt;/div&gt;&lt;div&gt;${escape(text.slice(i))}&lt;/div&gt;`,
+                    "Modified text is wrong");
+    }, `execCommand("insertparagraph", false, "") at "&lt;div&gt;${getDescriptionForTextNode(editor.firstChild.firstChild)}&lt;/div&gt;"`);
+  }
+
+  done();
+}
+
+window.addEventListener("load", runTests, {once: true});
+</script>
+</body>
+</html>

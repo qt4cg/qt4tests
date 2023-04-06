@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="reftest-wait">
+<head><title>Multiple &lt;use&gt; referencing same external resource, with revalidation required</title>
+<link href="reference/green-100x100.html" rel="match"/>
+</head><body><svg xmlns="http://www.w3.org/2000/svg">
+  <rect fill="red" height="100" width="100"/>
+</svg>
+<script>
+  let container = document.querySelector('svg');
+  function makeUse(x) {
+    let use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    use.setAttribute('href', 'support/etag-max-age-zero-icons.svg#green-square');
+    use.setAttribute('x', x);
+    use.setAttribute('width', 50);
+    use.setAttribute('height', 50);
+    use.setAttribute('transform', 'scale(1, 2)');
+    return use;
+  }
+  function insertFirstUse() {
+    let use = makeUse(0);
+    use.onload = insertSecondUse;
+    container.appendChild(use);
+  }
+  function insertSecondUse() {
+    let use = makeUse(50);
+    use.onload = endTest;
+    container.appendChild(use);
+    document.body.offsetTop;
+  }
+  function endTest() {
+    document.documentElement.classList.remove('reftest-wait');
+  }
+  onload = function() {
+    requestAnimationFrame(insertFirstUse);
+  };
+</script>
+</body></html>

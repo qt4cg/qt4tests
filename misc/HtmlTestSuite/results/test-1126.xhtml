@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <script src="/resources/testharness.js"/>
+  <script src="/resources/testharnessreport.js"/>
+
+  <script src="resources/profile-utils.js"/>
+</head>
+<body>
+  <iframe src="resources/child-frame.html"/>
+
+  <script>
+    promise_test(_ =&gt; new Promise(res =&gt; window.addEventListener('load', res)),
+                 'wait for load event');
+
+    promise_test(async t =&gt; {
+      const profiler = new Profiler({
+        sampleInterval: 10,
+        maxBufferSize: Number.MAX_SAFE_INTEGER,
+      });
+
+      const iframe = frames[0];
+      await ProfileUtils.forceSampleFrame(iframe);
+
+      const trace = await profiler.stop();
+
+      assert_false(ProfileUtils.containsFrame(trace, { name: 'sampleFromMessage' }),
+                   'function from child context not included in trace');
+
+      const childUrl = iframe.src;
+      assert_false(ProfileUtils.containsResource(trace, childUrl),
+                  'child resources are not included');
+    }, 'functions from child frame are not included in profile created by parent frame');
+  </script>
+</body>
+</html>

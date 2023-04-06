@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<title>CSS Transitions Test: no transitionend event after display:none</title>
+<link href="http://chrisrebert.com" rel="author" title="Chris Rebert"/>
+<link href="http://www.w3.org/TR/css3-transitions/#transition-events" rel="help"/>
+<link data-section-title="AnimationEnd events and display: none" href="https://lists.w3.org/Archives/Public/www-style/2015Apr/0405.html" rel="help" title="[CSSWG] Minutes Telecon 2015-04-29"/>
+<meta content="Making an element display:none; while it has a transition in progress should prevent a transitionend event from getting fired." name="assert"/>
+
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="./support/helper.js" type="text/javascript"/>
+
+</head>
+<body>
+
+<div id="log"/>
+
+<script>
+async_test(t =&gt; {
+  window.addEventListener('load', function () {
+    const div = addDiv(t, { 'style': 'transition: background-color 0.4s;' +
+                                     'background-color: red' });
+    getComputedStyle(div).backgroundColor;
+    div.style.backgroundColor = 'blue';
+
+    // Wait until the transition has started before registering the event
+    // listener. That way, if the transition finishes before the
+    // requestAnimationFrame callback is called and the element is made
+    // display:none, we won't report an error if transitionend is dispatched.
+    //
+    // In that case, there will be no indication that the test didn't test
+    // anything. However, that's preferable to having this test fail
+    // intermittently on slower automation hardware and end up being disabled
+    // as a result.
+    requestAnimationFrame(t.step_func(() =&gt; {
+      div.addEventListener('transitionend', t.step_func(() =&gt; {
+        assert_unreached('transitionend event didn\'t fire');
+      }), false);
+
+      div.style.display = 'none';
+
+      setTimeout(t.done.bind(t), 500);
+    }));
+  }, false);
+}, 'transitionend should not be fired if the element is made display:none during the transition');
+</script>
+</body>
+</html>

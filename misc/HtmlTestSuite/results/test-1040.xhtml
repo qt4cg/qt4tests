@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>Media documents: video</title>
+<link href="mailto:mventnor@mozilla.com" rel="author" title="Michael Ventnor"/>
+<link href="mailto:ms2ger@gmail.com" rel="author" title="Ms2ger"/>
+<link href="https://html.spec.whatwg.org/multipage/#read-media" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/common/media.js"/>
+</head><body><div id="log"/>
+<script>
+async_test(function() {
+  var testframe = document.createElement('iframe');
+  var url = getVideoURI("/media/A4");
+  var contentType = getMediaContentType(url);
+  testframe.onload = this.step_func_done(function() {
+    assert_equals(testframe.contentDocument.contentType, contentType);
+    assert_equals(testframe.contentDocument.compatMode, "CSS1Compat", "Media documents should be in standards mode");
+    var testframeChildren = testframe.contentDocument.body.childNodes;
+    assert_equals(testframeChildren.length, 1, "Body of image document has 1 child");
+    assert_equals(testframeChildren[0].nodeName, "VIDEO", "Only child of body must be an &lt;video&gt; element");
+    assert_equals(testframeChildren[0].namespaceURI, "http://www.w3.org/1999/xhtml",
+                  "Only child of body must be an HTML element");
+  });
+  testframe.src = url;
+  document.body.appendChild(testframe);
+}, "The document for a standalone media file should have one child in the body.");
+</script>
+</body></html>

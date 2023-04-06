@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Acid3 numbered tests</title>
+<meta content="long" name="timeout"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script>
+var tests = undefined;
+
+function gotMessage(e) {
+  var m = e.data;
+  if (tests === undefined &amp;&amp; "num_tests" in m) {
+    tests = [];
+    for (var i = 0; i &lt; m.num_tests; i++) {
+      tests.push(async_test("Test " + i));
+    }
+  } else if ("result" in m) {
+    var test = m.test;
+    var passed = m.result === "pass";
+    var message = m.message;
+    tests[test].step(function() {
+      assert_true(passed, message);
+    });
+    tests[test].done();
+  }
+}
+window.addEventListener("message", gotMessage, false);
+</script>
+</head><body><iframe src="test.html"/>
+</body></html>

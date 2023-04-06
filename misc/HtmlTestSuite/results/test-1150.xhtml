@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>activeElement when immediately focusing different-site iframe</title>
+<script>
+let log = "";
+function getLog() {
+    return log;
+}
+window.onmessage = function(e) {
+    log += e.data;
+};
+</script>
+</head><body><iframe src="http://{{hosts[alt][www]}}:{{ports[http][0]}}/focus/support/activeelement-after-immediately-focusing-different-site-iframe-inner.html"/>
+<script>
+log += "outerparser,";
+log += "activeElement:" + document.activeElement.tagName + ",";
+log += "willfocusiframe,";
+document.getElementsByTagName("iframe")[0].focus();
+log += "didfocusiframe,";
+log += "activeElement:" + document.activeElement.tagName + ",";
+log += "willbluriframe,";
+document.getElementsByTagName("iframe")[0].blur();
+log += "didbluriframe,";
+log += "activeElement:" + document.activeElement.tagName + ",";
+log += "willspineventloop,"
+opener.step_timeout(function() {
+    opener.postMessage(getLog(), "*");
+}, 1500);
+</script>
+</body></html>

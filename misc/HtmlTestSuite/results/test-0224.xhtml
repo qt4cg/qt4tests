@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head><meta charset="utf-8"/>
+  <title>CSS-contain test: size containment: layout in place</title>
+  <link href="https://florian.rivoal.net" rel="author" title="Florian Rivoal"/>
+  <meta content="" name="flags"/>
+  <meta content="The size containment box's content (including any pseudo-elements) must be laid out into the now fixed-size size containment box normally." name="assert"/>
+  <link href="reference/contain-size-064-ref.html" rel="match"/>
+  <link href="https://drafts.csswg.org/css-contain-1/#containment-size" rel="help"/>
+
+<style>
+div { font-size: 50px; }
+.red { background: red; }
+.green { background: green; }
+.grid {
+    display: grid;
+    grid-template-columns: min-content max-content;
+}
+#test { contain: size; }
+#test::after { content: "\a0" ; }
+</style>
+
+</head><body><p>This test passes if there are two green rectangles and no red.
+
+</p><div class="grid">
+    <div style="grid-area: 1/1"> </div>
+    <div class="red" style="grid-area: 1/2"/><!-- will show if the size containment doesn't result in 0x0-->
+    <div style="grid-area: 1/3"/>
+
+    <div class="red"/><!-- will show if the size containment doesn't result in 0x0-->
+    <div class="grid red" id="test"><!-- will show if the size containment doesn't result in 0x0-->
+        <div> </div>
+        <div class="green"/><!-- won't show unless ::after is inserted and grid tracks are properly sized-->
+        <div class="green"/><!-- won't show unless ::after is inserted and grid tracks are properly sized-->
+    </div>
+</div>
+
+
+
+</body></html>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>form-action-src-redirect-allowed-target-blank</title>
+  <meta content="form-action 'self'" http-equiv="Content-Security-Policy"/>
+  <script src="/resources/testharness.js"/>
+  <script src="/resources/testharnessreport.js"/>
+  <script>
+    function OnDocumentLoaded() {
+      let test = async_test("form submission targetting _blank allowed after a redirect");
+      window.addEventListener("message", function(event) {
+        if (event.data == "DocumentNotBlocked") {
+          event.source.close();
+          test.done();
+        }
+      });
+
+      let form = document.getElementById("form");
+      let final_url = "/content-security-policy/form-action/support/post-message-to-opener.sub.html?message=DocumentNotBlocked";
+      let redirect_url = "/common/redirect.py?location=";
+      form.action = redirect_url + encodeURIComponent(final_url);
+
+      let submit = document.getElementById("submit");
+      submit.click();
+    }
+  </script>
+</head>
+<body onload="OnDocumentLoaded();">
+  <form id="form" method="POST" rel="opener" target="_blank">
+    <input id="submit" type="submit"/>
+  </form>
+</body>
+</html>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-highest">
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-highest" covers-40="fn-highest">
    <description>Tests for the fn:highest function (4.0 proposal)</description>
    
    <dependency type="spec" value="XP40+ XQ40+"/>
@@ -224,10 +224,9 @@
    <test-case name="highest-117">
       <description>Replicated argument</description>
       <created by="Christian Gruen" on="2022-08-09"/>
-      <dependency type="spec" value="XQ40+"/>
-      <test><![CDATA[fn:highest(replicate(<_/>, 2))]]></test>
+      <test><![CDATA[fn:highest(replicate(5, 2))]]></test>
       <result>
-         <assert-xml><![CDATA[<_/><_/>]]></assert-xml>
+         <assert-deep-eq>5, 5</assert-deep-eq>
       </result>
    </test-case>
    <test-case name="highest-118">
@@ -257,9 +256,35 @@
    <test-case name="highest-121">
       <description>Argument that cannot be compared</description>
       <created by="Christian Gruen" on="2022-08-09"/>
-      <test><![CDATA[fn:highest(true#0)]]></test>
+      <modified by="Michael Kay" on="2023-02-02" 
+                change="with a singleton sequence, a processor could avoid evaluating the sort key"/>
+      <test><![CDATA[fn:highest((true#0, false#0))]]></test>
       <result>
          <error code="FOTY0013"/>
+      </result>
+   </test-case>
+   <test-case name="highest-122">
+      <description>Untyped data that cannot be converted to xs:double</description>
+      <created by="Christian Gruen" on="2022-11-24"/>
+      <test><![CDATA[fn:highest((xs:untypedAtomic('1'), xs:untypedAtomic('')))]]></test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="highest-123">
+      <description>Untyped data that cannot be converted to xs:double</description>
+      <created by="Christian Gruen" on="2022-11-24"/>
+      <test><![CDATA[fn:highest((xs:untypedAtomic(''), xs:untypedAtomic('1')))]]></test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="highest-124">
+      <description>Untyped data that cannot be converted to xs:double</description>
+      <created by="Christian Gruen" on="2022-11-24"/>
+      <test><![CDATA[fn:highest(replicate(xs:untypedAtomic(''), 2))]]></test>
+      <result>
+         <error code="FORG0001"/>
       </result>
    </test-case>
 

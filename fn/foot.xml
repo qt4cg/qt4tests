@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-foot" covers-40="fn-foot">
+   <description>Tests for the foot() function</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/"
+         idref="func-foot"/>
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="foot-001">
+      <description> foot() of a simple sequence </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>foot(3 to 10)</test>
+      <result>
+         <assert-eq>10</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="foot-002">
+      <description> foot() of a simple sequence </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>foot(("a", current-dateTime(), "b"))</test>
+      <result>
+         <assert-eq>"b"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="foot-003">
+      <description> foot() of a node sequence </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <environment ref="works-mod"/>
+      <test>let $a := /works return foot($a/*)/string(@name)</test>
+      <result>
+         <assert-string-value>Jane Doe 13</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="foot-004">
+      <description> foot() of a singleton sequence </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <environment ref="works-mod"/>
+      <test>let $a := /works return name(foot($a))</test>
+      <result>
+         <assert-string-value>works</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="foot-005">
+      <description> foot() of an empty sequence </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <environment ref="works-mod"/>
+      <test>foot(/works/cucumber)</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="foot-006">
+      <description> foot() preserves identity </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <environment ref="works-mod"/>
+      <test>let $a := /works/* return (foot($a) is $a[last()])</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="foot-007">
+      <description> dynamic call on foot() </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>
+        let $f := if (current-date() gt xs:date('1900-01-01')) then foot#1 else count#1
+        return $f(5 to 10)</test>
+      <result>
+         <assert-eq>10</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="foot-008">
+      <description> dynamic call on foot(), returning empty </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <environment ref="works-mod"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>
+        let $f := if (current-date() gt xs:date('1900-01-01')) then foot#1 else (abs#1, abs#1, abs#1, abs#1)
+        return $f[1](/works/cucumber)</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+</test-set>

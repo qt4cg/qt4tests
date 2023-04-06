@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="reftest-wait">
+<head><meta charset="utf-8"/>
+<title>CSS Test: ::marker pseudo elements styled with 'content' property</title>
+<link href="mailto:obrufau@igalia.com" rel="author" title="Oriol Brufau"/>
+<link href="marker-content-013-ref.html" rel="match"/>
+<link href="https://drafts.csswg.org/css-pseudo-4/#marker-pseudo" rel="help"/>
+<link href="https://drafts.csswg.org/css-lists/#list-style-position-property" rel="help"/>
+<meta content="Checks that ::marker is updated when 'list-style-position' changes dynamically." name="assert"/>
+<style>
+.inside {
+  list-style-position: inside;
+}
+.string {
+  list-style-type: "string";
+}
+.content::marker {
+  content: "content";
+}
+.before, .after {
+  display: contents;
+}
+.before::before, .after::after {
+  content: "item";
+  display: list-item;
+  list-style-type: "nested";
+}
+</style>
+</head><body><ol class="inside">
+  <li class="decimal">item</li>
+  <li class="string">item</li>
+  <li class="content">item</li>
+  <li class="before"/>
+  <li class="after"/>
+</ol>
+<ol class="outside">
+  <li class="decimal">item</li>
+  <li class="string">item</li>
+  <li class="content">item</li>
+  <li class="before"/>
+  <li class="after"/>
+</ol>
+<script src="/common/reftest-wait.js"/>
+<script>
+"use strict";
+addEventListener("load", function() {
+  requestAnimationFrame(() =&gt; {
+    for (const list of document.querySelectorAll("ol")) {
+      list.classList.toggle("inside");
+      list.classList.toggle("outside");
+    }
+    takeScreenshot();
+  });
+}, {once: true});
+</script>
+</body></html>

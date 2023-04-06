@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head>
+<title>Performance Paint Timing Test: FCP due for non-empty text input</title>
+</head>
+<body>
+<script src="../resources/utils.js"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<input id="input" type="text"/>
+<script>
+  setup({"hide_test_state": true});
+  promise_test(async t =&gt; {
+      assert_implements(window.PerformancePaintTiming, "Paint Timing isn't supported.");
+      await new Promise(r =&gt; window.addEventListener('load', r));
+      await assertNoFirstContentfulPaint(t);
+      const input = document.getElementById('input');
+      input.setAttribute('value', '  ');
+      await assertNoFirstContentfulPaint(t);
+      input.setAttribute('value', 'value');
+      await assertFirstContentfulPaint(t);
+  }, 'Text input should become contentful when its value is non-empty');
+</script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>HTML Templates: Template is not a foster parent element</title>
+<meta href="mailto:sgrekhov@unipro.ru" name="author" title="Sergey G. Grekhov"/>
+<meta content="When template element shouldn't be a foster parent then regular rules of foster parenting should be applied" name="assert"/>
+<link href="http://www.w3.org/TR/2013/WD-html-templates-20130214/#foster-parent-addition" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/html/resources/common.js"/>
+</head>
+<body>
+<div id="log"/>
+<script type="text/javascript">
+
+
+test(function () {
+    var doc = newHTMLDocument();
+
+    doc.body.innerHTML = '' +
+    '&lt;div id="tmplParent"&gt;' +
+        '&lt;template id="tmpl1"&gt;' +
+            '&lt;div id="fosterParent"&gt;' +
+                '&lt;table id="tbl"&gt;' +
+                    '&lt;tr&gt;&lt;td&gt;Cell 1&lt;/td&gt;&lt;/tr&gt;' +
+                // Misplaced &lt;div&gt;. It should be foster parented
+                '&lt;div id="orphanDiv"&gt;Orphan div content&lt;/div&gt;' +
+                    '&lt;tr&gt;&lt;td&gt;Cell 2&lt;/td&gt;&lt;/tr&gt;' +
+                '&lt;/table&gt;' +
+            '&lt;/div&gt;' +
+        '&lt;/template&gt;' +
+    '&lt;/div&gt;';
+
+    var template = doc.querySelector('#tmpl1');
+    var fosterParent = template.content.querySelector('#fosterParent');
+    var div = template.content.querySelector('#orphanDiv');
+
+    assert_equals(div.parentNode, fosterParent, 'Wrong foster parent element');
+
+}, 'Template is not a foster parent element. '
+    + 'Test the case when &lt;template&gt; is higher in stack of open elements');
+
+
+
+test(function () {
+    var doc = newHTMLDocument();
+
+    doc.body.innerHTML = '' +
+            '&lt;div id="fosterParent"&gt;' +
+                '&lt;table id="tbl"&gt;' +
+                    '&lt;tr&gt;&lt;td&gt;&lt;template id="tmpl1"&gt;Template content&lt;/template&gt;&lt;/td&gt;&lt;/tr&gt;' +
+                // Misplaced &lt;div&gt;. It should be foster parented
+                '&lt;div id="orphanDiv"&gt;Orphan div content&lt;/div&gt;' +
+                    '&lt;tr&gt;&lt;td&gt;Cell 2&lt;/td&gt;&lt;/tr&gt;' +
+                '&lt;/table&gt;' +
+            '&lt;/div&gt;' +
+    '&lt;/div&gt;';
+
+    var t = doc.querySelector('#tmpl1');
+    var fosterParent = doc.querySelector('#fosterParent');
+    var div = doc.querySelector('#orphanDiv');
+
+    assert_equals(div.parentNode, fosterParent, 'Wrong foster parent element');
+
+}, 'Template is not a foster parent element. '
+    + 'Test the case when &lt;template&gt; is lower in stack of open elements');
+
+</script>
+</body>
+</html>

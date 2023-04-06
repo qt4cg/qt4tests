@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>event handlers</title>
+<link href="http://www.intel.com" rel="author" title="Intel"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/WebIDLParser.js"/>
+<script src="resources/event-handler-body.js"/>
+<script>
+setup({ explicit_done: true });
+
+handlersListPromise.then(({ shadowedHandlers, notShadowedHandlers }) =&gt; {
+  eventHandlerTest(shadowedHandlers, notShadowedHandlers, "frameset");
+
+  // The testharness framework appends test results to document.body,
+  // show test results in frame after test done.
+  add_completion_callback(() =&gt; {
+    const log_elem = document.getElementById("log");
+    const frame_elem = document.querySelector("frame");
+    if (log_elem) {
+      frame_elem.contentDocument.body.innerHTML = log_elem.innerHTML;
+    }
+  });
+
+  done();
+});
+</script>
+</head><frameset>
+  <frame src="/common/blank.html"/>
+</frameset>
+</html>

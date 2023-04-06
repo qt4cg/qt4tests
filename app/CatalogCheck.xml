@@ -217,9 +217,10 @@
   </test-case>
   
   <test-case name="Catalog010">
-    <description> Check that, for each test-set and each test-case, the names appearing in its "covers" attribute (if present)
+    <description> Check that, for each test-set and each test-case, the names appearing in its "covers-40" attribute (if present)
       are names of changes listed in the changes.xml file. </description>
     <created by="Michael Kay" on="2011-08-23"/>
+    <modified by="Michael Kay" on="2022-12-21" change="upgrade to 4.0"/>
     <environment ref="catalog"/>
     <dependency type="spec" value="XQ10+"/>
     <test><![CDATA[
@@ -229,7 +230,7 @@
         let $testfile := $xq-test/@file/doc(resolve-uri(., base-uri(..)))
         let $testset := $testfile/fots:test-set
         let $testcases := $testset/fots:test-case
-        for $token in distinct-values((tokenize($testset/@covers-30, ' '), $testcases/@covers-30/tokenize(., ' '), tokenize($testset/@covers, ' '), $testcases/@covers/tokenize(., ' ')))
+        for $token in distinct-values((tokenize($testset/@covers-40, ' '), $testcases/@covers-40/tokenize(., ' ')))
         where not($token = $changes)
         return <out test-set="{string($testset/@name)}" bad-covers-value="{$token}"/>
       ]]></test>
@@ -242,18 +243,19 @@
     <description> Check that for every change listed in the changes.xml file there are at least five tests. </description>
     <created by="O'Neil Delpratt" on="2015-01-20"/>
     <modified by="Michael Kay" on="2015-07-13" change="success is an empty element"/>
+    <modified by="Michael Kay" on="2022-12-21" change="upgrade to 4.0"/>
     <environment ref="catalog"/>
     <dependency type="spec" value="XQ10+"/>
     <test><![CDATA[
     declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
     <r>{
-        let $changes := doc('../changes.xml')//spec[contains(@name, '31')]/change
+        let $changes := doc('../changes.xml')//spec[contains(@name, '40')]/change
         let $changesid := $changes/@id/string()
         let $testfiles := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
         let $testsets := $testfiles/fots:test-set
         for $token in distinct-values($changesid)
-        let $relevant-testsets := $testsets[tokenize(@covers, ' ') = $token]
-        let $relevant-testcases := $testsets/fots:test-case[tokenize(@covers, ' ') = $token]
+        let $relevant-testsets := $testsets[tokenize(@covers-40, ' ') = $token]
+        let $relevant-testcases := $testsets/fots:test-case[tokenize(@covers-40, ' ') = $token]
         let $count := count($relevant-testsets/fots:test-case) + count($relevant-testcases)
         where $count lt 5
         return <out spec="{$changes[@id=$token]/../@name}" change="{$token}" tests="{$count}" names="{$relevant-testcases/@name}">

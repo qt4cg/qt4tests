@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head><script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script>
+const t = async_test(
+  'After &lt;script type="module"&gt; import maps should fire error events');
+const log = [];
+</script>
+<script src="../resources/empty.js?pipe=trickle(d1)" type="module"/>
+<script onerror="t.done()" type="importmap">
+{
+  "imports": {
+    "../resources/log.js?pipe=sub&amp;name=A": "../resources/log.js?pipe=sub&amp;name=B"
+  }
+}
+</script>
+<script>
+promise_test(() =&gt; {
+  return import("../resources/log.js?pipe=sub&amp;name=A")
+    .then(() =&gt; assert_array_equals(log, ["log:A"]))
+  },
+  'After &lt;script type="module"&gt; import maps are not effective');
+</script>
+</head><body/></html>

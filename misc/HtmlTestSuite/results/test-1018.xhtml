@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>Selector: pseudo-classes (:checked)</title>
+<link href="mailto:denis@w3.org" id="link1" rel="author" title="Denis Ah-Kang"/>
+<link href="https://html.spec.whatwg.org/multipage/#pseudo-classes" id="link2" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="utils.js"/>
+</head><body><div id="log"/>
+<select id="select1">
+ <optgroup id="optgroup1" label="options">
+  <option id="option1" selected="" value="option1">option1
+  </option><option id="option2" value="option2">option2
+  </option><option checked="" id="option3" value="option2">option3
+</option></optgroup></select>
+<input checked="" id="checkbox1" type="checkbox"/>
+<input id="checkbox2" type="checkbox"/>
+<input id="checkbox3" selected="" type="checkbox"/>
+<input checked="" id="radio1" type="radio"/>
+<input id="radio2" type="radio"/>
+<form>
+  <p><input contextmenu="formmenu" id="submitbutton" type="submit"/></p>
+  <menu id="formmenu" type="context">
+    <!-- historical; these should *not* match -->
+    <menuitem checked="" default="" id="menuitem1" type="checkbox">
+    <menuitem default="" id="menuitem2" type="checkbox">
+    <menuitem id="menuitem3" type="checkbox">
+    <menuitem checked="" id="menuitem4" type="radio">
+    <menuitem id="menuitem5" type="radio">
+  </menuitem></menuitem></menuitem></menuitem></menuitem></menu>
+</form>
+
+<script>
+  testSelectorIdsMatch(":checked", ["option1", "checkbox1", "radio1"], "':checked' matches checked &lt;input&gt;s in checkbox and radio button states, selected &lt;option&gt;s");
+
+  document.getElementById("checkbox1").removeAttribute("type");  // change type of input
+  document.getElementById("radio1").removeAttribute("type");  // change type of input
+  testSelectorIdsMatch(":checked", ["option1"], "':checked' should no longer match &lt;input&gt;s whose type checkbox/radio has been removed");
+
+  document.getElementById("option2").selected = "selected";  // select option2
+  document.getElementById("checkbox2").click();  // check chekbox2
+  document.getElementById("radio2").click();  // check radio2
+  testSelectorIdsMatch(":checked", ["option2", "checkbox2", "radio2"], "':checked' matches clicked checkbox and radio buttons");
+</script>
+</body></html>

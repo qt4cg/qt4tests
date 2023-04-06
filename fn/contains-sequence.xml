@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-contains-sequence" covers-40="fn-contains-sequence">
+    <description>Tests for the fn:contains-sequence function (4.0 proposal)</description>
+    <link type="spec" document="http://www.w3.org/TR/xpath-functions-11/"
+        idref="func-contains-sequence"/>
+
+    <dependency type="spec" value="XP40+ XQ40+"/>
+
+    <test-case name="contains-sequence-001">
+        <description>Basic example, true</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(1 to 29, 18 to 23)</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+
+    <test-case name="contains-sequence-002">
+        <description>Basic example, false</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(1 to 29, 18 to 30)</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-003">
+        <description>Second arg empty</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(1 to 29, ())</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-004">
+        <description>First arg empty</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence((), 1 to 29)</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-005">
+        <description>Both args empty</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence((), ())</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-006">
+        <description>NaNs compare equal</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(number('NaN'), number('NaN'))</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-007">
+        <description>Numerics of different types compare equal</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(1 to 10, (5e0, 6e0))</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-008">
+        <description>Non-comparables don't cause an error</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(1 to 10, ("a", "b", "c"))</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-009">
+        <description>Second sequence is longer</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(10 to 20, 1 to 20)</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-010">
+        <description>Sequences are equal</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(1 to 10, 1 to 10)</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-011">
+        <description>Timezone is ignored</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence((current-dateTime(), xs:dateTime('2022-10-27T12:00:00Z')), xs:dateTime('2022-10-27T13:00:00+01:00'))</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-012">
+        <description>This might be slow.</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(1 to 1000, 100 to 300)</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-013">
+        <description>This could be optimized</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(1 to 1000, -1)</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-014">
+        <description>Compare nodes deep-equal</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test><![CDATA[contains-sequence((0, replicate(parse-xml('<a><b/><c/></a>'), 4), 0), replicate(parse-xml('<a><b/><c/></a>'), 2))]]></test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-015">
+        <description>Compare nodes deep-equal (namespaces are ignored)</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test><![CDATA[contains-sequence((0, replicate(parse-xml('<a><b xmlns:p="q"/><c/></a>'), 4), 0), replicate(parse-xml('<a><b/><c/></a>'), 2))]]></test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-016">
+        <description>Compare maps, true</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence((map{true():8, false():9}, map{true():3, false():4}, map{}), map{false():4, true():3})</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-017">
+        <description>Compare maps, false</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence((map{true():3, false():4}, map{true():8, false():9}), map{false():4, true():3, 'maybe':'not'})</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-018">
+        <description>Compare arrays, true</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence((['x', 'y', 'z'], ['a', 'b', 'c'], ['c', 'b', 'a'], []), (['a', 'b', 'c'], ['c', 'b', 'a']))</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-019">
+        <description>Compare arrays, false</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence((['a', 'b', 'c'], ['c', 'b', 'a'], ['x', 'y', 'z'], []), (['a', 'b', 'c'], ['x', 'y', 'z']))</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-020">
+        <description>Starts well, ends badly</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(1 to 10000, (23 to 1000, 1002))</test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-021">
+        <description>Use default collation</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test>
+            declare default collation "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"; 
+            contains-sequence(("A", "B", "C", "D"), ("b", "c"))</test>
+        <result>
+            <assert-true/>  
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-101">
+        <description>Compare with user function</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(1 to 100, 290 to 295, function($x, $y){$x mod 100 = $y mod 100})</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-102">
+        <description>Compare with "is" operator</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test><![CDATA[let $doc := parse-xml('<doc><a/></doc>')
+                       return contains-sequence(($doc, $doc), $doc, op("is")) ]]></test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-103">
+        <description>Compare nodes by identity </description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test><![CDATA[contains-sequence(replicate(parse-xml('<a><b/><c/></a>'), 4), replicate(parse-xml('<a><b/><c/></a>'), 2), op("is"))]]></test>
+        <result>
+            <assert-false/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-104">
+        <description>Compare with fn:starts-with </description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(("Alpha", "Beta", "Gamma", "Delta"), ("B", "G"), fn:starts-with#2)</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-105">
+        <description>Second item ignored (tests whether 10 consecutive items are positive) - true</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence((-200 to 100, 1000 to 5000), 1 to 10, function($x, $y){$x ge 0})</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-106">
+        <description>Second item ignored (tests whether 10 consecutive items are positive) - true</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence((-4, -3, -5, -2, 1 to 9, -6, 20 to 30), 1 to 10, function($x, $y){$x gt 0})</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    
+    <test-case name="contains-sequence-901">
+        <description>Comparison function throws error</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(-10 to 10, -10 to 10, function($x, $y){$x div $y le 1})</test>
+        <result>
+            <error code="FOAR0001"/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-902">
+        <description>Comparison function has wrong arity</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(-10 to 10, -10 to 10, function($x, $y, $z){$x div $y eq $z})</test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-903">
+        <description>Comparison function returns non-boolean</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(-10 to 10, -10 to 10, function($x, $y){if ($x eq $y) then 1 else 0})</test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
+    <test-case name="contains-sequence-904">
+        <description>Comparison function can't handle supplied types</description>
+        <created by="Michael Kay" on="2022-10-27"/>
+        <test>contains-sequence(1 to 10, 1 to 10, fn:lang#2)</test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
+
+
+
+
+
+
+</test-set>

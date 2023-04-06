@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<meta content="?1-1000" name="variant"/>
+<meta content="?1001-2000" name="variant"/>
+<meta content="?2001-3000" name="variant"/>
+<meta content="?3001-4000" name="variant"/>
+<meta content="?4001-5000" name="variant"/>
+<meta content="?5001-6000" name="variant"/>
+<meta content="?6001-7000" name="variant"/>
+<meta content="?7001-8000" name="variant"/>
+<meta content="?8001-9000" name="variant"/>
+<meta content="?9001-last" name="variant"/>
+<link href="../include/reset.css" rel="stylesheet"/>
+<meta content="long" name="timeout"/>
+<title>multitest - HTML editing conformance tests</title>
+
+</head><body><p id="timing"/>
+
+<div id="log"/>
+
+<div id="test-container"/>
+
+<script src="../include/implementation.js"/>
+<script>var testsJsLibraryOnly = true</script>
+<script src="../include/tests.js"/>
+<script src="../data/multitest.js"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/common/subset-tests.js"/>
+<script>
+"use strict";
+
+(function() {
+    var startTime = Date.now();
+
+    // Make document.body.innerHTML more tidy by removing unnecessary things.
+    [].forEach.call(document.querySelectorAll("script"), function(node) {
+        node.parentNode.removeChild(node);
+    });
+
+    if (true) {
+        // Silly hack: the CSS styling flag should be true, not false, to match
+        // expected results.  This is because every group of tests except the
+        // last (multitest) sets styleWithCSS automatically, and it sets it
+        // first to false and then to true.  Thus it's left at true at the end
+        // of each group of tests, so in gentest.html it will be true when
+        // starting each group of tests other than the first.  But browsers are
+        // supposed to default it to false when the page loads, so flip it.
+        try { document.execCommand("styleWithCSS", false, "true") } catch(e) {}
+    }
+
+    browserTests.forEach(runConformanceTest);
+
+    document.getElementById("test-container").parentNode
+        .removeChild(document.getElementById("test-container"));
+
+    var elapsed = Math.round(Date.now() - startTime)/1000;
+    document.getElementById("timing").textContent =
+        "Time elapsed: " + Math.floor(elapsed/60) + ":"
+        + ((elapsed % 60) &lt; 10 ? "0" : "")
+        + (elapsed % 60).toFixed(3) + " min.";
+})();
+</script>
+</body></html>

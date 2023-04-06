@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Parsing and serialization of doctype internal subset</title>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script>
+test(function () {
+  // https://www.w3.org/TR/xml11/#sec-prolog-dtd has intSubset as part of the
+  // syntax, which is not represented in the DocumentType interface. Check that
+  // publicId and systemId are not affected.
+  var doc = new DOMParser().parseFromString('&lt;!DOCTYPE foo [ &lt;!ENTITY x "y"&gt; ]&gt;&lt;foo&gt;&amp;x;&lt;/foo&gt;', 'text/xml');
+  var doctype = doc.doctype;
+  assert_equals(doctype.name, 'foo', 'doctype name');
+  assert_equals(doctype.publicId, '', 'doctype publicId');
+  assert_equals(doctype.systemId, '', 'doctype systemId');
+  // Check that document itself was parsed correctly.
+  var documentElementString = new XMLSerializer().serializeToString(doc.documentElement);
+  assert_equals(documentElementString, '&lt;foo&gt;y&lt;/foo&gt;', 'serialized document element');
+  // https://w3c.github.io/DOM-Parsing/#xml-serializing-a-documenttype-node also
+  // does not have any notion of the internal subset, so also check that it
+  // isn't serialized by XMLSerializer.
+  var doctypeString = new XMLSerializer().serializeToString(doctype);
+  assert_equals(doctypeString, '&lt;!DOCTYPE foo&gt;', 'serialized doctype');
+});
+</script>
+</head><body/></html>

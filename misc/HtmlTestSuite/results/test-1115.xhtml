@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>HTML Test: focusgroup - Focus moves to next item, skipping the focusgroup that extends in the orthogonal axis.</title>
+<link href="http://www.microsoft.com/" rel="author" title="Microsoft"/>
+<link href="https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/Focusgroup/explainer.md" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+<script src="/resources/testdriver-actions.js"/>
+<script src="../../resources/focusgroup-utils.js"/>
+
+</head><body><div focusgroup="" id="root">
+  <div focusgroup="extend vertical" id="item1" tabindex="0">
+    <span id="item2" tabindex="-1">item2</span>
+  </div>
+  <span id="item3" tabindex="-1">item3</span>
+</div>
+
+<script>
+
+  promise_test(async t =&gt; {
+    var item1 = document.getElementById("item1");
+    var item3 = document.getElementById("item3");
+
+    await focusAndKeyPress(item1, kArrowRight);
+    assert_equals(document.activeElement, item3);
+  }, "When the focus is set on an extending focusgroup element but that focusgroup doesn't support the axis of the arrow key pressed, skip that subtree altogether.");
+
+</script></body></html>

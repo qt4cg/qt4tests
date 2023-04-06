@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>
+  Verify that certain location interface properties are protected cross-origin.
+</title>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/common/dispatcher/dispatcher.js"/>
+<script src="/common/get-host-info.sub.js"/>
+<script src="/common/utils.js"/>
+
+</head><body><script>
+
+const iframeToken = token();
+const responseToken = token();
+const iframeUrl =
+  get_host_info().REMOTE_ORIGIN +
+  "/common/dispatcher/executor.html?uuid=" +
+  iframeToken;
+
+const iframe = document.createElement("iframe");
+iframe.src = iframeUrl;
+document.body.appendChild(iframe);
+
+[
+  "assign",
+  "customproperty",
+  "hash",
+  "host",
+  "hostname",
+  "pathname",
+  "port",
+  "protocol",
+  "reload",
+  "search",
+  "toString",
+  "valueOf",
+].forEach(property =&gt; {
+  promise_test(async t =&gt; {
+    // Make sure the cross-origin document is loaded in the iframe.
+    send(iframeToken, `send("${responseToken}", "Responsive");`);
+    assert_equals(await receive(responseToken), "Responsive");
+
+    assert_throws_dom("SecurityError", () =&gt; {
+      const unused = iframe.contentWindow.location[property];
+    }, "Cross origin get of a location property should throw a security error");
+
+    assert_throws_dom("SecurityError", () =&gt; {
+      iframe.contentWindow.location[property] = "Random string";
+    }, "Cross origin set of a location property should throw a security error");
+
+    // Verify that the property was indeed not modified.
+    send(iframeToken, `send("${responseToken}", location["${property}"])`);
+    assert_true(await receive(responseToken) != "Random string");
+
+    assert_throws_dom("SecurityError", () =&gt; {
+      const unused = Object.getOwnPropertyDescriptor(
+        iframe.contentWindow.location, property);
+    }, "Cross origin get of descriptors should throw a security error");
+  }, `Verifying that cross-origin access of '${property}' is restricted`);
+});
+
+</script>
+</body> <!-- Needed to append the iframe -->
+
+</html>

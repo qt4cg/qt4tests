@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>CSS Cascade Layers: Media queries</title>
+<meta content="CSS Cascade Layers nested in Media Queries" name="assert"/>
+<link href="mailto:antti@apple.com" rel="author" title="Antti Koivisto"/>
+<link href="https://www.w3.org/TR/css-cascade-5/#layering" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+</head>
+<body>
+<iframe frameborder="0" height="300" width="300"/>
+<div id="log"/>
+<script>
+
+const imports = {
+    "basic-green.css": `
+        target { color: green; }
+    `,
+    "basic-red.css": `
+        target { color: red; }
+    `,
+    "empty.css": "",
+};
+
+// For 300px wide iframe the target should be red and for 500px green.
+const testCases = [
+    {
+        title: 'A1 Basic',
+        style: `
+            @layer { target { color: red } }
+            @media (min-width: 500px) {
+                @layer {
+                    target { color: green; }
+                }
+            }
+        `
+    },
+    {
+        title: 'A2 Basic',
+        style: `
+            @media (min-width: 500px) {
+                @layer {
+                    target { color: green; }
+                }
+            }
+            @media (max-width: 300px) {
+                @layer {
+                    target { color: red; }
+                }
+            }
+        `
+    },
+    {
+        title: 'B1 Basic import',
+        style: `
+            @import url(basic-red.css) layer;
+            @import url(basic-green.css) layer (min-width: 500px);
+        `
+    },
+    {
+        title: 'B2 Basic import',
+        style: `
+            @import url(basic-green.css) layer (min-width: 500px);
+            @import url(basic-red.css) layer (max-width: 300px);
+        `
+    },
+    {
+        title: 'C1 Reordering',
+        style: `
+            @media (max-width: 300px) {
+                @layer B {
+                    target { color: green; }
+                }
+                @layer A {
+                    target { color: red; }
+                }
+            }
+            @media (min-width: 500px) {
+                @layer A {
+                    target { color: red; }
+                }
+                @layer B {
+                    target { color: green; }
+                }
+            }
+        `
+    },
+    {
+        title: 'C2 Reordering',
+        style: `
+            @media (max-width: 300px) {
+                @layer B { }
+                @layer A { target { color: red; } }
+            }
+            @media (min-width: 500px) {
+                @layer A { target { color: red; } }
+                @layer B { }
+            }
+            @layer B {
+                target { color: green; }
+            }
+        `
+    },
+    {
+        title: 'C3 Reordering',
+        style: `
+            @media (max-width: 300px) {
+                @layer B, A;
+            }
+            @media (min-width: 500px) {
+                @layer A, B;
+            }
+            @layer A {
+                target { color: red; }
+            }
+            @layer B {
+                target { color: green; }
+            }
+        `
+    },
+    {
+        title: 'C4 Reordering',
+        style: `
+            @import url(empty.css) layer(B) (max-width: 300px);
+            @import url(empty.css) layer(A) (max-width: 300px);
+            @import url(empty.css) layer(A) (min-width: 500px);
+            @import url(empty.css) layer(B) (min-width: 500px);
+            @layer A {
+                target { color: red; }
+            }
+            @layer B {
+                target { color: green; }
+            }
+        `
+    },
+];
+
+let iframe = document.querySelector("iframe");
+
+for (let testCase of testCases) {
+    promise_test(async t =&gt; {
+        const styleText = testCase['style'].replaceAll(/url\((.+?)\)/g, (match, p1) =&gt; {
+            return `url(data:text/css,${ encodeURI(imports[p1]) })`;
+        });
+
+        iframe.width = 300;
+
+        await new Promise(resolve =&gt; {
+            iframe.onload = resolve;
+            iframe.srcdoc = `
+                &lt;style&gt;
+                ${styleText}
+                &lt;/style&gt;
+                &lt;target&gt;&lt;/target&gt;
+            `;
+        });
+
+        const target = iframe.contentDocument.querySelector('target');
+        assert_equals(getComputedStyle(target).color, 'rgb(255, 0, 0)', testCase['title']);
+
+        iframe.width = 500;
+
+        assert_equals(getComputedStyle(target).color, 'rgb(0, 128, 0)', testCase['title']);
+    }, testCase['title']);
+}
+</script>
+</body>
+</html>

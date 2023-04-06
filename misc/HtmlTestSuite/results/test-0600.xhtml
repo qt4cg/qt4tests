@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Generic font family: -webkit-* treated as &lt;font-family&gt;</title>
+    <link href="https://drafts.csswg.org/css-fonts-4/#generic-font-families" rel="help"/>
+    <script src="/resources/testharness.js"/>
+    <script src="/resources/testharnessreport.js"/>
+    <script src="/css/css-fonts/support/font-family-keywords.js"/>
+    <link href="/fonts/ahem.css" rel="stylesheet" type="text/css"/>
+    <style>
+      div {
+        font-size: 10px;
+      }
+      #ahem {
+        font-family: Ahem;
+      }
+    </style>
+  </head>
+  <body>
+    <div><span id="ahem">00000</span></div>
+    <div><span id="test">00000</span></div>
+<script>
+  setup({ explicit_done: true });
+  window.addEventListener("load", () =&gt; { document.fonts.ready.then(runTests); });
+  function SetFontFamilyAndMeasure(fontFamilyValue) {
+    var element = document.getElementById('test');
+    element.setAttribute("style", `font-family: ${fontFamilyValue}, Ahem;`);
+    return element.offsetWidth;
+  }
+  function runTests() {
+    let ahem = document.getElementById('ahem');
+    let ahem_expected_width = ahem.offsetWidth;
+    let families = kGenericFontFamilyKeywords.map(keyword =&gt; `-webkit-${keyword}`).concat(kNonGenericFontFamilyKeywords);
+    families.forEach(name =&gt; {
+      test(function() {
+      assert_equals(SetFontFamilyAndMeasure(name), ahem_expected_width);
+      }, `font-family: ${name} treated as &lt;font-family&gt;, not &lt;generic-name&gt;`);
+    });
+    done();
+  }
+</script>
+  </body>
+</html>

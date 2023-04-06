@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<link href="mailto:jarhar@chromium.org" rel="author" title="Joey Arhar"/>
+<meta content="Assigning to defaultValue does not modify text a user has already typed in." name="assert"/>
+
+<!-- This behavior is not explicitly specified. -->
+
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+
+</head><body><div>
+  email with leading whitespace: <input id="emailinput" type="email"/>
+</div>
+<div>
+  number with trailing incomplete exponent: <input id="numberinput" type="number"/>
+</div>
+
+<script>
+promise_test(async () =&gt; {
+  await test_driver.send_keys(emailinput, '  user');
+  assert_false(emailinput.validity.valid, '"  user" should not be a valid value for type=email.');
+
+  emailinput.defaultValue = emailinput.value;
+  assert_false(emailinput.validity.valid, 'Assigning to defaultValue should not affect input.validity.');
+}, 'Visible value and validity should not be affected when assigning to the defaultValue property for type=email.');
+
+promise_test(async () =&gt; {
+  await test_driver.send_keys(numberinput, '123e');
+  assert_false(numberinput.validity.valid, '"123e" should not be a valid value for type=number.');
+
+  numberinput.defaultValue = numberinput.value;
+  assert_false(numberinput.validity.valid, 'Assigning to defaultValue should not affect input.validity.');
+}, 'Visible value and validity should not be affected when assigning to the defaultValue property for type=number.');
+</script>
+</body></html>

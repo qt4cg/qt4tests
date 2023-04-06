@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link href="https://www.w3.org/TR/cssom-view-1/" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-actions.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+<style>
+body, h1 { margin: 20px; }
+#vp {
+  height: 400px;
+  width: 600px;
+  overflow: scroll;
+  left: 10px;
+  top: 10px;
+  border: 5px solid #8cf;
+}
+</style>
+</head>
+<body>
+<div id="vp">
+  <div style="transform-style: preserve-3d">
+    <h1 style="height:2000px; transform: translateZ(0)">
+      Gazing into the stars
+    </h1>
+  </div>
+</div>
+<script>
+  promise_test(async () =&gt; {
+    let scroll_promise = new Promise((resolve, reject) =&gt; {
+      vp.addEventListener("scroll", resolve);
+    });
+    await new test_driver.Actions().scroll(100, 100, 0, 50).send();
+    await scroll_promise;
+    assert_true(vp.scrollTop &gt; 0);
+  }, "Element is scrollable over preserve-3d descendant");
+</script>
+</body>
+</html>

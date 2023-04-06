@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>selection in contenteditable should not be changed when designMode is turned on/off</title>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+</head><body><div id="log"/>
+<iframe srcdoc="&lt;body contenteditable&gt;abc&lt;/body&gt;"/>
+<script>
+  const test_load = async_test("Selection in contenteditable shouldn't be reinitialized when changing designMode");
+  window.addEventListener("load", test_load.step_func_done(() =&gt; {
+    let iframe = document.querySelector("iframe");
+    let iframeSelection = iframe.contentDocument.getSelection();
+    iframe.focus();
+    iframeSelection.collapse(iframe.contentDocument.body, 1);
+    function summariseRange(range) {
+      if (!range) {
+        return "null";
+      }
+      return `(${range.startContainer.nodeName}, ${range.startOffset}) - (${range.endContainer.nodeName}, ${range.endOffset})`;
+    }
+    let maybeNormalizedRangeSummary = summariseRange(iframeSelection.getRangeAt(0));
+    assert_in_array(maybeNormalizedRangeSummary, ["(BODY, 1) - (BODY, 1)", "(#text, 3) - (#text, 3)"],
+                    "Selection collapsed at end of &lt;body&gt; can be either as-is or normalized to the end of the text node");
+    iframe.contentDocument.designMode = "on";
+    assert_equals(summariseRange(iframeSelection.getRangeAt(0)), maybeNormalizedRangeSummary,
+                  "Turning designMode on at load event shouldn't change selection in contenteditable");
+    iframe.contentDocument.designMode = "off";
+    assert_equals(summariseRange(iframeSelection.getRangeAt(0)), maybeNormalizedRangeSummary,
+                  "Turning designMode off at load event shouldn't change selection in contenteditable");
+  }));
+</script>
+</body></html>

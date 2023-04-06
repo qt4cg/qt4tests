@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><link href="https://svgwg.org/svg2-draft/coords.html#InterfaceSVGTransformList" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+</head><body>
+
+<svg xmlns="http://www.w3.org/2000/svg" height="600" width="800">
+<text id="text" transform="scale(1) translate(0 0)" x="200" y="200">123</text>
+<text id="ref" transform="scale(10 1) translate(0 0)" x="200" y="200">123</text>
+</svg>
+
+<script>
+test(() =&gt; {
+  const referenceBox = document.querySelector('#ref').getBBox();
+  const root = document.querySelector('svg');
+  const text = document.querySelector('#text');
+
+  // Make the transform of #text same as #ref.
+  const scale = root.createSVGTransform();
+  scale.setScale(10, 1);
+  text.transform.baseVal.replaceItem(scale, 0);
+
+  const box = text.getBBox();
+  assert_equals(box.y, referenceBox.y);
+  assert_equals(box.height, referenceBox.height);
+}, 'Dynamic update of transform; replaceItem()');
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>Cloning of SVG elements and attributes</title>
+<link href="https://dom.spec.whatwg.org/#dom-node-clonenode" rel="help"/>
+<link href="https://dom.spec.whatwg.org/#concept-node-clone" rel="help"/>
+<!-- regression test for https://github.com/jsdom/jsdom/issues/1601 -->
+
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+
+</head><body><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use href="#test"/></svg>
+
+<script>
+"use strict";
+
+const svg = document.querySelector("svg");
+const clone = svg.cloneNode(true);
+
+test(() =&gt; {
+
+  assert_equals(clone.namespaceURI, "http://www.w3.org/2000/svg");
+  assert_equals(clone.prefix, null);
+  assert_equals(clone.localName, "svg");
+  assert_equals(clone.tagName, "svg");
+
+}, "cloned &lt;svg&gt; should have the right properties");
+
+test(() =&gt; {
+
+  const attr = clone.attributes[0];
+
+  assert_equals(attr.namespaceURI, "http://www.w3.org/2000/xmlns/");
+  assert_equals(attr.prefix, "xmlns");
+  assert_equals(attr.localName, "xlink");
+  assert_equals(attr.name, "xmlns:xlink");
+  assert_equals(attr.value, "http://www.w3.org/1999/xlink");
+
+}, "cloned &lt;svg&gt;'s xmlns:xlink attribute should have the right properties");
+
+test(() =&gt; {
+
+  const use = clone.firstElementChild;
+  assert_equals(use.namespaceURI, "http://www.w3.org/2000/svg");
+  assert_equals(use.prefix, null);
+  assert_equals(use.localName, "use");
+  assert_equals(use.tagName, "use");
+
+}, "cloned &lt;use&gt; should have the right properties");
+
+test(() =&gt; {
+
+  const use = clone.firstElementChild;
+  const attr = use.attributes[0];
+
+  assert_equals(attr.namespaceURI, "http://www.w3.org/1999/xlink");
+  assert_equals(attr.prefix, "xlink");
+  assert_equals(attr.localName, "href");
+  assert_equals(attr.name, "xlink:href");
+  assert_equals(attr.value, "#test");
+
+}, "cloned &lt;use&gt;'s xlink:href attribute should have the right properties");
+
+</script>
+</body></html>

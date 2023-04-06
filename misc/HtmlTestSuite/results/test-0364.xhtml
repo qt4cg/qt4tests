@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" class="reftest-wait">
+<head><meta charset="utf-8"/>
+<title>Reference for rotate transform equivalent</title>
+<script src="/common/reftest-wait.js"/>
+<style>
+  .block {
+    border: 2px solid white; /* Avoid anti-aliasing artifacts */
+    height: 100px;
+    width: 100px;
+    position: absolute;
+    left: 100px;
+    top: 100px;
+  }
+
+  .overlay {
+    background: green;
+    z-index: 2;
+  }
+</style>
+</head><body>
+  <div class="block overlay" id="transform"/>
+
+<script>
+  'use strict';
+
+  async function waitForNextFrame() {
+    return new Promise(resolve =&gt; {
+      window.requestAnimationFrame(() =&gt; {
+        resolve();
+      });
+    });
+  }
+
+  async function createAnimation(elementName, keyframes) {
+    const element = document.getElementById(elementName);
+    const anim = element.animate(keyframes, 1000);
+    anim.pause();
+    anim.currentTime = 500;
+    return anim.ready;
+  }
+
+  onload = async function() {
+    await waitForNextFrame();
+
+    await createAnimation('transform', [
+        {transform: 'matrix3d(1, 0, 0, 0,   0, 0, 1, 0,   0, -1, 0, 0,   0, 0, 0, 1)'},
+        {transform: 'matrix(0, 1, -1, 0, 0, 0)'}]);
+
+    await waitForNextFrame();
+    takeScreenshot();
+  };
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Preserved trailing spaces in inline boxes should hang</title>
+<link href="https://drafts.csswg.org/css-text-3/#propdef-white-space" rel="help"/>
+<link href="http://crbug.com/1130310" rel="help"/>
+<link href="mailto:kojii@chromium.org" rel="author" title="Koji Ishii"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<style>
+.target {
+  font-family: Consolas, 'Courier New', Courier, monospace;
+  font-size: 20px;
+  width: 5ch;
+  white-space: pre-wrap;
+  overflow: auto visible;
+  border: 1px solid blue;
+}
+.not-culled span {
+  background: orange;
+}
+</style>
+</head><body>
+  <div class="target">12345 678</div>
+  <div class="target"><span>12345 678</span></div>
+  <div class="target not-culled"><span>12345 678</span></div>
+<script>
+for (let target of document.getElementsByClassName('target')) {
+  test(() =&gt; {
+    let width = target.offsetWidth;
+    let scroll_width = target.scrollWidth;
+    assert_less_than_equal(scroll_width, width);
+  });
+}
+</script>
+</body>
+</html>

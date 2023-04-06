@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>Test the onbeforeinput attribute</title>
+<meta content="long" name="timeout"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/testdriver.js"/>
+<script src="/resources/testdriver-vendor.js"/>
+
+</head><body><div id="container"/>
+<script>
+  const container = document.getElementById("container");
+  const events = new Map();
+
+  function handleEvent(event) {
+    if (!events.has(event.target)) {
+      events.set(event.target, []);
+    }
+    events.get(event.target).push(event);
+  }
+
+  let onInputFired = null;
+
+  const onBeforeInput = handleEvent;
+  const onInput = (event) =&gt; {
+    handleEvent(event);
+    onInputFired()
+  }
+
+  let elems = [];
+  for (let type of ["text", "search", "tel", "url", "email", "password", "number"]) {
+    elems.push(`&lt;input type=${type} onbeforeinput="onBeforeInput(event)" oninput="onInput(event)"&gt;
+&lt;input type=${type}&gt;
+`);
+  }
+  elems.push(`&lt;textarea onbeforeinput="onBeforeInput(event)" oninput="onInput(event)"&gt;&lt;/textarea&gt;
+&lt;textarea&gt;&lt;/textarea&gt;`)
+  container.innerHTML = elems.join("");
+
+for (const element of container.children) {
+  promise_test(async t =&gt; {
+    if (!element.hasAttribute("onbeforeinput")) {
+      element.onbeforeinput = e =&gt; onBeforeInput(e);
+      element.oninput = e =&gt; onInput(e);
+    };
+
+    let afterOnInput = new Promise(resolve =&gt; {onInputFired = resolve});
+    await test_driver.send_keys(element, "1"); // has to be a number so &lt;input type=number&gt; works
+    // Ensure we're in the post-update state
+    await afterOnInput;
+
+    assert_true(events.has(element), "Got events for element");
+    let elementEvents = events.get(element);
+
+    assert_array_equals(elementEvents.map(event =&gt; event.type), ["beforeinput", "input"], "Got expected events");
+  }, `${element.outerHTML}`);
+}
+</script>
+</body></html>

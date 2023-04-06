@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>CSS Syntax Test: handle at-rules in declaration lists</title>
+<link href="https://drafts.csswg.org/css-syntax/#consume-list-of-declarations" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<style id="test_sheet">
+</style>
+<script>
+  function parseRule(rule_text) {
+    let sheet = test_sheet.sheet;
+    if (sheet.cssRules.length != 0)
+      sheet.deleteRule(0);
+    sheet.insertRule(rule_text);
+    return sheet.cssRules[0];
+  }
+
+  test(() =&gt; {
+    let rule = parseRule(`
+      div {
+        @at {}
+        color: green;
+      }
+    `);
+    assert_equals(rule.style.color, "green");
+  }, "Allow @-rule with block inside style rule");
+
+  test(() =&gt; {
+    let rule = parseRule(`
+      div {
+        @at at;
+        color: green;
+      }
+    `);
+    assert_equals(rule.style.color, "green");
+  }, "Allow @-rule with semi-colon inside style rule");
+
+  test(() =&gt; {
+    let rule = parseRule(`
+      @page {
+        @at {}
+        margin-top: 20px;
+      }
+    `);
+    assert_equals(rule.style.marginTop, "20px");
+  }, "Allow @-rule with block inside page rule");
+
+  test(() =&gt; {
+    let rule = parseRule(`
+      @page {
+        @at at;
+        margin-top: 20px;
+      }
+    `);
+    assert_equals(rule.style.marginTop, "20px");
+  }, "Allow @-rule with semi-colon inside page rule");
+
+  test(() =&gt; {
+    let rule = parseRule(`
+      @font-face {
+        @at {}
+        font-family: myfont;
+      }
+    `);
+    assert_equals(rule.style.fontFamily, "myfont");
+  }, "Allow @-rule with block inside font-face rule");
+
+  test(() =&gt; {
+    let rule = parseRule(`
+      @font-face {
+        @at at;
+        font-family: myfont;
+      }
+    `);
+    assert_equals(rule.style.fontFamily, "myfont");
+  }, "Allow @-rule with semi-colon inside font-face rule");
+</script>
+</head><body/></html>

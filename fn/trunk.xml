@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-trunk" covers-40="fn-trunk">
+   <description>Tests for the trunk() function</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/"
+         idref="func-head"/>
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="trunk-001">
+      <description> trunk() of a simple sequence </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>trunk(12 to 15)</test>
+      <result>
+         <assert-deep-eq>12, 13, 14</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="trunk-002">
+      <description> trunk() of a simple sequence </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>trunk(("a", "b", "c"))</test>
+      <result>
+         <assert-deep-eq>"a", "b"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="trunk-003">
+      <description> trunk() of a singleton sequence </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <test>count(trunk("a"))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="trunk-004">
+      <description> trunk() of an empty sequence </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <environment ref="works-mod"/>
+      <test>let $a := /works/employee return count(trunk($a/z))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="trunk-005">
+      <description> trunk() of a node sequence </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <environment ref="works-mod"/>
+      <test>let $a := /works/employee[@gender='female']/@name return trunk($a)/string()</test>
+      <result>
+         <assert-deep-eq>"Jane Doe 1", "Jane Doe 3", "Jane Doe 5", "Jane Doe 7", "Jane Doe 9", "Jane Doe 11"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="trunk-006">
+      <description> foot/trunk recursion </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare function local:sum($n) { if (empty($n)) then 0 else foot($n) + local:sum(trunk($n)) }; 
+            local:sum(1 to 5)</test>
+      <result>
+         <all-of>
+            <assert-eq>15</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="trunk-007">
+      <description> trunk applied to reverse() </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>trunk(reverse(("a", "b", "c", "d")))</test>
+      <result>
+         <assert-deep-eq>"d", "c", "b"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="trunk-008">
+      <description> trunk applied to characters() </description>
+      <created by="Michael Kay" on="2022-11-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>characters("abcd") => trunk() => string-join()</test>
+      <result>
+         <assert-eq>"abc"</assert-eq>
+      </result>
+   </test-case>
+</test-set>

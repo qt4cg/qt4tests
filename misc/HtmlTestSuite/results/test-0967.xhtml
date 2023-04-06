@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>HTML Templates: innerHTML of template element replaces all referenced by the content attribute</title>
+<meta href="mailto:sgrekhov@unipro.ru" name="author" title="Sergey G. Grekhov"/>
+<meta href="a.semenov@unipro.ru" name="author" title="Aleksei Yu. Semenov"/>
+<meta content="innerHTML of template element replaces all referenced by the content attribute" name="assert"/>
+<link href="http://www.w3.org/TR/2013/WD-html-templates-20130214/#innerhtml-on-templates" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/html/resources/common.js"/>
+</head>
+<body>
+<div id="log"/>
+<script type="text/javascript">
+
+test(function () {
+    var doc = newHTMLDocument();
+    var template = doc.createElement('template');
+
+    var div1 = doc.createElement('div');
+    div1.setAttribute('id', 'div1');
+    template.content.appendChild(div1);
+
+    assert_not_equals(template.content.querySelector('#div1'), null,
+            'Element should present in template content');
+
+    template.innerHTML = '&lt;div id="div2"&gt;&lt;/div&gt;';
+
+    assert_equals(template.content.querySelector('#div1'), null,
+            'Template content should be replaced by innerHTML');
+    assert_not_equals(template.content.querySelector('#div2'), null,
+            'Element should present in template content');
+
+}, 'innerHTML of template element replaces all referenced by the content attribute');
+
+
+test(function () {
+    var doc = newHTMLDocument();
+    var template = doc.createElement('template');
+
+    var div1 = doc.createElement('div');
+    div1.setAttribute('id', 'div1');
+    template.content.appendChild(div1);
+
+    assert_not_equals(template.content.querySelector('#div1'), null,
+            'Element should present in template content');
+
+    template.innerHTML = '';
+
+    assert_false(template.content.hasChildNodes(),
+            'Template content should be removed by innerHTML');
+
+}, 'innerHTML of template element replaces all referenced by the content attribute. '
+    + 'Test empty HTML string');
+
+
+test(function () {
+    var doc = newHTMLDocument();
+    var template = doc.createElement('template');
+    var nestedTemplate = doc.createElement('template');
+
+    template.content.appendChild(nestedTemplate);
+
+    var div1 = doc.createElement('div');
+    div1.setAttribute('id', 'div1');
+    nestedTemplate.content.appendChild(div1);
+
+    assert_not_equals(nestedTemplate.content.querySelector('#div1'), null,
+            'Element should present in template content');
+
+    nestedTemplate.innerHTML = '&lt;div id="div2"&gt;&lt;/div&gt;';
+
+    assert_equals(nestedTemplate.content.querySelector('#div1'), null,
+            'Template content should be replaced by innerHTML');
+    assert_not_equals(nestedTemplate.content.querySelector('#div2'), null,
+            'Element should present in template content');
+
+}, 'innerHTML of template element replaces all referenced by the content attribute. '
+    + 'Test nested template');
+
+
+testInIFrame('../resources/template-contents.html', function(context) {
+    var doc = context.iframes[0].contentDocument;
+
+    var template = doc.querySelector('template');
+    assert_not_equals(template.content.querySelector('div'), null,
+           'Div element should present in template content');
+
+    template.innerHTML = '&lt;span&gt;span internals&lt;/span&gt;';
+
+    assert_equals(template.content.querySelector('div'), null,
+           'div element should be replaced by span in template content');
+
+    assert_not_equals(template.content.querySelector('span'), null,
+           'span element should present in template content');
+
+
+}, 'innerHTML of template element replaces all referenced by the content attribute. '
+    + 'Test loading of HTML document from a file');
+
+
+</script>
+</body>
+</html>

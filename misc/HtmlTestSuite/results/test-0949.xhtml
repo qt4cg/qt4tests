@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>radio group name case-sensitive</title>
+<link href="mailto:denis@w3.org" rel="author" title="Denis Ah-Kang"/>
+<link href="mailto:d@domenic.me" rel="author" title="Domenic Denicola"/>
+<link href="https://html.spec.whatwg.org/multipage/forms.html#radio-button-group" rel="help"/>
+<!-- See also: https://github.com/whatwg/html/issues/1666 -->
+
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+
+</head><body><div id="log"/>
+
+<input id="r1" name="sImPlE" type="radio"/>
+<input id="r2" name="simple" type="radio"/>
+<input id="r3" name="SIMPLE" type="radio"/>
+
+<input id="r4" name="paSSfield-killroyß" type="radio"/>
+<input id="r5" name="passfield-killroyß" type="radio"/>
+<input id="r6" name="PASSFIELD-KILLROYß" type="radio"/>
+<input id="r7" name="paſſfield-killroyß" type="radio"/>
+<input id="r8" name="passfield-Killroyß" type="radio"/>
+<input id="r9" name="paßfield-killroyß" type="radio"/>
+<input id="r10" name="paẞfield-killroyß" type="radio"/>
+<input id="r11" name="passfield-killroyẞ" type="radio"/>
+<input id="r12" name="passﬁeld-killroyß" type="radio"/>
+<input id="r13" name="passfıeld-killroyß" type="radio"/>
+<input id="r14" name="passfİeld-killroyß" type="radio"/>
+
+<input id="r15" name="глупый" type="radio"/>
+<input id="r16" name="глупый" type="radio"/>
+<input id="r17" name="ГЛУПЫЙ" type="radio"/>
+<input id="r18" name="ГЛУПЫЙ" type="radio"/>
+
+<input id="r19" name="åωk" type="radio"/>
+<input id="r20" name="ÅΩK" type="radio"/>
+<input id="r21" name="Åωk" type="radio"/>
+<input id="r22" name="åΩk" type="radio"/>
+<input id="r23" name="åωK" type="radio"/>
+
+<input id="r24" name="blah1" type="radio"/>
+<input id="r25" name="blah①" type="radio"/>
+<input id="r26" name="blⒶh1" type="radio"/>
+<input id="r27" name="blⓐh1" type="radio"/>
+
+<input id="r28" name="tÉdz5アパートFi" type="radio"/>
+<input id="r29" name="TÉDZ5アパートFi" type="radio"/>
+<input id="r30" name="TéǱ⁵アパートFi" type="radio"/>
+<input id="r31" name="tÉdz5㌀Fi" type="radio"/>
+<input id="r32" name="tÉdz5アパートFi" type="radio"/>
+<input id="r34" name="TÉDZ⁵アパートFi" type="radio"/>
+<input id="r35" name="TÉDZ5アパートﬁ" type="radio"/>
+
+<input id="r36" name="ΣΣ" type="radio"/>
+<input id="r37" name="σς" type="radio"/>
+
+<script>
+"use strict";
+const notGroups = {
+  "sImPlE": ["r1" ,"r2", "r3"],
+  "paSSfield-killroyß": ["r4", "r5", "r6", "r7", "r8", "r9", "r10", "r11", "r12", "r13", "r14"],
+  "глупый": ["r15", "r16", "r17", "r18"],
+  "åωk": ["r19", "r20", "r21", "r22", "r23"],
+  "blah1": ["r24", "r25", "r26", "r27"],
+  "tÉdz5アパートFi": ["r28", "r29", "r30", "r31", "r32", "r34", "r35"],
+  "ΣΣ": ["r36", "r37"]
+};
+
+for (let notGroupLabel of Object.keys(notGroups)) {
+  test(() =&gt; {
+    const ids = notGroups[notGroupLabel];
+    const radios = ids.map(id =&gt; document.getElementById(id));
+
+    for (let radio of radios) {
+      radio.checked = true;
+    }
+
+    for (let radio of radios) {
+      assert_true(radio.checked, `${radio.name} must be checked`);
+    }
+  }, `Among names like ${notGroupLabel}, everything must be checkable at the same time`);
+}
+</script>
+</body></html>

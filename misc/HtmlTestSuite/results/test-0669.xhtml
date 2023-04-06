@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>CSS Flexbox: images' aspect ratio in flex box with flex-direction: column for min-size: auto</title>
+<link href="https://drafts.csswg.org/css-flexbox/#flex-containers" rel="help"/>
+<link href="https://drafts.csswg.org/css-flexbox/#flex-direction-property" rel="help"/>
+<link href="https://drafts.csswg.org/css-flexbox/#min-size-auto" rel="help"/>
+<link href="https://drafts.csswg.org/css-sizing-3/#replaced-intrinsic" rel="help"/>
+<link href="https://crbug.com/581535" rel="help"/>
+<link href="https://crbug.com/581361" rel="help"/>
+<link href="support/flexbox.css" rel="stylesheet"/>
+<meta content="Images maintain aspect ratio in flex box with column direction with min-size: auto." name="assert"/>
+
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/check-layout-th.js"/>
+
+</head><body onload="checkLayout('.flexbox')">
+<div id="log"/>
+
+<div class="flexbox" data-expected-width="10" style="width: 10px;">
+    <!-- should use content width, clamped by converted max-height, as minimum width. -->
+    <img data-expected-height="5" data-expected-width="5" src="support/100x100-green.png" style="max-height: 5px;"/>
+</div>
+
+<div class="flexbox" data-expected-width="10" style="width: 10px;">
+    <!-- should use min(specified, content width) = 10px as minimum width,
+         which the image will shrink to due to default flex-shrink. -->
+    <img data-expected-width="10" src="support/10x10-green.png" style="width: 100px;"/>
+</div>
+
+<div class="flexbox" data-expected-width="10" style="width: 10px;">
+    <!-- should use content width, clamped by converted min-height, as minimum width. -->
+    <img data-expected-height="5" data-expected-width="5" src="support/100x100-green.png" style="max-height: 5px;"/>
+</div>
+
+<div class="flexbox" data-expected-width="10" style="width: 10px;">
+    <!-- should use content width, clamped by converted min-height, as minimum width. -->
+    <img data-expected-height="10" data-expected-width="10" src="support/100x100-green.png" style="max-height: 5px; min-height: 10px;"/>
+</div>
+
+<div class="flexbox" data-expected-width="10" style="width: 10px;">
+    <!-- transferred and content suggestions are both 100px here, so minimum
+      width is min(transferred, content width) = 100px. -->
+    <img data-expected-width="100" src="support/10x10-green.png" style="height: 100px;"/>
+</div>
+
+<div class="flexbox column" data-expected-height="10" style="height: 10px;">
+    <!-- should use content height, clamped by converted max-width, as minimum height. -->
+    <img data-expected-height="5" data-expected-width="5" src="support/100x100-green.png" style="max-width: 5px;"/>
+</div>
+
+<div class="flexbox column" data-expected-height="10" style="height: 10px; width: 50px;">
+    <!-- should use min(specified=100, content height=50) = 50px as minimum height,
+         which the image will shrink to due to default flex-shrink. -->
+    <img data-expected-height="50" src="support/10x10-green.png" style="height: 100px;"/>
+</div>
+
+<div class="flexbox" data-expected-height="10" style="height: 10px;">
+    <!-- should use content height, clamped by converted min-height, as minimum height. -->
+    <img data-expected-height="5" src="support/100x100-green.png" style="max-height: 5px;"/>
+</div>
+
+<div class="flexbox" data-expected-height="10" style="height: 10px;">
+    <!-- should use content height, clamped by converted min-width, as minimum height. -->
+    <img data-expected-height="10" data-expected-width="10" src="support/100x100-green.png" style="max-width: 5px; min-width: 10px;"/>
+</div>
+
+<div class="flexbox column" data-expected-height="10" style="height: 10px;">
+    <!-- should use min(transferred (100), content height (100)) = 100px as
+         minimum height, which will be final height of the image -->
+    <img data-expected-height="100" src="support/10x10-green.png" style="width: 100px;"/>
+</div>
+</body></html>

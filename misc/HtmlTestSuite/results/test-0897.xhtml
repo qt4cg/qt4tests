@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <title>CSS integration - styling SVG from inline style on page with different-origin base tag</title>
+  <script src="/resources/testharness.js"/>
+  <script src="/resources/testharnessreport.js"/>
+  <script src="/common/utils.js"/>
+  <!-- Common global functions for referrer-policy tests. -->
+  <script src="/common/security-features/resources/common.sub.js"/>
+  <!-- Helper functions for referrer-policy css tests. -->
+  <script src="/referrer-policy/css-integration/css-test-helper.js"/>
+  <meta content="origin" name="referrer"/>
+<base href="http://other-page.example/"/></head>
+
+
+
+<body>
+  <p>Check that resources from inline styles are loaded with
+    the referrer and referrer policy from the document and, in
+    particular, not from the document's overridden base URL.</p>
+  <script>
+    function setInlineStyle(test) {
+      test.expected = location.origin + "/";
+      let svg = createSvg();
+      document.body.appendChild(svg);
+      let element = svg.getElementsByTagName('path')[0];
+      element.style = test.property + ": url(" + url_prefix + "svg.py?id=" +
+        test.id + "#invalidFragment);";
+    }
+
+    runSvgTests(svg_test_properties,
+      "Styling SVG from inline styles",
+      setInlineStyle);
+  </script>
+
+  <div id="log"/>
+</body>
+
+</html>

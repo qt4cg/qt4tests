@@ -17,6 +17,35 @@
             <created by="Michael Kay" on="2012-05-30"/>
         </schema>        
    </environment>
+   
+   <environment name="id-validation">
+      <schema uri="http://www.w3.org/XQueryTest/ididrefs"
+         file="id/id.xsd">
+         <description>A schema for validating a file such as id/id.xml</description>
+         <created by="Carmelo Montanez" on="2005-11-27"/>
+      </schema>
+      <resource file="id/id.xml"
+         uri="http://www.w3.org/XQueryTest/id.xml"
+         media-type="text/plain" 
+         encoding="utf-8">
+         <description>An XML file, suitable for validation, masquerading as plain text.</description>
+         <created by="Tim Mills" on="2012-01-05"/>
+      </resource>
+   </environment>
+   
+   <environment name="nilled-validation">
+      <schema uri="http://www.w3.org/XQueryTest/nillable" file="nilled/nillable.xsd">
+         <description>A Schema with some nillable elements</description>
+         <created by="Michael Kay" on="2012-10-02"/>
+      </schema>
+      <resource file="nilled/nillable.xml"
+         uri="http://www.w3.org/XQueryTest/nilled.xml"
+         media-type="text/plain" 
+         encoding="utf-8">
+         <description>An XML file, suitable for validation, masquerading as plain text.</description>
+         <created by="Tim Mills" on="2012-01-05"/>
+      </resource>
+   </environment>
 
 
    <test-case name="fn-deep-equalint2args-1">
@@ -761,7 +790,8 @@
 
    <test-case name="fn-deep-equal-mix-args-017a">
       <description> Comparing arg1:decimal , arg2:float </description>
-      <created by="Christian Gruen" on="2022-08-22" change="XQuery 4: comparison of numeric values changed"/>
+      <created by="Pulkita Tyagi" on="2005-05-24"/>
+      <modified by="Christian Gruen" on="2022-08-22" change="XQuery 4: comparison of numeric values changed"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>fn:deep-equal( xs:decimal(1.01) , xs:float(1.01))</test>
       <result>
@@ -782,7 +812,8 @@
 
    <test-case name="fn-deep-equal-mix-args-018a">
       <description> Comparing arg1:decimal, arg2:double </description>
-      <created by="Christian Gruen" on="2022-08-22" change="XQuery 4: comparison of numeric values changed"/>
+      <created by="Pulkita Tyagi" on="2005-05-24"/>
+      <modified by="Christian Gruen" on="2022-08-22" change="XQuery 4: comparison of numeric values changed"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>fn:deep-equal( xs:decimal(1.01) , xs:double(1.01))</test>
       <result>
@@ -1395,9 +1426,13 @@
    <test-case name="K-SeqDeepEqualFunc-3">
       <description> A test whose essence is: `deep-equal("a string", "a string", "http://www.w3.org/2005/xpath-functions/collation/codepoint", "wrong param")`. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Michael Kay" on="2023-02-08" change="Different error code for a 4.0 processor"/>
       <test>deep-equal("a string", "a string", "http://www.w3.org/2005/xpath-functions/collation/codepoint", "wrong param")</test>
       <result>
-         <error code="XPST0017"/>
+         <any-of>
+            <error code="XPST0017"/><!-- 3.1 -->
+            <error code="XPTY0004"/><!-- 4.0 -->
+         </any-of>
       </result>
    </test-case>
 
@@ -2729,5 +2764,1207 @@
          <assert-false/>
       </result>
    </test-case>
+   
+   <test-case name="deep-equal-40-options-001" covers-40="fn-deep-equal">
+      <description> Test that valid boolean options are accepted </description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal((), (), (), map{
+            "base-uri":true(), "comments":true(), "debug":true(), 
+            "false-on-error":true(), "id-property":true(), "idref-property":true(),
+            "in-scope-namespaces":true(), "namespace-prefixes":true(), "nilled-property":true(), "normalize-space":true(),
+            "processing-instructions":true(), "text-boundaries":true(), "timezones":true(), "type-annotations":true(),
+            "type-variety":true(), "typed-values":true(), "preserve-space":true()})
+            
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-options-002" covers-40="fn-deep-equal">
+      <description> Test that valid boolean options are accepted </description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(1, 2, (), map{
+            "base-uri":false(), "comments":false(), "debug":false(), 
+            "false-on-error":false(), "id-property":false(), "idref-property":false(),
+            "in-scope-namespaces":false(), "namespace-prefixes":false(), "nilled-property":false(), "normalize-space":false(),
+            "processing-instructions":false(), "text-boundaries":false(), "timezones":false(), "type-annotations":false(),
+            "type-variety":false(), "typed-values":false(), "preserve-space":false()})
+            
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-options-003" covers-40="fn-deep-equal">
+      <description> Test that invalid boolean options are rejected </description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(1, 2, (), map{
+            "base-uri":false(), "comments":23, "debug":false(), 
+            "false-on-error":false(), "id-property":false(), "idref-property":false(),
+            "in-scope-namespaces":false(), "namespace-prefixes":false(), "nilled-property":false(), "normalize-space":false(),
+            "processing-instructions":false(), "text-boundaries":false(), "timezones":false(), "type-annotations":false(),
+            "type-variety":false(), "typed-values":false(), "preserve-space":false()})
+            
+            ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-options-004" covers-40="fn-deep-equal">
+      <description> Test coercion of boolean options according to the option parameter conventions </description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(1, 2, (), map{'comments': parse-xml('<a>0</a>')})           
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-options-005" covers-40="fn-deep-equal">
+      <description> Test that unknown string-valued options are ignored </description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(1, 2, (), map{'bifurcation': true()})           
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-options-006" covers-40="fn-deep-equal">
+      <description> Test that unknown QName-valued options are ignored </description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(1, 2, (), map{parse-QName('Q{http://my.ns/}bifurcation'): true()})           
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-base-uri-001" covers-40="fn-deep-equal">
+      <description> Test base-uri option of deep equal - defaulted</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a xml:base="http://example.com/one"><b>42</b></a>')//b,
+            parse-xml('<a xml:base="http://example.com/two"><b>42</b></a>')//b)
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-base-uri-002" covers-40="fn-deep-equal">
+      <description> Test base-uri option of deep equal - false</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a xml:base="http://example.com/one"><b>42</b></a>')//b,
+            parse-xml('<a xml:base="http://example.com/two"><b>42</b></a>')//b,
+            (), map{'base-uri':false()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-base-uri-003" covers-40="fn-deep-equal">
+      <description> Test base-uri option of deep equal - true</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a xml:base="http://example.com/one"><b>42</b></a>')//b,
+            parse-xml('<a xml:base="http://example.com/two"><b>42</b></a>')//b,
+            (), map{'base-uri':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-comments-001" covers-40="fn-deep-equal">
+      <description> Test comments option of deep equal - defaulted</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><!--foo--></a>'),
+            parse-xml('<a><!--bar--></a>'))
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-comments-002" covers-40="fn-deep-equal">
+      <description> Test comments option of deep equal - false</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><!--foo--></a>'),
+            parse-xml('<a><!--bar--></a>'),
+            collation := (),
+            options := map{'comments':false()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-comments-003" covers-40="fn-deep-equal">
+      <description> Test comments option of deep equal - true</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><!--foo--></a>'),
+            parse-xml('<a><!--bar--></a>'),
+            collation := (),
+            options := map{'comments':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-comments-004" covers-40="fn-deep-equal">
+      <description> Test comments option of deep equal - false but splitting text</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a>pre<!--foo-->amble</a>'),
+            parse-xml('<a>pream<!--bar-->ble</a>'),
+            options := map{'comments':false(), 'text-boundaries':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-comments-005" covers-40="fn-deep-equal">
+      <description> Test comments option of deep equal - false while merging text</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a>pre<!--foo-->amble</a>'),
+            parse-xml('<a>pream<!--bar-->ble</a>'),
+            options := map{'comments':false(), 'text-boundaries':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-comments-006" covers-40="fn-deep-equal">
+      <description> Test comments option of deep equal - false while merging text</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a>preamble<!--foo--></a>'),
+            parse-xml('<a><!--bar-->preamble</a>'),
+            options := map{'comments':false(), 'text-boundaries':true()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-comments-007" covers-40="fn-deep-equal">
+      <description> Test comments option of deep equal - false while merging text</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a>preamble<!--foo--></a>'),
+            parse-xml('<a>p<!--bar-->reamble</a>'),
+            options := map{'comments':false(), 'text-boundaries':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-comments-008" covers-40="fn-deep-equal">
+      <description> Test comments option of deep equal - case-blind collation</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><!--foo--></a>'),
+            parse-xml('<a><!--FOO--></a>'),
+            collation := 'http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive',
+            options := map{'comments':true()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-comments-009" covers-40="fn-deep-equal">
+      <description> Test comments option of deep equal - normalize-space</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><!--foo--></a>'),
+            parse-xml('<a><!-- foo --></a>'),
+            options := map{'comments':true(), 'normalize-space':true()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-comments-010" covers-40="fn-deep-equal">
+      <description> Test comments option of deep equal - normalization-form</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <modified by="Michael Kay" on="2023-03-04" change="Doesn't work as written for XPath"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><!--(&#506;)--></a>'),
+            parse-xml('<a><!--(A&#778;&#769;)--></a>'),
+            options := map{'comments':true(), 'normalization-form':'NFC'})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-comments-011" covers-40="fn-deep-equal">
+      <description> The option parameter conventions apply, so options are atomized and converted where necessary </description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <modified by="Michael Kay" on="2023-03-04" change="Doesn't work as written for XPath"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><!--(&#506;)--></a>'),
+            parse-xml('<a><!--(A&#778;&#769;)--></a>'),
+            options := map{'comments':parse-xml('<x>true</x>'), 'normalization-form':parse-xml('<y>NFC</y>')})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-false-on-error-001" covers-40="fn-deep-equal">
+      <description> Comparing function items</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(true#0, false#0)</test>
+      <result>
+         <error code="FOTY0015"/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-false-on-error-002" covers-40="fn-deep-equal">
+      <description> Comparing function items</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(true#0, false#0, (), map{'false-on-error':false()})</test>
+      <result>
+         <error code="FOTY0015"/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-false-on-error-003" covers-40="fn-deep-equal">
+      <description> Comparing function items</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(true#0, false#0, (), map{'false-on-error':true()})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-false-on-error-004" covers-40="fn-deep-equal">
+      <description> Comparing function items</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(true#0, true#0, (), map{'false-on-error':true()})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-processing-instructions-001" covers-40="fn-deep-equal">
+      <description> Test processing-instructions option of deep equal - defaulted</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><?foo?></a>'),
+            parse-xml('<a><?bar?></a>'))
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-processing-instructions-002" covers-40="fn-deep-equal">
+      <description> Test processing-instructions option of deep equal - false</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><?foo?></a>'),
+            parse-xml('<a><?bar?></a>'),
+            options := map{'processing-instructions':false()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-processing-instructions-003" covers-40="fn-deep-equal">
+      <description> Test processing-instructions option of deep equal - true</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><?foo?></a>'),
+            parse-xml('<a><?bar?></a>'),
+            options := map{'processing-instructions':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-processing-instructions-004" covers-40="fn-deep-equal">
+      <description> Test processing-instructions option of deep equal - false but splitting text</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a>pre<?foo?>amble</a>'),
+            parse-xml('<a>pream<?bar?>ble</a>'),
+            options := map{'processing-instructions':false(), 'text-boundaries':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-processing-instructions-005" covers-40="fn-deep-equal">
+      <description> Test processing-instructions option of deep equal - false while merging text</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a>pre<?foo?>amble</a>'),
+            parse-xml('<a>pream<?bar?>ble</a>'),
+            options := map{'processing-instructions':false(), 'text-boundaries':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-processing-instructions-006" covers-40="fn-deep-equal">
+      <description> Test processing-instructions option of deep equal - false while merging text</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a>preamble<?foo?></a>'),
+            parse-xml('<a><?bar?>preamble</a>'),
+            options := map{'processing-instructions':false(), 'text-boundaries':true()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-processing-instructions-007" covers-40="fn-deep-equal">
+      <description> Test processing-instructions option of deep equal - false while merging text</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a>preamble<?foo?></a>'),
+            parse-xml('<a>p<?bar?>reamble</a>'),
+            options := map{'processing-instructions':false(), 'text-boundaries':false()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-processing-instructions-008" covers-40="fn-deep-equal">
+      <description> Test processing-instructions option of deep equal - case-blind collation</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><?pi foo?></a>'),
+            parse-xml('<a><?pi FOO?></a>'),
+            collation := 'http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive',
+            options := map{'processing-instructions':true()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-processing-instructions-009" covers-40="fn-deep-equal">
+      <description> Test processing-instructions option of deep equal - normalize-space</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><?pi foo bar baz?></a>'),
+            parse-xml('<a><?pi foo    bar   baz  ?></a>'),
+            options := map{'processing-instructions':true(), 'normalize-space':true()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-processing-instructions-010" covers-40="fn-deep-equal">
+      <description> Test processing-instructions option of deep equal - normalization-form</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <modified by="Michael Kay" on="2023-03-04" change="Doesn't work as written for XPath"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><?foo (&#506;)?></a>'),
+            parse-xml('<a><?foo (A&#778;&#769;)?></a>'),
+            options := map{'processing-instructions':true(), 'normalization-form':'NFD'})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-normalize-unicode-001" covers-40="fn-deep-equal">
+      <description> Test normalize-unicode option of deep equal - off - text nodes</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <modified by="Michael Kay" on="2023-03-04" change="Doesn't work as written for XPath"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a>&#506;?></a>'),
+            parse-xml('<a>A&#778;&#769;</a>'))
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-normalize-unicode-002" covers-40="fn-deep-equal">
+      <description> Test normalization-form option of deep equal - NFC - text nodes</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a>&#506;</a>'),
+            parse-xml('<a>A&#778;&#769;</a>'),
+            options := map{'normalization-form':'NFC'})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-normalize-unicode-003" covers-40="fn-deep-equal">
+      <description> Test normalization-form option of deep equal - NFD - text nodes</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a>&#506;</a>'),
+            parse-xml('<a>A&#778;&#769;</a>'),
+            options := map{'normalization-form':'NFD'})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-normalize-unicode-004" covers-40="fn-deep-equal">
+      <description> Test normalization-form option of deep equal - NFD - attribute nodes</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a z="&#506;"/>'),
+            parse-xml('<a z="A&#778;&#769;"/>'),
+            options := map{'normalization-form':'NFD'})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-normalize-unicode-005" covers-40="fn-deep-equal">
+      <description> Test normalize-unicode option of deep equal - NFC - strings</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal('&#506;', 'A&#778;&#769;', options := map{'normalization-form':'NFC'})</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-normalize-unicode-006" covers-40="fn-deep-equal">
+      <description> Test normalize-unicode option of deep equal - invalid normalization form</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal('&#506;', 'A&#778;&#769;', options := map{'normalization-form':'KFC'})</test>
+      <result>
+         <error code="FOJS0005"/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-namespace-prefixes-001" covers-40="fn-deep-equal">
+      <description> Test prefixes option of deep equal - off - element names</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a xmlns="http://one/"><b/></a>'),
+            parse-xml('<p:a xmlns:p="http://one/"><p:b/></p:a>'))
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-namespace-prefixes-002" covers-40="fn-deep-equal">
+      <description> Test namespace-prefixes option of deep equal - on - element names</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a xmlns="http://one/"><b/></a>'),
+            parse-xml('<p:a xmlns:p="http://one/"><p:b/></p:a>'),
+            options := map{'namespace-prefixes':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-namespace-prefixes-003" covers-40="fn-deep-equal">
+      <description> Test namespace-prefixes option of deep equal - off - attribute names</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a xmlns:p="http://one/"><b p:foo="bar"/></a>'),
+            parse-xml('<a xmlns:q="http://one/"><b q:foo="bar"/></a>'))
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-namespace-prefixes-004" covers-40="fn-deep-equal">
+      <description> Test prefixes option of deep equal - on - attribute names</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a xmlns:p="http://one/"><b p:foo="bar"/></a>'),
+            parse-xml('<a xmlns:q="http://one/"><b q:foo="bar"/></a>'),
+            options := map{'namespace-prefixes':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-namespace-prefixes-005" covers-40="fn-deep-equal">
+      <description> Test namespace-prefixes option of deep equal - off - atomic QName values</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(QName("http://p.com/", "a:local"), QName("http://p.com/", "b:local"))
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-namespace-prefixes-006" covers-40="fn-deep-equal">
+      <description> Test prefixes option of deep equal - on - atomic QName values</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(QName("http://p.com/", "a:local"), QName("http://p.com/", "b:local"), options := map{'namespace-prefixes':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-namespace-prefixes-007" covers-40="fn-deep-equal">
+      <description> Test prefixes option of deep equal - off - atomic QName values derived from node names</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(node-name(parse-xml('<p:a xmlns:p="http://p.com"/>')/*), 
+                    node-name(parse-xml('<q:a xmlns:q="http://p.com"/>')/*))
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-namespace-prefixes-008" covers-40="fn-deep-equal">
+      <description> Test prefixes option of deep equal - on - atomic QName values derived from node names</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(node-name(parse-xml('<p:a xmlns:p="http://p.com"/>')/*), 
+                    node-name(parse-xml('<q:a xmlns:q="http://p.com"/>')/*), 
+                    options := map{'namespace-prefixes':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-in-scope-namespaces-001" covers-40="fn-deep-equal">
+      <description> Test in-scope-namespaces option of deep equal - absent</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><b/></a>'),
+            parse-xml('<a xmlns:p="http://one/"><b/></a>'))
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-in-scope-namespaces-002" covers-40="fn-deep-equal">
+      <description> Test in-scope-namespaces option of deep equal - off</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><b/></a>'),
+            parse-xml('<a xmlns:p="http://one/"><b/></a>'),
+            options := map{'in-scope-namespaces':false()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-in-scope-namespaces-003" covers-40="fn-deep-equal">
+      <description> Test in-scope-namespaces option of deep equal - on</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><b/></a>'),
+            parse-xml('<a xmlns:p="http://one/"><b/></a>'),
+            options := map{'in-scope-namespaces':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-id-property-001" covers-40="fn-deep-equal">
+      <description> Test id-property option of deep equal - on</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <environment ref="id-validation"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/> 
+      <test><![CDATA[
+         let $source := unparsed-text("http://www.w3.org/XQueryTest/id.xml")
+         let $validated := validate strict {parse-xml($source)}
+         let $unvalidated := parse-xml($source)
+         return
+         deep-equal(
+            $validated//*:elementwithid-1,
+            $unvalidated//*:elementwithid-1,
+            options := map{'id-property':true(), 'type-annotation':false(), 'type-variety': false()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-id-property-002" covers-40="fn-deep-equal">
+      <description> Test id-property option of deep equal - off</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <environment ref="id-validation"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/> 
+      <test><![CDATA[
+         let $source := unparsed-text("http://www.w3.org/XQueryTest/id.xml")
+         let $validated := validate strict {parse-xml($source)}
+         let $unvalidated := parse-xml($source)
+         return
+         deep-equal(
+            $validated//*:elementwithid-1,
+            $unvalidated//*:elementwithid-1,
+            options := map{'id-property':false(), 'type-annotation':false(), 'type-variety': false(), 'debug':true()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-idref-property-001" covers-40="fn-deep-equal">
+      <description> Test idrefs-property option of deep equal - on</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <environment ref="id-validation"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/> 
+      <test><![CDATA[
+         let $source := unparsed-text("http://www.w3.org/XQueryTest/id.xml")
+         let $validated := validate strict {parse-xml($source)}
+         let $unvalidated := parse-xml($source)
+         return
+         deep-equal(
+            $validated//*:elementwithidref-1,
+            $unvalidated//*:elementwithidref-1,
+            options := map{'idrefs-property':true(), 'type-annotation':false(), 'type-variety': false()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-idref-property-002" covers-40="fn-deep-equal">
+      <description> Test idrefs-property option of deep equal - off</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <environment ref="id-validation"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/> 
+      <test><![CDATA[
+         let $source := unparsed-text("http://www.w3.org/XQueryTest/id.xml")
+         let $validated := validate strict {parse-xml($source)}
+         let $unvalidated := parse-xml($source)
+         return
+         deep-equal(
+            $validated//*:elementwithidref-1,
+            $unvalidated//*:elementwithidref-1,
+            options := map{'idrefs-property':false(), 'type-annotation':false(), 'type-variety': false(), 'debug':true()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-nilled-property-001" covers-40="fn-deep-equal">
+      <description> Test idrefs-property option of deep equal - on</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <environment ref="nilled-validation"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/> 
+      <test><![CDATA[
+         let $source := unparsed-text("http://www.w3.org/XQueryTest/nilled.xml")
+         let $validated := validate strict {parse-xml($source)}
+         let $unvalidated := parse-xml($source)
+         return
+         deep-equal(
+            $validated//*:date,
+            $unvalidated//*:date,
+            options := map{'nilled-property':false(), 'type-annotation':false(), 
+                     'typed-values':false(), 'type-variety': false(), 'debug': true()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-nilled-property-002" covers-40="fn-deep-equal">
+      <description> Test idrefs-property option of deep equal - on</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <environment ref="nilled-validation"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/> 
+      <test><![CDATA[
+         let $source := unparsed-text("http://www.w3.org/XQueryTest/nilled.xml")
+         let $validated := validate strict {parse-xml($source)}
+         let $unvalidated := parse-xml($source)
+         return
+         deep-equal(
+            $validated//*:date,
+            $unvalidated//*:date,
+            options := map{'nilled-property':true(), 'type-annotation':false(), 
+                           'typed-values':false(), 'type-variety': false(), 'debug':true()})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-timezones-001" covers-40="fn-deep-equal">
+      <description> Test timezones option with atomic values - defaulted</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <test>deep-equal(xs:time('12:00:00+01:00'), xs:time('11:00:00Z'))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-timezones-002" covers-40="fn-deep-equal">
+      <description> Test timezones option with atomic values - false</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <test>deep-equal(xs:time('12:00:00+01:00'), xs:time('11:00:00Z'), (), map{'timezones':false()})</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-timezones-003" covers-40="fn-deep-equal">
+      <description> Test timezones option with atomic values - true</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <test>deep-equal(xs:time('12:00:00+01:00'), xs:time('11:00:00Z'), (), map{'timezones':true()})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-timezones-004" covers-40="fn-deep-equal">
+      <description> Test timezones option with atomic values - defaulted</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <test>deep-equal(xs:time('12:00:00+01:00'), xs:time('12:00:00Z'))</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-timezones-005" covers-40="fn-deep-equal">
+      <description> Test timezones option with atomic values - false</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <test>deep-equal(xs:time('12:00:00+01:00'), xs:time('12:00:00Z'), (), map{'timezones':false()})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-timezones-006" covers-40="fn-deep-equal">
+      <description> Test timezones option with atomic values - true</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <test>deep-equal(xs:time('12:00:00+01:00'), xs:time('12:00:00Z'), (), map{'timezones':true()})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-timezones-007" covers-40="fn-deep-equal">
+      <description> Test timezones option with atomic values</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <test>deep-equal(xs:time('12:00:00+01:00'), adjust-time-to-timezone(xs:time('12:00:00+01:00'), ()),
+         (), map{'timezones':true()})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-timezones-008" covers-40="fn-deep-equal">
+      <description> Test timezones option with atomic values - true</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <test>deep-equal(xs:time('12:00:00'), xs:time('12:00:00'), (), map{'timezones':true()})</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-type-annotations-001" covers-40="fn-deep-equal">
+      <description> Test type-annotations option with atomic values - defaulted - numeric</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <test>deep-equal(1e3, xs:float(1e3))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-type-annotations-002" covers-40="fn-deep-equal">
+      <description> Test type-annotations option with atomic values - false - numeric</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(1e3, xs:float(1e3), (), map{'type-annotations':false()})</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-type-annotations-003" covers-40="fn-deep-equal">
+      <description> Test type-annotations option with atomic values - true - numeric</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(1e3, xs:float(1e3), (), map{'type-annotations':true()})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-type-annotations-004" covers-40="fn-deep-equal">
+      <description> Test type-annotations option with atomic values - defaulted - strings</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal("foo", local-name-from-QName(parse-QName("foo")))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-type-annotations-005" covers-40="fn-deep-equal">
+      <description> Test type-annotations option with atomic values - false - strings</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal("foo", local-name-from-QName(parse-QName("foo")), 
+         (), map{'type-annotations':false()})</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-type-annotations-006" covers-40="fn-deep-equal">
+      <description> Test type-annotations option with atomic values - true - strings</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal("foo", local-name-from-QName(parse-QName("foo")), 
+         (), map{'type-annotations':true()})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-type-annotations-007" covers-40="fn-deep-equal">
+      <description> Test type-annotations option with validated nodes - false - attributes</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test><![CDATA[
+         deep-equal(
+             validate type xs:integer {<a>1922</a>},
+             validate type xs:decimal {<a>1922</a>},
+         (), map{'type-annotations':false(), 'debug':true()})
+         ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-type-annotations-008" covers-40="fn-deep-equal">
+      <description> Test type-annotations option with validated nodes - true - attributes</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test><![CDATA[
+         deep-equal(
+             validate type xs:integer {<a>1922</a>},
+             validate type xs:decimal {<a>1922</a>},
+         (), map{'type-annotations':true(), 'debug':true()})
+         ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-unordered-elements-001" covers-40="fn-deep-equal">
+      <description> Test unordered-elements option of deep equal</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><b/><c/></a>'),
+            parse-xml('<a><c/><b/></a>'),
+            options := map{'unordered-elements': parse-QName("xxxxxxx")})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-unordered-elements-002" covers-40="fn-deep-equal">
+      <description> Test unordered-elements option of deep equal</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><b/><c/></a>'),
+            parse-xml('<a><c/><b/></a>'),
+            options := map{'unordered-elements': parse-QName("a")})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-unordered-elements-003" covers-40="fn-deep-equal">
+      <description> Test unordered-elements option of deep equal - duplicated element names</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><b>1</b><b>2</b></a>'),
+            parse-xml('<a><b>2</b><b>1</b></a>'),
+            options := map{'unordered-elements': parse-QName("a")})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-unordered-elements-004" covers-40="fn-deep-equal">
+      <description> Test unordered-elements option of deep equal - mixed content</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a>able<was/>I</a>'),
+            parse-xml('<a>I<was/>able</a>'),
+            options := map{'unordered-elements': parse-QName("a")})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-unordered-elements-005" covers-40="fn-deep-equal">
+      <description> Test unordered-elements option of deep equal - mixed content with whitespace normalization</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a> able <was/> I </a>'),
+            parse-xml('<a>I<was/>able</a>'),
+            options := map{'unordered-elements': parse-QName("a"), 'normalize-space':true()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-unordered-elements-006" covers-40="fn-deep-equal">
+      <description> Test unordered-elements option of deep equal - mixed content with whitespace text removal</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><bold/><text/></a>'),
+            parse-xml('<a> <text/> <bold/> </a>'),
+            options := map{'unordered-elements': parse-QName("a"), 'preserve-space':false()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-unordered-elements-007" covers-40="fn-deep-equal">
+      <description> Test unordered-elements option of deep equal - element-only content with whitespace text removal</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a> <b/> <c/> <d/> <e/> </a>'),
+            parse-xml('<a>   <b/>   <d/>   <e/>   <c/>   </a>'),
+            options := map{'unordered-elements': parse-QName("a"), 'preserve-space':false()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-unordered-elements-008" covers-40="fn-deep-equal">
+      <description> Test unordered-elements option of deep equal - element-only content with comments</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a> <b/> <c/> <d/> <e/> </a>'),
+            parse-xml('<a>   <b/> <!-- a big gap -->  <d/>   <e/>   <c/>   </a>'),
+            options := map{'unordered-elements': parse-QName("a"), 'preserve-space':false(), 'text-boundaries': false()})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-unordered-elements-009" covers-40="fn-deep-equal">
+      <description> Test unordered-elements option of deep equal with duplicates on both sides</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><b/><c/><b/></a>'),
+            parse-xml('<a><c/><b/><c/></a>'),
+            options := map{'unordered-elements': parse-QName("a")})
+            ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-unordered-elements-010" covers-40="fn-deep-equal">
+      <description> Test unordered-elements option of deep equal with matched duplicates</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><b/><c/><b/><c/></a>'),
+            parse-xml('<a><c/><b/><c/><b/></a>'),
+            options := map{'unordered-elements': parse-QName("a")})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-unordered-elements-011" covers-40="fn-deep-equal">
+      <description> Test unordered-elements option of deep equal with nested unordered elements</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><b><x/><y/></b><b><x/><y/><z/></b><b><x/><z/><y/></b></a>'),
+            parse-xml('<a><b><z/><y/><x/></b><b><x/><y/></b><b><x/><y/><z/></b></a>'),
+            options := map{'unordered-elements': (parse-QName("a"), parse-QName("b"))})
+            ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-unordered-elements-012" covers-40="fn-deep-equal">
+      <description> Test unordered-elements option of deep equal with invalid list of QNames</description>
+      <created by="Michael Kay" on="2023-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(
+            parse-xml('<a><b><x/><y/></b><b><x/><y/><z/></b><b><x/><z/><y/></b></a>'),
+            parse-xml('<a><b><z/><y/><x/></b><b><x/><y/></b><b><x/><y/><z/></b></a>'),
+            options := map{'unordered-elements': ("a", "b")})
+            ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
    
 </test-set>

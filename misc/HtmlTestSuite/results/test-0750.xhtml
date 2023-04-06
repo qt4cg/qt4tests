@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>Logical properties with &lt;code&gt;var()&lt;/code&gt;</title>
+<link href="mailto:obrufau@igalia.com" rel="author" title="Oriol Brufau"/>
+<link href="https://drafts.csswg.org/css-logical-1/#box" rel="help"/>
+<link href="https://drafts.csswg.org/css-variables-1/" rel="help"/>
+<meta content="Checks that logical properties can use the 'var()' notation to reference custom properties." name="assert"/>
+</head><body><div id="target"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script>
+const target = document.getElementById("target");
+const {style} = target;
+const computedStyle = getComputedStyle(target);
+let title;
+
+function check(property, specifiedExpected, expectedComputed) {
+  test(() =&gt; {
+    const specifiedActual = style.getPropertyValue(property);
+    assert_equals(specifiedActual, specifiedExpected, "Specified value");
+    const computedActual = computedStyle.getPropertyValue(property);
+    assert_equals(computedActual, expectedComputed, "Computed value");
+  }, title + " - " + property);
+}
+
+{
+  title = "Logical longhands with variables";
+  style.cssText = "";
+  style.setProperty("--one", "1px");
+  style.setProperty("--two", "2px");
+  style.setProperty("margin-inline-start", "var(--one)");
+  style.setProperty("margin-inline-end", "var(--two)");
+
+  check("margin-inline-start", "var(--one)", "1px");
+  check("margin-inline-end", "var(--two)", "2px");
+  check("margin-inline", "", "1px 2px");
+}
+{
+  title = "Logical shorthand with 1 variable";
+  style.cssText = "";
+  style.setProperty("--one", "1px");
+  style.setProperty("margin-inline", "var(--one)");
+
+  check("margin-inline-start", "", "1px");
+  check("margin-inline-end", "", "1px");
+  check("margin-inline", "var(--one)", "1px");
+}
+{
+  title = "Logical shorthand with 2 variables";
+  style.cssText = "";
+  style.setProperty("--one", "1px");
+  style.setProperty("--two", "2px");
+  style.setProperty("margin-inline", "var(--one) var(--two)");
+
+  check("margin-inline-start", "", "1px");
+  check("margin-inline-end", "", "2px");
+  check("margin-inline", "var(--one) var(--two)", "1px 2px");
+}
+{
+  title = "Logical shorthand with 1 variable and 1 length";
+  style.cssText = "";
+  style.setProperty("--one", "1px");
+  style.setProperty("margin-inline", "var(--one) 2px");
+
+  check("margin-inline-start", "", "1px");
+  check("margin-inline-end", "", "2px");
+  check("margin-inline", "var(--one) 2px", "1px 2px");
+}
+</script>
+</body></html>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="array-foot" covers-40="array-foot"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Tests for the array:foot function introduced in XPath 4.0</description>
+    <link type="spec" document="http://www.w3.org/TR/xpath-functions-40/" idref="func-array-foot"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+
+
+
+    <test-case name="array-foot-601">
+        <description>Return foot of array with integer members</description>
+        <created by="Michael Kay" on="2022-11-16"/>
+        <environment ref="array"/>
+        <test>array:foot([5,6,7,8])</test>
+        <result>
+            <all-of>
+                <assert-type>item()*</assert-type>
+                <assert-eq>8</assert-eq>
+            </all-of>
+        </result>
+    </test-case>
+    <test-case name="array-foot-602">
+        <description>Return foot of array with array members</description>
+        <created by="Michael Kay" on="2022-11-16"/>
+        <environment ref="array"/>
+        <test>array:foot([["a", "b"], ["c", "d"]])</test>
+        <result>
+            <all-of>
+                <assert-type>array(*)</assert-type>
+                <assert-deep-eq>["c", "d"]</assert-deep-eq>
+            </all-of>
+        </result>
+    </test-case>
+    <test-case name="array-foot-603">
+        <description>Return foot of array with sequence members</description>
+        <created by="Michael Kay" on="2022-11-16"/>
+        <environment ref="array"/>
+        <test>array:foot([("a", "b"), ("c", "d")])</test>
+        <result>
+            <all-of>
+                <assert-type>item()*</assert-type>
+                <assert-deep-eq>"c", "d"</assert-deep-eq>
+            </all-of>
+        </result>
+    </test-case>
+    <test-case name="array-foot-604">
+        <description>Return foot of array - error</description>
+        <created by="Michael Kay" on="2022-11-16"/>
+        <environment ref="array"/>
+        <test>array:foot([])</test>
+        <result>
+            <error code="FOAY0001"/>
+        </result>
+    </test-case>
+
+    <test-case name="array-foot-605">
+        <description>Return foot of array - empty sequence</description>
+        <created by="Michael Kay" on="2022-11-16"/>
+        <environment ref="array"/>
+        <test>array:foot([1, ()])</test>
+        <result>
+            <assert-empty/>
+        </result>
+    </test-case>
+
+    <test-case name="array-foot-606">
+        <description>Return foot of array - nested arrays</description>
+        <created by="Michael Kay" on="2022-11-16"/>
+        <environment ref="array"/>
+        <test>array:foot([[1,[2],3], [4,5,6]])</test>
+        <result>
+            <all-of>
+                <assert-type>array(*)</assert-type>
+                <assert>array:size($result) eq 3</assert>
+                <assert>$result?2 eq 5</assert>
+            </all-of>
+        </result>
+    </test-case>
+
+    <test-case name="array-foot-607">
+        <description>Return foot of array - foot is sequence, only member</description>
+        <created by="Michael Kay" on="2022-11-16"/>
+        <dependency type="spec" value="XQ40+"/>
+        <environment ref="array"/>
+        <test><![CDATA[
+           array:foot([(1, [<e><f>g</f></e>, "b"], 2)])
+        ]]></test>
+        <result>
+            <all-of>
+                <assert>count($result) eq 3</assert>
+                <assert>$result[2]?2 eq "b"</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="array-foot-608">
+        <description>array:foot() applied to a curly array constructor</description>
+        <created by="Michael Kay" on="2022-11-16"/>
+        <environment ref="array"/>
+        <test>array:foot(array { (), (27, 17, 0) })</test>
+        <result>
+            <assert-eq>0</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="array-foot-609">
+        <description>array:foot() applied to a dynamically empty array</description>
+        <created by="Michael Kay" on="2022-11-16"/>
+        <environment ref="array"/>
+        <test>array:foot(array { (1 to 100) [. eq year-from-date(current-date())] })</test>
+        <result>
+            <error code="FOAY0001"/>
+        </result>
+    </test-case>
+    
+</test-set>

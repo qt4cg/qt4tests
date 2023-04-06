@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>`strict-dynamic` policy should discard `unsafe-inline` policy.</title>
+    <script src="/resources/testharness.js"/>
+    <script src="/resources/testharnessreport.js"/>
+    <script>
+      var t = async_test("Should fire a security policy violation for the inline block");
+      window.addEventListener('securitypolicyviolation', t.step_func_done(function(e) {
+        assert_equals(e.blockedURI, 'inline');
+      }));
+    </script>
+    <meta content="default-src 'unsafe-inline' 'strict-dynamic'" http-equiv="Content-Security-Policy"/>
+</head>
+
+<body>
+  <script>
+      assert_unreached('Inline script shouldn\'t be run because of the `strict-dynamic` source expression.');
+  </script>
+</body>
+
+</html>

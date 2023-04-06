@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>CSS Grid: track sizing algo with size restrictions and intrinsic sizes.</title>
+<link href="mailto:svillar@igalia.com" rel="author" title="Sergio Villar"/>
+<link href="https://drafts.csswg.org/css-grid-1/#layout-algorithm" rel="help"/>
+<meta content="This test ensures that fr tracks are properly sized whenever grid has intrinsic sizes." name="assert"/>
+<link href="https://crbug.com/423743" rel="issue"/>
+<link href="/css/support/width-keyword-classes.css" rel="stylesheet"/>
+<link href="/css/support/height-keyword-classes.css" rel="stylesheet"/>
+<link href="/css/support/grid.css" rel="stylesheet"/>
+<link href="/fonts/ahem.css" rel="stylesheet" type="text/css"/>
+
+<style>
+.container {
+    width: 100px;
+    height: 100px;
+}
+
+.grid {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+div { font: 10px/1 Ahem; }
+</style>
+
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="/resources/check-layout-th.js"/>
+<script type="text/javascript">
+  setup({ explicit_done: true });
+</script>
+
+</head><body onload="document.fonts.ready.then(() =&gt; { checkLayout('.grid'); })">
+
+<div class="container">
+  <div class="grid" data-expected-height="10" data-expected-width="100">
+    <div>XXX XXX</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="grid min-content" data-expected-height="20" data-expected-width="30">
+    <div>XXX XXX</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="grid min-content" data-expected-height="20" data-expected-width="0" style="grid-template-columns:minmax(0, 1fr);">
+    <div>XXX XXX</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="grid max-content" data-expected-height="10" data-expected-width="70">
+    <div>XXX XXX</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="grid fit-content" data-expected-height="10" data-expected-width="70">
+    <div>XXX XXX</div>
+  </div>
+</div>
+
+<div class="min-content">
+    <div class="grid" data-expected-height="50" data-expected-width="40">
+        <div>XXX XXXX XX X XX XXX</div>
+    </div>
+</div>
+
+<div class="grid container" data-expected-height="100" data-expected-width="100">
+    <div data-expected-height="100" data-expected-width="100" style="display: grid; grid-template-columns: 3fr; grid-template-rows: 2fr;">
+        <div>XXX XXXX XX X XX XXX</div>
+    </div>
+</div>
+
+<div class="grid" data-expected-height="300" data-expected-width="300" style="grid; grid: 1fr 2fr / 2fr 1fr; width: 300px; height: 300px;">
+    <div class="firstRowFirstColumn" data-expected-height="100" data-expected-width="200" style="display: grid; grid: 1fr 3fr / 3fr 1fr;">
+        <div data-expected-height="25" data-expected-width="150" style="border: 2px solid magenta;">XXXX</div>
+        <div class="secondRowSecondColumn" data-expected-height="75" data-expected-width="50" style="border: 2px solid cyan;">XXXX XX XX</div>
+    </div>
+    <div class="secondRowSecondColumn" data-expected-height="200" data-expected-width="100" style="display: grid; grid: 3fr 4fr / 4fr 3fr;">
+        <div data-expected-height="86" data-expected-width="56" style="border: 2px solid lime;">XXX XX X</div>
+        <div class="secondRowSecondColumn" data-expected-height="114" data-expected-width="44" style="border: 2px solid navy;">XXXX XXX XXXX XXX XXXX</div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<title>CSSStyleSheet.replace/replaceSync() doesn't change cssRules object</title>
+<link href="mailto:emilio@crisal.io" rel="author" title="Emilio Cobos Álvarez"/>
+<link href="https://mozilla.org" rel="author" title="Mozilla"/>
+<link href="https://drafts.csswg.org/cssom/#extensions-to-the-document-or-shadow-root-interface" rel="help"/>
+<link href="https://bugzilla.mozilla.org/show_bug.cgi?id=1752392" rel="help"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+</head><body><span>Should be green</span>
+<script>
+promise_test(async function() {
+  const sheet = new CSSStyleSheet();
+  let rules = sheet.cssRules;
+  sheet.replaceSync('span {color:blue;}');
+  assert_equals(rules, sheet.cssRules, "Rules should be the same after replaceSync");
+  await sheet.replace('span {color: lime;}');
+  assert_equals(rules, sheet.cssRules, "Rules should be the same after replace()");
+  document.adoptedStyleSheets = [sheet];
+  assert_equals(getComputedStyle(document.querySelector("span")).color, "rgb(0, 255, 0)", "Sheet should apply");
+}, "cssRules doesn't change on replace / replaceSync");
+</script>
+</body></html>

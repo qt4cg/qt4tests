@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/>
+<meta content="long" name="timeout"/>
+<title>IndexedDB: Parallel iteration of cursors in upgradeneeded</title>
+<link href="pwnall@chromium.org" rel="author" title="Victor Costan"/>
+<script src="/resources/testharness.js"/>
+<script src="/resources/testharnessreport.js"/>
+<script src="resources/support-promises.js"/>
+<script>
+'use strict';
+
+for (let cursorCount of [2, 20, 200, 2000]) {
+  promise_test(testCase =&gt; {
+    return createDatabase(testCase, (database, transaction) =&gt; {
+      const store = database.createObjectStore('cache', { keyPath: 'key' });
+      store.put({ key: '42' });
+
+      const promises = [];
+
+      for (let j = 0; j &lt; 2; j += 1) {
+        const promise = new Promise((resolve, reject) =&gt; {
+          let request = null;
+          for (let i = 0; i &lt; cursorCount / 2; i += 1) {
+            request = store.openCursor();
+          }
+
+          let continued = false;
+          request.onsuccess = testCase.step_func(() =&gt; {
+            const cursor = request.result;
+
+            if (!continued) {
+              assert_equals(cursor.key, '42');
+              assert_equals(cursor.value.key, '42');
+              continued = true;
+              cursor.continue();
+            } else {
+              assert_equals(cursor, null);
+              resolve();
+            }
+          });
+          request.onerror = () =&gt; reject(request.error);
+        });
+        promises.push(promise);
+      }
+      return Promise.all(promises);
+    }).then(database =&gt; {
+      database.close();
+    });
+  }, `${cursorCount} cursors`);
+}
+
+</script>
+</head><body/></html>

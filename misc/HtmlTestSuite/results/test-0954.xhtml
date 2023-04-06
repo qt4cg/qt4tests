@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Inline async module script execution order</title>
+    <meta content="long" name="timeout"/>
+    <script src="/resources/testharness.js"/>
+    <script src="/resources/testharnessreport.js"/>
+  </head>
+  <body>
+    <script>
+      let loaded = [];
+      let test = async_test("Inline async module script execution order");
+      window.addEventListener("load", test.step_func(function() {
+        assert_array_equals(loaded,
+                            ["fast", "fast", "fast", "slow", "slow", "slow"]);
+      test.done();
+      }));
+    </script>
+    <script async="" src="resources/slow-module.js?pipe=trickle(d2)&amp;unique=1" type="module"/>
+    <script async="" type="module">
+      import "./resources/slow-module.js?pipe=trickle(d2)&amp;unique=2";
+      loaded.push("slow");
+    </script>
+    <script async="" src="resources/fast-module.js?unique=1" type="module"/>
+    <script async="" type="module">
+      import "./resources/fast-module.js?unique=2";
+      loaded.push("fast");
+    </script>
+  </body>
+</html>
