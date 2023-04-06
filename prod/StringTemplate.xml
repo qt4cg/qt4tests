@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-StringTemplate" covers="string-template">
+   <description>Tests for the "string template" expression: `String with {$inserted} expression]`</description>
+   <link type="spec" document="http://www.w3.org/TR/xquery-40/"
+         idref="prod-StringTemplate"/>
+ 
+   <dependency type="spec" value="XP40+ XQ40+"/>      
+
+   <test-case name="string-template-001">
+      <description>simple case of string template </description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were {$n} green bottles`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There were 10 green bottles"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-002">
+      <description>Trivial string template </description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were 10 green bottles`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There were 10 green bottles"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-003">
+      <description>More complex string template </description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <dependency type="spec" value="XQ40+"/> 
+      <test><![CDATA[
+        declare variable $n as xs:integer external := 10; 
+        declare variable $thing as xs:string external := `wall`;
+        `There were {$n} green bottles hanging on the {$thing}`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There were 10 green bottles hanging on the wall"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-004">
+      <description>Entity references not recognized</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were &lt; {$n} green bottles`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-string-value>There were &amp;lt; 10 green bottles</assert-string-value>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-005">
+      <description>Special characters OK, braces and backticks doubled</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `"{{}}"'[``]'\\<> {$n}`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-string-value><![CDATA["{}"'[`]'\\<> 10]]></assert-string-value>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-006">
+      <description>No fixed part</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `{$n}{$n+1}{$n+2}`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-string-value>101112</assert-string-value>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-007">
+      <description>Whitespace is retained</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        ` {$n} {$n+1} {$n+2} `
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-string-value> 10 11 12 </assert-string-value>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-008">
+      <description>Enclosed expressions are atomized</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := parse-xml('<e>10</e>') return 
+        `There were {$n} green bottles`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There were 10 green bottles"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-009">
+      <description>Nested string template</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := parse-xml('<e>10</e>') return 
+        `There were {`at least {$n}`} green bottles`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There were at least 10 green bottles"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-010">
+      <description>String template in element constructor</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare variable $n external := <e>10</e>; 
+        <a>{`There were {$n} green bottles`}</a>
+      ]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>There were 10 green bottles</a>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-011">
+      <description>String template in attribute constructor</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare variable $n external := <e>10</e>; 
+        <a text="{`There were {$n} green bottles`}"/>
+      ]]></test>
+      <result>
+         <assert-xml><![CDATA[<a text="There were 10 green bottles"/>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-012">
+      <description>String template within a conditional</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        if ($n lt 20) then `There were {$n} green bottles` else `There were many green bottles`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There were 10 green bottles"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-013">
+      <description>String template within a filter expression</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were {$n} green bottles`[$n lt 20]
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There were 10 green bottles"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-014">
+      <description>Newlines within a string template</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There
+were {$n} green
+bottles`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There&#xa;were 10 green&#xa;bottles"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-015">
+      <description>Square array constructor containing string template </description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <modified by="Michael Kay" on="2015-11-26" change="remove HOF dependency"/>
+      <test><![CDATA[
+        let $n := 10 return
+        [`There were {$n} green bottles`]?1
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There were 10 green bottles"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-016">
+      <description>String template containing square array constructor</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were {[$n]} green bottles`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There were 10 green bottles"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-017">
+      <description>String template containing curly array constructor</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were {array{$n}} green bottles`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There were 10 green bottles"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-018">
+      <description>Embedded expression can contain comma operator</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were {$n, ()} green bottles`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There were 10 green bottles"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-019">
+      <description>String can contain doubled backtick</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were ``{$n}`` green bottles`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There were `10` green bottles"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-020">
+      <description>Escaping</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were {"{"}{$n}{"}"} green bottles{"`"}`
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"There were {10} green bottles`"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-021">
+      <description>Use in regex</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        matches("""", `["']`)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-022">
+      <description>Empty string template</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test>``</test>
+      <result>
+         <assert-eq>""</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-023">
+      <description>Escaped backtick</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test>``` {fn:round(Q{http://www.w3.org/2005/xpath-functions/math}pi(), 4)}`</test>
+      <result>
+         <assert-eq>"` 3.1416"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-024">
+      <description>Absent enclosed expression</description>
+      <created by="Michael Kay" on="2015-10-21"/>
+      <test>` *{}* `</test>
+      <result>
+         <assert-eq>" ** "</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-025">
+      <description>Enclosed expression containing comment only</description>
+      <created by="Michael Kay" on="2015-10-21"/>
+      <test>` *{(:Nothing here:)}* `</test>
+      <result>
+         <assert-eq>" ** "</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-026">
+      <description>Date-valued enclosed expression</description>
+      <created by="Michael Kay" on="2015-10-21"/>
+      <test>` *{xs:date('2012-05-05')}* `</test>
+      <result>
+         <assert-eq>" *2012-05-05* "</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-027">
+      <description>Confusing enclosed expression in element constructor</description>
+      <created by="Michael Kay" on="2019-05-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<a>Today is `{xs:date('2012-05-05')}`</a>]]></test>
+      <result>
+           <assert-eq>"Today is `2012-05-05`"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-028">
+      <description>Nested string templates within nested element constructors</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare variable $n external := <e>10</e>; 
+        <a>{`There were {<b>{`at least {$n}`}</b>} green bottles`}</a>
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>element(a)</assert-type>
+            <assert-eq>"There were at least 10 green bottles"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-029">
+      <description>Empty string template</description>
+      <created by="Michael Kay" on="2023-01-31"/>
+      <test>``</test>
+      <result>
+         <assert-eq>""</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-030">
+      <description>String template with variable part only</description>
+      <created by="Michael Kay" on="2023-01-31"/>
+      <test>`{003}`</test>
+      <result>
+         <assert-eq>"3"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-031">
+      <description>String template with two variable parts only</description>
+      <created by="Michael Kay" on="2023-01-31"/>
+      <test>`{003}{004}`</test>
+      <result>
+         <assert-eq>"34"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-032">
+      <description>String template with empty variable part only</description>
+      <created by="Michael Kay" on="2023-01-31"/>
+      <test>`{}`</test>
+      <result>
+         <assert-eq>""</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-033">
+      <description>Whitespace-only fixed part</description>
+      <created by="Michael Kay" on="2023-01-31"/>
+      <test>`  {03}  `</test>
+      <result>
+         <assert-eq>"  3  "</assert-eq>
+      </result>
+   </test-case>
+   
+   
+   
+   
+   
+   <test-case name="string-template-901">
+      <description>Unterminated string template </description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were {$n} green bottles]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-902">
+      <description>Unterminated string template </description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were {$n} green bottles]]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-903">
+      <description>Unterminated string template </description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were {$n} green bottles]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-904">
+      <description>Unterminated string template </description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were {$n} green ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-905">
+      <description>Unterminated string template </description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were {$n]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-906">
+      <description>Improperly started string template </description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        ``There were {$n} green bottles`
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-907">
+      <description>Improperly started string template </description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `{There were {$n} green bottles}`
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-908">
+      <description>Unpaired "}"</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `unordered{{$n}`
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-909">
+      <description>Unexpected "}"</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        let $n := 10 return
+        }nasty!`
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-910">
+      <description>Maps can't be atomized</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        declare variable $n external := map{'a':10}; 
+        `There were {$n} green bottles`
+      ]]></test>
+      <result>
+         <error code="FOTY0013"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-911">
+      <description>Maps can't be atomized</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        declare variable $n external := map{'a':10}; 
+        `There were {map{'a':10}} green bottles`
+      ]]></test>
+      <result>
+         <error code="FOTY0013"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-912">
+      <description>String template containing sequence</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <modified by="Michael Kay" on="2015-10-22" change="spec change, bug 29186"/>
+      <test><![CDATA[
+        let $n := 10 return
+        `There were {1 to $n} green bottles`
+      ]]></test>
+      <result>
+         <assert-eq>"There were 1 2 3 4 5 6 7 8 9 10 green bottles"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-913">
+      <description>Not allowed as literal attribute</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        <a b=`c`/>
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-914">
+      <description>Not allowed in namespace declaration</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        declare namespace xsl=`http://www.w3.org/1999/XSL/Transform`;
+        <xsl:output/>
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-915">
+      <description>Not allowed in option declaration</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test><![CDATA[
+        declare namespace zzz="http://example.com/options";
+        declare option zzz:synonymous = `http://www.w3.org/1999/XSL/Transform`;
+        <zzz:output/>
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-916">
+      <description>Not allowed in processing-instruction name</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test>processing-instruction(`pi-action`)</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-917">
+      <description>Not allowed in decimal format declaration</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test>declare default decimal-format NaN = `not-a-number`; 12</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-918">
+      <description>Not allowed in collation literal</description>
+      <created by="Michael Kay" on="2023-01-29"/>
+      <test>for $x in (1 to 10)/string() order by $x collation `http://www.w3.org/2005/xpath-functions/collation/codepoint` return xs:integer($x)</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="string-template-919">
+      <description>Disallowed tokenization - special rule to avoid ambiguity</description>
+      <created by="Michael Kay" on="2023-01-31"/>
+      <test>``[1]</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   
+
+
+</test-set>
