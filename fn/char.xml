@@ -1,0 +1,386 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-char">
+  <description>Tests for the fn:char function</description>
+
+  <dependency type="spec" value="XP40+ XQ40+"/>
+
+  <test-case name="char-001">
+    <description>Test all HTML entities</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      let $entities := json-doc('char/entities.json')
+      (: entities.json copied from https://html.spec.whatwg.org/entities.json on 2023-03-18 :)
+      return 
+          for $k1 in map:keys($entities), 
+              $k2 in $k1 => substring(2) => translate(';', ''),
+              $str in $entities($k1)?characters
+          return if (char($k2) ne $str) {trace($k2, 'missing:')}         
+    </test>
+    <result>
+      <assert-string-value/> <!-- expect empty string -->
+    </result>
+  </test-case>
+  
+  <test-case name="char-002">
+    <description>Test NewLine HTML entity</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      string-to-codepoints(char('NewLine')) eq 10
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-003">
+    <description>Test nbsp HTML entity</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      string-to-codepoints(char('nbsp')) eq 160
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-004">
+    <description>Test multi-character HTML entity</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      deep-equal(string-to-codepoints(trace(char('NotEqualTilde'), 'actual:')), (8770, 824))
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-005">
+    <description>Test unknown HTML entity</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('Unknown')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-006">
+    <description>Test HTML entity in wrong case</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('NBSP')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-007">
+    <description>Test HTML entity with disallowed ampersand</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char(`&amp;nbsp`)
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-008">
+    <description>Test HTML entity with disallowed semicolon</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('Auml;')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-009">
+    <description>Test empty string</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-010">
+    <description>Test empty sequence</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char(())
+    </test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-011">
+    <description>Test multiple characters</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char(('lt', 'gt'))
+    </test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-012">
+    <description>Test multiple characters</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('lt gt')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-013">
+    <description>Test disallowed whitespace</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char(' npsb ')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-100">
+    <description>Test decimal numeric character</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#60')
+    </test>
+    <result>
+      <assert-eq>'&lt;'</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="char-101">
+    <description>Test decimal numeric character with leading zeroes</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#0060')
+    </test>
+    <result>
+      <assert-eq>'&lt;'</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="char-102">
+    <description>Test hexadecimal numeric character</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#x25EF') = char('xcirc')
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-103">
+    <description>Test hexadecimal numeric character with leading zeros</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#x00025EF') = char('xcirc')
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-104">
+    <description>Test hexadecimal numeric character with mixed case</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#x00025eF') = char('xcirc')
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-110">
+    <description>Test decimal numeric character with invalid semicolon</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#60;')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-111">
+    <description>Test hexadecimal numeric character with invalid semicolon</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#x25EF;')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-112">
+    <description>Test hexadecimal numeric character with invalid whitespace</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#x25EF ')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-113">
+    <description>Test multiple hexadecimal characters</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#x25EF #60')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-114">
+    <description>Test missing digits after #</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-115">
+    <description>Test missing digits after #x</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#x')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-116">
+    <description>Test non-digits after #</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#fff')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-117">
+    <description>Test non-digits after #x</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#xabcdefgh')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-118">
+    <description>Test non-digits after #</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('##')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-119">
+    <description>#x must be lower-case</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#Xa0')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-120">
+    <description>Unpaired surrogate</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('#xDEAD')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-200">
+    <description>Test escaped newline</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('\n') eq char('#10')
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-201">
+    <description>Test escaped tab</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('\t') eq char('#9')
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-202">
+    <description>Test escaped CR</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('\r') eq char('#13')
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-203">
+    <description>Test invalid escaped char</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('\\')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+  
+  <test-case name="char-204">
+    <description>Test lone backslash</description>
+    <created by="Michael Kay" on="2023-03-18"/>
+    <test>
+      char('\')
+    </test>
+    <result>
+      <error code="FOCH0005"/>
+    </result>
+  </test-case>
+
+</test-set>

@@ -1,0 +1,612 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="fn-build-uri" covers="fn-build-uri">
+  <description>fn:build-uri() tests</description>
+
+  <link type="spec" document="https://qt4cg.org/specifications/xpath-functions-40/"
+        idref="func-build-uri"/>
+
+  <dependency type="spec" value="XQ40+ XP40+"/>
+
+  <test-case name="fn-build-uri-from-parse-001">
+    <description>Builds a simple URI</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+        "authority": "example.com",
+        "host": "example.com",
+        "path": "/path/to/file",
+        "path-segments": [ "", "path", "to", "file" ],
+        "scheme": "https",
+        "uri": "https://example.com\path\to\file"
+      })</test>
+    <result><assert-eq>"https://example.com/path/to/file"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-002">
+    <description>Builds a URI with a complicated authority</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {'uri': 'https://user:password@example.com:443/path',
+                           'scheme': 'https',
+                           'authority': 'user:password@example.com:443',
+                           'host': 'example.com',
+                           'port': '443',
+                           'path-segments': ['', 'path'],
+                           'path': '/path'})</test>
+    <result><assert-eq>"https://example.com:443/path"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-003">
+    <description>Builds a URI with a escaped path components</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {'scheme': 'http',
+                           'authority': 'foo',
+                           'host': 'foo',
+                           'uri': 'http://foo'
+                           })</test>
+    <result><assert-eq>"http://foo"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-004">
+    <description>Builds a URI with a escaped path components</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {'scheme': 'https',
+                           'uri': 'https://user:password@example.com:443/path/a%2fb/a+b',
+                           'authority': 'user:password@example.com:443',
+                           'port': '443',
+                           'host': 'example.com',
+                           'path-segments': ['','path','a/b','a b'],
+                           'path': '/path/a%2fb/a+b'})</test>
+    <result>
+      <any-of>
+        <assert-eq>"https://example.com:443/path/a%2fb/a+b"</assert-eq>
+        <assert-eq>"https://example.com:443/path/a%2Fb/a+b"</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-005">
+    <description>Builds a URI with a fragment identifier</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+        "authority": "qt4cg.org",
+        "fragment": "parse-uri",
+        "host": "qt4cg.org",
+        "path": "/specifications/xpath-functions-40/Overview.html",
+        "path-segments": [ "", "specifications", "xpath-functions-40", "Overview.html" ],
+        "scheme": "https",
+        "uri": "https://qt4cg.org/specifications/xpath-functions-40/Overview.html#parse-uri"
+      })</test>
+    <result><assert-eq>"https://qt4cg.org/specifications/xpath-functions-40/Overview.html#parse-uri"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-006">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "http://www.ietf.org/rfc/rfc2396.txt",
+  "scheme": "http",
+  "authority": "www.ietf.org",
+  "host": "www.ietf.org",
+  "path": "/rfc/rfc2396.txt",
+  "path-segments": array { "", "rfc", "rfc2396.txt" }
+})</test>
+    <result><assert-eq>"http://www.ietf.org/rfc/rfc2396.txt"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-007">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "https://example.com/path/to/file",
+  "scheme": "https",
+  "authority": "example.com",
+  "host": "example.com",
+  "path": "/path/to/file",
+  "path-segments": array { "", "path", "to", "file" }
+})</test>
+    <result><assert-eq>"https://example.com/path/to/file"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-008">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Michael Kay" on="2023-03-16" change="run both on XPath and XQuery"/>
+    <test>
+      let $amp := codepoints-to-string(38) return
+      fn:build-uri(map {
+  "uri": "https://example.com:8080/path?s=%22hello world%22" || $amp || "sort=relevance",
+  "scheme": "https",
+  "authority": "example.com:8080",
+  "host": "example.com",
+  "port": "8080",
+  "path": "/path",
+  "query": "s=%22hello world%22" || $amp || ";sort=relevance",
+  "query-segments": array {
+    map { "key": "s", "value": """hello world""" },
+    map { "key": "sort", "value": "relevance" }
+  },
+  "path-segments": array { "", "path" }
+})</test>
+    <result>
+      <any-of>
+        <assert-eq>'https://example.com:8080/path?s="hello+world"&amp;sort=relevance'</assert-eq>
+        <assert-eq>'https://example.com:8080/path?s="hello%20world"&amp;sort=relevance'</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-009">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "https://user@example.com/path/to/file",
+  "scheme": "https",
+  "authority": "user@example.com",
+  "userinfo": "user",
+  "host": "example.com",
+  "path": "/path/to/file",
+  "path-segments": array { "", "path", "to", "file" }
+})</test>
+    <result><assert-eq>"https://user@example.com/path/to/file"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-010">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "ftp://ftp.is.co.za/rfc/rfc1808.txt",
+  "scheme": "ftp",
+  "authority": "ftp.is.co.za",
+  "host": "ftp.is.co.za",
+  "path": "/rfc/rfc1808.txt",
+  "path-segments": array { "", "rfc", "rfc1808.txt" }
+})</test>
+    <result><assert-eq>"ftp://ftp.is.co.za/rfc/rfc1808.txt"</assert-eq></result>
+  </test-case>
+
+<!-- T.B.D.
+  <test-case name="fn-build-uri-from-parse-011">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "file:////uncname/path/to/file",
+  "scheme": "file",
+  "authority": "uncname",
+  "host": "uncname",
+  "path": "/path/to/file",
+  "path-segments": array { "", "path", "to", "file" }
+})</test>
+    <result><assert-eq>"file:////uncname/path/to/file"</assert-eq></result>
+  </test-case>
+-->
+
+  <test-case name="fn-build-uri-from-parse-012">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "file:///c:/path/to/file",
+  "scheme": "file",
+  "path": "/c:/path/to/file",
+  "path-segments": array { "", "c:", "path", "to", "file" }
+})</test>
+    <result>
+      <any-of>
+        <assert-eq>"file:///c:/path/to/file"</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-013">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "file:/C:/Program%20Files/test.jar",
+  "scheme": "file",
+  "path": "/C:/Program%20Files/test.jar",
+  "path-segments": array { "", "C:", "Program Files", "test.jar" }
+})</test>
+    <result>
+      <any-of>
+        <assert-eq>"file:///C:/Program%20Files/test.jar"</assert-eq>
+        <assert-eq>"file:///C:/Program+Files/test.jar"</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-014">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "file:\\c:\path\to\file",
+  "scheme": "file",
+  "path": "/c:/path/to/file",
+  "path-segments": array { "", "c:", "path", "to", "file" }
+})</test>
+    <result>
+      <any-of>
+        <assert-eq>"file:///c:/path/to/file"</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-015">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "file:\c:\path\to\file",
+  "scheme": "file",
+  "path": "/c:/path/to/file",
+  "path-segments": array { "", "c:", "path", "to", "file" }
+})</test>
+    <result>
+      <any-of>
+        <assert-eq>"file:///c:/path/to/file"</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-016">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "c:\path\to\file",
+  "scheme": "file",
+  "path": "/c:/path/to/file",
+  "path-segments": array { "", "c:", "path", "to", "file" }
+})</test>
+    <result>
+      <any-of>
+        <assert-eq>"file:///c:/path/to/file"</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-017">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "/path/to/file",
+  "path": "/path/to/file",
+  "path-segments": array { "", "path", "to", "file" }
+})</test>
+    <result><assert-eq>"/path/to/file"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-018">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "#testing",
+  "fragment": "testing"
+})</test>
+    <result><assert-eq>"#testing"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-019">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "?q=1",
+  "query": "q=1",
+  "query-segments": array {
+    map { "key": "q", "value": "1" }
+  }
+})</test>
+    <result><assert-eq>"?q=1"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-020">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "ldap://[2001:db8::7]/c=GB?objectClass?one",
+  "scheme": "ldap",
+  "authority": "[2001:db8::7]",
+  "host": "[2001:db8::7]",
+  "path": "/c=GB",
+  "query": "objectClass?one",
+  "query-segments": array {
+    map { "value": "objectClass?one" }
+  },
+  "path-segments": array { "", "c=GB" }
+})</test>
+    <result>
+      <any-of>
+        <assert-eq>"ldap://[2001:db8::7]/c=GB?objectClass%3fone"</assert-eq>
+        <assert-eq>"ldap://[2001:db8::7]/c=GB?objectClass%3Fone"</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-021">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "mailto:John.Doe@example.com",
+  "scheme": "mailto",
+  "path": "John.Doe@example.com",
+  "path-segments": array { "John.Doe@example.com" }
+})</test>
+    <result>
+      <assert-eq>"mailto:John.Doe@example.com"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-022">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "news:comp.infosystems.www.servers.unix",
+  "scheme": "news",
+  "path": "comp.infosystems.www.servers.unix",
+  "path-segments": array { "comp.infosystems.www.servers.unix" }
+})</test>
+    <result><assert-eq>"news:comp.infosystems.www.servers.unix"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-023">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "tel:+1-816-555-1212",
+  "scheme": "tel",
+  "path": "+1-816-555-1212",
+  "path-segments": array { "+1-816-555-1212" }
+})</test>
+    <result><assert-eq>"tel:+1-816-555-1212"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-024">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "telnet://192.0.2.16:80/",
+  "scheme": "telnet",
+  "authority": "192.0.2.16:80",
+  "host": "192.0.2.16",
+  "port": "80",
+  "path": "/",
+  "path-segments": array { "", "" }
+})</test>
+    <result><assert-eq>"telnet://192.0.2.16:80/"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-025">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "urn:oasis:names:specification:docbook:dtd:xml:4.1.2",
+  "scheme": "urn",
+  "path": "oasis:names:specification:docbook:dtd:xml:4.1.2",
+  "path-segments": array { "oasis:names:specification:docbook:dtd:xml:4.1.2" }
+})</test>
+    <result><assert-eq>"urn:oasis:names:specification:docbook:dtd:xml:4.1.2"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-026">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+    "uri": "tag:textalign.net,2015:ns",
+    "scheme": "tag",
+    "path": "textalign.net,2015:ns",
+    "path-segments": [ "textalign.net,2015:ns" ]
+  })</test>
+    <result>
+      <assert-eq>"tag:textalign.net,2015:ns"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-027">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+    "uri": "tag:jan@example.com,1999-01-31:my-uri",
+    "scheme": "tag",
+    "path": "jan@example.com,1999-01-31:my-uri",
+    "path-segments": [ "jan@example.com,1999-01-31:my-uri" ]
+})</test>
+    <result><assert-eq>"tag:jan@example.com,1999-01-31:my-uri"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-028">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "jar:file:/C:/Program%20Files/test.jar!/foo/bar",
+  "scheme": "jar",
+  "path": "file:/C:/Program%20Files/test.jar!/foo/bar",
+  "path-segments": array { "file:", "C:", "Program Files", "test.jar!", "foo", "bar" }
+})</test>
+    <result>
+      <any-of>
+        <assert-eq>"jar:file:/C:/Program%20Files/test.jar!/foo/bar"</assert-eq>
+        <assert-eq>"jar:file:/C:/Program+Files/test.jar!/foo/bar"</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-029">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+    "uri": "http://www.example.org/Dürst",
+    "scheme": "http",
+    "authority": "www.example.org",
+    "host": "www.example.org",
+    "path": "/Dürst",
+    "path-segments": [ "","Dürst" ]
+})</test>
+    <result><assert-eq>"http://www.example.org/Dürst"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-030">
+    <description>Builds an example from the specification</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {
+  "uri": "https://example.com:8080/path?s=%22hello world%22;sort=relevance",
+  "scheme": "https",
+  "authority": "example.com:8080",
+  "host": "example.com",
+  "port": "8080",
+  "path": "/path",
+  "query": "s=%22hello world%22;sort=relevance",
+  "query-segments": array {
+    map { "key": "s", "value": """hello world""" },
+    map { "key": "sort", "value": "relevance" }
+  },
+  "path-segments": array { "", "path" }
+}, map { 'query-separator': ';' })</test>
+    <result>
+      <any-of>
+        <assert-eq>"https://example.com:8080/path?s=%22hello+world%22;sort=relevance"</assert-eq>
+        <assert-eq>'https://example.com:8080/path?s="hello+world";sort=relevance'</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-031">
+    <description>Builds a URI preserving deprecated features</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {'uri': 'https://user:password@example.com:443/path',
+                           'scheme': 'https',
+                           'authority': 'user:password@example.com:443',
+                           'userinfo': 'user:password',
+                           'host': 'example.com',
+                           'port': '443',
+                           'path-segments': ['', 'path'],
+                           'path': '/path'},
+                        map { 'allow-deprecated-features': true() })</test>
+    <result><assert-eq>"https://user:password@example.com:443/path"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-from-parse-032-modified">
+    <description>Builds a URI omitting known ports</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <test>fn:build-uri(map {'uri': 'https://user:password@example.com:443/path',
+                           'scheme': 'https',
+                           'authority': 'user:password@example.com:443',
+                           'host': 'example.com',
+                           'port': '443',
+                           'path-segments': ['', 'path'],
+                           'path': '/path'}, map { 'omit-default-ports': true() })</test>
+    <result><assert-eq>"https://example.com/path"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-001">
+    <description>Constructs a URI from a path</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-08"/>
+    <test>fn:build-uri(map {'scheme': 'https',
+                            'host': 'example.com',
+                            'path': '/path/to/file'}, map { })</test>
+    <result>
+      <assert-eq>'https://example.com/path/to/file'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-002">
+    <description>Constructs a URI from path segments</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-08"/>
+    <test>fn:build-uri(map {'scheme': 'https',
+                            'host': 'example.com',
+                            'path-segments': ['', 'path','to','file'],
+                            'path': '/wont/be/used'}, map { })</test>
+    <result>
+      <assert-eq>'https://example.com/path/to/file'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-003">
+    <description>Constructs a URI with query segments</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-08"/>
+    <test>fn:build-uri(map {'scheme': 'https',
+                            'host': 'example.com',
+                            'path-segments': ['', 'path','to','file'],
+                            'query-segments': [
+                              map { 'key': 'key1', 'value': 'value1' },
+                              map { 'key': 'key2' },
+                              map { 'value': 'value3'},
+                              map { 'something': 'else', 'is': 'ignored' }
+                            ]}, map { })</test>
+    <result>
+      <assert-eq>'https://example.com/path/to/file?key1=value1&amp;key2&amp;value3'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-004">
+    <description>Constructs a URI with character encoding</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-08"/>
+    <modified by="Michael Kay" on="2023-03-16" change="run both on XPath and XQuery"/>
+    <test><![CDATA[
+      let $amp := codepoints-to-string(38) return
+      fn:build-uri(map {'scheme': 'https',
+                            'host': 'example.com',
+                            'path-segments': ['', 'path to','a/b','file'],
+                            'query-segments': [
+                              map { 'key': 'ke=y1', 'value': 'val'||$amp||'ue1' },
+                              map { 'key': 'ke?y2', 'value': 'val''ue2' }
+                            ]}, map { }) ]]></test>
+    <result>
+      <any-of>
+        <assert-eq>'https://example.com/path+to/a%2fb/file?ke%3dy1=val%26ue1&amp;ke%3fy2=val%27ue2'</assert-eq>
+        <assert-eq>'https://example.com/path+to/a%2Fb/file?ke%3Dy1=val%26ue1&amp;ke%3Fy2=val%27ue2'</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-005">
+    <description>Constructs a URI with a fragment</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-08"/>
+    <test>fn:build-uri(map {'scheme': 'https',
+                            'host': 'example.com',
+                            'path-segments': ['', 'path to','a/b','file'],
+                            'fragment': 'frag id'
+                           }, map { })</test>
+    <result>
+      <any-of>
+        <assert-eq>'https://example.com/path+to/a%2fb/file#frag+id'</assert-eq>
+        <assert-eq>'https://example.com/path+to/a%2Fb/file#frag+id'</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-006">
+    <description>Constructs a URI with a query and a fragment</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-08"/>
+    <test>fn:build-uri(map {'scheme': 'https',
+                            'host': 'example.com',
+                            'path-segments': ['', 'path','to','file'],
+                            'query-segments': [
+                              map { 'key': 'key1', 'value': 'value1' },
+                              map { 'key': 'key2', 'value': 'value2' }
+                            ],
+                            'fragment': 'fragid'}, map { })</test>
+    <result>
+      <assert-eq>'https://example.com/path/to/file?key1=value1&amp;key2=value2#fragid'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-007">
+    <description>Constructs an hierarchical URI with an unknown scheme</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-12"/>
+    <test>fn:build-uri(map {'scheme': 'querty',
+                            'path-segments': ['', 'abc'],
+                            'path': 'abc'}, map { })</test>
+    <result>
+      <assert-eq>"querty:///abc"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-008">
+    <description>Constructs a non-hierarchical URI with an unknown scheme</description>
+    <created by="Norm Tovey-Walsh" on="2023-03-12"/>
+    <test>fn:build-uri(map {'scheme': 'querty',
+                            'hierarchical': false(),
+                            'path-segments': ['abc'],
+                            'path': 'abc'}, map { })</test>
+    <result>
+      <assert-eq>"querty:abc"</assert-eq>
+    </result>
+  </test-case>
+
+</test-set>
+

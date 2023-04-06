@@ -104,10 +104,80 @@
     <test-case name="array-get-010">
         <description>array index out of range </description>
         <created by="Michael Kay after Christian Gruen" on="2017-11-09"/>
-        <dependency type="spec" value="XQ31+"/>
+        <dependency type="spec" value="XP31+ XQ31+"/>
         <test>array:get([1], 4294967297)</test>
         <result>
             <error code="FOAY0001"/>
+        </result>
+    </test-case>
+    
+    <test-case name="array-get-400" covers-40="array-get">
+        <description>array index out of range with fallback</description>
+        <created by="Michael Kay" on="2023-03-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>array:get([1], 4294967297, ->($i){})</test>
+        <result>
+            <assert-empty/>
+        </result>
+    </test-case>
+    
+    <test-case name="array-get-401" covers-40="array-get">
+        <description>Unused fallback</description>
+        <created by="Michael Kay" on="2023-03-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>array:get([1,2,3], 2, ->($i){})</test>
+        <result>
+            <assert-eq>2</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="array-get-402" covers-40="array-get">
+        <description>Index-dependent fallback</description>
+        <created by="Michael Kay" on="2023-03-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>array:get([1,2,3], -1, ->($i){abs($i)})</test>
+        <result>
+            <assert-eq>1</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="array-get-403" covers-40="array-get">
+        <description>Array as fallback</description>
+        <created by="Michael Kay" on="2023-03-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>array:get([1,2,3], 27, array{1 to 100})</test>
+        <result>
+            <assert-eq>27</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="array-get-404" covers-40="array-get">
+        <description>Partial fallback</description>
+        <created by="Michael Kay" on="2023-03-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>array:get([1,2,3], -3, array{1 to 100})</test>
+        <result>
+            <error code="FOAY0001"/>
+        </result>
+    </test-case>
+    
+    <test-case name="array-get-405" covers-40="array-get">
+        <description>Map as fallback</description>
+        <created by="Michael Kay" on="2023-03-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>array:get([1,2,3], -3, fallback := map{-3:()})</test>
+        <result>
+            <assert-empty/>
+        </result>
+    </test-case>
+    
+    <test-case name="array-get-406" covers-40="array-get">
+        <description>Invalid fallback</description>
+        <created by="Michael Kay" on="2023-03-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>array:get([1,2,3], -3, function($x as node()){22})</test>
+        <result>
+            <error code="XPTY0004"/>
         </result>
     </test-case>
  
