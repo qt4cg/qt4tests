@@ -1422,6 +1422,8 @@ line2</assert-string-value>
    <test-case name="K2-Literals-21">
       <description> XQuery doesn't have a syntax for expressing hexa decimals. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Michael Kay" on="2023-04-08" change="This changes in 4.0"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31 XP20 XP30 XP31"/>
       <test>0x20</test>
       <result>
          <error code="XPST0003"/>
@@ -1698,6 +1700,398 @@ line2</assert-string-value>
       <test><![CDATA['&#x0;']]></test>
       <result>
          <error code="XQST0090"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-001">
+      <description> hex numeric literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0xff</test>
+      <result>
+         <assert-eq>255</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-002">
+      <description> hex numeric literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0x00</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-003">
+      <description> hex numeric literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0xFFFFFFFF</test>
+      <result>
+         <assert-eq>4294967295</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-004">
+      <description> hex numeric literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0xFFFF_ffff</test>
+      <result>
+         <assert-eq>4294967295</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-005">
+      <description> hex numeric literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0xcafe_babe</test>
+      <result>
+         <assert-eq>3405691582</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-006">
+      <description> hex numeric literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0x0800_0800_0800_0800</test>
+      <result>
+         <assert-eq>576469548530665472</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-007">
+      <description> hex numeric literals in context </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0xffff - 0xfffe</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-008">
+      <description> long hex numeric literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0x0000_0001_0002_0003_0004_0005_0006_0007_0008_0009_000A_000B_000C</test>
+      <result>
+         <assert-eq>95783894374296312204254609415132616901051673142296588</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-009">
+      <description> long hex numeric literal arithmetic </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0x0000_0001_0002_0003_0004_0005_0006_0007_0008_0009_000A_000B_000C+1</test>
+      <result>
+         <assert-eq>95783894374296312204254609415132616901051673142296589</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-010">
+      <description> long hex numeric literal arithmetic </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>1+0x0000_0001_0002_0003_0004_0005_0006_0007_0008_0009_000A_000B_000C</test>
+      <result>
+         <assert-eq>95783894374296312204254609415132616901051673142296589</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-011">
+      <description>Hex/binary literals in annotation parameter</description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace eg = "http://example.com";
+
+         declare %eg:integer(0xf0f0) variable $foo := 0;
+
+         declare %eg:integer(0b10101010) function local:foo($arg) { $arg }; 
+
+         local:foo($foo)
+      ]]></test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-020">
+      <description> binary numeric literals </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0b101</test>
+      <result>
+         <assert-eq>5</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-021">
+      <description> binary numeric literals </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0b1111_1111</test>
+      <result>
+         <assert-eq>255</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-022">
+      <description> long binary numeric literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0b1111_0000_1111_0000_0101_1010_0000_1111_1001_0110_0110_0110_1000_1001_1010_1011_1100_1101_1111_0000_0001</test>
+      <result>
+         <assert-eq>18204826624597765574680321</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-030">
+      <description> underscores in integer literals </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>1_000_000</test>
+      <result>
+         <assert-eq>1000000</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-031">
+      <description> underscores in integer literals </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>1_0__0__0_0__0__0</test>
+      <result>
+         <assert-eq>1000000</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-032">
+      <description> underscores in decimal literals </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>1_000.000_001</test>
+      <result>
+         <assert-eq>1000.000001</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-033">
+      <description> valid integer literal (?) </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>123_ + 234_</test>
+      <result>
+         <any-of>
+            <!-- TODO: which is it to be?? -->
+            <assert-eq>357</assert-eq>
+            <error code="XPST0003"/>
+         </any-of>       
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-034">
+      <description> underscores in double literals </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>1.000_001e0_2</test>
+      <result>
+         <assert-eq>1.000001e2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-901">
+      <description> invalid hex literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0x123456789abcdefg</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-902">
+      <description> invalid hex literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0_x1234</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-903">
+      <description> invalid hex literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>1xffff</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-904">
+      <description> invalid binary literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0b1212121</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-905">
+      <description> invalid decimal literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>123._256</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-906">
+      <description> invalid float literal </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>123.256e_04</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-907">
+      <description> invalid integer literal (?) </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>123_ + 234_</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-908">
+      <description> hex literals not allowed in function references </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>fn:count#0x1(23)</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-909">
+      <description> hex literals not allowed on rhs of lookup </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>[1,2,3]?0x1</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-910">
+      <description> There must be at least one digit </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>[0x2, 0x1, 0x]?2</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-911">
+      <description> There must be at least one digit </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>[0b11, 0b10, 0b01, 0b]?2</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-912">
+      <description> Misplaced sign </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>[0x2, 0x1, 0x0, 0x-1]?2</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-913">
+      <description> Misplaced underscore </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0x_ff</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-914">
+      <description> Misplaced underscore </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0xff_</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-915">
+      <description> Misplaced underscore </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0b_010_101</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-916">
+      <description> Misplaced underscore </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0b010_101_</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-917">
+      <description> Hex fractional part </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>.0xaa</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-918">
+      <description> Hex fractional part </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0.0xaa</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Literals-40-919">
+      <description> Hex fractional part </description>
+      <created by="Michael Kay" on="2023-04-07"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>0xaa.0xaa</test>
+      <result>
+         <error code="XPST0003"/>
       </result>
    </test-case>
 </test-set>
