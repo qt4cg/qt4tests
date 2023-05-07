@@ -304,24 +304,52 @@
   </test-case>
 
   <test-case name="Catalog014">
-    <description> Check that for every test marked as dependent on 3.1, there is coverage metadata. </description>
+    <description> Check that for every test marked as dependent on 4.0, there is coverage metadata. </description>
     <created by="O'Neil Delpratt" on="2015-01-20"/>
     <modified by="Michael Kay" on="2018-08-17" change="add exception for new generated JSON tests"/>
     <modified by="Michael Kay" on="2018-10-31" change="add exception for all tests added after 1 Jan 2018"/>
+    <modified by="Michael Kay" on="2023-04-28" change="upgrade to 40"/>
     <environment ref="catalog"/>
     <dependency type="spec" value="XQ30+"/>
     <test><![CDATA[
     declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
-        let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
-        for $test in $testsets//fots:test-case
-        where not(exists($test/(@covers | ../@covers)))
-        where exists($test/((fots:dependency | ../fots:dependency)[@type='spec' and contains(@value, '31')]))
-        where not(starts-with($test/@name, 'fo-test-' (: special exemption for generated tests :)))
-        where xs:date($test/created/@on) le xs:date('2018-01-01')  (: no point keeping this requirement any longer :)
-        return <out test="{$test/@name}"/>
+        <tests-with-no-covers-40-attribute>{
+          let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
+          for $test in $testsets//fots:test-case
+          where not(exists($test/(@covers-40 | ../@covers-40)))
+          where exists($test/((fots:dependency | ../fots:dependency)[@type='spec' and contains(@value, '40')]))
+          where not(starts-with($test/@name, 'fo-test-' (: special exemption for generated tests :)))
+          (:where xs:date($test/created/@on) le xs:date('2018-01-01')  (: no point keeping this requirement any longer :) :)
+          return <out test="{$test/@name}" test-set="{$test/ancestor::fots:test-set/@name}"/>
+        }</tests-with-no-covers-40-attribute>   
       ]]></test>
     <result>
       <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="Catalog015">
+    <description> Output the test coverage data. The test always passes. </description>
+    <created by="Michael Kay" on="2023-04-28"/>
+    <environment ref="catalog"/>
+    <dependency type="spec" value="XQ10+"/>
+    <test><![CDATA[
+    declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
+    trace(serialize(<r>{
+        let $changes := doc('../changes.xml')//spec[contains(@name, '40')]/change
+        let $changesid := $changes/@id/string()
+        let $testfiles := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
+        let $testsets := $testfiles/fots:test-set
+        for $token in distinct-values($changesid)
+        let $relevant-testsets := $testsets[tokenize(@covers-40, ' ') = $token]
+        let $relevant-testcases := $testsets/fots:test-case[tokenize(@covers-40, ' ') = $token]
+        let $count := count($relevant-testsets/fots:test-case) + count($relevant-testcases)
+        order by $token
+        return <tests change="{$token}" count="{$count}" description="{$changes[@id=$token]/text()}"/>
+     }</r>, map{'indent':true()}), 'result')
+      ]]></test>
+    <result>
+      <assert>true()</assert>
     </result>
   </test-case>
   

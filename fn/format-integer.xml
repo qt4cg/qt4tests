@@ -758,4 +758,178 @@
             <assert-deep-eq>"Ein", "Erstes", "Erster", "Ersten"</assert-deep-eq>
         </result>    
     </test-case>
+    
+    <test-case name="format-integer-40-001" covers-40="fn-format-integer">
+        <description>format-integer - Hex output</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>format-integer(255, '16^xxxx')</test>
+        <result>
+            <assert-eq>"00ff"</assert-eq>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-002" covers-40="fn-format-integer">
+        <description>format-integer - Hex output upper case with grouping</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>format-integer(65535, '16^XX:XX')</test>
+        <result>
+            <assert-eq>"FF:FF"</assert-eq>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-003" covers-40="fn-format-integer">
+        <description>format-integer - output zero in different radices</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>every $r in (2 to 36) satisfies format-integer(0, $r || '^X') = "0"</test>
+        <result>
+            <assert-true/>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-004" covers-40="fn-format-integer">
+        <description>format-integer - output plus one in different radices</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>every $r in (2 to 36) satisfies format-integer(1, $r || '^X') = "1"</test>
+        <result>
+            <assert-true/>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-005" covers-40="fn-format-integer">
+        <description>format-integer - output minus one in different radices</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>every $r in (2 to 36) satisfies format-integer(-1, $r || '^X') = "-1"</test>
+        <result>
+            <assert-true/>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-006" covers-40="fn-format-integer">
+        <description>format-integer - output "ten" in different radices</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>every $r in (2 to 36) satisfies format-integer($r, $r || '^X') = "10"</test>
+        <result>
+            <assert-true/>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-007" covers-40="fn-format-integer">
+        <description>format-integer - output "eleven" in different radices</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>every $r in (2 to 36) satisfies format-integer($r+1, $r || '^X') = "11"</test>
+        <result>
+            <assert-true/>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-008" covers-40="fn-format-integer">
+        <description>format-integer - output "a hundred" in different radices, with leading zeroes</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>every $r in (2 to 36) satisfies format-integer($r*$r, $r || '^XXXX') = "0100"</test>
+        <result>
+            <assert-true/>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-009" covers-40="fn-format-integer">
+        <description>format-integer - output "a thousand" in different radices, with grouping separator</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>every $r in (2 to 36) satisfies format-integer($r*$r*$r, $r || '^X_XXX') = "1_000"</test>
+        <result>
+            <assert-true/>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-010" covers-40="fn-format-integer">
+        <description>format-integer - output "a thousand" in different radices, with irregular grouping separators</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>every $r in (2 to 36) satisfies format-integer($r*$r*$r, $r || '^XX_X_XXX') = "00_1_000"</test>
+        <result>
+            <assert-true/>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-011" covers-40="fn-format-integer">
+        <description>format-integer - output equivalent of "nine" in different radices</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>every $r in (2 to 36) satisfies format-integer($r - 1, $r || '^x') = 
+            substring("0123456789abcdefghijklmnopqrstuvwxyz", $r, 1)</test>
+        <result>
+            <assert-true/>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-012" covers-40="format-integer parse-integer">
+        <description>format-integer - round-trips with parse-integer</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>every $r in (2 to 36), 
+                    $n in (0, 1, 7, 23, 86, 159, 2134672, 105093381562) 
+                    satisfies (format-integer($n, $r || '^X') => parse-integer($r)) eq $n
+        </test>
+        <result>
+            <assert-true/>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-013" covers-40="fn-format-integer">
+        <description>format-integer - variable-length with grouping separators</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>format-integer(999, "8^#:#:#:#:XX")</test>
+        <result>
+            <assert-eq>"1:7:47"</assert-eq>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-014" covers-40="fn-format-integer">
+        <description>format-integer - Explicit radix of 10</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>format-integer(999, "10^0000")</test>
+        <result>
+            <assert-eq>"00^0999"</assert-eq>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-015" covers-40="fn-format-integer">
+        <description>format-integer - Radix of 10 with ^ as grouping separator</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>format-integer(999, "9^9999")</test>
+        <result>
+            <assert-eq>"0^0999"</assert-eq>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-016" covers-40="fn-format-integer">
+        <description>format-integer - Radix of 16 with ^ as grouping separator</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>format-integer(65535, "16^xx^xx")</test>
+        <result>
+            <assert-eq>"ff^ff"</assert-eq>
+        </result>    
+    </test-case>
+    
+    <test-case name="format-integer-40-017" covers-40="fn-format-integer">
+        <description>format-integer - Ordinal hex (nonsense but allowed)</description>
+        <created by="Michael Kay" on="2023-04-26"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>format-integer(21, "16^xx;o")</test>
+        <result>
+            <assert-eq>"15st"</assert-eq>
+        </result>    
+    </test-case>
 </test-set>

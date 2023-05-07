@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-parse-integer" covers-40="fn-parse-integer">
+   <description>Tests for the parse-integer() function</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-31/"
+         idref="func-parse-integer"/>
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="parse-integer-001">
+      <description>Single argument</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("1234")</test>
+      <result>
+         <assert-eq>1234</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-002">
+      <description>Single argument, whitespace</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("  1234  ")</test>
+      <result>
+         <assert-eq>1234</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-003">
+      <description>Single argument, plus sign</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("  +1234  ")</test>
+      <result>
+         <assert-eq>1234</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-004">
+      <description>Single argument, minus sign</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("-1234  ")</test>
+      <result>
+         <assert-eq>-1234</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-005">
+      <description>Single argument, with underscore</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("1_234")</test>
+      <result>
+         <assert-eq>1234</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-006">
+      <description>Single argument, with embedded space</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("1 234")</test>
+      <result>
+         <assert-eq>1234</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-007">
+      <description>Single argument, with leading zeroes</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("001234")</test>
+      <result>
+         <assert-eq>1234</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-008">
+      <description>Single argument: type of result</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("001234") instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-009">
+      <description>Two arguments: range of radixes</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>every $x in (2 to 36) ! parse-integer("0", .) satisfies $x eq 0</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-010">
+      <description>Two arguments: range of radixes, minus zero</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>every $x in (2 to 36) ! parse-integer("-0", .) satisfies $x eq 0</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-011">
+      <description>Two arguments: range of radixes, plus zero</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>every $x in (2 to 36) ! parse-integer(" +0 ", .) satisfies $x eq 0</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-012">
+      <description>Two arguments: range of radixes, "1"</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>every $x in (2 to 36) ! parse-integer(" 1 ", .) satisfies $x eq 1</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-013">
+      <description>Two arguments: range of radixes, "10"</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>every $x in (2 to 36) satisfies parse-integer(" 10 ", $x) eq $x</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-014">
+      <description>Two arguments: range of radixes, "11"</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>every $x in (2 to 36) satisfies parse-integer("+11", $x) eq $x + 1</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-015">
+      <description>Two arguments: binary</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("0001 0010 0011 0100 0101 0110 0111 1000 1001 1010 1011 1100 1101 1110 1111 0000", 2)</test>
+      <result>
+         <assert-eq>1311768467463790320</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-016">
+      <description>Two arguments: octal</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("0377", 8)</test>
+      <result>
+         <assert-eq>255</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-017">
+      <description>Two arguments: hex</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("cafebabe", 16)</test>
+      <result>
+         <assert-eq>3405691582</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-018">
+      <description>Two arguments: hex</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("fffff", 16)</test>
+      <result>
+         <assert-eq>1048575</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-019">
+      <description>Two arguments: hex, negative</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("-fffff", 16)</test>
+      <result>
+         <assert-eq>-1048575</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-020">
+      <description>A long decimal string, maybe too long</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer(string-join(replicate("142857", 100))) gt 1e200</test>
+      <result>
+         <any-of>
+            <assert-true/>
+            <error code="FOCA003"/>
+         </any-of>        
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-021">
+      <description>A long hex string, maybe too long</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer(string-join(replicate("ff 00 ff 00 ", 100)), 16) gt 1e200</test>
+      <result>
+         <any-of>
+            <assert-true/>
+            <error code="FOCA003"/>
+         </any-of>        
+      </result>
+   </test-case>
+   
+   
+   
+   
+   
+   <test-case name="parse-integer-901">
+      <description>Single argument, with decimal point</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("1.234")</test>
+      <result>
+         <error code="FORG0012"/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-902">
+      <description>Single argument, with two signs</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("+-1234")</test>
+      <result>
+         <error code="FORG0012"/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-903">
+      <description>Single argument, with grouping separators</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("1'234'567")</test>
+      <result>
+         <error code="FORG0012"/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-904">
+      <description>Invalid radix</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("42", 42)</test>
+      <result>
+         <error code="FORG0011"/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-905">
+      <description>Invalid radix</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("0", 1)</test>
+      <result>
+         <error code="FORG0011"/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-906">
+      <description>Invalid radix</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("42", -8)</test>
+      <result>
+         <error code="FORG0011"/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-907">
+      <description>Zero length string</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("", 4)</test>
+      <result>
+         <error code="FORG0012"/>
+      </result>
+   </test-case>
+   
+   <test-case name="parse-integer-908">
+      <description>Zero length string after the sign</description>
+      <created by="Michael Kay" on="2023-04-25"/>
+      <test>parse-integer("-", 4)</test>
+      <result>
+         <error code="FORG0012"/>
+      </result>
+   </test-case>
+
+  
+</test-set>
