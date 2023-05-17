@@ -189,6 +189,30 @@
     </result>
   </test-case>
   
+  <test-case name="partition-100">
+    <description>Test equivalent expression given in spec</description>
+    <created by="Michael Kay" on="2023-04-24"/>
+    <dependency type="spec" value="XQ40+"/>      
+    <test><![CDATA[
+      let $equiv := function($input, $break-when) {
+         fold-left($input, (), function($partitions, $next) {
+           if (empty($partitions) or $break-when(foot($partitions)?*, $next))
+           then ($partitions, [$next])
+           else (trunk($partitions), array{foot($partitions)?*, $next}) 
+         })
+      } 
+      return deep-equal(trace(partition((1, 2, 3, 5, 6, 8, 9), function($prev, $next) {$next ne foot($prev)+1}), 'one'),
+                        trace($equiv((1, 2, 3, 5, 6, 8, 9), function($prev, $next) {$next ne foot($prev)+1}), 'two'))
+      ]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  
+  
+  
+  
   
   <test-case name="partition-901">
     <description>Callback function doesn't return boolean</description>
