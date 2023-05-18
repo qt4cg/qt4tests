@@ -879,7 +879,7 @@
    <test-case name="fn-distinct-values-1">
       <description> Test Bugzilla #5183, [FO] Effect of type promotion in fn:distinct-values </description>
       <created by="Andrew Eisenberg" on="2009-12-24"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>
         let $input := (xs:float('1.0'), xs:decimal('1.0000000000100000000001'), 
                        xs:double( '1.00000000001'), xs:float('2.0'), 
@@ -889,6 +889,20 @@
         (every $bool in (for $d1 at $p in $distinct, $d2 in $distinct [position() &gt; $p] return $d1 eq $d2) satisfies not($bool)) )</test>
       <result>
          <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-distinct-values-1a">
+      <description>qt4cg/qtspecs#410: Converting doubles to decimals, fractional digits</description>
+      <created by="Christian Gruen" on="2023-05-18"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>distinct-values((
+  xs:float('1.0'),
+  xs:decimal('1.0000000000100000000001'), 
+  xs:double('1.00000000001')
+))</test>
+      <result>
+         <assert-permutation>1, 1.0000000000100000000001, 1.00000000001</assert-permutation>
       </result>
    </test-case>
 
