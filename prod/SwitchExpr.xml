@@ -283,6 +283,75 @@
          <assert-eq>1</assert-eq>
       </result>
    </test-case>
+   
+   <test-case name="switch-401" covers-40="switch">
+      <description> switch, case operand &gt;1 item, allowed in 4.0 </description>
+      <created by="Christian Gruen" on="2023-04-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare variable $in external := 2; 
+        switch ($in) 
+            case 1 return "Moo" 
+            case 5 return "Meow" 
+            case 3 return "Quack" 
+            case ($in to 4) return "Oink" 
+            default return "Baa" ]]></test>
+      <result>
+         <assert-eq>"Oink"</assert-eq>            
+      </result>
+   </test-case>
+   
+   <test-case name="switch-402" covers-40="switch">
+      <description> switch, doesn't match empty sequence </description>
+      <created by="Michael Kay" on="2023-05-18"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare variable $in external := 6; 
+        switch ($in) 
+            case 1 return "Moo" 
+            case 5 return "Meow" 
+            case 3 return "Quack" 
+            case ($in to 4) return "Oink" 
+            default return "Baa"]]></test>
+      <result>
+         <assert-eq>"Baa"</assert-eq>       
+      </result>
+   </test-case>
+   
+   <test-case name="switch-403" covers-40="switch">
+      <description> switch, does match empty sequence </description>
+      <created by="Michael Kay" on="2023-05-18"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare variable $in := (5 to 20)[year-from-date(current-date()) = .]; 
+        switch (head($in)) 
+            case 1 return "Moo" 
+            case 5 return "Meow" 
+            case 3 return "Quack" 
+            case ($in, $in) return "Oink" 
+            default return "Baa"]]></test>
+      <result>
+         <assert-eq>"Oink"</assert-eq>       
+      </result>
+   </test-case>
+   
+   <test-case name="switch-404" covers-40="switch">
+      <description> switch, heterogenous types </description>
+      <created by="Michael Kay" on="2023-05-18"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare variable $in := (1 to 20)[year-from-date(current-date()) idiv 1000 = .]; 
+        <out>{ switch (head($in)) 
+            case 1 return "Moo" 
+            case 5 to 10 return "Meow" 
+            case 3 return "Quack"
+            case () return "Empty"
+            case ("a", "b", true(), 2) return "Oink" 
+            default return "Baa" }</out>]]></test>
+      <result>
+         <assert-eq>"Oink"</assert-eq>       
+      </result>
+   </test-case>
 
    <test-case name="switch-901">
       <description> switch, type error, switch operand &gt;1 item </description>
@@ -315,23 +384,6 @@
             default return "Baa" }</out>]]></test>
       <result>
          <error code="XPTY0004"/>
-      </result>
-   </test-case>
-
-   <test-case name="switch-902a">
-      <description> switch, type error, case operand &gt;1 item </description>
-      <created by="Christian Gruen" on="2023-04-06"/>
-      <dependency type="spec" value="XQ40"/>
-      <test><![CDATA[
-        declare variable $in := 2; 
-        <out>{ switch ($in) 
-            case 1 return "Moo" 
-            case 5 return "Meow" 
-            case 3 return "Quack" 
-            case ($in to 4) return "Oink" 
-            default return "Baa" }</out>]]></test>
-      <result>
-         <assert-xml><![CDATA[<out>Oink</out>]]></assert-xml>            
       </result>
    </test-case>
 
