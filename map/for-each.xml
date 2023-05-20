@@ -205,6 +205,64 @@
         </result>
     </test-case>
     
+    <test-case name="map-for-each-401" covers-40="arity-coercion">
+        <description>Callback function has reduced arity</description>
+        <created by="Michael Kay, Saxonica" on="2023-05-20"/>
+        <environment ref="map"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[<e>{map:for-each(map{"a":1, "b":2}, function($k){attribute{$k}{'99'}})}</e>]]></test>
+        <result>
+            <assert-xml><![CDATA[<e a="99" b="99"/>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="map-for-each-402" covers-40="arity-coercion">
+        <description>Callback function has reduced arity</description>
+        <created by="Michael Kay, Saxonica" on="2023-05-20"/>
+        <environment ref="map"/>
+        <dependency type="spec" value="XQ40+ XP40+"/>
+        <test>string-join(map:for-each(map{"a":1, "b":2, "c":3}, function(){'x'}))</test>
+        <result>
+            <assert-eq>"xxx"</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-for-each-403" covers-40="arity-coercion">
+        <description>Callback function has increased arity</description>
+        <created by="Michael Kay, Saxonica" on="2023-05-20"/>
+        <environment ref="map"/>
+        <dependency type="spec" value="XQ40+ XP40+"/>
+        <test>string-join(map:for-each(map{"a":1, "b":2, "c":3}, function($x, $y, $z){'x'}))</test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
+    <test-case name="map-for-each-404" covers-40="arity-coercion">
+        <description>Callback function is a map, which has arity 1</description>
+        <created by="Michael Kay, Saxonica" on="2023-05-20"/>
+        <environment ref="map"/>
+        <dependency type="spec" value="XQ40+ XP40+"/>
+        <test>string-join(map:for-each(map{"a":1, "b":2, "c":3}, map{"b":"B", "c":"C"}))</test>
+        <result>
+            <any-of>
+                <assert-eq>"BC"</assert-eq>
+                <assert-eq>"CB"</assert-eq>
+            </any-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-for-each-405" covers-40="arity-coercion">
+        <description>Callback function is an array, which has arity 1</description>
+        <created by="Michael Kay, Saxonica" on="2023-05-20"/>
+        <environment ref="map"/>
+        <dependency type="spec" value="XQ40+ XP40+"/>
+        <test>sum(map:for-each(map{1:(), 2:(), 3:()}, [11, 22, 33]))</test>
+        <result>
+            <assert-eq>66</assert-eq>
+        </result>
+    </test-case>
+    
  
 
 </test-set>
