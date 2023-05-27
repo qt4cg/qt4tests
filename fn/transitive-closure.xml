@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-transitive-closure"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" covers="fn-transitive-closure">
+    <description>Tests for the fn:transitive-closure function introduced in XPath 4.0</description>
+    <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-transitive-closure"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <dependency type="feature" value="higherOrderFunctions"/>
+    
+    <environment name="trans-A">
+        <source role="." file="transitive-closure/xpath-grammar.xml"/>
+    </environment>
+
+    <test-case name="trans-closure-001">
+        <description>Empty sequence as input</description>
+        <created by="Michael Kay" on="2023-05-23"/>
+        <environment ref="trans-A"/>
+        <test>transitive-closure((), identity#1)</test>
+        <result>
+            <assert-empty/>
+        </result>
+    </test-case>
+    
+    <test-case name="trans-closure-002">
+        <description>Closure of identity function</description>
+        <created by="Michael Kay" on="2023-05-23"/>       
+        <environment ref="trans-A"/>
+        <test>transitive-closure(., identity#1)</test>
+        <result>
+            <assert>/Q{http://www.w3.org/2001/03/XPath/grammar}grammar</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="trans-closure-003">
+        <description>Closure over @ref element references</description>
+        <created by="Michael Kay" on="2023-05-23"/>       
+        <environment ref="trans-A"/>
+        <test>transitive-closure(//*:production[@name="VarRef"], 
+                                 function($prod){root($prod)//*:production[@name = $prod//*:ref/@name]})/@name
+               => string-join(' ')
+        </test>
+        <result>
+            <assert-eq>"_QName_or_EQName"</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="trans-closure-004">
+        <description>Closure over @ref element references</description>
+        <created by="Michael Kay" on="2023-05-23"/>       
+        <environment ref="trans-A"/>
+        <test>transitive-closure(//*:production[@name="NumericLiteral"], 
+            function($prod){root($prod)//*:production[@name = $prod//*:ref/@name]})/@name
+            => string-join(' ')
+        </test>
+        <result>
+            <assert-eq>"_QName_or_EQName"</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="trans-closure-005">
+        <description>Example from spec</description>
+        <created by="Michael Kay" on="2023-05-23"/>       
+        <environment ref="trans-A"/>
+        <test><![CDATA[let $data := parse-xml('
+            <doc>
+                <person id="0"/>
+                <person id="1" manager="0"/>
+                <person id="2" manager="0"/>
+                <person id="3" manager="2"/>
+                <person id="4" manager="2"/>
+                <person id="5" manager="1"/>
+                <person id="6" manager="3"/>
+            </doc>')
+            return transitive-closure($data//person[@id='2'], function($p){$data//person[@manager=$p/@id]})/string(@id)               
+        ]]></test>
+        <result>
+            <assert-deep-eq>("3", "4", "6")</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="trans-closure-006">
+        <description>Example from spec</description>
+        <created by="Michael Kay" on="2023-05-23"/>       
+        <environment ref="trans-A"/>
+        <test><![CDATA[let $data := parse-xml('
+            <doc>
+                <person id="0"/>
+                <person id="1" manager="0"/>
+                <person id="2" manager="0"/>
+                <person id="3" manager="2"/>
+                <person id="4" manager="2"/>
+                <person id="5" manager="1"/>
+                <person id="6" manager="3"/>
+            </doc>')
+            return transitive-closure($data, ->{child::*})/@id/string()               
+        ]]></test>
+        <result>
+            <assert-deep-eq>("0", "1", "2", "3", "4", "5", "6")</assert-deep-eq>
+        </result>
+    </test-case>
+ 
+
+</test-set>
