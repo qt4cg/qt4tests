@@ -12,8 +12,9 @@
    <test-case name="focus-function-001">
       <description>Basic inline function</description>
       <created by="Michael Kay" on="2020-12-02"/>
+      <modified by="Michael Kay" on="2023-05-27" change="All tests changed to use function{EXP} instead of ->{EXP}"/>
       <test>
-        let $f := ->{.+1} return $f(2)</test>
+        let $f := function{.+1} return $f(2)</test>
       <result>
          <assert-eq>3</assert-eq>
       </result>
@@ -24,7 +25,7 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
          sum(for $i in 1 to 6 return
-             let $add := ->{. + $i} return $add(4))</test>
+             let $add := function{. + $i} return $add(4))</test>
       <result>
          <assert-eq>45</assert-eq>
       </result>
@@ -33,7 +34,7 @@
    <test-case name="focus-function-007" covers="empty-enclosed-expr">
       <description>Function with empty body (3.1)</description>
       <created by="Michael Kay" on="2020-12-02"/>
-      <test>let $void := ->{} return $void(3)</test>
+      <test>let $void := function{} return $void(3)</test>
       <result>
          <assert-empty/>
       </result>
@@ -44,7 +45,7 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
          let $outer := ->($x) {
-            let $inner := ->{. + $x}
+            let $inner := function{. + $x}
             return $inner(5)
          }
          return $outer(3)
@@ -60,7 +61,7 @@
       <test>
          let $bonus := 10,
              $outer := ->($x) {
-                let $inner := ->{. + $x + $bonus}
+                let $inner := function{. + $x + $bonus}
                 return $inner(5)
              }
          return $outer(3)
@@ -74,7 +75,7 @@
       <description>Function with sequence-valued argument</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         let $add := ->{.+1}
+         let $add := function{.+1}
          return $add((3, 4.2))
       </test>
       <result>
@@ -86,7 +87,7 @@
       <description>Function returning a function containing a closure</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         let $process := ->($op, $x, $y) as function(*) {if ($op = "+") then ->{$x + $y} else ->{$x - $y}}
+         let $process := ->($op, $x, $y) as function(*) {if ($op = "+") then function{$x + $y} else function{$x - $y}}
          return $process("+", 3, 4)(926)
       </test>
       <result>
@@ -99,7 +100,7 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
-         let $add := %Q{http://example.com/speed}fast %Q{http://example.com/origin}author("Mike") ->{.+1} return $add(2)
+         let $add := %Q{http://example.com/speed}fast %Q{http://example.com/origin}author("Mike") function{.+1} return $add(2)
       </test>
       <result>
          <assert-eq>3</assert-eq>
@@ -111,7 +112,7 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <dependency type="spec" value="XP40+"/>
       <test>
-         let $add := %Q{http://example.com/speed}fast %Q{http://example.com/origin}author("Mike") ->{.+1} return $add(2,2)
+         let $add := %Q{http://example.com/speed}fast %Q{http://example.com/origin}author("Mike") function{.+1} return $add(2,2)
       </test>
       <result>
          <error code="XPST0003"/>
@@ -123,7 +124,7 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
-         let $add := %Q{http://example.com/speed}fast() %Q{http://example.com/origin}author("Mike") ->{.+1} return $add(2,2)
+         let $add := %Q{http://example.com/speed}fast() %Q{http://example.com/origin}author("Mike") function{.+1} return $add(2,2)
       </test>
       <result>
          <error code="XPST0003"/>
@@ -135,7 +136,7 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
-         let $add := %Q{http://example.com/speed}fast(true())  ->{.+1} return $add(2)
+         let $add := %Q{http://example.com/speed}fast(true())  function{.+1} return $add(2)
       </test>
       <result>
          <error code="XPST0003"/>
@@ -147,7 +148,7 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
-         let $add := % Q{http://example.com/speed}speed (-1)  ->{.+1} return $add(2)
+         let $add := % Q{http://example.com/speed}speed (-1)  function{.+1} return $add(2)
       </test>
       <result>
          <error code="XPST0003"/>
@@ -159,7 +160,7 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
-         let $add := % Q{http://example.com/speed}speed (())  ->{.+1} return $add(2)
+         let $add := % Q{http://example.com/speed}speed (())  function{.+1} return $add(2)
       </test>
       <result>
          <error code="XPST0003"/>
@@ -170,7 +171,7 @@
       <description>Name of an inline function</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         let $add := ->{.+1} return function-name($add)
+         let $add := function{.+1} return function-name($add)
       </test>
       <result>
          <assert-empty/>
@@ -181,7 +182,7 @@
       <description>Arity of an inline function</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         let $add := ->{.+1} return function-arity($add)
+         let $add := function{.+1} return function-arity($add)
       </test>
       <result>
          <assert-eq>1</assert-eq>
@@ -192,7 +193,7 @@
       <description>Apply an inline function</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         let $add := ->{.+1} return apply($add, [12])
+         let $add := function{.+1} return apply($add, [12])
       </test>
       <result>
          <assert-eq>13</assert-eq>
@@ -203,7 +204,7 @@
       <description>An inline function is a primary</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         ->{.+1} (12)
+         function{.+1} (12)
       </test>
       <result>
          <assert-eq>13</assert-eq>
@@ -214,7 +215,7 @@
       <description>An inline function is a primary</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         ->{.+1} [function-arity(.) = 1] (12)
+         function{.+1} [function-arity(.) = 1] (12)
       </test>
       <result>
          <assert-eq>13</assert-eq>
@@ -226,10 +227,10 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
          let $b := 2, $calc := map{
-            "+" : ->{. + $b},
-            "-" : ->{. - $b},
-            "*" : ->{. * $b},
-            "/" : ->{. div $b}}
+            "+" : function{. + $b},
+            "-" : function{. - $b},
+            "*" : function{. * $b},
+            "/" : function{. div $b}}
          return $calc("*")(3)  
       </test>
       <result>
@@ -241,7 +242,7 @@
       <description>Inline function has no string value</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         string(->{.+1})
+         string(function{.+1})
       </test>
       <result>
          <error code="FOTY0014"/>
@@ -252,7 +253,7 @@
       <description>deep-equal() comparing inline functions</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         deep-equal(->{.+1}, ->{.+1})
+         deep-equal(function{.+1}, function{.+1})
       </test>
       <result>
          <error code="FOTY0015"/>
@@ -263,7 +264,7 @@
       <description>Inline function has no typed value</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         data(->{.+1})
+         data(function{.+1})
       </test>
       <result>
          <error code="FOTY0013"/>
@@ -274,8 +275,8 @@
       <description>Inline function has no typed value</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         let $x := ->{.+1}, 
-             $y := ->{.-1},
+         let $x := function{.+1}, 
+             $y := function{.-1},
              $c := ->($x, $y) {$x = $y}
          return $c($x, $y)
       </test>
@@ -288,7 +289,7 @@
       <description>Type of an inline function</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         ->{.+1}
+         function{.+1}
       </test>
       <result>
          <all-of>
@@ -314,7 +315,7 @@
       </environment>
       <test>
          declare variable $p as xs:integer external;
-         declare variable $f := ->{. + $p};
+         declare variable $f := function{. + $p};
          $f(12)
       </test>
       <result>
@@ -332,7 +333,7 @@
       <test>
          declare variable $p as xs:integer external;
          declare function local:negate($x) {-$x};
-         declare variable $f := let $x := $p return ->{local:negate(. + $x + $p)};
+         declare variable $f := let $x := $p return function{local:negate(. + $x + $p)};
          $f(12)
       </test>
       <result>
@@ -344,7 +345,7 @@
       <description>Body of inline function fails type-checking</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         let $f := ->{1 to .}
+         let $f := function{1 to .}
          return $f(2.5)
       </test>
       <result>
@@ -356,7 +357,7 @@
       <description>Used as an argument to fn:filter</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         filter(1 to 10, ->{. mod 3 = 0})
+         filter(1 to 10, function{. mod 3 = 0})
       </test>
       <result>
          <assert-deep-eq>3, 6, 9</assert-deep-eq>
