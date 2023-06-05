@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-xdm-to-json" covers-40="fn-xdm-to-json">
-   <description>Tests for the iexists() function</description>
+   <description>Tests for the xdm-to-json() function</description>
    <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/"
          idref="func-xdm-to-json"/>
+   
+   <environment name="specimen">
+      <schema uri="http://www.w3.org/XQueryTest/specimen" file="xdm-to-json/specimen.xsd" xsd-version="1.1">
+         <description>A Schema with some nillable elements</description>
+         <created by="Michael Kay" on="2023-05-31"/>
+      </schema>
+   </environment>
 
    <test-case name="xdm-to-json-001">
       <description> Empty sequence </description>
@@ -331,6 +338,83 @@
       </result>
    </test-case>
    
+   <test-case name="xdm-to-json-034">
+      <description> Solidus is escaped </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test>
+         xdm-to-json(["and/or","http://ibm.com"], map{'escape-solidus':true()})
+      </test>
+      <result>
+         <assert-string-value>["and\/or","http:\/\/ibm.com"]</assert-string-value>     
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-035">
+      <description> Solidus is not escaped </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test>
+         xdm-to-json(["and/or","http://ibm.com"], map{'escape-solidus':false()})
+      </test>
+      <result>
+         <assert-string-value>["and/or","http://ibm.com"]</assert-string-value>     
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-036">
+      <description> Solidus is not escaped </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test>
+         xdm-to-json(["and/or","http://ibm.com"])
+      </test>
+      <result>
+         <assert-string-value>["and/or","http://ibm.com"]</assert-string-value>     
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-037">
+      <description> Solidus is escaped </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test>
+         xdm-to-json(map{'and/or': 'http://ibm.com'}, map{'escape-solidus':true()})
+      </test>
+      <result>
+         <assert-string-value>{"and\/or":"http:\/\/ibm.com"}</assert-string-value>     
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-038">
+      <description> Solidus is not escaped </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test>
+         xdm-to-json(map{'and/or': 'http://ibm.com'}, map{'escape-solidus':false()})
+      </test>
+      <result>
+         <assert-string-value>{"and/or":"http://ibm.com"}</assert-string-value>     
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-039">
+      <description> Tab and newline are escaped </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test>
+         xdm-to-json(map{char('#xa'): char('#x9')})
+      </test>
+      <result>
+         <assert-string-value>{"\n":"\t"}</assert-string-value>     
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-040">
+      <description> Backslash is escaped </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test>
+         xdm-to-json(map{'\': '/'}, map{'escape-solidus':true()})
+      </test>
+      <result>
+         <assert-string-value>{"\\":"\/"}</assert-string-value>     
+      </result>
+   </test-case>
+   
    <test-case name="xdm-to-json-104">
       <description> Text node </description>
       <created by="Michael Kay" on="2023-05-28"/>
@@ -450,7 +534,7 @@
          xdm-to-json(doc('abs/e1.xml'))
       ]]></test>
       <result>
-         <assert-string-value>{"#document":{"#content":[{"e":"1"}]}}</assert-string-value>     
+         <assert-string-value>{"#document":[{"e":"1"}]}</assert-string-value>     
       </result>
    </test-case>
    
@@ -461,7 +545,7 @@
          xdm-to-json(parse-xml('<a/>'))
       ]]></test>
       <result>
-         <assert-string-value>{"#document":{"#content":[{"a":""}]}}</assert-string-value> 
+         <assert-string-value>{"#document":[{"a":""}]}</assert-string-value> 
       </result>
    </test-case>
    
@@ -472,7 +556,7 @@
          xdm-to-json(parse-xml('<!--start--> <a/> <!--end-->'))
       ]]></test>
       <result>
-         <assert-string-value>{"#document":{"#content":[{"#comment":"start"},{"a":""},{"#comment":"end"}]}}</assert-string-value> 
+         <assert-string-value>{"#document":[{"#comment":"start"},{"a":""},{"#comment":"end"}]}</assert-string-value> 
       </result>
    </test-case>
    
@@ -484,7 +568,7 @@
          xdm-to-json(document{text{"ill-formed"}})
       ]]></test>
       <result>
-         <assert-string-value>{"#document":{"#content":["ill-formed"]}}</assert-string-value> 
+         <assert-string-value>{"#document":["ill-formed"]}</assert-string-value> 
       </result>
    </test-case>
    
@@ -710,7 +794,7 @@
    </test-case>
    
    <test-case name="xdm-to-json-230">
-      <description> element node - implicit - list</description>
+      <description> element node - implicit - list-plus</description>
       <created by="Michael Kay" on="2023-05-28"/>
       <test><![CDATA[
          xdm-to-json(parse-xml('<a id="zz"><b/><b/></a>')/a)
@@ -721,7 +805,7 @@
    </test-case>
    
    <test-case name="xdm-to-json-231">
-      <description> element node - implicit - list</description>
+      <description> element node - implicit - list-plus</description>
       <created by="Michael Kay" on="2023-05-28"/>
       <test><![CDATA[
          xdm-to-json(parse-xml('<a xml:id="zz"><b>xxx</b><b>yyy</b><b>zzz</b></a>')/a)
@@ -732,7 +816,7 @@
    </test-case>
    
    <test-case name="xdm-to-json-232">
-      <description> element node - implicit - list</description>
+      <description> element node - implicit - list-plus</description>
       <created by="Michael Kay" on="2023-05-28"/>
       <test><![CDATA[
          xdm-to-json(parse-xml('<a xml:id="zz"><b><p/></b><b><q/></b><b><r/></b></a>')/a)
@@ -743,7 +827,7 @@
    </test-case>
    
    <test-case name="xdm-to-json-233">
-      <description> element node - implicit - list - whitespace</description>
+      <description> element node - implicit - list-plus - whitespace</description>
       <created by="Michael Kay" on="2023-05-28"/>
       <test><![CDATA[
          xdm-to-json(parse-xml('<a xml:id="zz"><b> <p/> </b><b> <q/> </b><b> <r/> </b></a>')/a)
@@ -754,7 +838,7 @@
    </test-case>
    
    <test-case name="xdm-to-json-234">
-      <description> element node - implicit - list - same namespace</description>
+      <description> element node - implicit - list-plus - same namespace</description>
       <created by="Michael Kay" on="2023-05-28"/>
       <test><![CDATA[
          xdm-to-json(parse-xml('<a xmlns="http://one.com/" xml:id="zz"><b><p/></b><b><q/></b><b><r/></b></a>')/*:a)
@@ -765,7 +849,7 @@
    </test-case>
    
    <test-case name="xdm-to-json-235">
-      <description> element node - implicit - list - different namespace</description>
+      <description> element node - implicit - list-plus - different namespace</description>
       <created by="Michael Kay" on="2023-05-28"/>
       <test><![CDATA[
          xdm-to-json(parse-xml('<a xml:id="zz"><b xmlns="http://one.com/"><p/></b><b xmlns="http://one.com/"><q/></b><b xmlns="http://one.com/"><r/></b></a>')/*:a)
@@ -776,7 +860,7 @@
    </test-case>
    
    <test-case name="xdm-to-json-236">
-      <description> element node - implicit - list - different namespace</description>
+      <description> element node - implicit - list-plus - different namespace</description>
       <created by="Michael Kay" on="2023-05-28"/>
       <test><![CDATA[
          xdm-to-json(parse-xml('<a xmlns="http://zero.com/" xml:id="zz"><b xmlns="http://one.com/"><p/></b><b xmlns="http://one.com/"><q/></b><b xmlns="http://one.com/"><r/></b></a>')/*:a)
@@ -826,7 +910,7 @@
          xdm-to-json(parse-xml('<a><head/><p/><p/><p/></a>')/a)
       ]]></test>
       <result>
-         <assert-string-value>{"a":{"#content":[{"head":""},{"p":""},{"p":""},{"p":""}]}}</assert-string-value> 
+         <assert-string-value>{"a":[{"head":""},{"p":""},{"p":""},{"p":""}]}</assert-string-value> 
       </result>
    </test-case>
    
@@ -837,7 +921,7 @@
          xdm-to-json(parse-xml('<a diff="chg"><head/><p>Intro</p><p/><p/></a>')/a)
       ]]></test>
       <result>
-         <assert-string-value>{"a":{"@diff":"chg","#content":[{"head":""},{"p":"Intro"},{"p":""},{"p":""}]}}</assert-string-value> 
+         <assert-string-value>{"a":[{"@diff":"chg"},{"head":""},{"p":"Intro"},{"p":""},{"p":""}]}</assert-string-value>
       </result>
    </test-case>
    
@@ -848,7 +932,7 @@
          xdm-to-json(parse-xml('<a diff="chg"> <head/> <p>Intro</p> <p/> <p/> </a>')/a)
       ]]></test>
       <result>
-         <assert-string-value>{"a":{"@diff":"chg","#content":[{"head":""},{"p":"Intro"},{"p":""},{"p":""}]}}</assert-string-value> 
+         <assert-string-value>{"a":[{"@diff":"chg"},{"head":""},{"p":"Intro"},{"p":""},{"p":""}]}</assert-string-value> 
       </result>
    </test-case>
    
@@ -859,7 +943,7 @@
          xdm-to-json(parse-xml('<a><head/><p/><p/><p/>The end</a>')/a)
       ]]></test>
       <result>
-         <assert-string-value>{"a":{"#content":[{"head":""},{"p":""},{"p":""},{"p":""},"The end"]}}</assert-string-value> 
+         <assert-string-value>{"a":[{"head":""},{"p":""},{"p":""},{"p":""},"The end"]}</assert-string-value> 
       </result>
    </test-case>
    
@@ -870,7 +954,7 @@
          xdm-to-json(parse-xml('<a diff="chg"><head/>The beginning<p>Intro</p><p/><p/></a>')/a)
       ]]></test>
       <result>
-         <assert-string-value>{"a":{"@diff":"chg","#content":[{"head":""},"The beginning",{"p":"Intro"},{"p":""},{"p":""}]}}</assert-string-value> 
+         <assert-string-value>{"a":[{"@diff":"chg"},{"head":""},"The beginning",{"p":"Intro"},{"p":""},{"p":""}]}</assert-string-value>
       </result>
    </test-case>
    
@@ -881,7 +965,7 @@
          xdm-to-json(parse-xml('<a diff="chg"> <head/> <p>Intro</p> The middle <p/> <p/> </a>')/a)
       ]]></test>
       <result>
-         <assert-string-value>{"a":{"@diff":"chg","#content":[" ",{"head":""}," ",{"p":"Intro"}," The middle ",{"p":""}," ",{"p":""}," "]}}</assert-string-value> 
+         <assert-string-value>{"a":[{"@diff":"chg"}," ",{"head":""}," ",{"p":"Intro"}," The middle ",{"p":""}," ",{"p":""}," "]}</assert-string-value> 
       </result>
    </test-case>
    
@@ -892,7 +976,7 @@
          xdm-to-json(parse-xml('<a><head>Title</head><!--lets start--><p>Intro</p><p>Outtro</p><!--the end--></a>')/a)
       ]]></test>
       <result>
-         <assert-string-value>{"a":{"#content":[{"head":"Title"},{"#comment":"lets start"},{"p":"Intro"},{"p":"Outtro"},{"#comment":"the end"}]}}</assert-string-value> 
+         <assert-string-value>{"a":[{"head":"Title"},{"#comment":"lets start"},{"p":"Intro"},{"p":"Outtro"},{"#comment":"the end"}]}</assert-string-value> 
       </result>
    </test-case>
    
@@ -903,9 +987,916 @@
          xdm-to-json(parse-xml('<a> <head>Title</head> Lets start <p>Intro</p> <p>Outtro</p> <!--the end--> </a>')/a)
       ]]></test>
       <result>
-         <assert-string-value>{"a":{"#content":[" ",{"head":"Title"}," Lets start ",{"p":"Intro"}," ",{"p":"Outtro"}," ",{"#comment":"the end"}," "]}}</assert-string-value> 
+         <assert-string-value>{"a":[" ",{"head":"Title"}," Lets start ",{"p":"Intro"}," ",{"p":"Outtro"}," ",{"#comment":"the end"}," "]}</assert-string-value> 
       </result>
    </test-case>
+   
+   <test-case name="xdm-to-json-270">
+      <description> element node - implicit - list</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b/><b/></a>')/a)
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":["",""]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-271">
+      <description> element node - implicit - list</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b>xxx</b><b>yyy</b><b>zzz</b></a>')/a)
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":["xxx","yyy","zzz"]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-272">
+      <description> element node - implicit - list</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b><p/></b><b><q/></b><b><r/></b></a>')/a)
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":[{"p":""},{"q":""},{"r":""}]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-273">
+      <description> element node - implicit - list - whitespace</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b> <p/> </b><b> <q/> </b><b> <r/> </b></a>')/a)
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":[{"p":""},{"q":""},{"r":""}]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-274">
+      <description> element node - implicit - list - complex children</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b nr="1"><p>One</p></b><b nr="2"><p>Two</p></b><b nr="3"><p>Three</p></b></a>')/a)
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":[{"@nr":"1","p":"One"},{"@nr":"2","p":"Two"},{"@nr":"3","p":"Three"}]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+ 
+   
+   <test-case name="xdm-to-json-300">
+      <description> element node - schema-based - empty</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:Empty/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}Empty":""}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-301">
+      <description> element node - schema-based - empty content, schema allows attributes, but there are none</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{}}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-302">
+      <description> element node - schema-based - empty content, with a boolean attribute</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus test="true"/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"@test":true}}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-303">
+      <description> element node - schema-based - empty content, with a numeric attribute</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus num="42"/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"@num":42}}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-304">
+      <description> element node - schema-based - empty content, with a list-valued attribute</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus list="42 43 44"/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"@list":[42,43,44]}}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-305">
+      <description> element node - schema-based - empty content, with a singleton list-valued attribute</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus list="1234"/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"@list":[1234]}}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-306">
+      <description> element node - schema-based - empty content, with an empty list-valued attribute</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus list=""/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"@list":[]}}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-307">
+      <description> element node - schema-based - empty content, nilled</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus list="" xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"@list":[]}}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-310">
+      <description> element node - schema-based - simple content, numeric</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:Number>5</c:Number>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}Number":5}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-311">
+      <description> element node - schema-based - simple content, boolean</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:Boolean>0</c:Boolean>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}Boolean":false}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-312">
+      <description> element node - schema-based - simple content, date</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:Date>2023-05-31</c:Date>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}Date":"2023-05-31"}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-313">
+      <description> element node - schema-based - simple content, list of numbers</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:ListOfNumbers>33 32 31</c:ListOfNumbers>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}ListOfNumbers":[33,32,31]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-314">
+      <description> element node - schema-based - simple content, singleton list of numbers</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:ListOfNumbers>33</c:ListOfNumbers>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}ListOfNumbers":[33]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-315">
+      <description> element node - schema-based - simple content, empty list of numbers</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:ListOfNumbers></c:ListOfNumbers>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}ListOfNumbers":[]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-316">
+      <description> element node - schema-based - simple typed content, plus attributes </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:BooleanPlus num="3" test="0">1</c:BooleanPlus>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}BooleanPlus":{"@num":3,"@test":false,"#content":true}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-317">
+      <description> element node - schema-based - simple typed content, plus attributes, nilled </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:BooleanPlus num="3" test="0" xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}BooleanPlus":{"@num":3,"@test":false,"#content":null}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-318">
+      <description> element node - schema-based - simple typed content, plus attributes, @xsi:nil attribute is dropped </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:BooleanPlus num="3" test="0" xsi:nil="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1</c:BooleanPlus>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}BooleanPlus":{"@num":3,"@test":false,"#content":true}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-320">
+      <description> element node - schema-based - list layout - whitespace dropped</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:ListPlus num="5">
+                                        <c:DatePlus num="1">2000-01-01</c:DatePlus>
+                                        <c:DatePlus num="2">2000-01-02</c:DatePlus>
+                                        <c:DatePlus num="3">2000-01-03</c:DatePlus></c:ListPlus>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}ListPlus":{"@num":5,"DatePlus":[{"@num":1,"#content":"2000-01-01"},{"@num":2,"#content":"2000-01-02"},{"@num":3,"#content":"2000-01-03"}]}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-321">
+      <description> element node - schema-based - list layout - singleton</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:ListPlus num="3">
+                                        <c:DatePlus num="1">2000-01-01</c:DatePlus>
+                                     </c:ListPlus>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}ListPlus":{"@num":3,"DatePlus":[{"@num":1,"#content":"2000-01-01"}]}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-322">
+      <description> element node - schema-based - list layout - empty</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:ListPlus num="3" test="0"/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}ListPlus":{"@num":3,"@test":false,"DatePlus":[]}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-330">
+      <description> element node - schema-based - record layout, no attributes, no repeats, whitespace </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:RecordPlus>
+                                       <c:Boolean>1</c:Boolean>
+                                       <c:Number>2</c:Number>
+                                       <c:Date>1966-07-03</c:Date>
+                                     </c:RecordPlus>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":{"Boolean":true,"Number":2,"Date":"1966-07-03"}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-331">
+      <description> element node - schema-based - record layout, attributes, no repeats, whitespace </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:RecordPlus test="1">
+                                       <c:Boolean>1</c:Boolean>
+                                       <c:Number>2</c:Number>
+                                       <c:Date>1966-07-03</c:Date>
+                                     </c:RecordPlus>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":{"@test":true,"Boolean":true,"Number":2,"Date":"1966-07-03"}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-332">
+      <description> element node - schema-based - record layout, attributes, repeated element, whitespace </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:RecordPlus test="1">
+                                       <c:Boolean>1</c:Boolean>
+                                       <c:Number>2</c:Number>
+                                       <c:Date>1966-07-03</c:Date>
+                                       <c:Date>1966-07-04</c:Date>
+                                     </c:RecordPlus>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":{"@test":true,"Boolean":true,"Number":2,"Date[1]":"1966-07-03","Date[2]":"1966-07-04"}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-333">
+      <description> element node - schema-based - record layout, repeated element, whitespace </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:RecordPlus>
+                                       <c:Date>1966-07-03</c:Date>
+                                       <c:Boolean>1</c:Boolean>
+                                       <c:Date>1966-07-04</c:Date>
+                                     </c:RecordPlus>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":{"Date[1]":"1966-07-03","Boolean":true,"Date[2]":"1966-07-04"}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-334">
+      <description> element node - schema-based - record layout, nilled, no attributes </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:RecordPlus xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":{"#content":null}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-335">
+      <description> element node - schema-based - record layout, nilled, with attributes </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:RecordPlus num="42" xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":{"@num":42,"#content":null}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-336">
+      <description> element node - schema-based - record layout, empty, not nilled, attributes </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:RecordPlus num="42" xsi:nil="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":{"@num":42}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-337">
+      <description> element node - schema-based - record layout, empty, not nilled, no attributes </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:RecordPlus xsi:nil="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":{}}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-340">
+      <description> element node - schema-based - sequence layout, no attributes, whitespace </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:Sequence>
+                                       <c:Boolean>1</c:Boolean>
+                                       <c:Number>2</c:Number>
+                                       <c:Date>1966-07-03</c:Date>
+                                     </c:Sequence>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}Sequence":[{"Boolean":true},{"Number":2},{"Date":"1966-07-03"}]}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-341">
+      <description> element node - schema-based - sequence layout, attributes, whitespace </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:SequencePlus num="42">
+                                       <c:BooleanPlus>1</c:BooleanPlus>
+                                       <c:NumberPlus>2</c:NumberPlus>
+                                       <c:DatePlus>1966-07-03</c:DatePlus>
+                                     </c:SequencePlus>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}SequencePlus":[{"@num":42},{"BooleanPlus":{"#content":true}},{"NumberPlus":{"#content":2}},{"DatePlus":{"#content":"1966-07-03"}}]}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-342">
+      <description> element node - schema-based - sequence layout, nilled </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:SequencePlus num="42" xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}SequencePlus":[{"@num":42},null]}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-350">
+      <description> element node - schema-based - mixed layout, whitespace, no attributes </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:Mixed>A can of <c:Number>2</c:Number>  <c:Date>1966-07-03</c:Date> worms</c:Mixed>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}Mixed":["A can of ",{"Number":2},"  ",{"Date":"1966-07-03"}," worms"]}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-351">
+      <description> element node - schema-based - mixed layout, whitespace, attributes </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:MixedPlus test="0">A can of <c:Number>2</c:Number>  <c:Date>1966-07-03</c:Date> worms</c:MixedPlus>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}MixedPlus":[{"@test":false},"A can of ",{"Number":2},"  ",{"Date":"1966-07-03"}," worms"]}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-352">
+      <description> element node - schema-based - mixed layout, whitespace, attributes, nilled </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:MixedPlus test="0" xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}MixedPlus":[{"@test":false},null]}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-353">
+      <description> element node - schema-based - mixed layout, whitespace, attributes, not nilled </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:MixedPlus test="0" xsi:nil="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            >A can of <c:Number>2</c:Number>  <c:Date>1966-07-03</c:Date> worms</c:MixedPlus>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}MixedPlus":[{"@test":false},"A can of ",{"Number":2},"  ",{"Date":"1966-07-03"}," worms"]}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-354">
+      <description> element node - schema-based - mixed layout, whitespace, attributes, comments and PIs </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:MixedPlus test="0">A can of <!--many-->  <c:Date>1966-07-03</c:Date> <?pi worms?></c:MixedPlus>}
+         return xdm-to-json($in)
+      ]]></test>
+      <result>
+         <assert-string-value>{"Q{http://www.w3.org/XQueryTest/specimen}MixedPlus":[{"@test":false},"A can of ",{"#comment":"many"},"  ",{"Date":"1966-07-03"}," ",{"#processing-instruction":{"#name":"pi","#data":"worms"}}]}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-400">
+      <description> element node - explicit - selects empty layout though not empty</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a id="3"/>')/a, map{'layouts':map{QName('','a'):'empty'}})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":""}</assert-string-value>     
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-401">
+      <description> element node - explicit - selects empty layout though not empty</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a id="3"><b/></a>')/a, map{'layouts':map{QName('','a'):'empty'}})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":""}</assert-string-value>     
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-402">
+      <description> element node - explicit - selects empty-plus layout though there are no attributes</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a/>')/a, map{'layouts':map{QName('','a'):'empty-plus'}})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":{}}</assert-string-value>     
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-403">
+      <description> element node - explicit - selects empty-plus layout though there are children</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b/></a>')/a, map{'layouts':map{QName('','a'):'empty-plus'}})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":{}}</assert-string-value>     
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-410">
+      <description> element node - explicit - selects simple layout though there is mixed content</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a>The <i>short</i> introduction</a>')/a, map{'layouts':map{QName('','a'):'simple'}})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":"The short introduction"}</assert-string-value>     
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-411">
+      <description> element node - explicit - selects simple-plus layout though there are no attributes</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a>The <i>short</i> introduction</a>')/a, map{'layouts':map{QName('','a'):'simple-plus'}})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":{"#content":"The short introduction"}}</assert-string-value>     
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-412">
+      <description> element node - schema-based - request simple layout, but content cannot be atomized</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:Sequence><c:Boolean>1</c:Boolean><c:Number>2</c:Number></c:Sequence>}
+         return xdm-to-json($in, map{'layouts':map{QName('http://www.w3.org/XQueryTest/specimen','Sequence'):'simple'}})
+      ]]></test>
+      <result>
+         <error code="FOTY0012"/> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-420">
+      <description> element node - request list format though element names are inconsistent. Fall back to mixed.</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a id="zz"><b/><b/><c/></a>')/a, map{'layouts':map{QName('','a'):'list'}})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":[{"@id":"zz"},{"b":""},{"b":""},{"c":""}]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-421">
+      <description> element node - request list format though there are text node children. Fall back to mixed. </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a id="zz"><b/>rhubarb<b/></a>')/a, map{'layouts':map{QName('','a'):'list'}})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":[{"@id":"zz"},{"b":""},"rhubarb",{"b":""}]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-422">
+      <description> element node - request list format though there are attributes. Drop the attributes. </description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a id="zz"><b>one</b><b>two</b></a>')/a, map{'layouts':map{QName('','a'):'list'}})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":["one","two"]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-430">
+      <description> element node - select record format though element names repeat</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a id="zz"><b/><b/><c/></a>')/a, map{'layouts':map{QName('','a'):'record'}})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":{"@id":"zz","b[1]":"","b[2]":"","c":""}}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-431">
+      <description> element node - select record layout though element names repeat, nested</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a id="zz"><b><p/></b><b><p/><p/></b></a>')/a, map{'layouts':map{QName('','a'):'record',QName('','b'):'record'}})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":{"@id":"zz","b[1]":{"p":""},"b[2]":{"p[1]":"","p[2]":""}}}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-440">
+      <description> element node - select mixed/simple layout though there is no non-whitespace text</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b> </b> <b>_</b></a>')/a, map{'layouts':map{QName('','a'):'mixed',QName('','b'):'simple'}})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":[{"b":" "}," ",{"b":"_"}]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-500">
+      <description> element node - uniform across empty and empty-plus elements</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b/><b id="x"/><b/><c/></a>')/a, map{'uniform':true()})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":[{"b":{}},{"b":{"@id":"x"}},{"b":{}},{"c":""}]}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-501">
+      <description> element node - uniform across simple and empty-plus elements</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b>-</b><b id="x"/><b>+</b><c/></a>')/a, map{'uniform':true()})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":[{"b":{"#content":"-"}},{"b":{"@id":"x","#content":""}},{"b":{"#content":"+"}},{"c":""}]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-502">
+      <description> element node - uniform across list and single-child and empty elements</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b></b><b><i/><i/><i/></b><b><i/></b></a>')/a, map{'uniform':true(),'layouts':map{QName('','b'):'list-plus'}})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":[[],{"i":["","",""]},[{"i":""}]]}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-503">
+      <description> element node - uniform across lists with different child elements</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b></b><b><j/><j/><j/></b><b><i/></b></a>')/a, map{'uniform':true()})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":[[],["","",""],[""]]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-504">
+      <description> element node - uniform across list and list-plus elements</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b id="x"></b><b><i/><i/><i/></b><b><i/></b><c/></a>')/a, map{'uniform':true()})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":[{"b":{"@id":"x","i":[]}},{"b":{"i":["","",""]}},{"b":{"i":[""]}},{"c":""}]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-505">
+      <description> element node - uniform across list and record elements</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b><i/><j/><k/></b><b><i/><i/><i/></b><c/></a>')/a, map{'uniform':true()})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":[{"b":{"i":"","j":"","k":""}},{"b":{"i[1]":"","i[2]":"","i[3]":""}},{"c":""}]}</assert-string-value> 
+      </result>
+   </test-case>
+   
+   <test-case name="xdm-to-json-506">
+      <description> element node - uniform across list and mixed elements</description>
+      <created by="Michael Kay" on="2023-05-28"/>
+      <test><![CDATA[
+         xdm-to-json(parse-xml('<a><b><i/><j/>zzz<k/></b><b><i/><i/><i/></b><c/></a>')/a, map{'uniform':true()})
+      ]]></test>
+      <result>
+         <assert-string-value>{"a":[{"b":[{"i":""},{"j":""},"zzz",{"k":""}]},{"b":[{"i":""},{"i":""},{"i":""}]},{"c":""}]}</assert-string-value>
+      </result>
+   </test-case>
+   
+   
    
    
    
