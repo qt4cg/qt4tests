@@ -2713,6 +2713,26 @@
         </result>
     </test-case>
     
+    <test-case name="serialize-json-127a" covers-40="escape-solidus">
+        <description>JSON serialization converts nodes to lexical XML</description>
+        <created by="Debbie Lockett, Saxonica" on="2015-08-20"/>
+        <modified by="Tim Mills" on="2016-07-27" change="Bug 29746"/>
+        <modified by="Tim Mills" on="2017-07-29" change="Bug 29753"/>
+        <modified by="Michael Kay" on="2023-05-31" change="Variant with escape-solidus=no"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <environment>
+            <source file="serialize/doc001.xml"
+                uri="http://www.w3.org/fots/serialize-json/doc001.xml"/>
+            <param name="uri" as="xs:string"
+                select="'http://www.w3.org/fots/serialize-json/doc001.xml'"/>
+        </environment>
+        <test>let $r := serialize(map{"a":doc($uri)}, map{'method':'json', 'escape-solidus':false()}) 
+            return translate($r, codepoints-to-string((32, 9, 10, 13)), '')</test>
+        <result>
+            <assert-string-value><![CDATA[{"a":"<a>text</a>"}]]></assert-string-value>
+        </result>
+    </test-case>
+    
     <test-case name="serialize-json-128" covers="fn-serialize json-output">
         <description>JSON serialization converts URI value to a string</description>
         <created by="Debbie Lockett, Saxonica" on="2015-08-20"/>
