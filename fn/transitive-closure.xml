@@ -14,7 +14,7 @@
         <description>Empty sequence as input</description>
         <created by="Michael Kay" on="2023-05-23"/>
         <environment ref="trans-A"/>
-        <test>transitive-closure((), identity#1)</test>
+        <test>transitive-closure(identity#1)(())</test>
         <result>
             <assert-empty/>
         </result>
@@ -24,7 +24,7 @@
         <description>Closure of identity function</description>
         <created by="Michael Kay" on="2023-05-23"/>       
         <environment ref="trans-A"/>
-        <test>transitive-closure(., identity#1)</test>
+        <test>transitive-closure(identity#1)(.)</test>
         <result>
             <assert>/Q{http://www.w3.org/2001/03/XPath/grammar}grammar</assert>
         </result>
@@ -34,12 +34,14 @@
         <description>Closure over @ref element references</description>
         <created by="Michael Kay" on="2023-05-23"/>       
         <environment ref="trans-A"/>
-        <test>transitive-closure(//*:production[@name="VarRef"], 
-                                 function($prod){root($prod)//*:production[@name = $prod//*:ref/@name]})/@name
+        <test>transitive-closure(
+                    function($prod){root($prod)//*:production[@name = $prod//*:ref/@name]})
+                       (//*:production[@name="VarRef"]) 
+                    /@name
                => string-join(' ')
         </test>
         <result>
-            <assert-eq>"_QName_or_EQName"</assert-eq>
+            <assert-eq>"VarName _QName_or_EQName EQName QName FunctionQName"</assert-eq>
         </result>
     </test-case>
     
@@ -47,12 +49,13 @@
         <description>Closure over @ref element references</description>
         <created by="Michael Kay" on="2023-05-23"/>       
         <environment ref="trans-A"/>
-        <test>transitive-closure(//*:production[@name="NumericLiteral"], 
-            function($prod){root($prod)//*:production[@name = $prod//*:ref/@name]})/@name
+        <test>transitive-closure(
+            function($prod){root($prod)//(*:production|*:token)[@name = $prod//*:ref/@name]})
+              (//*:production[@name="NumericLiteral"])/@name
             => string-join(' ')
         </test>
         <result>
-            <assert-eq>"_QName_or_EQName"</assert-eq>
+            <assert-eq>"IntegerLiteral HexIntegerLiteral BinaryIntegerLiteral DecimalLiteral DoubleLiteral Digits DecDigit HexDigits HexDigit BinaryDigits BinaryDigit"</assert-eq>
         </result>
     </test-case>
     
@@ -69,15 +72,66 @@
                 <person id="4" manager="2"/>
                 <person id="5" manager="1"/>
                 <person id="6" manager="3"/>
+                <person id="7" manager="6"/>
+                <person id="8" manager="6"/>
             </doc>')
-            return transitive-closure($data//person[@id='2'], function($p){$data//person[@manager=$p/@id]})/string(@id)               
+            return transitive-closure(function($p){$data//person[@manager=$p/@id]})
+                    ($data//person[@id='2'])/string(@id)               
+        ]]></test>
+        <result>
+            <assert-deep-eq>("3", "4", "6", "7", "8")</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="trans-closure-006">
+        <description>Example from spec with min=0</description>
+        <created by="Michael Kay" on="2023-05-23"/>       
+        <environment ref="trans-A"/>
+        <test><![CDATA[let $data := parse-xml('
+            <doc>
+                <person id="0"/>
+                <person id="1" manager="0"/>
+                <person id="2" manager="0"/>
+                <person id="3" manager="2"/>
+                <person id="4" manager="2"/>
+                <person id="5" manager="1"/>
+                <person id="6" manager="3"/>
+                <person id="7" manager="6"/>
+                <person id="8" manager="6"/>
+            </doc>')
+            return transitive-closure(function($p){$data//person[@manager=$p/@id]}, min:=0)
+                    ($data//person[@id='2'])/string(@id)               
+        ]]></test>
+        <result>
+            <assert-deep-eq>("2", "3", "4", "6", "7", "8")</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="trans-closure-007">
+        <description>Example from spec with max="2"</description>
+        <created by="Michael Kay" on="2023-05-23"/>       
+        <environment ref="trans-A"/>
+        <test><![CDATA[let $data := parse-xml('
+            <doc>
+                <person id="0"/>
+                <person id="1" manager="0"/>
+                <person id="2" manager="0"/>
+                <person id="3" manager="2"/>
+                <person id="4" manager="2"/>
+                <person id="5" manager="1"/>
+                <person id="6" manager="3"/>
+                <person id="7" manager="6"/>
+                <person id="8" manager="6"/>
+            </doc>')
+            return transitive-closure(function($p){$data//person[@manager=$p/@id]}, max:=2)
+                    ($data//person[@id='2'])/string(@id)               
         ]]></test>
         <result>
             <assert-deep-eq>("3", "4", "6")</assert-deep-eq>
         </result>
     </test-case>
     
-    <test-case name="trans-closure-006">
+    <test-case name="trans-closure-008">
         <description>Example from spec</description>
         <created by="Michael Kay" on="2023-05-23"/>       
         <environment ref="trans-A"/>
@@ -90,11 +144,13 @@
                 <person id="4" manager="2"/>
                 <person id="5" manager="1"/>
                 <person id="6" manager="3"/>
+                <person id="7" manager="6"/>
+                <person id="8" manager="6"/>
             </doc>')
-            return transitive-closure($data, ->{child::*})/@id/string()               
+            return transitive-closure(function{child::*})($data)/@id/string()               
         ]]></test>
         <result>
-            <assert-deep-eq>("0", "1", "2", "3", "4", "5", "6")</assert-deep-eq>
+            <assert-deep-eq>("0", "1", "2", "3", "4", "5", "6", "7", "8")</assert-deep-eq>
         </result>
     </test-case>
  
