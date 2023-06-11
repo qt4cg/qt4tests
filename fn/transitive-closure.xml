@@ -62,7 +62,6 @@
     <test-case name="trans-closure-005">
         <description>Example from spec</description>
         <created by="Michael Kay" on="2023-05-23"/>       
-        <environment ref="trans-A"/>
         <test><![CDATA[let $data := parse-xml('
             <doc>
                 <person id="0"/>
@@ -86,7 +85,6 @@
     <test-case name="trans-closure-006">
         <description>Example from spec with min=0</description>
         <created by="Michael Kay" on="2023-05-23"/>       
-        <environment ref="trans-A"/>
         <test><![CDATA[let $data := parse-xml('
             <doc>
                 <person id="0"/>
@@ -110,7 +108,6 @@
     <test-case name="trans-closure-007">
         <description>Example from spec with max="2"</description>
         <created by="Michael Kay" on="2023-05-23"/>       
-        <environment ref="trans-A"/>
         <test><![CDATA[let $data := parse-xml('
             <doc>
                 <person id="0"/>
@@ -134,7 +131,6 @@
     <test-case name="trans-closure-008">
         <description>Example from spec</description>
         <created by="Michael Kay" on="2023-05-23"/>       
-        <environment ref="trans-A"/>
         <test><![CDATA[let $data := parse-xml('
             <doc>
                 <person id="0"/>
@@ -153,6 +149,111 @@
             <assert-deep-eq>("0", "1", "2", "3", "4", "5", "6", "7", "8")</assert-deep-eq>
         </result>
     </test-case>
+    
+    <test-case name="trans-closure-009">
+        <description>Cycles are not a problem</description>
+        <created by="Michael Kay" on="2023-05-23"/>       
+        <test><![CDATA[let $data := parse-xml('
+            <doc>
+                <person id="0"/>
+                <person id="1" manager="0"/>
+                <person id="2" manager="0"/>
+                <person id="3" manager="2"/>
+                <person id="4" manager="2"/>
+                <person id="5" manager="1"/>
+                <person id="6" manager="3"/>
+                <person id="7" manager="6"/>
+                <person id="8" manager="6"/>
+            </doc>')
+            return transitive-closure(function{../child::*})($data//person[@id='4'])/@id/string()               
+        ]]></test>
+        <result>
+            <assert-deep-eq>("0", "1", "2", "3", "4", "5", "6", "7", "8")</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="trans-closure-010">
+        <description>Step function creates new nodes: relies on max for termination</description>
+        <created by="Michael Kay" on="2023-05-23"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+            let $data := parse-xml('<a/>')
+            let $step := function($node){(<b/>,<b/>)}
+            return count(transitive-closure($step, min:=0, max:=4)($data))             
+        ]]></test>
+        <result>
+            <assert-eq>31</assert-eq>
+        </result>
+    </test-case>
+    
+    
+    <test-case name="trans-closure-900">
+        <description>min lt 0</description>
+        <created by="Michael Kay" on="2023-05-23"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+            let $data := parse-xml('<a/>')
+            return count(transitive-closure(identity#1, min:=-1, max:=4)($data))             
+        ]]></test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
+    <test-case name="trans-closure-901">
+        <description>max lt 1</description>
+        <created by="Michael Kay" on="2023-05-23"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+            let $data := parse-xml('<a/>')
+            return count(transitive-closure(identity#1, min:=0, max:=0)($data))             
+        ]]></test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
+    <test-case name="trans-closure-902">
+        <description>max lt min (TODO: rule missing from spec)</description>
+        <created by="Michael Kay" on="2023-05-23"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+            let $data := parse-xml('<a/>')
+            return count(transitive-closure(identity#1, min:=2, max:=1)($data))             
+        ]]></test>
+        <result>
+            <error code="FORG0013"/>
+        </result>
+    </test-case>
+    
+    <test-case name="trans-closure-903">
+        <description>Apply result to non-node</description>
+        <created by="Michael Kay" on="2023-05-23"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+            let $data := parse-xml('<a/>')
+            let $tc := transitive-closure(root#1)
+            return $tc(42)             
+        ]]></test>
+        <result>
+            <error code="XXXX9999"/>
+        </result>
+    </test-case>
+    
+    <test-case name="trans-closure-904">
+        <description>call result with too many args</description>
+        <created by="Michael Kay" on="2023-05-23"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+            let $data := parse-xml('<a/>')
+            let $tc := transitive-closure(root#1)
+            return $tc($data, 12)             
+        ]]></test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
  
 
 </test-set>
