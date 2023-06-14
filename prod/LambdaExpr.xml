@@ -13,7 +13,7 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <modified by="Michael Kay" on="2023-05-27" change="all tests changed to use revised lambda syntax"/>
       <test>
-        let $f := $x -> {$x+1} return $f(2)</test>
+        let $f := ($x) -> {$x+1} return $f(2)</test>
       <result>
          <assert-eq>3</assert-eq>
       </result>
@@ -44,7 +44,7 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
          sum(for $i in 1 to 6 return
-             let $add := $x ->{$x + $i} return $add(4))</test>
+             let $add := ($x)->{$x + $i} return $add(4))</test>
       <result>
          <assert-eq>45</assert-eq>
       </result>
@@ -55,7 +55,7 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
          (1 to 4) !
-         (let $add := $x -> {$x + .} return $add(4))</test>
+         (let $add := ($x) -> {$x + .} return $add(4))</test>
       <result>
          <error code="XPDY0002"/>
       </result>
@@ -84,8 +84,8 @@
       <description>Nested inline functions</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         let $outer := $x -> {
-            let $inner := $y -> {$y + $x}
+         let $outer := ($x) -> {
+            let $inner := ($y) -> {$y + $x}
             return $inner(5)
          }
          return $outer(3)
@@ -100,8 +100,8 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
          let $bonus := 10,
-             $outer := $x -> {
-                let $inner :=  $y -> {$y + $x + $bonus}
+             $outer := ($x) -> {
+                let $inner :=  ($y) -> {$y + $x + $bonus}
                 return $inner(5)
              }
          return $outer(3)
@@ -496,7 +496,7 @@
       <description>Basic inline function, full-width angle bracket</description>
       <created by="Michael Kay" on="2023-05-16"/>
       <test>
-         let $f := $x -＞ {$x+1} return $f(2)</test>
+         let $f := ($x) -＞ {$x+1} return $f(2)</test>
       <result>
          <assert-eq>3</assert-eq>
       </result>
@@ -595,7 +595,7 @@
       <created by="Michael Kay" on="2023-05-27"/>
       <test>
          let $x := 1, $y := 2, $z := 3, $a := 4, $b := 5, $c := 6
-         let $f := ($x, $y, $z, $a, $b, $c -> {$c+1}) 
+         let $f := ($x, $y, $z, $a, $b, ($c) -> {$c+1}) 
          return $x+$f[6](20)</test>
       <result>
          <assert-eq>22</assert-eq>
@@ -607,7 +607,7 @@
       <created by="Michael Kay" on="2023-05-27"/>
       <test>
          let $x := 1, $y := 2, $z := 3, $a := 4, $b := 5, $c := 6
-         let $f := ($x, $y, $z, $a, $b, $c -> {$c+1}) -> {93.7} 
+         let $f := ($x, $y, $z, $a, $b, ($c) -> {$c+1}) -> {93.7} 
          return $x+$f[6](20)
       </test>
       <result>
@@ -648,7 +648,7 @@
       <description>Use on RHS of arrow expression</description>
       <created by="Michael Kay" on="2023-05-27"/>
       <test>
-         "In the beginning was the word" => tokenize() =!> ($t -> {`"{$t}"`})()
+         "In the beginning was the word" => tokenize() =!> (($t) -> {`"{$t}"`})()
       </test>
       <result>
          <assert-deep-eq>'"In"', '"the"', '"beginning"', '"was"', '"the"', '"word"'</assert-deep-eq>
@@ -660,7 +660,7 @@
       <created by="Michael Kay" on="2023-05-27"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
-         <![CDATA[<e att="{let $f := $foo:bar -> {$foo:bar + 1} return $f(3)}" xmlns:foo="http://foo.bar/"/>]]>
+         <![CDATA[<e att="{let $f := ($foo:bar) -> {$foo:bar + 1} return $f(3)}" xmlns:foo="http://foo.bar/"/>]]>
       </test>
       <result>
          <assert>$result//@att="4"</assert>
