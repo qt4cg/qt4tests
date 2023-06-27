@@ -123,7 +123,7 @@
    </test-case>
 
    <test-case name="letexprwith-12">
-      <description> Let clause using an ineteger expression type. </description>
+      <description> Let clause using an integer expression type. </description>
       <created by="Carmelo Montanez" on="2005-11-16"/>
       <dependency type="spec" value="XQ10+"/>
       <test>let $var as xs:integer := 100+200 return $var</test>
@@ -249,6 +249,75 @@
       <test>let $var as xs:string := typeswitch(fn:true()) case $i as xs:boolean return "Test Passed" default return "Test failed" return $var</test>
       <result>
          <assert-string-value>Test Passed</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="letexprwith-25">
+      <description> No coercion applied in XQ31 </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
+      <test>let $var as xs:double := 42 return $var</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="letexprwith-26" covers-40="coercion-in-variables">
+      <description> Coercion applied in XQ40 </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $var as xs:double := 42 return $var</test>
+      <result>
+         <all-of>
+            <assert-eq>42</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="letexprwith-27">
+      <description> No coercion applied in XQ31 </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
+      <test><![CDATA[let $var as xs:date := <a>2023-06-16</a> return $var]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="letexprwith-28" covers-40="coercion-in-variables">
+      <description> Coercion applied in XQ40 </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $var as xs:double := 42 return $var</test>
+      <result>
+         <all-of>
+            <assert-eq>42</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="letexprwith-29">
+      <description> No coercion applied in XQ31 </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
+      <test>let $var as xs:short := 42 return $var</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="letexprwith-30" covers-40="coercion-in-variables downcasting">
+      <description> Coercion applied in XQ40 </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $var as xs:short := 42 return $var</test>
+      <result>
+         <all-of>
+            <assert-eq>42</assert-eq>
+            <assert-type>xs:short</assert-type>
+         </all-of>
       </result>
    </test-case>
    
@@ -381,17 +450,7 @@
          <assert-string-value>hello there</assert-string-value>
       </result>
    </test-case>
-   
-   <test-case name="LetExpr013" covers-40="multiple-let">
-      <description>Purpose : Use a function in the let </description>
-      <created by="Ravindranath Chennoju" on="2005-05-11"/>
-      <dependency type="spec" value="XP30+ XQ10+"/>
-      <test>let $x:="hello" let $y:=concat($x," there") return $y</test>
-      <result>
-         <assert-string-value>hello there</assert-string-value>
-      </result>
-   </test-case>
-
+ 
    <test-case name="LetExpr014" covers-30="let-in-xpath">
       <description>Purpose : Use incompatible types in let </description>
       <created by="Ravindranath Chennoju" on="2005-05-11"/>
@@ -482,6 +541,17 @@
          <error code="XPST0008"/>
       </result>
    </test-case>
+   
+   <test-case name="LetExpr022" covers-40="multiple-let">
+      <description>Purpose : Use a function in the let </description>
+      <created by="Michael Kay" on="2023-06-27"/>
+      <dependency type="spec" value="XP30+ XQ10+"/>
+      <test>let $x:="hello" let $y:=concat($x," there") return $y</test>
+      <result>
+         <assert-string-value>hello there</assert-string-value>
+      </result>
+   </test-case>
+   
 
    <test-case name="K-LetExprWithout-1" covers-30="let-in-xpath">
       <description> A 'let' variable is out-of-scope due to FLWOR has higher precendence than the comma operator. </description>
@@ -590,12 +660,22 @@
    </test-case>
 
    <test-case name="K2-LetExprWithout-7">
-      <description> let-declarations doesn't cause type conversion. </description>
+      <description> let-declaration doesn't cause type conversion. </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>let $i as xs:integer := xs:untypedAtomic("1") return $i</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-LetExprWithout-7a">
+      <description> let-declaration does cause type conversion. </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $i as xs:integer := xs:untypedAtomic("1") return $i</test>
+      <result>
+         <assert-type>xs:integer</assert-type>
       </result>
    </test-case>
 
@@ -611,70 +691,161 @@
    <test-case name="K2-LetExprWithout-9">
       <description> let-declarations doesn't cause numeric promotion. </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>let $i as xs:float := 1.1 return $i</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-LetExprWithout-9a" covers-40="coercion-in-variables">
+      <description> let-declarations does cause numeric promotion. </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $i as xs:float := 1.1 return $i</test>
+      <result>
+         <all-of>
+            <assert-eq>1.1</assert-eq>
+            <assert-type>xs:float</assert-type>
+         </all-of>
       </result>
    </test-case>
 
    <test-case name="K2-LetExprWithout-10">
       <description> let-declarations doesn't cause numeric promotion(#2). </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>let $i as xs:double := 1.1 return $i</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-LetExprWithout-10a" covers-40="coercion-in-variables">
+      <description> let-declarations does cause numeric promotion(#2). </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $i as xs:double := 1.1 return $i</test>
+      <result>
+         <all-of>
+            <assert-eq>1.1</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
       </result>
    </test-case>
 
    <test-case name="K2-LetExprWithout-11">
       <description> let-declarations doesn't cause numeric promotion(#3). </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>let $i as xs:float := 1 return $i</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-LetExprWithout-11a" covers-40="coercion-in-variables">
+      <description> let-declarations does cause numeric promotion(#3). </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $i as xs:float := 1 return $i</test>
+      <result>
+         <all-of>
+            <assert-eq>1</assert-eq>
+            <assert-type>xs:float</assert-type>
+         </all-of>
       </result>
    </test-case>
 
    <test-case name="K2-LetExprWithout-12">
       <description> let-declarations doesn't cause numeric promotion(#4). </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>let $i as xs:double := 1 return $i</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-LetExprWithout-12a" covers-40="coercion-in-variables">
+      <description> let-declarations does cause numeric promotion(#4). </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $i as xs:double := 1 return $i</test>
+      <result>
+         <all-of>
+            <assert-eq>1</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
       </result>
    </test-case>
 
    <test-case name="K2-LetExprWithout-13">
       <description> let-declarations doesn't cause numeric promotion(#5). </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>let $i as xs:double := xs:float(3) return $i</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-LetExprWithout-13a" covers-40="coercion-in-variables">
+      <description> let-declarations does cause numeric promotion(#5). </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $i as xs:double := xs:float(3) return $i</test>
+      <result>
+         <all-of>
+            <assert-eq>3</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
       </result>
    </test-case>
 
    <test-case name="K2-LetExprWithout-14">
       <description> let-declarations doesn't cause string promotion conversion. </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>let $i as xs:string := xs:untypedAtomic("a string") return $i</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-LetExprWithout-14a" covers-40="coercion-in-variables">
+      <description> let-declarations does cause string promotion conversion. </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $i as xs:string := xs:untypedAtomic("a string") return $i</test>
+      <result>
+         <all-of>
+            <assert-eq>"a string"</assert-eq>
+            <assert-type>xs:string</assert-type>
+         </all-of>
       </result>
    </test-case>
 
    <test-case name="K2-LetExprWithout-15">
       <description> let-declarations doesn't cause URI promotion conversion. </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>let $i as xs:string := xs:anyURI("http://www.example.com/") return $i</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-LetExprWithout-15a" covers-40="coercion-in-variables">
+      <description> let-declarations does cause URI promotion conversion. </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $i as xs:string := xs:anyURI("http://www.example.com/") return $i</test>
+      <result>
+         <all-of>
+            <assert-eq>"http://www.example.com/"</assert-eq>
+            <assert-type>xs:string</assert-type>
+         </all-of>
       </result>
    </test-case>
 

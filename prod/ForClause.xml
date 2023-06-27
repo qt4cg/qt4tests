@@ -1827,12 +1827,24 @@
       <description> FLWOR expressions with type declaration. Attempt to promote xs:decimal | xs:double | xs:integer - no common subtype </description>
       <created by="Mike Rorke" on="2005-09-13"/>
       <environment ref="SpecialTypes"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>for $test as xs:double in ( 1, 1e2, 0.3 ) return $test</test>
       <result>
          <error code="XPTY0004"/>
       </result>
    </test-case>
+   
+   <test-case name="ForExprType046a" covers-40="coercion-in-variables">
+      <description> FLWOR expressions with type declaration. Attempt to promote xs:decimal | xs:double | xs:integer - no common subtype </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <environment ref="SpecialTypes"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>for $test as xs:double in ( 1, 1e2, 0.3 ) return $test</test>
+      <result>
+         <assert-type>xs:double*</assert-type>
+      </result>
+   </test-case>
+   
 
    <test-case name="ForExprType047">
       <description> FLWOR expressions with type declaration. Test matching no atomic simple types </description>
@@ -2127,10 +2139,20 @@
    <test-case name="K2-ForExprWith-1">
       <description> For declarations does not cause type promotions to apply. </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>for $i as xs:string in xs:untypedAtomic("input") return $i</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ForExprWith-2" covers-40="coercion-in-variables">
+      <description> For declarations does cause type promotions to apply in 4.0. </description>
+      <created by="Michael Kay" on="2023-06-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>for $i as xs:string in xs:untypedAtomic("input") return $i</test>
+      <result>
+         <assert-type>xs:string</assert-type>
       </result>
    </test-case>
 </test-set>
