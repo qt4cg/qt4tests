@@ -201,6 +201,137 @@
         </result>
     </test-case>
     
+    <!-- Following tests copied (mutatis mutandis) from map-group-by (MHK, 2023-06-28) -->
+    
+    <test-case name="map-build-201">
+        <description>Empty sequence, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((), boolean#1)]]></test>
+        <result>
+            <assert-deep-eq>map{}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-202">
+        <description>Integer, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build(0, boolean#1)]]></test>
+        <result>
+            <assert-deep-eq>map{false():0}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-203">
+        <description>Integer, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build(1, boolean#1)]]></test>
+        <result>
+            <assert-deep-eq>map{true():1}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-204">
+        <description>Integers, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((0, 1), boolean#1) => map:size()]]></test>
+        <result>
+            <assert-eq>2</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-205">
+        <description>Integers, function item</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((0, 1), function($i) { boolean($i)[.] })]]></test>
+        <result>
+            <assert-deep-eq>map{true():1}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-206">
+        <description>Integer range, function yielding empty sequence</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((1 to 100), function($i) { })]]></test>
+        <result>
+            <assert-deep-eq>map{}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-207">
+        <description>Integer range, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((1 to 100), boolean#1) => map:size()]]></test>
+        <result>
+            <assert-eq>1</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-208">
+        <description>Integer range, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((1 to 100), string#1) => map:size()]]></test>
+        <result>
+            <assert-eq>100</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-209">
+        <description>Integer range, function item</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((1 to 100), function($i) { $i mod 10 }) => map:size()]]></test>
+        <result>
+            <assert-eq>10</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-210">
+        <description>Strings, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build(('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+      'September', 'October', 'November', 'December'), string-length#1) => map:size()]]></test>
+        <result>
+            <assert-eq>7</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-211">
+        <description>Integer range, function item</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[map:build((1 to 100), function($i) { $i mod 10 }) => map:size()]]></test>
+        <result>
+            <assert-eq>10</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-212">
+        <description>Nodes, named function reference</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[map:build(<xml>{ (1 to 9) ! <sub>{ . }</sub> }</xml>/*, string-length#1) => map:keys()]]></test>
+        <result>
+            <assert-eq>1</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-213">
+        <description>Filter expression selecting appropriate functions</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[for $f in (true#0, false#0, concat#2, substring#2, contains#2, identity#1)[function-arity(.) = 1]
+      return map:build(5, $f)]]></test>
+        <result>
+            <assert-deep-eq>map{5:5}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-214">
+        <description>Filter expression selecting appropriate functions</description>
+        <created by="Christian Gruen" on="2022-08-10"/>
+        <test><![CDATA[for $f in (1, 2, 3, 4, string#1, 6)[. instance of function(*)] return  map:build(8, $f)]]></test>
+        <result>
+            <assert-deep-eq>map{"8":8}</assert-deep-eq>
+        </result>
+    </test-case>
+    
  
 
 </test-set>
