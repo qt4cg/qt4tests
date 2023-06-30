@@ -382,6 +382,40 @@
       </result>
    </test-case>
    
+   <test-case name="for-member-033" covers-40="coercion-in-variables">
+      <description>for member expression - with atomization</description>
+      <created by="Michael Kay" on="2023-06-30"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         let $doc := parse-xml(<doc><a>1</a><a>2</a><a>3></a></doc>)
+         for member $x as xs:integer in array{$doc//a} return $x+1
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-deep-eq>(2,3,4)</assert-deep-eq>
+            <assert-type>xs:integer*</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="for-member-034" covers-40="coercion-in-variables">
+      <description>for member expression - nested with atomization</description>
+      <created by="Michael Kay" on="2023-06-30"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         let $doc := parse-xml(<doc><a>1</a><a>2</a><a>3></a><b>11</b><b>22</b><b>33</b></doc>)
+         let $twoArrays := [array{$doc//a}, array{$doc//b}]
+         for member $x as array(node()) in $twoArrays
+         for member $y as xs:integer in $x return $y+1
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-deep-eq>(1,2,3,12,23,34)</assert-deep-eq>
+            <assert-type>xs:integer*</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
    
    
 
