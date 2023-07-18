@@ -6,8 +6,6 @@
    
    <dependency type="spec" value="XP40+ XQ40+"/>
    
-   <!-- Starter set of tests copied from distinct-values() - results need updating -->
-
    <test-case name="fn-duplicate-valuesint1args-1">
       <description> Evaluates The "duplicate-values" function with the arguments set as follows: $arg = xs:int(lower bound) </description>
       <created by="Michael Kay after Carmelo Montanez" on="2023-07-18"/>
@@ -489,7 +487,7 @@
       <created by="Michael Kay after Pulkita Tyagi" on="2023-07-18"/>
       <test>fn:duplicate-values((xs:float('NaN'), 'NaN'))</test>
       <result>
-         <assert-string-value>NaN</assert-string-value>
+         <assert-empty/>
       </result>
    </test-case>
 
@@ -498,7 +496,7 @@
       <created by="Michael Kay after Pulkita Tyagi" on="2023-07-18"/>
       <test>fn:duplicate-values((xs:float('INF'), 'INF'))</test>
       <result>
-         <assert-string-value>INF</assert-string-value>
+         <assert-empty/>
       </result>
    </test-case>
 
@@ -507,7 +505,7 @@
       <created by="Michael Kay after Pulkita Tyagi" on="2023-07-18"/>
       <test>fn:duplicate-values((xs:float('-INF'), '-INF'))</test>
       <result>
-         <assert-string-value>-INF</assert-string-value>
+         <assert-empty/>
       </result>
    </test-case>
 
@@ -667,7 +665,7 @@
          )))
       </test>
       <result>
-         <assert-empty/>
+         <assert-eq>1</assert-eq>
       </result>
    </test-case>
 
@@ -836,16 +834,20 @@
   xs:double('1.00000000001')
 ))</test>
       <result>
-         <assert-permutation>1, 1.0000000000100000000001, 1.00000000001</assert-permutation>
+         <assert-empty/>
       </result>
    </test-case>
 
    <test-case name="fn-duplicate-values-2">
       <description>duplicate-values() on a somewhat larger set of values</description>
       <created by="Michael Kay" on="2023-07-18"/>
-      <test>duplicate-values((1 to 300, 100 to 400, 29, 145, 20 to 50, for $x in (30 to 40) return xs:string($x), "foo", "bar"))</test>
+      <test><![CDATA[
+duplicate-values(
+  (1 to 300, 100 to 400, 29, 145, 20 to 50,
+  for $x in (30 to 40) return xs:string($x), "foo", "bar")
+) => sort()]]></test>
       <result>
-         <assert-permutation>1 to 400, "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "foo", "bar"</assert-permutation>
+         <assert-deep-eq>20 to 50, 100 to 300</assert-deep-eq>
       </result>
    </test-case>
    
@@ -1117,7 +1119,7 @@
       		local:create('-P2DT15H0M0S'), local:create('FFFEFDFC'), local:create('aGVsbG8=') )) 
       	order by string($value) return $value</test>
       <result>
-	    <assert-string-value/>
+      <assert-string-value>---01 ---15Z --06 --06-01 --12-15Z --12Z -1 -1 -P1DT15H -P1DT15H0M0S -P2DT15H -P2DT15H0M0S 0 0 00:00:00 00:00:00 1 1 12:00:00 12:00:00 1972-06-01T12:00:00+01:00 1972-06-01Z 1972-12Z 1972Z 2008 2008 2008-06 2008-06-01 2008-06-01T12:00:00 3 3.141 3.141 3.141 3.333 333 333.3 333.30000000000001136868377216160297393798828125 FFFEFDFC NaN NaN P10Y15M P11Y3M P20Y15M P21Y3M aGVsbG8= false false ht:person ht:person http://www.example.com/ person true true zero</assert-string-value>
       </result>
    </test-case>
    
@@ -1325,6 +1327,135 @@
       <test>count(fn:duplicate-values(("a", "b", "a"), collation:="xyz"[current-date() lt xs:date('1999-01-01')]))</test>
       <result>
          <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="duplicate-values-501">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values(1)]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-502">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values((1, 2))]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-503">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values((1, 2, 1))]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-504">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values((1, 2, 1, 1))]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-505">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values((1, 2, 2, 1))]]></test>
+      <result>
+          <assert-permutation>2,1</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-506">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values((1, 'a', true()))]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-507">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values(1 to 50000)]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-508">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values((1 to 50000) ! 1)]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-509">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values(data(attribute _ { '1' }) to 50000)]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-510">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values((1 to 5) ! <_>1</_>)]]></test>
+      <result>
+         <assert-string-value>1</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-511">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values((<a>1</a>, <b>1</b>))]]></test>
+      <result>
+         <assert-string-value>1</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-512">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values('a', "http://www.w3.org/2005/xpath-functions/collation/codepoint")]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-513">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values(('a', 'a'), "http://www.w3.org/2005/xpath-functions/collation/codepoint")]]></test>
+      <result>
+         <assert-string-value>a</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-514">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values(('a', 'a', 'a'), "http://www.w3.org/2005/xpath-functions/collation/codepoint")]]></test>
+      <result>
+         <assert-string-value>a</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-515">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values((1, true#0))]]></test>
+      <result>
+         <error code="FOTY0013"/>
+      </result>
+   </test-case>
+   <test-case name="duplicate-values-516">
+      <description>fn:duplicate-values</description>
+      <created by="Christian Gruen" on="2023-07-18"/>
+      <test><![CDATA[duplicate-values((1 to 5) ! true#0)]]></test>
+      <result>
+         <error code="FOTY0013"/>
       </result>
    </test-case>
 </test-set>
