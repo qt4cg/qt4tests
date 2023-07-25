@@ -12,8 +12,9 @@
       <description>Basic inline function</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <modified by="Michael Kay" on="2023-05-27" change="all tests changed to use revised lambda syntax"/>
+      <modified by="Michael Kay" on="2023-07-25" change="all tests changed to use fn{} syntax"/>
       <test>
-        let $f := ($x) -> {$x+1} return $f(2)</test>
+        let $f := fn($x)  {$x+1} return $f(2)</test>
       <result>
          <assert-eq>3</assert-eq>
       </result>
@@ -23,7 +24,7 @@
       <description>Zero-arity function</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         let $pi := ()->{3.14159} return $pi()</test>
+         let $pi := fn(){3.14159} return $pi()</test>
       <result>
          <assert-eq>3.14159</assert-eq>
       </result>
@@ -33,7 +34,7 @@
       <description>Arity two function</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         let $add := ($x, $y)->{$x + $y} return $add(4, 2)</test>
+         let $add := fn($x, $y){$x + $y} return $add(4, 2)</test>
       <result>
          <assert-eq>6</assert-eq>
       </result>
@@ -44,7 +45,7 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
          sum(for $i in 1 to 6 return
-             let $add := ($x)->{$x + $i} return $add(4))</test>
+             let $add := fn($x){$x + $i} return $add(4))</test>
       <result>
          <assert-eq>45</assert-eq>
       </result>
@@ -55,7 +56,7 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
          (1 to 4) !
-         (let $add := ($x) -> {$x + .} return $add(4))</test>
+         (let $add := fn($x)  {$x + .} return $add(4))</test>
       <result>
          <error code="XPDY0002"/>
       </result>
@@ -65,7 +66,7 @@
       <description>Function with empty body (3.0)</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <dependency type="spec" value="XP30 XQ30"/>
-      <test>let $void := ()->{} return $void()</test>
+      <test>let $void := fn(){} return $void()</test>
       <result>
          <error code="XPST0003"/>
       </result>
@@ -74,7 +75,7 @@
    <test-case name="lambda-fn-007" covers="empty-enclosed-expr">
       <description>Function with empty body (3.1)</description>
       <created by="Michael Kay" on="2020-12-02"/>
-      <test>let $void := ()->{} return $void()</test>
+      <test>let $void := fn(){} return $void()</test>
       <result>
          <assert-empty/>
       </result>
@@ -84,8 +85,8 @@
       <description>Nested inline functions</description>
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
-         let $outer := ($x) -> {
-            let $inner := ($y) -> {$y + $x}
+         let $outer := fn($x)  {
+            let $inner := fn($y)  {$y + $x}
             return $inner(5)
          }
          return $outer(3)
@@ -100,8 +101,8 @@
       <created by="Michael Kay" on="2020-12-02"/>
       <test>
          let $bonus := 10,
-             $outer := ($x) -> {
-                let $inner :=  ($y) -> {$y + $x + $bonus}
+             $outer := fn($x)  {
+                let $inner :=  ($y)  {$y + $x + $bonus}
                 return $inner(5)
              }
          return $outer(3)
@@ -111,578 +112,6 @@
       </result>
    </test-case>
    
-   <!--<test-case name="lambda-fn-010">
-      <description>Function with declared parameter types</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         let $add := ($x as xs:integer, $y as xs:integer)->{$x + $y}
-         return $add(3,4)
-      </test>
-      <result>
-         <assert-eq>7</assert-eq>
-      </result>
-   </test-case>-->
-   
-   <!--<test-case name="lambda-fn-011">
-      <description>Function with declared parameter types, error case</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         let $add := ($x as xs:integer, $y as xs:integer)->{$x + $y}
-         return $add(3,4.2)
-      </test>
-      <result>
-         <error code="XPTY0004"/>
-      </result>
-   </test-case>-->
-   
-   <!--<test-case name="lambda-fn-012">
-      <description>Function with declared return type</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         let $add := ($x, $y)-> as xs:integer {$x + $y}
-         return $add(3, 4)
-      </test>
-      <result>
-         <assert-eq>7</assert-eq>
-      </result>
-   </test-case>-->
-   
-   <!--<test-case name="lambda-fn-012a">
-      <description>Function with declared return type, error case</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         let $add := ($x, $y)-> as xs:integer {$x + $y}
-         return $add(3, 4.1)
-      </test>
-      <result>
-         <error code="XPTY0004"/>
-      </result>
-   </test-case>-->
-   
-   <!--<test-case name="lambda-fn-013">
-      <description>Function with declared return type, causes type conversion</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         let $add := ($x, $y)-> as xs:double {$x + $y}
-         return $add(3, 4)
-      </test>
-      <result>
-         <all-of>
-            <assert-eq>7</assert-eq>
-            <assert-type>xs:double</assert-type>
-         </all-of>
-      </result>
-   </test-case>-->
-   
-   <test-case name="lambda-fn-014">
-      <description>Function returning a function containing a closure</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         let $process := ($op, $x, $y) -> {if ($op = "+") 
-                                           then () -> {$x + $y} 
-                                           else () -> {$x - $y}}
-         return $process("+", 3, 4)()
-      </test>
-      <result>
-         <assert-eq>7</assert-eq>
-      </result>
-   </test-case>
-   
-   <!--<test-case name="lambda-fn-015">
-      <description>Annotations are allowed in XQuery</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <dependency type="spec" value="XQ40+"/>
-      <test>
-         let $add := %Q{http://example.com/speed}fast %Q{http://example.com/origin}author("Mike") ($x, $y)-> {$x + $y} return $add(2,2)
-      </test>
-      <result>
-         <assert-eq>4</assert-eq>
-      </result>
-   </test-case>-->
-   
-   <test-case name="lambda-fn-016">
-      <description>Annotations are not allowed in XPath</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <dependency type="spec" value="XP40+"/>
-      <test>
-         let $add := %Q{http://example.com/speed}fast %Q{http://example.com/origin}author("Mike") ($x, $y)-> {$x + $y} return $add(2,2)
-      </test>
-      <result>
-         <error code="XPST0003"/>
-      </result>
-   </test-case>
-   
-   <!--<test-case name="lambda-fn-017">
-      <description>Annotations with parentheses must have parameters</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <dependency type="spec" value="XQ40+"/>
-      <test>
-         let $add := %Q{http://example.com/speed}fast() %Q{http://example.com/origin}author("Mike") ($x, $y)-> {$x + $y} return $add(2,2)
-      </test>
-      <result>
-         <error code="XPST0003"/>
-      </result>
-   </test-case>-->
-   
-   <!--<test-case name="lambda-fn-018">
-      <description>Parameters to Annotations must be literals</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <dependency type="spec" value="XQ40+"/>
-      <test>
-         let $add := %Q{http://example.com/speed}fast(true())  ($x, $y)-> {$x + $y} return $add(2,2)
-      </test>
-      <result>
-         <error code="XPST0003"/>
-      </result>
-   </test-case>-->
-   
-   <!--<test-case name="lambda-fn-019">
-      <description>Parameters to Annotations must be literals</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <dependency type="spec" value="XQ40+"/>
-      <test>
-         let $add := % Q{http://example.com/speed}speed (-1)  ($x, $y)-> {$x + $y} return $add(2,2)
-      </test>
-      <result>
-         <error code="XPST0003"/>
-      </result>
-   </test-case>-->
-   
-   <!--<test-case name="lambda-fn-020">
-      <description>Parameters to Annotations must be literals</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <dependency type="spec" value="XQ40+"/>
-      <test>
-         let $add := % Q{http://example.com/speed}speed (())  ($x, $y)-> {$x + $y} return $add(2,2)
-      </test>
-      <result>
-         <error code="XPST0003"/>
-      </result>
-   </test-case>-->
-   
-   <test-case name="lambda-fn-021">
-      <description>Name of an inline function</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         let $add := ($x, $y)-> {$x + $y} return function-name($add)
-      </test>
-      <result>
-         <assert-empty/>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-022">
-      <description>Arity of an inline function</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         let $add := ($x, $y)-> {$x + $y} return function-arity($add)
-      </test>
-      <result>
-         <assert-eq>2</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-023" covers="fn-apply">
-      <description>Apply an inline function</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         let $add := ($x, $y)-> {$x + $y} return apply($add, [12, 5])
-      </test>
-      <result>
-         <assert-eq>17</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-024">
-      <description>An inline function is a primary</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         ($x, $y)-> {$x + $y} (12, 5)
-      </test>
-      <result>
-         <assert-eq>17</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-025">
-      <description>An inline function is a primary</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         ($x, $y)-> {$x + $y} [function-arity(.) = 2] (12, 5)
-      </test>
-      <result>
-         <assert-eq>17</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-026">
-      <description>Pass a function to itself</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         let $weirdo := ($x, $f)-> {if ($x=0) then 0 else $f($x - 1, $f)} 
-         return $weirdo(12, $weirdo)
-      </test>
-      <result>
-         <assert-eq>0</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-027" covers="map-general">
-      <description>A map containing inline functions</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         let $calc := map{
-            "+" : ($a, $b)-> {$a + $b},
-            "-" : ($a, $b)-> {$a - $b},
-            "*" : ($a, $b)-> {$a * $b},
-            "/" : ($a, $b)-> {$a div $b}}
-         return $calc("*")(2,3)  
-      </test>
-      <result>
-         <assert-eq>6</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-028">
-      <description>Inline function has no string value</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         string(($a, $b)-> {$a + $b})
-      </test>
-      <result>
-         <error code="FOTY0014"/>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-029">
-      <description>deep-equal() comparing inline functions</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         deep-equal(($a, $b)-> {$a + $b}, ($a, $b)-> {$a - $b})
-      </test>
-      <result>
-         <error code="FOTY0015"/>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-030">
-      <description>Inline function has no typed value</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         data(($a, $b)-> {$a + $b})
-      </test>
-      <result>
-         <error code="FOTY0013"/>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-031">
-      <description>Inline function has no typed value</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         let $x := ($a, $b)-> {$a + $b}, 
-             $y := ($a, $b)-> {$a - $b},
-             $c := ($x, $y)-> {$x = $y}
-         return $c($x, $y)
-      </test>
-      <result>
-         <error code="FOTY0013"/>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-032">
-      <description>Type of an inline function</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         ($a, $b)-> {$a + $b}
-      </test>
-      <result>
-         <all-of>
-            <assert-type>item()</assert-type>
-            <assert-type>function(*)</assert-type>
-            <assert-type>function(item()*, item()*) as item()*</assert-type>
-            <assert-type>function(xs:integer, xs:integer) as item()*</assert-type>
-            <not>
-               <assert-type>function(item()*, item()*) as xs:integer</assert-type>
-            </not>
-            <not>
-               <assert-type>function(item()*, item()*, item()*) as item()*</assert-type>
-            </not>
-         </all-of>
-      </result>
-   </test-case>
-   
-   <!--<test-case name="lambda-fn-033">
-      <description>Type of an inline function</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         ($a as xs:integer, $b as xs:integer)-> as xs:integer {$a + $b}
-      </test>
-      <result>
-         <all-of>
-            <assert-type>item()</assert-type>
-            <assert-type>function(*)</assert-type>
-            <assert-type>function(xs:integer, xs:integer) as item()*</assert-type>
-            <assert-type>function(xs:long, xs:long) as xs:integer+</assert-type>
-            <not>
-               <assert-type>function(item()*, item()*) as xs:integer</assert-type>
-            </not>
-            <not>
-               <assert-type>function(xs:integer, xs:decimal) as xs:integer</assert-type>
-            </not>
-         </all-of>
-      </result>
-   </test-case>-->
-   
-   <test-case name="lambda-fn-034">
-      <description>Inline function accessing global variable in XQuery</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <dependency type="spec" value="XQ40+"/>
-      <environment>
-         <param name="p" select="7" declared="true"/>
-      </environment>
-      <test>
-         declare variable $p as xs:integer external;
-         declare variable $f := ($a)-> {$a + $p};
-         $f(12)
-      </test>
-      <result>
-         <assert-eq>19</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-035">
-      <description>Inline function with closure accessing global variables and functions in XQuery</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <dependency type="spec" value="XQ40+"/>
-      <environment>
-         <param name="p" select="7" declared="true"/>
-      </environment>
-      <test>
-         declare variable $p as xs:integer external;
-         declare function local:negate($x) {-$x};
-         declare variable $f := let $x := $p return ($a)-> {local:negate($a + $x + $p)};
-         $f(12)
-      </test>
-      <result>
-         <assert-eq>-26</assert-eq>
-      </result>
-   </test-case>
-   
-   <!--<test-case name="lambda-fn-036">
-      <description>Body of inline function fails type-checking</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         let $f := ($x as xs:double)-> {1 to $x}
-         return $f(3)
-      </test>
-      <result>
-         <error code="XPTY0004"/>
-      </result>
-   </test-case>-->
-   
-   <test-case name="lambda-fn-037">
-      <description>Used as an argument to fn:filter</description>
-      <created by="Michael Kay" on="2020-12-02"/>
-      <test>
-         filter(1 to 10, ($x)->{$x mod 3 = 0})
-      </test>
-      <result>
-         <assert-deep-eq>3, 6, 9</assert-deep-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-038" covers-40="operator-symbols">
-      <description>Basic inline function, full-width angle bracket</description>
-      <created by="Michael Kay" on="2023-05-16"/>
-      <test>
-         let $f := ($x) -＞ {$x+1} return $f(2)</test>
-      <result>
-         <assert-eq>3</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-039" covers-40="operator-symbols">
-      <description>Duplicate parameter names</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <test>
-         let $f := ($x, $z, $x) -＞ {$x+1} return $f(2, 3, 4)</test>
-      <result>
-         <error code="XQST0039"/>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-040">
-      <description>Unresolvable parameter names</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <test>
-         let $f := ($foo:x) -> {$foo:x+1} return $f(2)</test>
-      <result>
-         <error code="XPST0081"/>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-041">
-      <description>Duplicate parameter names due to namespaces</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <dependency type="spec" value="XQ40+"/>
-      <test>
-         declare namespace foo = "http://www.example.com/foo";
-         declare namespace bar = "http://www.example.com/foo";
-         let $f := ($foo:x, $z, $bar:x) -> {$foo:x+1} return $f(2, 3, 4)</test>
-      <result>
-         <error code="XQST0039"/>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-042">
-      <description>Need space between name and arrow</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <test>
-         let $f := $x->{x+1} return $f(2, 3, 4)</test>
-      <result>
-         <error code="XPST0003"/>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-043">
-      <description>Confusing lookahead, success case</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <test>
-         let $f := ((:$x,:) $x (:,$y:))  -＞ {$x+1} return $f(2)</test>
-      <result>
-         <assert-eq>3</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-044">
-      <description>Confusing lookahead, success case</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <test>
-         let $f := ($x, $y, $z, $a, $b, $c, $d, $e, $f, $g, $h, $i, $j) -> {$x+1} return function-arity($f)</test>
-      <result>
-         <assert-eq>13</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-045">
-      <description>Parameters shadow outer variables</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <test>
-         let $x := 1, $y := 2, $z := 3, $h := 15
-         let $f := ($x, $y, $z, $a, $b, $c, $d, $e, $f, $g, $h, $i, $j) -> {$x+$h} 
-         return $f(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)</test>
-      <result>
-         <assert-eq>12</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-046">
-      <description>Backtracking needed</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <test>
-         let $x := 1, $y := 2, $z := 3, $a := 4, $b := 5, $c := 6
-         let $f := ($x, $y, $z, $a, $b, $c)
-         let $g := ()->{42}
-         return $x+$c+$g()</test>
-      <result>
-         <assert-eq>49</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-047">
-      <description>Backtracking needed</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <test>
-         let $x := 1, $y := 2, $z := 3, $a := 4, $b := 5, $c := 6
-         let $f := ($x, $y, $z, $a, $b, ($c) -> {$c+1}) 
-         return $x+$f[6](20)</test>
-      <result>
-         <assert-eq>22</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-048">
-      <description>Backtracking needed, but fails</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <test>
-         let $x := 1, $y := 2, $z := 3, $a := 4, $b := 5, $c := 6
-         let $f := ($x, $y, $z, $a, $b, ($c) -> {$c+1}) -> {93.7} 
-         return $x+$f[6](20)
-      </test>
-      <result>
-         <error code="XPST0003"/>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-049">
-      <description>EQNames for parameters</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <dependency type="spec" value="XQ40+"/>
-      <test>
-         declare namespace foo = "http://www.example.com/foo";
-         let $f := ($Q{http://www.example.com/foo}x, $y, $foo:z) -> {$foo:x+$foo:z} return $f(2, 3, 4)
-      </test>
-      <result>
-         <assert-eq>6</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-050">
-      <description>Doubled parens not allowed</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <dependency type="spec" value="XQ40+"/>
-      <test>
-         declare namespace foo = "http://www.example.com/foo";
-         let $f := (($Q{http://www.example.com/foo}x, $y)) -> {$foo:x+$y} return $f(2, 3)
-      </test>
-      <result>
-         <any-of>
-            <error code="XPST0003"/>
-            <error code="XPST0008"/>
-         </any-of>        
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-051">
-      <description>Use on RHS of arrow expression</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <test>
-         "In the beginning was the word" => tokenize() =!> (($t) -> {`"{$t}"`})()
-      </test>
-      <result>
-         <assert-deep-eq>'"In"', '"the"', '"beginning"', '"was"', '"the"', '"word"'</assert-deep-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-052">
-      <description>Forwards reference to namespace declaration</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <dependency type="spec" value="XQ40+"/>
-      <test>
-         <![CDATA[<e att="{let $f := ($foo:bar) -> {$foo:bar + 1} return $f(3)}" xmlns:foo="http://foo.bar/"/>]]>
-      </test>
-      <result>
-         <assert>$result//@att="4"</assert>
-      </result>
-   </test-case>
-   
-   <test-case name="lambda-fn-053">
-      <description>Forwards reference to namespace declaration</description>
-      <created by="Michael Kay" on="2023-05-27"/>
-      <dependency type="spec" value="XQ40+"/>
-      <test>
-         <![CDATA[<e att="{let $f := ($foo:bar, $foo:baz) -> {$foo:bar + $foo:baz} return $f(3, 4)}" xmlns:foo="http://foo.bar/"/>]]>
-      </test>
-      <result>
-         <assert>$result//@att="7"</assert>
-      </result>
-   </test-case>
-   
-   
-   
-   
-   
-
+ 
    
 </test-set>
