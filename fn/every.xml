@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-every" covers-40="fn-every">
+   <description>Tests for the fn:every() function (4.0 proposal)</description>
+   <link type="spec" document="http://www.w3.org/TR/xquery-30/"
+         idref="doc-xquery30-QuantifiedExpr"/>
+   <link type="spec" document="XQuery" section-number="3.11"
+         idref="id-quantified-expressions"/>
+   
+   <!-- Tests are derived from the tests on quantified expressions -->
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+   
+   <test-case name="every-1">
+      <description> Call on fn:every and addition expression. Returns false </description>
+      <created by="Michael Kay after Carmelo Montanez" on="2020-11-29"/>
+      <test>every((1, 2), function($x){$x + $x = 3})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="every-2">
+      <description> Call on fn:every and addition expression. Returns true </description>
+      <created by="Michael Kay after Carmelo Montanez" on="2020-11-29"/>
+      <test>every((1, 2), function($x){$x + $x = 2})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="every-3">
+      <description> Call on fn:every and a subtraction expression. Returns false </description>
+      <created by="Michael Kay after Carmelo Montanez" on="2020-11-29"/>
+      <test>every((1, 2), function($x){$x - 2 = 2})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="every-4">
+      <description>every() applied to empty sequence</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>every(year-from-date(current-date()) to 0, is-NaN#1)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="every-5">
+      <description>every() with function returning non-boolean</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>every(1 to 10, function($x){$x + 1})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="every-6">
+      <description>every() with function having wrong arity</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>every(10 to 20, function($x, $y){$x + 1})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="every-7">
+      <description>every() with function accepting wrong type</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <test>every(10 to 20, function($x){name($x) = 'alpha'})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="every-16">
+      <description> Call on fn:every and use of logical expression (and). </description>
+      <created by="Michael Kay after Carmelo Montanez" on="2020-11-29"/>
+      <test>every((1, 2), function($x){ $x = 1 and ($x +1) = 2})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="every-17">
+      <description> Call on fn:every and and use of string data. </description>
+      <created by="Michael Kay after Carmelo Montanez" on="2020-11-29"/>
+      <test>every(("A","B","C"), function($x){ $x = "A" })</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="every-18">
+      <description> Call on fn:every with multiple variables and addition expression </description>
+      <created by="Michael Kay after Carmelo Montanez" on="2020-11-29"/>
+      <test>every((1,2,3), function($x){every((4,5,6), function($y){$x + $y = 5})})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="every-19">
+      <description> Call on fn:every and and use of string data. </description>
+      <created by="Michael Kay after Carmelo Montanez" on="2020-11-29"/>
+      <test>every(("A","B","C"), function($x){ $x instance of xs:string })</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="every-20">
+      <description>fn:every#1, empty sequence</description>
+      <created by="Michael Kay" on="2022-09-13"/>
+      <test>every(())</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="every-21">
+      <description>fn:every#1, returning true</description>
+      <created by="Michael Kay" on="2022-09-13"/>
+      <test>every((1=1, 2=2, 3=3))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="every-22">
+      <description>fn:every#1, returning false</description>
+      <created by="Michael Kay" on="2022-09-13"/>
+      <test>every((1=1, 2=5, 3=3))</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="every-23">
+      <description>fn:every#1, returning error</description>
+      <created by="Michael Kay" on="2022-09-13"/>
+      <test>every((1=1, 2=2, 17))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="every-24">
+      <description>fn:every#1, returning false or error</description>
+      <created by="Michael Kay" on="2022-09-13"/>
+      <test>every((1=1, 2=3, 17))</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <error code="XPTY0004"/>
+         </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="every-25">
+      <description>fn:every#2, function requires coercion, success case</description>
+      <created by="Michael Kay" on="2022-09-13"/>
+      <test>every(1 to 5, function($x){$x gt 0})</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="every-26">
+      <description>fn:every#2, function requires coercion, failure case</description>
+      <created by="Michael Kay" on="2022-09-13"/>
+      <test>every((true(), 'zizzy'), function($x){$x})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+
+</test-set>
