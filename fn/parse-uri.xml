@@ -130,8 +130,8 @@
       let $amp := codepoints-to-string(38) return
       fn:parse-uri("https://example.com:8080/path?s=%22hello world%22" || $amp || "sort=relevance")</test>
     <result>
-      <assert-deep-eq>
-        map {
+      <assert-deep-eq><![CDATA[
+map {
   "uri": "https://example.com:8080/path?s=%22hello world%22&amp;sort=relevance",
   "scheme": "https",
   "hierarchical": true(),
@@ -145,7 +145,7 @@
     map { "key": "sort", "value": "relevance" }
   },
   "path-segments": array { "", "path" }
-}</assert-deep-eq>
+}]]></assert-deep-eq>
     </result>
   </test-case>
 
@@ -643,22 +643,26 @@
   <test-case name="fn-parse-uri-036">
     <description>Parses a complex example; from Saxonica bug #6031.</description>
     <created by="Norm Tovey-Walsh" on="2023-05-11"/>
-    <test>fn:parse-uri("https://example.com:8080/path?s=%22hello world%22&amp;sort=relevance")</test>
+    <modified by="Michael Kay" on="2023-06-28" change="backticks achieve XP/XQ compatibility"/>
+    <test>fn:parse-uri(`https://example.com:8080/path?s=%22hello world%22&amp;sort=relevance`)</test>
     <result>
-      <assert-deep-eq>map {"host": "example.com",
-                           "hierarchical": true(),
-                           "port": "8080",
-                           "authority": "example.com:8080",
-                           "path": "/path",
-                           "scheme": "https",
-                           "query-segments":[
-                              map {"value": """hello world""",
-                                   "key":"s"},
-                              map {"value":"relevance",
-                                   "key":"sort"}],
-                           "path-segments": ["","path"],
-                           "query": "s=%22hello world%22&amp;sort=relevance",
-                           "uri": "https://example.com:8080/path?s=%22hello world%22&amp;sort=relevance"}</assert-deep-eq>
+      <assert-deep-eq><![CDATA[
+map {
+  "host": "example.com",
+  "hierarchical": true(),
+  "port": "8080",
+  "authority": "example.com:8080",
+  "path": "/path",
+  "scheme": "https",
+  "query-segments":[
+    map {"value": """hello world""",
+         "key":"s"},
+    map {"value":"relevance",
+         "key":"sort"}],
+  "path-segments": ["","path"],
+  "query": "s=%22hello world%22&amp;sort=relevance",
+  "uri": "https://example.com:8080/path?s=%22hello world%22&amp;sort=relevance"
+}]]></assert-deep-eq>
     </result>
   </test-case>
 

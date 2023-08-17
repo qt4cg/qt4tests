@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="map-pair"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" covers="map-pair">
+    <description>Tests for the map:pair function introduced in XPath 4.0</description>
+    <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-map-get"/>
+    <dependency type="spec" value="XP31+ XQ31+ XT30+"/>
+    
+    <!-- Placeholder tests, need updating -->
+
+ 
+    <test-case name="map-pair-001">
+        <description>Integer key, singleton value</description>
+        <created by="Michael Kay" on="2023-07-25"/>
+        <environment ref="map"/>
+        <test>map:pair(3, 5)</test>
+        <result>
+            <all-of>
+                <assert-count>1</assert-count>
+                <assert-type>map(*)</assert-type>
+                <assert-type>map(xs:string, xs:integer)</assert-type>
+                <assert>$result?key eq 3</assert>
+                <assert>$result?value eq 5</assert>
+                <assert>map:size($result) eq 2</assert>
+                <assert>map:size(map:remove($result, "key")) eq 1</assert>
+                <assert>map:size(map:remove($result, "value")) eq 1</assert>
+            </all-of>
+        </result>
+    </test-case>
+    <test-case name="map-pair-002">
+        <description>Integer key, empty value</description>
+        <created by="Michael Kay" on="2023-07-25"/>
+        <environment ref="map"/>
+        <test>map:pair(3, ())</test>
+        <result>
+            <all-of>
+                <assert-count>1</assert-count>
+                <assert-type>map(*)</assert-type>
+                <assert-type>map(xs:string, item()*)</assert-type>
+                <assert>empty($result?value)</assert>
+                <assert>map:size($result) eq 2</assert>
+                <assert>map:size(map:remove($result, "key")) eq 1</assert>
+                <assert>map:size(map:remove($result, "value")) eq 1</assert>
+            </all-of>
+        </result>
+    </test-case>
+    <test-case name="map-pair-003">
+        <description>String key, sequence value</description>
+        <created by="Michael Kay" on="2023-07-25"/>
+        <environment ref="map"/>
+        <test>map:pair("foo", ("x", "y", "z"))</test>
+        <result>
+            <all-of>
+                <assert-count>1</assert-count>
+                <assert-type>map(*)</assert-type>
+                <assert-type>map(xs:string, xs:string*)</assert-type>
+                <assert>empty($result?bar)</assert>
+                <assert>count($result?key) eq 1</assert>
+                <assert>count($result?value) eq 3</assert>
+                <assert>map:get($result, "value") = "z"</assert>
+                <assert>map:get($result, xs:untypedAtomic("value")) = "z"</assert>
+                <assert>map:size($result) eq 2</assert>
+                <assert>map:size(map:remove($result, "key")) eq 1</assert>
+                <assert>map:size(map:remove($result, "value")) eq 1</assert>
+            </all-of>
+        </result>
+    </test-case>
+    <test-case name="map-pair-004">
+        <description>Untyped atomic key, map as value</description>
+        <created by="Michael Kay" on="2023-07-25"/>
+        <environment ref="map"/>
+        <test>map:pair(xs:untypedAtomic("foo"), map{})</test>
+        <result>
+            <all-of>
+                <assert-count>1</assert-count>
+                <assert-type>map(*)</assert-type>
+                <assert-type>map(xs:string, item())</assert-type>
+                <assert>empty($result?bar)</assert>
+                <assert>count($result?key) eq 1</assert>
+                <assert>count($result?value) eq 1</assert>
+                <assert>empty($result?value?bar)</assert>
+                <assert>empty($result?(xs:untypedAtomic("value"))?("bar"))</assert>
+            </all-of>
+        </result>
+    </test-case>
+    <test-case name="map-pair-005">
+        <description>Double NaN as key</description>
+        <created by="Michael Kay" on="2023-07-25"/>
+        <environment ref="map"/>
+        <test>map:pair(number('NaN'), 'NaN')</test>
+        <result>
+            <all-of>
+                <assert-count>1</assert-count>
+                <assert-type>map(*)</assert-type>
+                <assert>map:size($result) eq 2</assert>
+                <assert>exists($result?value)</assert>
+            </all-of>
+        </result>
+    </test-case>
+    <test-case name="map-pair-006">
+        <description>Float NaN as key</description>
+        <created by="Michael Kay" on="2023-07-25"/>
+        <test>map:pair(xs:float('NaN'), 'NaN')</test>
+        <result>
+            <all-of>
+                <assert-count>1</assert-count>
+                <assert-type>map(*)</assert-type>
+                <assert>map:size($result) eq 2</assert>
+                <assert>exists($result?value)</assert>
+            </all-of>
+        </result>
+    </test-case>
+    <test-case name="map-pair-007-hof">
+        <description>Integer key, singleton value (map-pair-001 adapted)</description>
+        <created by="Michael Kay" on="2023-07-25"/>
+        <environment ref="map"/>
+        <dependency type="feature" value="higherOrderFunctions"/>
+        <test>map:pair(3, 5)</test>
+        <result>
+            <all-of>
+                <assert-count>1</assert-count>
+                <assert-type>map(*)</assert-type>
+                <assert-type>map(xs:string, xs:integer)</assert-type>
+                <assert-type>function(xs:anyAtomicType) as item()*</assert-type>
+                <assert>$result?key eq 3</assert>
+                <assert>$result?value eq 5</assert>
+                <assert>map:size($result) eq 2</assert>
+                <assert>map:size(map:remove($result, 'key')) eq 1</assert>
+                <assert>map:size(map:remove($result, 'value')) eq 1</assert>
+            </all-of>
+        </result>
+    </test-case>
+    <test-case name="map-pair-007">
+        <description>Integer key, singleton value (map-pair-001 adapted)</description>
+        <created by="Michael Kay" on="2023-07-25"/>
+        <environment ref="map"/>
+        <test>map:pair(3, 5)</test>
+        <result>
+            <all-of>
+                <assert-count>1</assert-count>
+                <assert-type>map(*)</assert-type>
+                <assert-type>map(xs:string, xs:integer)</assert-type>
+                <assert>$result?key eq 3</assert>
+                <assert>$result?value eq 5</assert>
+                <assert>map:size($result) eq 2</assert>
+                <assert>map:size(map:remove($result, 'key')) eq 1</assert>
+                <assert>map:size(map:remove($result, 'value')) eq 1</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-pair-008">
+        <description>Integer key, singleton value, with keywords</description>
+        <created by="Michael Kay" on="2023-07-25"/>
+        <environment ref="map"/>
+        <test>map:pair(key:=3, value:=5)</test>
+        <result>
+            <all-of>
+                <assert-count>1</assert-count>
+                <assert-type>map(*)</assert-type>
+                <assert-type>map(xs:string, xs:integer)</assert-type>
+                <assert>$result?key eq 3</assert>
+                <assert>$result?value eq 5</assert>
+                <assert>map:size($result) eq 2</assert>
+                <assert>map:size(map:remove($result, 'key')) eq 1</assert>
+                <assert>map:size(map:remove($result, 'value')) eq 1</assert>
+            </all-of>
+        </result>
+    </test-case>
+ 
+
+</test-set>

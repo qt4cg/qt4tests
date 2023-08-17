@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-NameTestUnion" covers-40="NameTestUnion">
+   <description>Tests for the NameTestUnion production</description>
+   <link type="spec" document="http://www.w3.org/TR/xquery-30/"
+         idref="doc-xquery30-NameTest"/>
+   <link type="spec" document="XQuery" section-number="3.2.1.2" idref="node-tests"/>
+   
+   <environment name="TreeNS">
+      <source role="." file="AxisStep/TreeNS.xml">
+         <description>Simple tree with a couple of namespaces</description>
+         <created by="Kuen Siew" on="2003-03-25"/>
+      </source>
+      <namespace prefix="nn" uri="http://example.com/north-ns"/>
+   </environment>
+   
+   <environment name="QualifiedAtts">
+      <schema uri="http://example.com/ns/qualifiedAtts" file="NameTestUnion/QualifiedAtts.xsd">
+         <description>A Schema for namespace-qualified attributes</description>
+         <created by="Michael Kay" on="2023-07-19"/>
+      </schema> 
+      <source role="." file="NameTestUnion/QualifiedAtts1.xml" validation="strict">
+         <description>Uses schema-validated attributes in a namespace</description>
+         <created by="Michael Kay" on="2023-07-19"/>
+      </source>
+      <namespace prefix="q" uri="http://example.com/ns/qualifiedAtts"/>
+   </environment>
+   
+   <environment name="QualifiedAttsXQ">
+      <schema uri="http://example.com/ns/qualifiedAtts" file="NameTestUnion/QualifiedAtts.xsd">
+         <description>A Schema for namespace-qualified attributes</description>
+         <created by="Michael Kay" on="2023-07-19"/>
+      </schema> 
+      <source role="." file="NameTestUnion/QualifiedAtts1.xml" validation="strict">
+         <description>Uses schema-validated attributes in a namespace</description>
+         <created by="Michael Kay" on="2023-07-19"/>
+      </source>
+   </environment>
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="NameTestUnion-001">
+      <description> Simple element test with a union of wildcards </description>
+      <created by="Michael Kay" on="2023-07-14"/>
+      <environment ref="TreeNS"/>
+      <test>count(//element(*:west|*:east))</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-002">
+      <description> Simple element test with a union of wildcards </description>
+      <created by="Michael Kay" on="2023-07-14"/>
+      <environment ref="TreeNS"/>
+      <test>count(//element(*:west|*:east, xs:anyType))</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-003">
+      <description> Simple element test with a union of wildcards </description>
+      <created by="Michael Kay" on="2023-07-14"/>
+      <environment ref="TreeNS"/>
+      <test>count(//element(*:west|*:east, xs:untyped?))</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-004">
+      <description> Simple element test with a union of qualified names </description>
+      <created by="Michael Kay" on="2023-07-14"/>
+      <environment ref="TreeNS"/>
+      <test>count(//element(nn:north|nn:near-north))</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-005">
+      <description> Simple element test with a union of qualified names </description>
+      <created by="Michael Kay" on="2023-07-14"/>
+      <environment ref="TreeNS"/>
+      <test>count(//element(nn:north|nn:near-north|nn:east))</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-006">
+      <description> Simple element test with a union of unqualified names</description>
+      <created by="Michael Kay" on="2023-07-14"/>
+      <environment ref="TreeNS"/>
+      <test>count(//element(west|east|near-west|near-east))</test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-007">
+      <description> Simple element test with a union of unqualified names and wildcards</description>
+      <created by="Michael Kay" on="2023-07-14"/>
+      <environment ref="TreeNS"/>
+      <test>count(//element(west|east|near-west|near-east|nn:*))</test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-008">
+      <description> Simple element test with a union of unqualified names and wildcards</description>
+      <created by="Michael Kay" on="2023-07-14"/>
+      <environment ref="TreeNS"/>
+      <test>count(//element(west|east|near-west|near-east|nn:*, xs:untyped))</test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-020">
+      <description> Schema-aware element tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>count(//element(q:*))</test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-021">
+      <description> Schema-aware element tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>count(//element(q:e|q:f))</test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-022">
+      <description> Schema-aware element tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>count(//element(q:*|q:f))</test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-023">
+      <description> Schema-aware element tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAttsXQ"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         import schema namespace q="http://example.com/ns/qualifiedAtts" at "NameTestUnion/QualifiedAtts.xsd";
+         count(//element(q:*|q:f, q:fType))
+      </test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-024">
+      <description> Schema-aware element tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAttsXQ"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         import schema namespace q="http://example.com/ns/qualifiedAtts" at "NameTestUnion/QualifiedAtts.xsd";
+         count(//element(q:*|q:f, q:fType?))
+      </test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-025">
+      <description> Schema-aware element tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAttsXQ"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         import schema namespace q="http://example.com/ns/qualifiedAtts" at "NameTestUnion/QualifiedAtts.xsd";
+         count(//element(*|*:f, q:eType?))
+      </test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-026">
+      <description> Schema-aware element tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAttsXQ"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         import schema namespace q="http://example.com/ns/qualifiedAtts" at "NameTestUnion/QualifiedAtts.xsd";
+         //*:f instance of element(*:e|*:f, q:fType)*
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-027">
+      <description> Schema-aware element tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAttsXQ"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         import schema namespace q="http://example.com/ns/qualifiedAtts" at "NameTestUnion/QualifiedAtts.xsd";
+         //*:e instance of schema-element(q:e)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-028">
+      <description> Schema-aware element tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAttsXQ"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         import schema namespace q="http://example.com/ns/qualifiedAtts" at "NameTestUnion/QualifiedAtts.xsd";
+         //*:f instance of element(*:e|*:f, q:fType?)*
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-029">
+      <description> Schema-aware element tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAttsXQ"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         import schema namespace q="http://example.com/ns/qualifiedAtts" at "NameTestUnion/QualifiedAtts.xsd";
+         declare default element namespace "http://example.com/ns/qualifiedAtts";
+         //*:f instance of element(e|f, fType?)*
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-100">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>count(//attribute(q:*))</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-101">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>count(//attribute(q:int))</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-102">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>count(//attribute(q:int|q:str))</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-103">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>count(//attribute(*:date|q:*))</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-104">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>count(//attribute(*|*))</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-105">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>count(//attribute(*|nonsense))</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-106">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAttsXQ"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         import schema namespace q="http://example.com/ns/qualifiedAtts" at "NameTestUnion/QualifiedAtts.xsd";
+         count(//schema-attribute(q:int))
+      </test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-110">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>//@q:int instance of attribute(q:int)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-111">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>//@q:int instance of attribute(q:int|q:str)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-112">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>//@q:int instance of attribute(q:*)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-113">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>//@q:int instance of attribute(q:*, xs:integer)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-114">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>//@q:int instance of attribute(q:int|q:str, xs:integer)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-115">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>//@q:int instance of attribute(q:date|q:str)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-116">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>//@q:int instance of attribute(q:int|q:str, xs:date)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-117">
+      <description> Attribute tests </description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAtts"/>
+      <test>//@q:int instance of attribute(q:int|q:str, xs:date?)</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-118">
+      <description> Schema-aware attribute tests (default element namespace does not apply)</description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAttsXQ"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         import schema namespace q="http://example.com/ns/qualifiedAtts" at "NameTestUnion/QualifiedAtts.xsd";
+         declare default element namespace "http://example.com/ns/qualifiedAtts";
+         //@*:int instance of attribute(int|date)*
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-119">
+      <description> Schema-aware attribute tests (default element namespace does not apply)</description>
+      <created by="Michael Kay" on="2023-07-19"/>
+      <environment ref="QualifiedAttsXQ"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         import schema namespace q="http://example.com/ns/qualifiedAtts" at "NameTestUnion/QualifiedAtts.xsd";
+         declare default element namespace "http://example.com/ns/qualifiedAtts";
+         //@*:int instance of schema-attribute(int)
+      </test>
+      <result>
+         <error code="XPST0008"/>
+      </result>
+   </test-case>
+   
+ 
+   
+   <test-case name="NameTestUnion-901">
+      <description> Not allowed with schema-element </description>
+      <created by="Michael Kay" on="2023-07-14"/>
+      <environment ref="TreeNS"/>
+      <test>count(//schema-element(west|east))</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="NameTestUnion-902">
+      <description> Not allowed with schema-attribute </description>
+      <created by="Michael Kay" on="2023-07-14"/>
+      <environment ref="TreeNS"/>
+      <test>count(//schema-attribute(west|east))</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+  
+</test-set>

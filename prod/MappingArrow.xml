@@ -88,7 +88,7 @@
     <description>Integer arguments, functions returning numbers</description>
     <created by="Christian Gruen" on="2022-08-16"/>
     <modified by="Michael Kay" on="2023-06-12" change="syntax changes"/>
-    <test><![CDATA[(1, 4, 9, 16, 25, 36) =!> math:sqrt() =!> function{ . + 1 }() => sum()]]></test>
+    <test><![CDATA[(1, 4, 9, 16, 25, 36) =!> Q{http://www.w3.org/2005/xpath-functions/math}sqrt() =!> function{ . + 1 }() => sum()]]></test>
     <result>
       <assert-eq>27</assert-eq>
     </result>
@@ -296,6 +296,7 @@
   <test-case name="MappingArrow-031">
     <description>Named function reference bound to global variable</description>
     <created by="Christian Gruen" on="2022-08-16"/>
+    <dependency type="spec" value="XQ40+"/>
     <test><![CDATA[
       declare variable $ABS := abs#1;
       (-5 to 0) =!> $ABS() => sum()
@@ -466,18 +467,26 @@
   <test-case name="MappingArrow-048">
     <description>Error: unknown function in local function namespace</description>
     <created by="Christian Gruen" on="2022-08-16"/>
+    <modified by="Michael Kay" on="2023-06-30" change="alternative error code for XPath"/>
     <test><![CDATA[0 =!> local:unknown()]]></test>
     <result>
-      <error code="XPST0017"/>
+      <any-of>
+        <error code="XPST0017"/>
+        <error code="XPST0081"/>
+      </any-of>
     </result>
   </test-case>
   
   <test-case name="MappingArrow-049">
     <description>Error: partial function application, local function namespace</description>
     <created by="Christian Gruen" on="2022-08-16"/>
+    <modified by="Michael Kay" on="2023-06-30" change="alternative error code for XPath"/>
     <test><![CDATA[0 =!> local:unknown(?)]]></test>
     <result>
-      <error code="XPST0017"/>
+      <any-of>
+        <error code="XPST0017"/>
+        <error code="XPST0081"/>
+      </any-of>
     </result>
   </test-case>
   
