@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-LocalUnionType"
+          covers-40="prod-ItemTypeDecl">
+   <description>Tests for item type declarations: 4.0 proposal</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-11/"
+         idref="func-abs"/>
+         
+   <dependency type="spec" value="XP40+ XQ40+"/>
+      
+   <test-case name="itemTypeDecl-001">
+      <description>local union type, used in instance of</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+         declare item-type local:int-or-string as union(xs:integer, xs:string);
+      	2 instance of local:int-or-string
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-002">
+      <description>local union type, used in instance of with occurrence indicator</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+         declare item-type local:int-or-string as union(xs:integer, xs:string);
+      	(2, "fred") instance of local:int-or-string*
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-003">
+      <description>local union type, used in cast as. Issue 163</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+         declare item-type local:int-or-string as union(xs:integer, xs:string);
+      	"fred" cast as local:int-or-string
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>"fred"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-004">
+      <description>local union type, used in cast as. Issue 163</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+         declare item-type local:int-or-string as union(xs:integer, xs:string);
+      	"30" cast as local:int-or-string
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:integer</assert-type>
+            <assert-eq>30</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-005">
+      <description>local union type, used in treat as</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+         declare item-type local:int-or-string as union(xs:integer, xs:string);
+      	"fred" treat as local:int-or-string
+      ]]></test>
+      <result>
+         <assert-eq>"fred"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-006">
+      <description>local union type, used in variable declaration</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+         declare item-type local:int-or-string as union(xs:integer, xs:string);
+      	declare variable $fred as local:int-or-string := 17;
+      	$fred
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:integer</assert-type>
+            <assert-eq>17</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-007">
+      <description>local union type, used in variable declaration, forwards reference
+         (not allowed)</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+         declare variable $fred as local:int-or-string := 17;
+         declare item-type local:int-or-string as union(xs:integer, xs:string);     	
+      	$fred
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-008">
+      <description>local union type, used as function argument</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+         declare item-type local:int-or-string as union(xs:integer, xs:string);
+      	declare function local:increment ($val as local:int-or-string) as xs:integer {
+      	    if ($val instance of xs:integer) then $val + 1 else string-length($val) + 1
+      	};
+      	(local:increment(17), local:increment("two"))
+      ]]></test>
+      <result>
+         <assert-deep-eq>18, 4</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-009">
+      <description>local union type, used as function result</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+         declare item-type local:int-or-string as union(xs:integer, xs:string);
+      	declare function local:show ($val as xs:integer) as local:int-or-string {
+      	    if ($val lt 0) then $val else string($val)
+      	};
+      	(local:show(-17), local:show(+17))
+      ]]></test>
+      <result>
+         <assert-deep-eq>-17, "17"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-010">
+      <description>local union type, used as function argument, forwards reference</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+         declare function local:increment ($val as local:int-or-string) as xs:integer {
+      	    if ($val instance of xs:integer) then $val + 1 else string-length($val) + 1
+      	};
+      	declare item-type local:int-or-string as union(xs:integer, xs:string);
+      	(local:increment(17), local:increment("two"))
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-011">
+      <description>local union type, used as type of local variable</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+      	declare item-type local:int-or-string as union(xs:integer, xs:string);
+      	let $x as local:int-or-string := 42 return $x + 1
+      ]]></test>
+      <result>
+         <assert-eq>43</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-012">
+      <description>local union type, used as type of local variable, type error</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+      	declare item-type local:int-or-string as union(xs:integer, xs:string);
+      	let $x as local:int-or-string := 8.3 return $x + 1
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-013">
+      <description>local union type, used in castable as. Issue 163</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+         declare item-type local:int-or-string as union(xs:integer, xs:string);
+      	"fred" castable as local:int-or-string
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-014">
+      <description>%public is ignored in main module</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+         declare %public item-type local:int-or-string as union(xs:integer, xs:string);
+      	"fred" castable as local:int-or-string
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-015">
+      <description>%private is ignored in main module</description>
+      <created by="Michael Kay" on="2023-09-08"/>
+      <test><![CDATA[
+         declare %public item-type local:int-or-string as union(xs:integer, xs:string);
+      	"fred" castable as local:int-or-string
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+ 
+ 
+   
+ 
+
+</test-set>

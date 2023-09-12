@@ -534,7 +534,7 @@
    <test-case name="annotation-33">
       <description>An inline function using true() as an annotation parameter </description>
       <created by="Michael Kay" on="2012-12-15"/>
-      <dependency type="spec" value="XQ30+"/>
+      <dependency type="spec" value="XQ30 XQ31"/>
       <test><![CDATA[
          declare namespace eg = "http://example.com";
          %eg:sequential(true())  function () { "bar" } ()
@@ -625,6 +625,266 @@
          <assert-eq>"bar"</assert-eq>
       </result>
    </test-case>
+   
+   <test-case name="annotation-39" covers="map-general">
+      <description>true() disallowed prior to 4.0</description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ30 XQ31"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(true()) variable $foo := "bar";
+         $foo
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-01" covers-40="annotation-values">
+      <description>
+         Annotation value true()</description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(true()) function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <assert-eq>"bar"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-02" covers-40="annotation-values">
+      <description>
+         Annotation value false()</description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(false()) function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <assert-eq>"bar"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-03" covers-40="annotation-values">
+      <description>
+         Annotation value true() with whitespace</description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent( true ( ) ) function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <assert-eq>"bar"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-04" covers-40="annotation-values">
+      <description>
+         Annotation value false() with whitespace and comments</description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent( (:heh:) false (:hoh:) ( (:and away:) ) (:we go:) ) function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <assert-eq>"bar"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-05" covers-40="annotation-values">
+      <description>
+         Annotation value false() with namespace prefix: not allowed</description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(fn:false()) function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-06" covers-40="annotation-values">
+      <description>
+         Annotation values true() and false() mixed with others</description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(true(), 12, false(), "xyz") function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <assert-eq>"bar"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-07" covers-40="annotation-values">
+      <description>
+         Annotation value true() used with a variable</description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(true()) variable $bar := 23;
+         $bar
+      ]]></test>
+      <result>
+         <assert-eq>23</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-08" covers-40="annotation-values">
+      <description>Hex integers are allowed</description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(0xFFFFFFFF) function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <assert-eq>"bar"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-09" covers-40="annotation-values">
+      <description>Underscores in integers are allowed</description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(1_000_000_000) function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <assert-eq>"bar"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-10" covers-40="annotation-values">
+      <description>Binary integers are allowed</description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(0b01010101) function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <assert-eq>"bar"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-11" covers-40="annotation-values">
+      <description>Negative numbers are allowed</description>
+      <created by="Michael Kay" on="2023-09-07"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(-10) function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <assert-eq>"bar"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-12" covers-40="annotation-values">
+      <description>Negative numbers are allowed</description>
+      <created by="Michael Kay" on="2023-09-07"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(- (:minus:) 1_000_000) function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <assert-eq>"bar"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-13" covers-40="annotation-values">
+      <description>Negative strings are not allowed</description>
+      <created by="Michael Kay" on="2023-09-07"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(-"fred") function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-14" covers-40="annotation-values">
+      <description>Negative booleans are not allowed</description>
+      <created by="Michael Kay" on="2023-09-07"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(-true()) function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="annotation-40-15" covers-40="annotation-values">
+      <description>Double negatuves are not allowed</description>
+      <created by="Michael Kay" on="2023-09-07"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace a = "http://www.example.org/annotation";
+         declare %a:translucent(--1) function local:foo() {
+            "bar"
+         };
+         local:foo()
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
 
    <test-case name="annotation-assertion-1" covers-30="annotation-assertions">
       <description>
@@ -924,5 +1184,71 @@
          </any-of>
       </result>
    </test-case>
+   
+   <test-case name="annotation-assertion-40-01" covers-40="annotation-values">
+      <description>
+         In an annotation assertion, the value true() can be used
+      </description>
+      <created by="Michael Kay" on="2023-09-06"/>        
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace eg = "http://example.com";
+         () instance of %eg:x(true()) function(*)
+      ]]></test>
+      <result><assert-false/></result>
+   </test-case>
+   
+   <test-case name="annotation-assertion-40-02" covers-40="annotation-values">
+      <description>
+         In an annotation assertion, the value false() can be used
+      </description>
+      <created by="Michael Kay" on="2023-09-06"/>        
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace eg = "http://example.com";
+         () instance of %eg:x( false ( ) ) function(*)
+      ]]></test>
+      <result><assert-false/></result>
+   </test-case>
+   
+   <test-case name="annotation-assertion-40-03" covers-40="annotation-values">
+      <description>
+         In an annotation assertion, the values true() and false() can be used together
+      </description>
+      <created by="Michael Kay" on="2023-09-06"/>        
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace eg = "http://example.com";
+         () instance of %eg:x(true(), false()) function(*)
+      ]]></test>
+      <result><assert-false/></result>
+   </test-case>
+   
+   <test-case name="annotation-assertion-40-04" covers-40="annotation-values">
+      <description>
+         In an annotation assertion, comments can be used together with true() and false()
+      </description>
+      <created by="Michael Kay" on="2023-09-06"/>        
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace eg = "http://example.com";
+         () instance of %eg:x((:a:) true (:b:) ((:c:)) (:d:), (:e:) false(:f:)((:g:))(:h:)) (:i:) function(*)
+      ]]></test>
+      <result><assert-false/></result>
+   </test-case>
+   
+   <test-case name="annotation-assertion-40-05" covers-40="annotation-values">
+      <description>
+         In an annotation assertion, negative numbers are allowed
+      </description>
+      <created by="Michael Kay" on="2023-09-07"/>        
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace eg = "http://example.com";
+         () instance of %eg:x(-1, -2, -3, -4) function(*)
+      ]]></test>
+      <result><assert-false/></result>
+   </test-case>
+   
 
 </test-set>
