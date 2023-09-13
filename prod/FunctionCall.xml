@@ -897,6 +897,47 @@
       </result>
    </test-case>
    
+   <test-case name="FunctionCall-056">
+      <description>Expected type is a union of anonymous types: success case. See issue #688 for 4.0.</description>
+      <created by="Michael Kay" on="2023-09-07"/>
+      <environment ref="unionListDefined"/>
+      <dependency type="spec" value="XQ30+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test><![CDATA[
+         declare namespace lu = 'http://www.w3.org/XQueryTest/unionListDefined' ;
+         import schema "http://www.w3.org/XQueryTest/unionListDefined";
+         declare function local:f($arg as lu:union-of-anonymous) as xs:boolean {
+             $arg = 1
+         };
+         (local:f(1), local:f(2), local:f("Jan"), local:f("Feb"))
+      ]]></test>
+      <result>
+         <!--<assert-deep-eq>true(), false(), false(), false()</assert-deep-eq>-->
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-057">
+      <description>Expected type is a union of anonymous types: failure case</description>
+      <created by="Michael Kay" on="2023-09-07"/>
+      <environment ref="unionListDefined"/>
+      <dependency type="spec" value="XQ30+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test><![CDATA[
+         declare namespace lu = 'http://www.w3.org/XQueryTest/unionListDefined' ;
+         import schema "http://www.w3.org/XQueryTest/unionListDefined";
+         declare function local:f($arg as lu:union-of-anonymous) as xs:boolean {
+             $arg = 1
+         };
+         local:f(12)
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
    <test-case name="FunctionCall-400" covers-40="downcasting">
       <description>Coercion rules allow downcasting (type relabeling) in 4.0</description>
       <created by="Michael Kay" on="2021-01-11"/>

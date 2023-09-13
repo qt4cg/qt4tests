@@ -284,6 +284,29 @@
       </result>
    </test-case>
    
+   <test-case name="switch-019">
+      <description>Expression masquerading as a switch</description>
+      <created by="Michael Kay" on="2023-09-07"/>
+      <test><![CDATA[ 
+         let $v := parse-xml("<switch>2</switch>")
+         return $v//switch
+      ]]></test>
+      <result>
+         <assert-eq>"2"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="switch-020">
+      <description>Expression masquerading as a switch</description>
+      <created by="Michael Kay" on="2023-09-07"/>
+      <test><![CDATA[ 
+         parse-xml("<switch>2</switch>") ! (switch (switch) case '2' return 2 default return 1)
+      ]]></test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
    <test-case name="switch-401" covers-40="switch">
       <description> switch, case operand &gt;1 item, allowed in 4.0 </description>
       <created by="Christian Gruen" on="2023-04-06"/>
@@ -367,6 +390,59 @@
             case "Duck" return "Quack" 
             default return "What's that odd noise?" 
         }]]></test>
+      <result>
+         <assert-eq>"Meow"</assert-eq>            
+      </result>
+   </test-case>
+   
+   <test-case name="switch-406" covers-40="switch">
+      <description> switch example with omitted comparand, using braces</description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[xquery version "4.0"; 
+        declare variable $animal as xs:string := "Cat"; 
+        switch {
+            case $animal eq "Cow" return "Moo" 
+            case $animal eq "Cat" return "Meow" 
+            case $animal eq "Duck" return "Quack" 
+            default return "What's that odd noise?" 
+        }]]></test>
+      <result>
+         <assert-eq>"Meow"</assert-eq>            
+      </result>
+   </test-case>
+   
+   <test-case name="switch-407" covers-40="switch">
+      <description> switch example with omitted comparand, sans braces</description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[xquery version "4.0"; 
+        declare variable $animal as xs:string := "Cat"; 
+        switch 
+            case $animal eq "Cow" return "Moo" 
+            case $animal eq "Cat" return "Meow" 
+            case $animal eq "Duck" return "Quack" 
+            default return "What's that odd noise?" 
+        ]]></test>
+      <result>
+         <assert-eq>"Meow"</assert-eq>            
+      </result>
+   </test-case>
+   
+   <test-case name="switch-408" covers-40="switch">
+      <description>
+         switch example with omitted comparand, sans braces, with a disorienting comment
+      </description>
+      <created by="Michael Kay" on="2023-09-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[xquery version "4.0"; 
+        declare variable $animal as xs:string := "Cat"; 
+        switch (:$animal:)
+            case $animal eq "Cow" return "Moo" 
+            case $animal eq "Cat" return "Meow" 
+            case $animal eq "Duck" return "Quack" 
+            default return "What's that odd noise?" 
+        ]]></test>
       <result>
          <assert-eq>"Meow"</assert-eq>            
       </result>
