@@ -192,6 +192,7 @@
   <test-case name="partition-100">
     <description>Test equivalent expression given in spec</description>
     <created by="Michael Kay" on="2023-04-24"/>
+    <modified by="Christian Gruen" on="2023-09-16" change="fixed, cleaned up"/>
     <dependency type="spec" value="XQ40+"/>      
     <test><![CDATA[
       let $equiv := function($input, $break-when) {
@@ -201,8 +202,10 @@
            else (trunk($partitions), array{foot($partitions)?*, $next}) 
          })
       } 
-      return deep-equal(trace(partition((1, 2, 3, 5, 6, 8, 9), function($prev, $next) {$next ne foot($prev)+1}), 'one'),
-                        trace($equiv((1, 2, 3, 5, 6, 8, 9), function($prev, $next) {$next ne foot($prev)+1}), 'two'))
+      return deep-equal(
+         partition((1, 2, 3, 5, 6, 8, 9), function($prev, $next) {$next != foot($prev)+1}),
+         $equiv((1, 2, 3, 5, 6, 8, 9), function($prev, $next) {$next != foot($prev)+1})
+      )
       ]]></test>
     <result>
       <assert-true/>
@@ -217,6 +220,7 @@
   <test-case name="partition-901">
     <description>Callback function doesn't return boolean</description>
     <created by="Michael Kay" on="2023-04-24"/>
+    <modified by="Christian Gruen" on="2023-09-16" change="fixed"/>
     <dependency type="spec" value="XQ40+"/>      
     <test><![CDATA[
       <out>{
@@ -228,7 +232,10 @@
       }</out>
       ]]></test>
     <result>
-      <error code="XPTY0004"/>
+      <any-of>
+        <error code="XPTY0004"/>
+        <error code="FORG0001"/>        
+      </any-of>
     </result>
   </test-case>
 </test-set>
