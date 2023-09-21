@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-parse-csv" covers="fn-parse-csv">
+   <description>
+      Tests the parse-csv function.
+   </description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-40/" idref="func-parse-csv"/>
+   <dependency type="spec" value="XP40+ XQ40+"/>
+   
+   <test-case name="fn-parse-csv-001">
+      <description>Empty string</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-17"/>
+      <test>parse-csv("")</test>
+      <result>
+         <assert-deep-eq>()</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-002">
+      <description>Single column, header row, single data row</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-17"/>
+      <test>let $CR := char('\r'), $LF := char('\n') return parse-csv(`header{$CR}{$LF}002{$CR}{$LF}`)</test>
+      <result>
+         <assert-deep-eq>(["header"], ["002"])</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-003">
+      <description>Single column, header row, single data row</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-17"/>
+      <test>let $CRLF := codepoints-to-string((13, 10)) return parse-csv(`header{$CRLF}003{$CRLF}`)</test>
+      <result>
+         <assert-deep-eq>(["header"], ["003"])</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-004">
+      <description>Single column, header row, single data row</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-17"/>
+      <test>parse-csv("header&#13;&#10;004&#13;&#10;")</test>
+      <result>
+         <assert-deep-eq>(["header"], ["004"])</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-005">
+      <description>Trim whitespace, leading</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-17"/>
+      <test>parse-csv(`  name, city&#10;   Bob,Berlin&#10; Alice,Aachen&#10;`, map{"trim-whitespace": true()})</test>
+      <result>
+         <assert-deep-eq>(["name", "city"], ["Bob", "Berlin"], ["Alice", "Aachen"])</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-006">
+      <description>Trim whitespace, trailing</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-17"/>
+      <test>parse-csv(`name  ,city  &#10;Bob   ,Berlin&#10;Alice ,Aachen&#10;`, map{"trim-whitespace": true()})</test>
+      <result>
+         <assert-deep-eq>(["name", "city"], ["Bob", "Berlin"], ["Alice", "Aachen"])</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-007">
+      <description>Trim whitespace, both</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-17"/>
+      <test>parse-csv(`  name  ,city  &#10;Bob   ,  Berlin&#10;  Alice , Aachen&#10;`, map{"trim-whitespace": true()})</test>
+      <result>
+         <assert-deep-eq>(["name", "city"], ["Bob", "Berlin"], ["Alice", "Aachen"])</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-008">
+      <description>Invalid quotes: opening, not closed</description>
+      <created by="Matt Patterson, Saxonica" on="2023-09-19"/>
+      <test>parse-csv(`"name,"city&#10;`)</test>
+      <result>
+         <error code="FOCV0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-009">
+      <description>Invalid quotes: closing, not opened</description>
+      <created by="Matt Patterson, Saxonica" on="2023-09-19"/>
+      <test>parse-csv(`name",city"&#10;`)</test>
+      <result>
+         <error code="FOCV0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-010">
+      <description>Invalid quotes: single quote, mid-field</description>
+      <created by="Matt Patterson, Saxonica" on="2023-09-19"/>
+      <test>parse-csv(`na"me,ci"ty"&#10;`)</test>
+      <result>
+         <error code="FOCV0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-010">
+      <description>Invalid quotes: balanced quotes, mid-field</description>
+      <created by="Matt Patterson, Saxonica" on="2023-09-19"/>
+      <test>parse-csv(`the "extra" data,and "nothing" else&#10;`)</test>
+      <result>
+         <error code="FOCV0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-011">
+      <description>Invalid quotes: balanced quotes, mid-field, non-default quote</description>
+      <created by="Matt Patterson, Saxonica" on="2023-09-19"/>
+      <test>parse-csv(`the |extra| data,and |nothing| else&#10;`, map { "quote-character": "|" })</test>
+      <result>
+         <error code="FOCV0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-012">
+      <description>Field delimiter set to a multi-char string</description>
+      <created by="Matt Patterson, Saxonica" on="2023-09-19"/>
+      <test>parse-csv(`a,b&#10;`, map { "field-delimiter": "::" })</test>
+      <result>
+         <error code="FOCV0002"/>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-012">
+      <description>Row delimiter set to a multi-char string is ok</description>
+      <created by="Matt Patterson, Saxonica" on="2023-09-19"/>
+      <test>parse-csv(`a,b::c,d::`, map { "row-delimiter": "::" })</test>
+      <result>
+         <assert-deep-eq>(["a", "b"], ["c", "d"])</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-013">
+      <description>Quote char set to a multi-char string</description>
+      <created by="Matt Patterson, Saxonica" on="2023-09-19"/>
+      <test>parse-csv(`a,b&#10;`, map { "quote-character": "::" })</test>
+      <result>
+         <error code="FOCV0002"/>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-014">
+      <description>Field and row delimiter set to same character</description>
+      <created by="Matt Patterson, Saxonica" on="2023-09-19"/>
+      <test>parse-csv(`a,b&#10;`, map { "row-delimiter": "|", "field-delimiter": "|" })</test>
+      <result>
+         <error code="FOCV0003"/>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-015">
+      <description>Field and quote delimiters set to same character</description>
+      <created by="Matt Patterson, Saxonica" on="2023-09-19"/>
+      <test>parse-csv(`a,b&#10;`, map { "field-delimiter": "|", "quote-character": "|" })</test>
+      <result>
+         <error code="FOCV0003"/>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-016">
+      <description>Row delimiters shares a value with the quote delimiter</description>
+      <created by="Matt Patterson, Saxonica" on="2023-09-19"/>
+      <test>parse-csv(`a,b&#10;`, map { "row-delimiter": ("|", "&#10;"), "quote-character": "|" })</test>
+      <result>
+         <error code="FOCV0003"/>
+      </result>
+   </test-case>
+   <test-case name="fn-parse-csv-016">
+      <description>Row and quote delimiters set to same character</description>
+      <created by="Matt Patterson, Saxonica" on="2023-09-19"/>
+      <test>parse-csv(`a,b&#10;`, map { "row-delimiter": "|", "quote-character": "|" })</test>
+      <result>
+         <error code="FOCV0003"/>
+      </result>
+   </test-case>
+</test-set>

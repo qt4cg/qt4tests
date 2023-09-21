@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-csv-to-xdm" covers="fn-csv-to-xdm">
+   <description>
+      Tests the parse-csv function.
+   </description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-40/" idref="func-csv-to-xdm"/>
+   <dependency type="spec" value="XP40+ XQ40+"/>
+   
+   <test-case name="fn-csv-to-xdm-001">
+      <description>Empty string</description>
+      <created by="Matt Patterson, Saxonica" on="2023-09-15"/>
+      <test>fn:csv-to-xdm("")</test>
+      <result>
+         <assert-deep-eq>map { "columns": map { "names": map {}, "fields": () }, "rows": () }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-002">
+      <description>One row, no columns extraction - empty columns record</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-17"/>
+      <test>let $LF := char('\n') return fn:csv-to-xdm(`col1,col2{$LF}`)?columns</test>
+      <result>
+         <assert-deep-eq>map { "names": map {}, "fields": () }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-003">
+      <description>One row, no columns extraction - row correct fields</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-17"/>
+      <test>let $LF := char('\n') return fn:csv-to-xdm(`col1,col2{$LF}`)?rows[1]?fields</test>
+      <result>
+         <assert-deep-eq>("col1", "col2")</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-004">
+      <description>One row, no columns extraction - correct field lookup</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-17"/>
+      <test>let $LF := char('\n') return fn:csv-to-xdm(`col1,col2{$LF}`)?rows[1]?field(1)</test>
+      <result>
+         <assert-deep-eq>"col1"</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-005">
+      <description>One row, no columns extraction - named field lookup errors</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-17"/>
+      <test>let $LF := char('\n') return fn:csv-to-xdm(`col1,col2{$LF}`)?rows[1]?field("foo")</test>
+      <result>
+         <error code="FOCV0004"/>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-006">
+      <description>One row, columns extraction - correct columns record</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-17"/>
+      <test>let $LF := char('\n') return fn:csv-to-xdm(`col1,col2{$LF}`, map { "column-names": true() })?columns</test>
+      <result>
+         <assert-deep-eq>map { "names": map { "col1": 1, "col2": 2}, "fields": ("col1", "col2") }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-007">
+      <description>One row, columns extraction - empty rows</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-17"/>
+      <test>let $LF := char('\n') return fn:csv-to-xdm(`col1,col2{$LF}`, map { "column-names": true() })?rows</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-csv-to-xdm-101">
+      <description>Non-default record- and field-delimiters, non-default quotes: record structure is correct</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>map:keys(
+         fn:csv-to-xdm(
+            "|name|;|city|§|Bob|;|Berlin|§|Alice|;|Aachen|", 
+            map { "row-delimiter": "§", "field-delimiter": ";", "quote-character": "|" }
+         )
+      )</test>
+      <result>
+         <assert-deep-eq>("columns", "rows")</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-102">
+      <description>Non-default record- and field-delimiters, non-default quotes: csv-columns record is correct</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>fn:csv-to-xdm(
+         "|name|;|city|§|Bob|;|Berlin|§|Alice|;|Aachen|", 
+         map { "row-delimiter": "§", "field-delimiter": ";", "quote-character": "|" }
+      )?columns</test>
+      <result>
+         <assert-deep-eq>map {
+            "names": map {},
+            "fields": ()
+         }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-103">
+      <description>Non-default record- and field-delimiters, non-default quotes: row count correct</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>fn:csv-to-xdm(
+         "|name|;|city|§|Bob|;|Berlin|§|Alice|;|Aachen|", 
+         map { "row-delimiter": "§", "field-delimiter": ";", "quote-character": "|" }
+      )?rows</test>
+      <result>
+         <assert-count>3</assert-count>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-104">
+      <description>Non-default record- and field-delimiters, non-default quotes: fields correct</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in fn:csv-to-xdm(
+         "|name|;|city|§|Bob|;|Berlin|§|Alice|;|Aachen|", 
+         map { "row-delimiter": "§", "field-delimiter": ";", "quote-character": "|" }
+         )?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["name", "city"],
+            ["Bob", "Berlin"],
+            ["Alice", "Aachen"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-105">
+      <description>Non-default record- and field-delimiters, non-default quotes: field lookup by index</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm(
+         "|name|;|city|§|Bob|;|Berlin|§|Alice|;|Aachen|", 
+         map { "row-delimiter": "§", "field-delimiter": ";", "quote-character": "|" }
+         )?rows[2]?field(1)</test>
+      <result>
+         <assert-eq>"Bob"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-csv-to-xdm-201">
+      <description>Trimming whitespace in fields</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>let $crlf := "&#13;&#10;" return csv-to-xdm(`name  ,city  {$crlf}Bob   ,Berlin{$crlf}Alice ,Aachen{$crlf}`, map { "trim-whitespace": true() })?rows?fields</test>
+      <result>
+         <assert-deep-eq>("name", "city", "Bob", "Berlin", "Alice", "Aachen")</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <!-- filtering/restricting columns -->
+   <environment name="variable-column-length">
+      <param name="csv-string" select="string-join(('date,name,city,amount,currency,original amount,note', 
+         '2023-07-19,Bob,Berlin,10.00,USD,13.99', 
+         '2023-07-20,Alice,Aachen,15.00', 
+         '2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie', ''), '&#13;&#10;')"/>
+   </environment>
+   
+   <test-case name="fn-csv-to-xdm-301">
+      <environment ref="variable-column-length"/>
+      <description>Filtering columns, column-names: true()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": true(), "filter-columns": (2,1,4) })?columns</test>
+      <result>
+         <assert-deep-eq>map {
+            "names": map { "name": 1, "date": 2, "amount": 3 },
+            "fields": ("name","date","amount")
+         }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-302">
+      <environment ref="variable-column-length"/>
+      <description>Filtering columns, column-names: true()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": true(), "filter-columns": (2,1,4) })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["Bob","2023-07-19","10.00"],
+            ["Alice","2023-07-20","15.00"],
+            ["Charlie","2023-07-20","15.00"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-303">
+      <environment ref="variable-column-length"/>
+      <description>Filtering columns, column-names: false()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": false(), "filter-columns": (2,1,4) })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["name","date","amount"],
+            ["Bob","2023-07-19","10.00"],
+            ["Alice","2023-07-20","15.00"],
+            ["Charlie","2023-07-20","15.00"]
+            )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-304">
+      <environment ref="variable-column-length"/>
+      <description>Filtering columns, column-names: false()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": false(), "filter-columns": (2,1,4) })?columns</test>
+      <result>
+         <assert-deep-eq>map { 'names': map {}, 'fields': () }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-305">
+      <environment ref="variable-column-length"/>
+      <description>Filtering columns, column-names: map { ... }</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": map { "Person": 1, "Amount": 3 }, "filter-columns": (2,1,4) })?columns</test>
+      <result>
+         <assert-deep-eq>map {
+            "names": map { "Person": 1, "Amount": 3 },
+            "fields": ("Person", "", "Amount")
+         }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-306">
+      <environment ref="variable-column-length"/>
+      <description>Filtering columns, column-names: map { ... }</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": map { "Person": 1, "Amount": 3 }, "filter-columns": (2,1,4) })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["name","date","amount"],
+            ["Bob","2023-07-19","10.00"],
+            ["Alice","2023-07-20","15.00"],
+            ["Charlie","2023-07-20","15.00"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-307">
+      <environment ref="variable-column-length"/>
+      <description>Filtering columns, column-names: map { ... }, column-names bigger than filtered row size</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": map { "Person": 1, "Amount": 3, "Extra": 4 }, "filter-columns": (2,1,4) })?columns</test>
+      <result>
+         <assert-deep-eq>map {
+            "names": map { "Person": 1, "Amount": 3, "Extra": 4},
+            "fields": ("Person", "", "Amount", "Extra")
+            }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-308">
+      <environment ref="variable-column-length"/>
+      <description>Filtering columns, column-names: map { ... }, column-names bigger than filtered row size</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": map { "Person": 1, "Amount": 3, "Extra": 4 }, "filter-columns": (2,1,4) })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["name","date","amount"],
+            ["Bob","2023-07-19","10.00"],
+            ["Alice","2023-07-20","15.00"],
+            ["Charlie","2023-07-20","15.00"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-309">
+      <environment ref="variable-column-length"/>
+      <description>Filtering columns, column-names: map { ... }, column-names bigger than filtered row size</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": map { "Person": 1, "Amount": 3, "Extra": 4 }, "filter-columns": (2,1,4) })?rows[1]?field("Extra")</test>
+      <result>
+         <assert-eq>""</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-401">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: "all"; column-names: true()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": true(), "number-of-columns": "all" })?columns</test>
+      <result>
+         <assert-deep-eq>map { 
+            "names": map { "date": 1, "name": 2, "city": 3, "amount": 4, "currency": 5, "original amount": 6, "note": 7 },
+            "fields": ("date","name","city","amount","currency","original amount","note")
+         }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-402">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: "all"; column-names: true()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": true(), "number-of-columns": "all" })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["2023-07-19","Bob","Berlin","10.00","USD","13.99"],
+            ["2023-07-20","Alice","Aachen","15.00"],
+            ["2023-07-20","Charlie","Celle","15.00","GBP","11.99","cake","not a lie"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-403">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: "all"; column-names: false()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": false(), "number-of-columns": "all" })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["date","name","city","amount","currency","original amount","note"],
+            ["2023-07-19","Bob","Berlin","10.00","USD","13.99"],
+            ["2023-07-20","Alice","Aachen","15.00"],
+            ["2023-07-20","Charlie","Celle","15.00","GBP","11.99","cake","not a lie"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-404">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: "all"; column-names: false()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": false(), "number-of-columns": "all" })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["date","name","city","amount","currency","original amount","note"],
+            ["2023-07-19","Bob","Berlin","10.00","USD","13.99"],
+            ["2023-07-20","Alice","Aachen","15.00"],
+            ["2023-07-20","Charlie","Celle","15.00","GBP","11.99","cake","not a lie"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-405">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: "all"; column-names: map { ... }</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": map { "Date": 1, "Amount": 6, "Currency": 5 }, "number-of-columns": "all" })?columns</test>
+      <result>
+         <assert-deep-eq>map {
+            "names": map { "Date": 1, "Amount": 6, "Currency": 5 },
+            "fields": ("Date", "", "", "", "Currency", "Amount")
+         }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-406">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: "all"; column-names: map { ... }</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": map { "Date": 1, "Amount": 6, "Currency": 5 }, "number-of-columns": "all" })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["date","name","city","amount","currency","original amount","note"],
+            ["2023-07-19","Bob","Berlin","10.00","USD","13.99"],
+            ["2023-07-20","Alice","Aachen","15.00"],
+            ["2023-07-20","Charlie","Celle","15.00","GBP","11.99","cake","not a lie"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-407">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: "first-row"; column-names: false()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": false(), "number-of-columns": "first-row" })?columns</test>
+      <result>
+         <assert-deep-eq>map { 'names': map {}, 'fields': () }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-408">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: "first-row"; column-names: false()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": false(), "number-of-columns": "first-row" })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["date","name","city","amount","currency","original amount","note"],
+            ["2023-07-19","Bob","Berlin","10.00","USD","13.99",""],
+            ["2023-07-20","Alice","Aachen","15.00","","",""],
+            ["2023-07-20","Charlie","Celle","15.00","GBP","11.99","cake"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-409">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: "first-row"; column-names: true()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": true(), "number-of-columns": "first-row" })?columns</test>
+      <result>
+         <assert-deep-eq>map { 
+            "names": map { "date": 1, "name": 2, "city": 3, "amount": 4, "currency": 5, "original amount": 6, "note": 7 },
+            "fields": ("date","name","city","amount","currency","original amount","note")
+         }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-410">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: "first-row"; column-names: true()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": true(), "number-of-columns": "first-row" })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["2023-07-19","Bob","Berlin","10.00","USD","13.99",""],
+            ["2023-07-20","Alice","Aachen","15.00","","",""],
+            ["2023-07-20","Charlie","Celle","15.00","GBP","11.99","cake"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-411">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: "first-row"; column-names: map { ... }</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": map { "Date": 1, "Amount": 4 }, "number-of-columns": "first-row" })?columns</test>
+      <result>
+         <assert-deep-eq>map { 
+            "names": map { "Date": 1, "Amount": 4 },
+            "fields": ("Date", "", "", "Amount")
+         }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-412">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: "first-row"; column-names: map { ... }</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": map { "Date": 1, "Amount": 4 }, "number-of-columns": "first-row" })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["date","name","city","amount"],
+            ["2023-07-19","Bob","Berlin","10.00"],
+            ["2023-07-20","Alice","Aachen","15.00"],
+            ["2023-07-20","Charlie","Celle","15.00"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-413">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: N; column-names: true()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": true(), "number-of-columns": 6 })?columns</test>
+      <result>
+         <assert-deep-eq>map { 
+            "names": map { "date": 1, "name": 2, "city": 3, "amount": 4, "currency": 5, "original amount": 6 },
+            "fields": ("date","name","city","amount","currency","original amount")
+         }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-414">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: N; column-names: true()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": true(), "number-of-columns": 6 })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["2023-07-19","Bob","Berlin","10.00","USD","13.99"],
+            ["2023-07-20","Alice","Aachen","15.00","",""],
+            ["2023-07-20","Charlie","Celle","15.00","GBP","11.99"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-415">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: N; column-names: false()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": false(), "number-of-columns": 6 })?columns</test>
+      <result>
+         <assert-deep-eq>map { 'names': map {}, 'fields': () }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-416">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: N; column-names: false()</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": false(), "number-of-columns": 6 })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["date","name","city","amount","currency","original amount"],
+            ["2023-07-19","Bob","Berlin","10.00","USD","13.99"],
+            ["2023-07-20","Alice","Aachen","15.00","",""],
+            ["2023-07-20","Charlie","Celle","15.00","GBP","11.99"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-417">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: N; column-names: map { ... }</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": map { "Date": 1, "Amount": 4 }, "number-of-columns": 6 })?columns</test>
+      <result>
+         <assert-deep-eq>map {
+            "names": map { "Date": 1, "Amount": 4 },
+            "fields": ("Date", "", "", "Amount")
+         }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-418">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: N; column-names: map { ... }</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": map { "Date": 1, "Amount": 4 }, "number-of-columns": 6 })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["date","name","city","amount","currency","original amount"],
+            ["2023-07-19","Bob","Berlin","10.00","USD","13.99"],
+            ["2023-07-20","Alice","Aachen","15.00","",""],
+            ["2023-07-20","Charlie","Celle","15.00","GBP","11.99"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-419">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: N; column-names: map { ... }, column-names bigger than number-of-columns</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": map { "Date": 1, "Amount": 4 }, "number-of-columns": 3 })?columns</test>
+      <result>
+         <assert-deep-eq>map {
+            "names": map { "Date": 1, "Amount": 4 },
+            "fields": ("Date", "", "", "Amount")
+         }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-420">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: N; column-names: map { ... }, column-names bigger than number-of-columns</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>for $r in csv-to-xdm($csv-string, map { "column-names": map { "Date": 1, "Amount": 4 }, "number-of-columns": 3 })?rows return array { $r?fields }</test>
+      <result>
+         <assert-deep-eq>(
+            ["date","name","city"],
+            ["2023-07-19","Bob", "Berlin"],
+            ["2023-07-20","Alice","Aachen"],
+            ["2023-07-20","Charlie","Celle"]
+         )</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-421">
+      <environment ref="variable-column-length"/>
+      <description>Specifying the number of columns - number-of-columns: N; column-names: map { ... }, column-names bigger than number-of-columns</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm($csv-string, map { "column-names": map { "Date": 1, "Amount": 4 }, "number-of-columns": 3 })?rows[1]?field("Amount")</test>
+      <result>
+         <assert-eq>""</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-501">
+      <description>Specifying both number-of-columns and filter-columns is an error condition</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm("a,b", map { "filter-columns": (1,3), "number-of-columns": "first-row" })</test>
+      <result>
+         <error code="FOCV0006"/>
+      </result>
+   </test-case>   
+   <test-case name="fn-csv-to-xdm-502">
+      <description>Specifying both number-of-columns and filter-columns is an error condition, even with no data to parse</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm("", map { "filter-columns": (1,3), "number-of-columns": "first-row" })</test>
+      <result>
+         <error code="FOCV0006"/>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-to-xdm-503">
+      <description>Specifying negative integers, or zero, in options taking xs:integer values is an error condition</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm("a,b", map { "filter-columns": (-1) })</test>
+      <result>
+         <error code="FOCV0005"/>
+      </result>
+   </test-case>   
+   <test-case name="fn-csv-to-xdm-504">
+      <description>Specifying negative integers, or zero, in options taking xs:integer values is an error condition</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm("a,b", map { "filter-columns": (0) })</test>
+      <result>
+         <error code="FOCV0005"/>
+      </result>
+   </test-case>   
+   <test-case name="fn-csv-to-xdm-505">
+      <description>Specifying negative integers, or zero, in options taking xs:integer values is an error condition, even with no data to parse</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm("", map { "filter-columns": (0) })</test>
+      <result>
+         <error code="FOCV0005"/>
+      </result>
+   </test-case>   
+   <test-case name="fn-csv-to-xdm-506">
+      <description>Specifying negative integers, or zero, in options taking xs:integer values is an error condition</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm("a,b", map { "filter-columns": (0, 4) })</test>
+      <result>
+         <error code="FOCV0005"/>
+      </result>
+   </test-case>   
+   <test-case name="fn-csv-to-xdm-507">
+      <description>Specifying negative integers, or zero, in options taking xs:integer values is an error condition</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm("a,b", map { "number-of-columns": 0 })</test>
+      <result>
+         <error code="FOCV0005"/>
+      </result>
+   </test-case>   
+   <test-case name="fn-csv-to-xdm-508">
+      <description>Specifying negative integers, or zero, in options taking xs:integer values is an error condition</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm("a,b", map { "number-of-columns": -1 })</test>
+      <result>
+         <error code="FOCV0005"/>
+      </result>
+   </test-case>   
+   <test-case name="fn-csv-to-xdm-509">
+      <description>Specifying negative integers, or zero, in options taking xs:integer values is an error condition, even with no data to parse</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm("", map { "number-of-columns": -1 })</test>
+      <result>
+         <error code="FOCV0005"/>
+      </result>
+   </test-case>   
+   <test-case name="fn-csv-to-xdm-510">
+      <description>Specifying negative integers, or zero, in options taking xs:integer values is an error condition</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm("a,b", map { "column-names": map { "Name": 0 } })</test>
+      <result>
+         <error code="FOCV0005"/>
+      </result>
+   </test-case>   
+   <test-case name="fn-csv-to-xdm-511">
+      <description>Specifying negative integers, or zero, in options taking xs:integer values is an error condition</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm("a,b", map { "column-names": map { "Name": -1 } })</test>
+      <result>
+         <error code="FOCV0005"/>
+      </result>
+   </test-case>   
+   <test-case name="fn-csv-to-xdm-512">
+      <description>Specifying negative integers, or zero, in options taking xs:integer values is an error condition, even with no data to parse</description>
+      <created by="Matt Patterson, Saxonica" on="2023-05-21"/>
+      <test>csv-to-xdm("", map { "column-names": map { "Name": -1 } })</test>
+      <result>
+         <error code="FOCV0005"/>
+      </result>
+   </test-case>   
+</test-set>
