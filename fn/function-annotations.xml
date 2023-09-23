@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" 
+          name="fn-function-annotations" covers-40="fn-function-annotations">
+   <description>Tests for the function-annotations() function</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-40/"
+         idref="func-function-annotations"/>
+   
+   <dependency type="feature" value="higherOrderFunctions"/>
+   <dependency type="spec" value="XQ40+"/>
+
+   <test-case name="fn-function-annotations-001">
+      <description>No arguments</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>fn:function-annotations()</test>
+      <result>
+         <error code="XPST0017" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-002">
+      <description>Arity zero</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>fn:function-annotations#0</test>
+      <result>
+         <error code="XPST0017" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-003">
+      <description>Two arguments</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>fn:function-annotations(fn:dateTime#2, fn:dateTime#2)</test>
+      <result>
+         <error code="XPST0017" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-004">
+      <description>Arity two</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>fn:function-annotations#2</test>
+      <result>
+         <error code="XPST0017" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-005">
+      <description>Arity one, existence check</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>exists(fn:function-annotations#1)</test>
+      <result>
+         <assert-true />
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-006">
+      <description>Empty sequence as argument</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>fn:function-annotations( () )</test>
+      <result>
+         <error code="XPTY0004" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-007">
+      <description>Argument of type xs:anyAtomicType</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>fn:function-annotations( 1 )</test>
+      <result>
+         <error code="XPTY0004" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-008">
+      <description>Argument of type node()</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>fn:function-annotations( fn:analyze-string((), "unused") )</test>
+      <result>
+         <error code="XPTY0004" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-009">
+      <description>Argument, type checking</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>fn:function-annotations( (fn:concat#2, fn:concat#3) )</test>
+      <result>
+         <error code="XPTY0004" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-010">
+      <description>Argument, dynamic type checking</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <dependency type="feature" value="staticTyping"/>
+      <test>fn:function-annotations( if ( fn:current-dateTime() eq
+                                    fn:dateTime( fn:current-date(),
+                                                 fn:current-time() ))
+                               then fn:dateTime#2
+                               else 1 )</test>
+      <result>
+         <error code="XPTY0004" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-011">
+      <description>Argument, dynamic type checking</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>( fn:function-annotations( if (current-date() eq xs:date('1900-01-01'))
+                                 then fn:dateTime#2
+                                 else 1 ),
+              fn:function-annotations( if (current-date() eq xs:date('1900-01-01'))
+                                 then 1
+                                 else fn:dateTime#2 ) )</test>
+      <result>
+    <error code="XPTY0004" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-012">
+      <description>Argument, dynamic type checking</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <dependency type="feature" value="staticTyping"/>
+      <test>fn:function-annotations( if ( fn:current-dateTime() eq
+                                    fn:dateTime( fn:current-date(),
+                                                 fn:current-time() ))
+                               then fn:dateTime#2
+                               else () )</test>
+      <result>
+         <error code="XPTY0004" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-013">
+      <description>Argument, dynamic type checking</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>( fn:function-annotations( if (current-date() eq xs:date('1900-01-01'))
+                                 then fn:dateTime#2
+                                 else () ),
+              fn:function-annotations( if (current-date() eq xs:date('1900-01-01'))
+                                 then ()
+                                 else fn:dateTime#2 ) )</test>
+      <result>
+    <error code="XPTY0004" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-014">
+      <description>Test return type</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>fn:function-annotations( fn:substring#2 )</test>
+      <result>
+         <assert-type>map(xs:QName, xs:anyAtomicType*)</assert-type>
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-015">
+      <description>Result for built-in function: key</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>fn:function-annotations(true#0) ! map:keys(.)</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-016">
+      <description>Result for built-in function: value</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test>fn:function-annotations(true#0) ! map:values(.)</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-017">
+      <description>Function item</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test><![CDATA[
+declare %private function local:inc($c) { $c + 1 };
+function-annotations(local:inc#1)
+       ]]></test>
+      <result>
+         <assert-deep-eq>map { QName('http://www.w3.org/2012/xquery', 'private'): () }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-annotations-018">
+      <description>Partial function application</description>
+      <created by="Christian Gruen" on="2023-09-17"/>
+      <test><![CDATA[
+let $f := %Q{uri}name('a', 'b') function($a, $b) {}
+return function-annotations($f(?, 5))
+      ]]></test>
+      <result>
+         <assert-deep-eq>map { QName('uri', 'name'): ('a', 'b') }</assert-deep-eq>
+      </result>
+   </test-case>
+
+</test-set>
