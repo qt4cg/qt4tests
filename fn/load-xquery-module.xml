@@ -1188,6 +1188,51 @@
     </result>
   </test-case>
   
+  <test-case name="fn-load-xquery-module-075">
+    <description>Tests the dynamic context of functions in the loaded module. (Saxon bug 6209)</description>
+    <created by="Michael Kay" on="2023-10-01"/>
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/context/module" file="load-xquery-module/context-module.xqm"/>    
+    <test>
+      let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/context/module",
+      $module := fn:load-xquery-module($module-ns, map{"xquery-version" : 3.1})
+      return $module("functions")(QName($module-ns, "standard-functions-available"))(0)()
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="fn-load-xquery-module-076">
+    <description>Tests the dynamic context of functions in the loaded module. (Saxon bug 6209)</description>
+    <created by="Michael Kay" on="2023-10-01"/>
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/context/module" file="load-xquery-module/context-module.xqm"/>    
+    <test>
+      let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/context/module",
+      $module := fn:load-xquery-module($module-ns, map{"xquery-version" : 3.1})
+      return $module("functions")(QName($module-ns, "local-functions-available"))(0)()
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="fn-load-xquery-module-077">
+    <description>Tests the dynamic context of functions in the loaded module. (Saxon bug 6209)</description>
+    <created by="Michael Kay" on="2023-10-01"/>
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/context/module" file="load-xquery-module/context-module.xqm"/>    
+    <test>
+      let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/context/module",
+      $module := fn:load-xquery-module($module-ns, map{"xquery-version" : 3.1})
+      (: If a Saxon extension is available in the calling context then we expect it to be available in the called context, 
+         and vice versa :)
+      return $module("functions")(QName($module-ns, "saxon-functions-available"))(1)
+                 (exists(function-lookup(fn:QName('http://saxon.sf.net/', 'type'), 1)))
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
   <test-case name="fn-load-xquery-module-901">
     <description>Checks for an error when calling fn:load-xquery-module without a module-uri.</description>
     <created by="Tim Mills" on="2016-09-07"/>
