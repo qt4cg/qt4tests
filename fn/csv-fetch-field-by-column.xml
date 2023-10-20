@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-csv-fetch-field-by-column" covers="fn-csv-fetch-field-by-column">
+   <description>
+      Tests the parse-csv function.
+   </description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-40/" idref="func-csv-fetch-field-by-column"/>
+   <dependency type="spec" value="XP40+ XQ40+"/>
+   
+   <!-- basic variables -->
+   <environment name="csv">
+      <param name="csv-columns-record" select="map { 'names': map {'a': 1, 'c': 3}, 'fields': ('a', '', 'c') }"/>
+      <param name="fields" select="('field 1', 'field 2', 'field 3')"/>
+   </environment>
+   
+   <test-case name="fn-csv-fetch-field-by-column-001">
+      <environment ref="csv"/>
+      <description>Named column</description>
+      <created by="Matt Patterson, Saxonica" on="2023-10-10"/>
+      <test>fn:csv-fetch-field-by-column($csv-columns-record, $fields, "a")</test>
+      <result>
+         <assert-eq>"field 1"</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-fetch-field-by-column-002">
+      <environment ref="csv"/>
+      <description>Named column, not present</description>
+      <created by="Matt Patterson, Saxonica" on="2023-10-10"/>
+      <test>fn:csv-fetch-field-by-column($csv-columns-record, $fields, "d")</test>
+      <result>
+         <error code="FOCV0004"/>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-fetch-field-by-column-003">
+      <environment ref="csv"/>
+      <description>Column index</description>
+      <created by="Matt Patterson, Saxonica" on="2023-10-10"/>
+      <test>fn:csv-fetch-field-by-column($csv-columns-record, $fields, 3)</test>
+      <result>
+         <assert-eq>"field 3"</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-csv-fetch-field-by-column-004">
+      <environment ref="csv"/>
+      <description>Column index, not present</description>
+      <created by="Matt Patterson, Saxonica" on="2023-10-10"/>
+      <test>fn:csv-fetch-field-by-column($csv-columns-record, $fields, 4)</test>
+      <result>
+         <assert-eq>""</assert-eq>
+      </result>
+   </test-case>
+</test-set>
