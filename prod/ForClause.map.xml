@@ -1,0 +1,655 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-ForClause.map" covers-40="prod-ForClause.map">
+   <description>Tests for the "for key" and "for value" clauses in 4.0, introduced to iterate over maps</description>
+   <link type="spec" document="http://www.w3.org/TR/xquery-30/"
+         idref="doc-xquery30-ForClause"/>
+   <link type="spec" document="XQuery" section-number="3.8.1" idref="id-for-let"/>
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="for-map-key-001">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k in map { }
+         return $k
+      </test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-002">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k in map { 1: 'a', 2: 'b', 3: 'c' }
+         return $k + $k
+      </test>
+      <result>
+         <assert-permutation>2, 4, 6</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-003">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k in map { 1: '', 'a': '', xs:date('2001-01-01'): '' }
+         return $k
+      </test>
+      <result>
+         <assert-permutation>1, 'a', xs:date('2001-01-01')</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-004">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k1 in map { }, key $k2 in map { }
+         return $k2
+      </test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-005">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k1 in map { 1: '', 2: '' }, key $k2 in map { $k1: '' }
+         return $k2
+      </test>
+      <result>
+         <assert-permutation>1, 2</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-006">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k1 in map { 1: '', 2: '' }
+         for key $k2 in map { $k1: '' }
+         return $k2
+      </test>
+      <result>
+         <assert-permutation>1, 2</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-007">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k in map { 1: '', 2: '' }, key $k in map { $k: '' }
+         return $k
+      </test>
+      <result>
+         <assert-permutation>1, 2</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-008">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k in map { 1: '', 2: '' }, $k in $k + 1
+         return $k
+      </test>
+      <result>
+         <assert-permutation>2, 3</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-009">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for $k in 1 to 2, key $k in map { $k + 1: '' }
+         return $k
+      </test>
+      <result>
+         <assert-permutation>2, 3</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-010">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for key $k allowing empty in map {}
+         return $k
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-011">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for key $k at $p in map { 'a': '', 'b': '' }
+         return $p
+      </test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-012">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for key $k in map { 1: '', 2: '' }, $_ allowing empty in ()
+         return $k
+      </test>
+      <result>
+         <assert-permutation>1, 2</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-013">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k in []
+         return $k
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-014">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k in (map { }, map { })
+         return $k
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-015">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k in parse-json('{"A":1,"B":2}')
+         return $k
+      </test>
+      <result>
+         <assert-permutation>'A', 'B'</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-016">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k in map { 2: 'b', 1: 'a', 3: 'c' }
+         order by $k
+         return $k
+      </test>
+      <result>
+         <assert-deep-eq>1, 2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-017">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for key $k in map:merge((1 to 100) ! map:entry(., string()))
+         group by $n := $k mod 2
+         return $n
+      </test>
+      <result>
+         <assert-permutation>0, 1</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-018">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k as xs:integer in map { 1: 'a', 2: 'b' }
+         return $k
+      </test>
+      <result>
+         <assert-permutation>1, 2</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-019">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k as node() in map { 1: 'a', 2: 'b' }
+         return $k
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-020">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for member $m key $k in map { }
+         return ()
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-021">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k member $m in map { }
+         return ()
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-022">
+      <description>for key</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for key $dupl at $dupl in map {}
+         return ()
+      </test>
+      <result>
+         <error code="XQST0089"/>
+      </result>
+   </test-case>
+
+   <test-case name="for-map-value-001">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v in map { }
+         return $v
+      </test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-002">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v in map { 'a': 1, 'b': 2, 'c': 3 }
+         return $v + $v
+      </test>
+      <result>
+         <assert-permutation>2, 4, 6</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-003">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v in map { 1: 1, 2: 'a', 3: xs:date('2001-01-01') }
+         return $v
+      </test>
+      <result>
+         <assert-permutation>1, 'a', xs:date('2001-01-01')</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-004">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v1 in map { }, value $v2 in map { }
+         return $v2
+      </test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-005">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v1 in map { 'a': 1, 'b': 2 }, value $v2 in map { '': $v1 }
+         return $v2
+      </test>
+      <result>
+         <assert-permutation>1, 2</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-006">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v1 in map { 'a': 1, 'b': 2 }
+         for value $v2 in map { '': $v1 }
+         return $v2
+      </test>
+      <result>
+         <assert-permutation>1, 2</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-007">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v in map { 'a': 1, 'b': 2 }, value $v in map { '': $v }
+         return $v
+      </test>
+      <result>
+         <assert-permutation>1, 2</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-008">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v in map { 'a': 1, 'b': 2 }, $v in $v + 1
+         return $v
+      </test>
+      <result>
+         <assert-permutation>2, 3</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-009">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for $v in 1 to 2, value $v in map { '': $v + 1 }
+         return $v
+      </test>
+      <result>
+         <assert-permutation>2, 3</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-010">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for value $v allowing empty in map {}
+         return $v
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-011">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for value $v at $p in map { 8: 'a', 9: 'b' }
+         return $p
+      </test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-012">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for value $v in map { 'a': 1, 'b': 2 }, $_ allowing empty in ()
+         return $v
+      </test>
+      <result>
+         <assert-permutation>1, 2</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-013">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v in []
+         return $v
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-014">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v in (map { }, map { })
+         return $v
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-015">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v in parse-json('{"A":1,"B":2}')
+         return $v
+      </test>
+      <result>
+         <assert-permutation>1, 2</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-016">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v in map { 'b': 2, 'a': 1, 'c': 3 }
+         order by $v
+         return $v
+      </test>
+      <result>
+         <assert-deep-eq>1, 2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-017">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for value $v in map:merge((1 to 100) ! map:entry(string(), .))
+         group by $n := $v mod 2
+         return $n
+      </test>
+      <result>
+         <assert-permutation>0, 1</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-018">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v as xs:integer in map { 'a': 1, 'b': 2 }
+         return $v
+      </test>
+      <result>
+         <assert-permutation>1, 2</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-019">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v as node() in map { 'a': 1, 'b': 2 }
+         return $v
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-020">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for member $m value $v in map { }
+         return ()
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-021">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v member $m in map { }
+         return ()
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-value-022">
+      <description>for value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for value $dupl at $dupl in map {}
+         return ()
+      </test>
+      <result>
+         <error code="XQST0089"/>
+      </result>
+   </test-case>
+
+   <test-case name="for-map-key-value-001">
+      <description>for key/value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k value $v in map { }
+         return ($k, $v)
+      </test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-value-002">
+      <description>for key/value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k value $v in map { 'a': 'A', 'b': 'B' }
+         return $k || $v
+      </test>
+      <result>
+         <assert-permutation>'aA', 'bB'</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-value-003">
+      <description>for key/value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for key $k value $v allowing empty in map { }
+         return $k || $v
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-value-004">
+      <description>for key/value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for key $k value $v at $p in map { 'a': 'A', 'b': 'B' }
+         return $p
+      </test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-value-005">
+      <description>for key/value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k as xs:string value $v as xs:integer in map { 'a': 1, 'b': 2 }
+         return $k || ($v * 2)
+      </test>
+      <result>
+         <assert-permutation>'a2', 'b4'</assert-permutation>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-value-006">
+      <description>for key/value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         (for key $k value $v in map:merge((1 to 100) ! map:entry(., .))
+          return $k - $v) > 0
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-value-007">
+      <description>for key/value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for value $v key $k in map {}
+         return ()
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-value-008">
+      <description>for key/value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for member $m key $k value $v in map {}
+         return ()
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-value-009">
+      <description>for key/value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $k value $v member $m in map {}
+         return ()
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   <test-case name="for-map-key-value-010">
+      <description>for key/value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         for key $dupl value $dupl in map {}
+         return ()
+      </test>
+      <result>
+         <error code="XQST0089"/>
+      </result>
+   </test-case>
+
+   <test-case name="for-map-complex-001">
+      <description>for key/value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <test>
+         sum(
+            let $map := map:merge(reverse(1 to 10) ! map:entry(., . * .))
+            for key $k1 value $v1 in $map, key $k2 value $v2 in $map
+            return $k1 * $v1 * $k2 * $v2
+         )
+      </test>
+      <result>
+         <assert-eq>9150625</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="for-map-complex-002">
+      <description>for key/value</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         let $construct := function($m, $l, $f) {
+           if($l > 0) then $f(map { $l: $m }, $l - 1, $f) else $m
+         }
+         for key $k1 value $v1 at $p1 in $construct(map { 0: 'finito' }, 3, $construct)
+         for key $k2 value $v2 at $p2 in $v1
+         for key $k3 value $v3 at $p3 in $v2
+         for key $k4 value $v4 at $p4 in $v3
+         return ($v4, $k1 + $k2 + $k3 + $k4, $p1 + $p2 + $p3 + $p4)
+      </test>
+      <result>
+         <assert-deep-eq>'finito', 6, 4</assert-deep-eq>
+      </result>
+   </test-case>
+</test-set>
