@@ -629,7 +629,7 @@
   </test-case>
   
   <test-case name="fn-build-uri-from-parse-901">
-    <description>Supply path segments as a sequence rather than an array (error)</description>
+    <description>Supply path segments as a sequence</description>
     <created by="Michael Kay" on="2023-10-20"/>
     <test>fn:build-uri(map {
       "authority": "example.com",
@@ -639,9 +639,22 @@
       "scheme": "https",
       "uri": "https://example.com\path\to\file"
       })</test>
-    <result>
-      <error code="XPTY0004"/>
-    </result>
+    <result><assert-eq>"https://example.com/path/to/file"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-009">
+    <description>Tests that a list of query parameter values is handled correctly.</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-24"/>
+    <test>fn:build-uri(<![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           'path-segments': ('','path'),
+                           "query-parameters": map {
+                             "a": ("1", "3"),
+                             "b": "2&amp;4"
+                           }}]]>)</test>
+    <result><assert-eq>"http://example.com/path?a=1&amp;a=3&amp;b=2%264"</assert-eq></result>
   </test-case>
 
 </test-set>
