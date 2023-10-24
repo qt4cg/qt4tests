@@ -41,7 +41,7 @@
       <description>Multi-dimensional array</description>
       <created by="Michael Kay" on="2021-01-09"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>for member $a in [[1, 2, 3], [4, 5, 6], [7, 8, 9]], $b in $a return $b + 1</test>
+      <test>for member $a in [[1, 2, 3], [4, 5, 6], [7, 8, 9]], member $b in $a return $b + 1</test>
       <result>
          <assert-deep-eq>2 to 10</assert-deep-eq>
       </result>
@@ -52,10 +52,10 @@
       <created by="Michael Kay" on="2021-01-09"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
-         <e>{for member $a in [[1, 2, 3], [4, 5, 6], [7, 8, 9]], $b in $a return $b + 1}</e>
+         <e>{for member $a in [[1, 2, 3], [4, 5, 6], [7, 8, 9]], member $b in $a return $b + 1}</e>
          ]]></test>
       <result>
-         <assert>. = "2 3 4 5 6 7 8 9 10"</assert>
+         <assert>$result = "2 3 4 5 6 7 8 9 10"</assert>
       </result>
    </test-case>
    
@@ -82,7 +82,7 @@
          return $b + 1
       }</e>]]></test>
       <result>
-         <assert>. = "2 3 4 5 6 7 8 9 10"</assert>
+         <assert>$result = "2 3 4 5 6 7 8 9 10"</assert>
       </result>
    </test-case>
    
@@ -107,7 +107,7 @@
          for $a in ([1, 2, 3], [4, 5, 6], [7, 8, 9]) 
          for member $b in $a return $b + 1}</e>]]></test>
       <result>
-         <assert>. = "2 3 4 5 6 7 8 9 10"</assert>
+         <assert>$result = "2 3 4 5 6 7 8 9 10"</assert>
       </result>
    </test-case>
    
@@ -155,7 +155,7 @@
       <description>for member expression - multiple clauses</description>
       <created by="Michael Kay" on="2019-04-03"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>for member $m in [1, 2], $n in [3, 4] return $m * $n</test>
+      <test>for member $m in [1, 2], member $n in [3, 4] return $m * $n</test>
       <result>
          <assert-deep-eq>3, 4, 6, 8</assert-deep-eq>
       </result>
@@ -165,7 +165,7 @@
       <description>for member expression - static type error</description>
       <created by="Michael Kay" on="2019-04-03"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>for member $m in [1, 2], $n in (3, 4) return $m * $n</test>
+      <test>for member $m in [1, 2], member $n in (3, 4) return $m * $n</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -186,7 +186,7 @@
       <description>for member expression - nested</description>
       <created by="Michael Kay" on="2019-04-03"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>for member $x in [[1,2,3], [4,5,6]], $y in $x return $y + 1</test>
+      <test>for member $x in [[1,2,3], [4,5,6]], member $y in $x return $y + 1</test>
       <result>
          <assert-deep-eq>2,3,4,5,6,7</assert-deep-eq>
       </result>
@@ -216,7 +216,7 @@
       <description>for member expression - with position</description>
       <created by="Michael Kay" on="2021-01-10"/>
       <dependency type="spec" value="XQ40+"/>
-      <test>for member $x at $p in [[1,2,3], [4,5,6]], $y at $q in $x return $q</test>
+      <test>for member $x at $p in [[1,2,3], [4,5,6]], member $y at $q in $x return $q</test>
       <result>
          <assert-deep-eq>1,2,3,1,2,3</assert-deep-eq>
       </result>
@@ -226,9 +226,9 @@
       <description>for member expression - with position, in element constructor</description>
       <created by="Michael Kay" on="2021-01-10"/>
       <dependency type="spec" value="XQ40+"/>
-      <test><![CDATA[<e>{for member $x at $p in [[1,2,3], [4,5,6]], $y at $q in $x return $q}</e>]]></test>
+      <test><![CDATA[<e>{for member $x at $p in [[1,2,3], [4,5,6]], member $y at $q in $x return $q}</e>]]></test>
       <result>
-         <assert>. = "1 2 3 1 2 3"</assert>
+         <assert>$result = "1 2 3 1 2 3"</assert>
       </result>
    </test-case>
    
@@ -257,7 +257,7 @@
          return $q
         }</e>]]></test>
       <result>
-         <assert>. = "3 2 1 4 3 2 1"</assert>
+         <assert>$result = "3 2 1 4 3 2 1"</assert>
       </result>
    </test-case>
    
@@ -416,8 +416,85 @@
       </result>
    </test-case>
    
-   
-   
+   <test-case name="for-member-051">
+      <description>multiple for clauses</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         for $a in 1 to 3, member $m in [ 1 to $a ]
+         return count($m)
+      ]]></test>
+      <result>
+         <assert-deep-eq>1 to 3</assert-deep-eq>
+      </result>
+   </test-case>
 
- 
+   <test-case name="for-member-052">
+      <description>multiple for clauses</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         for $a in 1 to 3
+         for member $m in [ 1 to $a ]
+         return count($m)
+      ]]></test>
+      <result>
+         <assert-deep-eq>1 to 3</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="for-member-053">
+      <description>multiple for clauses</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         for member $m in [ 2, 3 ], $i in 1 to $m
+         return $i
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, 2, 1, 2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="for-member-054">
+      <description>multiple for clauses</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         for member $m in [ 2, 3 ]
+         for $i in 1 to $m
+         return $i
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, 2, 1, 2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="for-member-055">
+      <description>multiple for clauses</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         for member $m1 in array { 1 to 3 }, member $m2 in array { 3 to $m1 + 2 }
+         return $m2
+      ]]></test>
+      <result>
+         <assert-deep-eq>3, 3, 4, 3, 4, 5</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="for-member-056">
+      <description>multiple for clauses</description>
+      <created by="Christian Gruen" on="2023-09-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         for member $m1 in array { 1 to 3 }
+         for member $m2 in array { 3 to $m1 + 2 }
+         return $m2
+      ]]></test>
+      <result>
+         <assert-deep-eq>3, 3, 4, 3, 4, 5</assert-deep-eq>
+      </result>
+   </test-case>
+
 </test-set>
