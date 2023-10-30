@@ -640,5 +640,81 @@
     <result><assert-eq>"http://example.com/path?a=1&amp;a=3&amp;b=2%264"</assert-eq></result>
   </test-case>
 
+  <test-case name="fn-build-uri-010a">
+    <description>Tests character encoding</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-26"/>
+    <test>fn:build-uri(<![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           'path-segments': ('',' !"#$%&amp;''()*+,-./0123456789:;&lt;=>?'),
+                           "query-parameters": map {
+                             "a": (" !""#$%&amp;'()*+,-"),
+                             "b": ("./0123456789:;&lt;=>?")
+                           },
+                           "fragment": " !""#$%&amp;'()*+,-./0123456789:;&lt;=>?"
+                         }]]>)</test>
+    <result>
+      <assert-eq>`http://example.com/%20!%22%23$%25&amp;'()*+,-.%2F0123456789:;%3C=%3E%3F?a=%20!%22%23$%25%26'()*+,-&amp;b=./0123456789:;%3C%3D%3E?#%20!%22%23$%25&amp;'()*+,-./0123456789:;%3C=%3E?`</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-010b">
+    <description>Tests character encoding</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-26"/>
+    <test>fn:build-uri(<![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           'path-segments': ('','@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_'),
+                           "query-parameters": map {
+                             "a": ("@ABCDEFGHIJKLMN"),
+                             "b": ("OPQRSTUVWXYZ[\]^_")
+                           },
+                           "fragment": "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_"
+                         }]]>)</test>
+    <result>
+      <assert-eq>`http://example.com/@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_?a=@ABCDEFGHIJKLMN&amp;b=OPQRSTUVWXYZ%5B%5C%5D%5E_#@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_`</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-010c">
+    <description>Tests character encoding</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-26"/>
+    <test>fn:build-uri(<![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           'path-segments': ('','`abcdefghijklmnopqrstuvwxyz{|}~'),
+                           "query-parameters": map {
+                             "a": ("`abcdefghijklmn"),
+                             "b": ("opqrstuvwxyz{|}~")
+                           },
+                           "fragment": "`abcdefghijklmnopqrstuvwxyz{|}~"
+                         }]]>)</test>
+    <result>
+    <assert-eq>`http://example.com/%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~?a=%60abcdefghijklmn&amp;b=opqrstuvwxyz%7B%7C%7D~#%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~`</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-010d">
+    <description>Tests character encoding</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-26"/>
+    <test>fn:build-uri(<![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           'path-segments': ('','🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿'),
+                           "query-parameters": map {
+                             "a": ("🤷 ¡¢£¤ǌ"),
+                             "b": ("†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿")
+                           },
+                           "fragment": "🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿"
+                         }]]>)</test>
+    <result>
+      <assert-eq>`http://example.com/🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿?a=🤷 ¡¢£¤ǌ&amp;b=†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿#🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿`</assert-eq>
+    </result>
+  </test-case>
+
 </test-set>
 
