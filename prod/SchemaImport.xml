@@ -644,9 +644,9 @@
     </result>
   </test-case>
 
-  <test-case name="qischema016">
-    <description>validate a document read using the doc() function </description>
-    <created by="Michael Kay" on="2006-11-14"/>
+  <test-case name="qischema017">
+    <description>fixed default namespace (4.0)</description>
+    <created by="Michael Kay" on="2023-10-31"/>
     <environment>
       <source file="SchemaImport/xqischema008.xml"
         uri="http://www.w3.org/fots/SchemaImport/xqischema008.xml"/>
@@ -655,12 +655,27 @@
         <created by="Michael Kay" on="2006-11-14"/>
       </schema>
     </environment>
-    <test>
-        import schema default element namespace "http://www.w3.org/XQueryTest/abf" at "qischema008.xsd"; 
-        validate strict { doc("http://www.w3.org/fots/SchemaImport/xqischema008.xml") }
-      </test>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+        import schema fixed default element namespace "http://www.w3.org/XQueryTest/abf" at "qischema008.xsd"; 
+        let $in := validate strict { doc("http://www.w3.org/fots/SchemaImport/xqischema008.xml") }
+        return string(<out xmlns="http://random">{count($in//a)}</out>)
+    ]]></test>
     <result>
-      <assert-xml><![CDATA[<abf xmlns="http://www.w3.org/XQueryTest/abf"><a/><b/><f/></abf>]]></assert-xml>
+      <assert-eq>"1"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="qischema003">
+    <description>import schema using default namespace for a user-defined type </description>
+    <created by="Michael Kay" on="2006-11-14"/>
+    <environment ref="hats"/>
+    <dependency type="spec" value="XQ10+"/>
+    <test><![CDATA[
+        import schema default element namespace "http://www.w3.org/XQueryTest/hats" at "qischema001.xsd"; 
+        <hat:a xmlns:hat="http://www.example.com/shoes.uri"> { xs:date('2003-02-02') cast as date2003 }</hat:a>]]></test>
+    <result>
+      <assert-xml><![CDATA[<hat:a xmlns:hat="http://www.example.com/shoes.uri">2003-02-02</hat:a>]]></assert-xml>
     </result>
   </test-case>
 
