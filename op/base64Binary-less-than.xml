@@ -269,8 +269,10 @@ logical expression.  Use "and" and "eq" operators.
    </test-case>
    
    <test-case name="base64Binary-lt-25">
-      <description>Comparing hexBinary to base64Binary is not allowed</description>
+      <description>Comparing hexBinary to base64Binary is not allowed (until 4.0)</description>
       <created by="Michael Kay" on="2014-05-14"/>
+      <created by="Michael Kay" on="2023-11-06" change="add version dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31 XP20 XP30 XP31"/>
       <test>xs:hexBinary("00") lt xs:base64Binary("AAI=")</test>
       <result>
          <error code="XPTY0004"/>
@@ -352,6 +354,51 @@ logical expression.  Use "and" and "eq" operators.
             if ($arg) then xs:base64Binary('aGVsbG8=') else xs:base64Binary('Z29vZGJ5ZQ==') 
          }; 
          not(local:base64Binary-value(true()) le local:base64Binary-value(false()))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="base64BinaryEqual-lt-40-01" covers-40="binary-promotion">
+      <description>
+         Compare base64Binary and hexBinary (allowed in 4.0)
+      </description>
+      <created by="Michael Kay" on="2023-11-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>xs:base64Binary(xs:hexBinary("03")) le xs:hexBinary("03")</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="base64BinaryEqual-lt-40-02" covers-40="binary-promotion">
+      <description>
+         Compare base64Binary and hexBinary (allowed in 4.0)
+      </description>
+      <created by="Michael Kay" on="2023-11-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>xs:base64Binary("") le xs:hexBinary("")</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="base64BinaryEqual-lt-40-03" covers-40="binary-promotion">
+      <description>
+         Compare base64Binary and hexBinary (allowed in 4.0)
+      </description>
+      <created by="Michael Kay" on="2023-11-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>xs:base64Binary("") le xs:hexBinary("FF")</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="base64BinaryEqual-lt-40-04" covers-40="binary-promotion">
+      <description>
+         Compare base64Binary and hexBinary (allowed in 4.0)
+      </description>
+      <created by="Michael Kay" on="2023-11-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>xs:base64Binary("/w==") le xs:hexBinary("FF")</test>
       <result>
          <assert-true/>
       </result>
