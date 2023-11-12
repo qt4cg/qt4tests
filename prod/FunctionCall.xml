@@ -1756,7 +1756,8 @@
          <error code="XPTY0004"/>
       </result>
    </test-case>
-
+   
+  
    <test-case name="cbcl-promotion-007">
       <description> Check that correct type constraint is inserted. </description>
       <created by="Oliver Hallam" on="2008-07-03"/>
@@ -1769,6 +1770,145 @@
          <assert-string-value>1 2 3</assert-string-value>
       </result>
    </test-case>
+   
+   <test-case name="cbcl-promotion-008">
+      <description> Check that when promoting to double, type errors are still detected. </description>
+      <created by="Michael Kay" on="2023-11-05"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test>
+         declare function local:f($v as xs:double*) as xs:double+ { if (empty($v)) then 0 else $v };
+         declare function local:g($v as xs:double*) as xs:double+ { local:f($v) };
+         declare variable $v external := (1, 2, 3, "x");
+         local:g($v)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-call-promotion-401" covers-40="binary-promotion">
+      <description>Test promotion to hexBinary. </description>
+      <created by="Michael Kay" on="2023-11-03"/>
+      <dependency type="spec" value="XQ40"/>
+      <test>
+         declare function local:f($z as xs:hexBinary) { $z = xs:base64Binary("aGVsbG8=") };
+         local:f(xs:base64Binary("aGVsbG8="))
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-call-promotion-402" covers-40="binary-promotion">
+      <description>Test promotion to base64Binary. </description>
+      <created by="Michael Kay" on="2023-11-03"/>
+      <dependency type="spec" value="XQ40"/>
+      <test>
+         declare function local:f($z as xs:base64Binary) { $z = xs:hexBinary("CAFEBABE") };
+         local:f(xs:hexBinary("cafebabe"))
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-call-promotion-403">
+      <description>Test promotion to xs:string. (Available in 3.1)</description>
+      <created by="Michael Kay" on="2023-11-03"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>
+         declare function local:f($z as xs:string) { $z = xs:anyURI("http://example.com/") };
+         local:f(xs:anyURI("http://example.com/"))
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-call-promotion-404" covers-40="uri-promotion">
+      <description>Test promotion to xs:anyURI. </description>
+      <created by="Michael Kay" on="2023-11-03"/>
+      <dependency type="spec" value="XQ40"/>
+      <test>
+         declare function local:f($z as xs:anyURI) { $z = "http://example.com/" };
+         local:f(xs:string("http://example.com/"))
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-call-promotion-405">
+      <description>Test promotion to xs:string: type not known statically. (Available in 3.1)</description>
+      <created by="Michael Kay" on="2023-11-03"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>
+         declare function local:f($z as xs:string) { 
+            every $a in ($z, "x", $z, "y", xs:anyURI("u"))[string-length(.) gt 1] satisfies ($a instance of xs:string) 
+         };
+         declare variable $data := (xs:anyURI("http://example.com/"), "http://example.com/");
+         local:f($data[round(year-from-date(current-date()) idiv 2000)])
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-call-promotion-406" covers-40="binary-promotion">
+      <description>Test promotion to hexBinary, type not known statically. </description>
+      <created by="Michael Kay" on="2023-11-03"/>
+      <dependency type="spec" value="XQ40"/>
+      <test>
+         declare function local:f($z as xs:hexBinary) { $z = xs:base64Binary("aGVsbG8=") };
+         declare variable $bin external := xs:base64Binary("aGVsbG8=");
+         local:f($bin)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-call-promotion-407" covers-40="binary-promotion">
+      <description>Test promotion to base64Binary, type not known statically. </description>
+      <created by="Michael Kay" on="2023-11-03"/>
+      <dependency type="spec" value="XQ40"/>
+      <test>
+         declare function local:f($z as xs:base64Binary) { $z = xs:hexBinary("CAFEBABE") };
+         declare variable $bin external := xs:hexBinary("cafebabe");
+         local:f($bin)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-call-promotion-408" covers-40="binary-promotion">
+      <description>Test promotion of function result to hexBinary. </description>
+      <created by="Michael Kay" on="2023-11-03"/>
+      <dependency type="spec" value="XQ40"/>
+      <test>
+         declare function local:f($z as xs:hexBinary) as xs:hexBinary { xs:base64Binary($z) };
+         declare variable $bin external := xs:base64Binary("aGVsbG8=");
+         string(local:f($bin)) || ":" || xs:hexBinary($bin)
+      </test>
+      <result>
+         <assert-eq>"68656C6C6F:68656C6C6F"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-call-promotion-409" covers-40="binary-promotion">
+      <description>Test promotion of function result to base64Binary. </description>
+      <created by="Michael Kay" on="2023-11-03"/>
+      <dependency type="spec" value="XQ40"/>
+      <test>
+         declare function local:f($z as xs:base64Binary) as xs:base64Binary { xs:hexBinary($z) };
+         declare variable $bin external := xs:hexBinary("cafebabe");
+         string(local:f($bin)) || ":" || xs:base64Binary($bin)
+      </test>
+      <result>
+         <assert-eq>"yv66vg==:yv66vg=="</assert-eq>
+      </result>
+   </test-case>
+   
 
    <test-case name="function-call-reserved-function-names-001">
       <description>Check that reserved function name attribute is handled correctly. </description>
@@ -2415,5 +2555,7 @@
          <error code="XPST0003" />
       </result>
    </test-case>
+   
+ 
 
 </test-set>
