@@ -9353,6 +9353,21 @@ return map:keys($ann) || ': ' || string-join(map:values($ann), ', ')
       </result>
    </test-case>
 
+   <test-case name="fo-test-fn-for-each-004">
+      <description>Test case for fn:for-each</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        for-each(
+  ('one', 'two', 'three'),
+  fn($item, $pos) { $pos || '. ' || $item }
+)
+      </test>
+      <result>
+         <assert-deep-eq>("1. one", "2. two", "3. three")</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-fn-filter-001">
       <description>Test case for fn:filter</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
@@ -9374,6 +9389,22 @@ return map:keys($ann) || ': ' || string-join(map:values($ann), ', ')
       </test>
       <result>
          <assert-deep-eq>()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-filter-003">
+      <description>Test case for fn:filter</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        let $sequence := (1, 1, 2, 3, 4, 4, 5)
+return filter(
+  $sequence,
+  fn($item, $pos) { $item = $sequence[$pos - 1] }
+)
+      </test>
+      <result>
+         <assert-deep-eq>(1, 4)</assert-deep-eq>
       </result>
    </test-case>
 
@@ -9505,6 +9536,26 @@ return map:keys($ann) || ': ' || string-join(map:values($ann), ', ')
       </result>
    </test-case>
 
+   <test-case name="fo-test-fn-fold-left-009">
+      <description>Test case for fn:fold-left</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        
+let $input := (11 to 21, 21 to 31)
+let $search := 21
+return fold-left($input, (),
+  fn($result, $curr, $pos) {
+    $result, if($curr = $search) { $pos }
+  }
+)
+
+      </test>
+      <result>
+         <assert-deep-eq>(11, 12)</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-fn-fold-right-001">
       <description>Test case for fn:fold-right</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
@@ -9550,6 +9601,26 @@ return map:keys($ann) || ': ' || string-join(map:values($ann), ', ')
       </test>
       <result>
          <assert-deep-eq>"$f(1, $f(2, $f(3, $f(4, $f(5, $zero)))))"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-fold-right-004">
+      <description>Test case for fn:fold-right</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        
+let $input := (11 to 21, 21 to 31)
+let $search := 21
+return fold-right($input, (),
+  fn($curr, $result, $pos) {
+    $result, $pos[$curr = $search]
+  }
+)
+
+      </test>
+      <result>
+         <assert-deep-eq>(12, 11)</assert-deep-eq>
       </result>
    </test-case>
 
@@ -10055,6 +10126,24 @@ chain((1, 2, 3, 4), $product3)
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
       <test>
+        
+iterate-while(
+  1,
+  fn($num, $pos) { $pos &lt;= 10 },
+  fn($num, $pos) { $num * $pos }
+)
+
+      </test>
+      <result>
+         <assert-deep-eq>3628800</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-iterate-while-003">
+      <description>Test case for fn:iterate-while</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
         let $input := (0 to 4, 6 to 10)
 return iterate-while(
   0, 
@@ -10067,7 +10156,7 @@ return iterate-while(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-iterate-while-003">
+   <test-case name="fo-test-fn-iterate-while-004">
       <description>Test case for fn:iterate-while</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
@@ -10083,7 +10172,7 @@ return iterate-while(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-iterate-while-004">
+   <test-case name="fo-test-fn-iterate-while-005">
       <description>Test case for fn:iterate-while</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
@@ -10142,6 +10231,26 @@ return for-each-pair($s, tail($s), function($a, $b) { $a * $b })
       </test>
       <result>
          <assert-deep-eq>(2, 6, 12, 20, 30, 42, 56)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-for-each-pair-004">
+      <description>Test case for fn:for-each-pair</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        
+for-each-pair(
+  (1, 8, 2),
+  (3, 4, 3),
+  fn($item1, $item2, $pos) {
+    $pos || ': ' || max(($item1, $item2))
+  }
+)
+
+      </test>
+      <result>
+         <assert-deep-eq>("1: 1", "2: 4", "3: 2")</assert-deep-eq>
       </result>
    </test-case>
 
@@ -13341,6 +13450,21 @@ return $M(collation-key("a", $C))
       </result>
    </test-case>
 
+   <test-case name="fo-test-array-index-where-006">
+      <description>Test case for array:index-where</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        array:index-where(
+  [ 1, 8, 2, 7, 3 ],
+  fn($member, $pos) { $member &lt; 5 and $pos &gt; 2 }
+)
+      </test>
+      <result>
+         <assert-deep-eq>(3, 5)</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-array-slice-001">
       <description>Test case for array:slice</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
@@ -14022,6 +14146,21 @@ return $M(collation-key("a", $C))
       </result>
    </test-case>
 
+   <test-case name="fo-test-array-for-each-004">
+      <description>Test case for array:for-each</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        array:for-each(
+  ['one', 'two', 'three'],
+  fn($member, $pos) { $pos || '. ' || $member }
+)
+      </test>
+      <result>
+         <assert-deep-eq>["1. one", "2. two", "3. three"]</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-array-filter-001">
       <description>Test case for array:filter</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
@@ -14061,6 +14200,22 @@ return $M(collation-key("a", $C))
       </test>
       <result>
          <assert-deep-eq>["A", "B", 1]</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-array-filter-004">
+      <description>Test case for array:filter</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        let $array := [1, 1, 2, 3, 4, 4, 5]
+return array:filter(
+  $array,
+  fn($item, $pos) { $pos &gt; 1 and $item = $array($pos - 1) }
+)
+      </test>
+      <result>
+         <assert-deep-eq>[1, 4]</assert-deep-eq>
       </result>
    </test-case>
 
@@ -14112,6 +14267,26 @@ return $M(collation-key("a", $C))
       </result>
    </test-case>
 
+   <test-case name="fo-test-array-fold-left-004">
+      <description>Test case for array:fold-left</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        
+let $input := array { 11 to 21, 21 to 31 }
+let $search := 21
+return array:fold-left($input, (),
+  fn($result, $curr, $pos) {
+    $result, if($curr = $search) { $pos }
+  }
+)
+
+      </test>
+      <result>
+         <assert-deep-eq>(11, 12)</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-array-fold-right-001">
       <description>Test case for array:fold-right</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
@@ -14160,6 +14335,25 @@ return $M(collation-key("a", $C))
       </result>
    </test-case>
 
+   <test-case name="fo-test-array-fold-right-004">
+      <description>Test case for array:fold-right</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        
+let $input := array { 11 to 21, 21 to 31 }
+let $search := 21
+return array:fold-right($input, (),
+  fn($curr, $result, $pos) {
+    $result, if($curr = $search) { $pos }
+  }
+)
+      </test>
+      <result>
+         <assert-deep-eq>(12, 11)</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-array-for-each-pair-001">
       <description>Test case for array:for-each-pair</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
@@ -14190,6 +14384,26 @@ return array:for-each-pair(
       </test>
       <result>
          <assert-deep-eq>["AB", "BC", "CD"]</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-array-for-each-pair-003">
+      <description>Test case for array:for-each-pair</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        
+array:for-each-pair(
+  [1, 8, 2],
+  [3, 4, 3],
+  fn($member1, $member2, $pos) {
+    $pos || ': ' || max(($member1, $member2))
+  }
+)
+
+      </test>
+      <result>
+         <assert-deep-eq>["1: 1", "2: 4", "3: 2"]</assert-deep-eq>
       </result>
    </test-case>
 
@@ -14661,6 +14875,39 @@ return deep-equal(
       </result>
    </test-case>
 
+   <test-case name="fo-test-fn-every-008">
+      <description>Test case for fn:every</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        every(1 to 5, fn($num, $pos) { $num = $pos })
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-every-009">
+      <description>Test case for fn:every</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        
+let $dl := &lt;dl&gt;
+  &lt;dt&gt;Morgawr&lt;/dt&gt;
+  &lt;dd&gt;Sea giant&lt;/dd&gt;
+&lt;/dl&gt;
+return every($dl/*, fn($elem, $pos) {
+  name($elem) = (
+    if (($pos mod 2)) then "dt" else "dd"
+  )
+})
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-fn-char-001">
       <description>Test case for fn:char</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
@@ -14970,6 +15217,21 @@ return deep-equal(
       </result>
    </test-case>
 
+   <test-case name="fo-test-fn-index-where-005">
+      <description>Test case for fn:index-where</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        index-where(
+  ( 1, 8, 2, 7, 3 ),
+  fn($item, $pos) { $item &lt; 5 and $pos &gt; 2 }
+)
+      </test>
+      <result>
+         <assert-deep-eq>(3, 5)</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-fn-is-NaN-001">
       <description>Test case for fn:is-NaN</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
@@ -15082,6 +15344,18 @@ return deep-equal(
       </result>
    </test-case>
 
+   <test-case name="fo-test-fn-items-after-006">
+      <description>Test case for fn:items-after</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        items-after(10 to 20, fn($num, $pos) { $num &gt; 15 and $pos &gt; 8 })
+      </test>
+      <result>
+         <assert-deep-eq>(19, 20)</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-fn-items-before-001">
       <description>Test case for fn:items-before</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
@@ -15162,6 +15436,18 @@ return deep-equal(
       </result>
    </test-case>
 
+   <test-case name="fo-test-fn-items-before-007">
+      <description>Test case for fn:items-before</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        items-before(10 to 20, fn($num, $pos) { $num &gt; 11 and $pos &gt; 2 })
+      </test>
+      <result>
+         <assert-deep-eq>(10, 11)</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-fn-items-starting-where-001">
       <description>Test case for fn:items-starting-where</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
@@ -15227,6 +15513,18 @@ return deep-equal(
       </result>
    </test-case>
 
+   <test-case name="fo-test-fn-items-starting-where-006">
+      <description>Test case for fn:items-starting-where</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        items-starting-where(10 to 20, fn($num, $pos) { $num &gt; 15 and $pos &gt; 8 })
+      </test>
+      <result>
+         <assert-deep-eq>(18, 19, 20)</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-fn-items-ending-where-001">
       <description>Test case for fn:items-ending-where</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
@@ -15289,6 +15587,18 @@ return deep-equal(
       </test>
       <result>
          <assert-deep-eq>"p", "p", "h2"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-items-ending-where-006">
+      <description>Test case for fn:items-ending-where</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        items-ending-where(10 to 20, fn($num, $pos) { $num &gt; 11 and $pos &gt; 2 })
+      </test>
+      <result>
+         <assert-deep-eq>(10, 11, 12)</assert-deep-eq>
       </result>
    </test-case>
 
@@ -15474,6 +15784,18 @@ return deep-equal(
    "September", "October", "November", "December")
   =!&gt; contains("r")
 )
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-some-008">
+      <description>Test case for fn:some</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        some(reverse(1 to 5), fn($num, $pos) { $num = $pos })
       </test>
       <result>
          <assert-true/>
@@ -16297,6 +16619,21 @@ map {
       </test>
       <result>
          <assert-deep-eq>([1, 2, 3], [6, 7], [9, 10])</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-partition-006">
+      <description>Test case for fn:partition</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        partition(
+  ('a', 'b', 'c', 'd', 'e'),
+  fn($all, $next, $p) { $p mod 2 = 1 }
+)
+      </test>
+      <result>
+         <assert-deep-eq>["a", "b"], ["c", "d"], ["e"]</assert-deep-eq>
       </result>
    </test-case>
 
