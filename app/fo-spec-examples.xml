@@ -10203,8 +10203,18 @@ return for-each-pair($s, tail($s), function($a, $b) { $a * $b })
            return 
 
         
-        let $tc := transitive-closure($direct-reports)
-return $tc($data//person[@id="2"])/string(@id)
+          let $direct-reports := 
+          function($p as element(person)) as element(person)* {
+  $p/../person[@manager=$p/@id]
+}
+         
+           return 
+
+        
+        transitive-closure(
+  $data//person[@id="2"],
+  $direct-reports
+)/string(@id)
       </test>
       <result>
          <assert-deep-eq>("3", "4", "6", "7", "8")</assert-deep-eq>
@@ -10233,68 +10243,10 @@ return $tc($data//person[@id="2"])/string(@id)
            return 
 
         
-        let $tc := transitive-closure($direct-reports, min:=0)
-return $tc($data//person[@id="2"])/string(@id)
-      </test>
-      <result>
-         <assert-deep-eq>("2", "3", "4", "6", "7", "8")</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-transitive-closure-003">
-      <description>Test case for fn:transitive-closure</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $data := 
-          document{&lt;doc&gt;
-   &lt;person id="0"/&gt;
-   &lt;person id="1" manager="0"/&gt;
-   &lt;person id="2" manager="0"/&gt;
-   &lt;person id="3" manager="2"/&gt;
-   &lt;person id="4" manager="2"/&gt;
-   &lt;person id="5" manager="1"/&gt;
-   &lt;person id="6" manager="3"/&gt;
-   &lt;person id="7" manager="6"/&gt;
-   &lt;person id="8" manager="6"/&gt;
-&lt;/doc&gt;}
-         
-           return 
-
-        
-        let $tc := transitive-closure($direct-reports, max:=2)
-return $tc($data//person[@id="2"])/string(@id)
-      </test>
-      <result>
-         <assert-deep-eq>("3", "4", "6")</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-transitive-closure-004">
-      <description>Test case for fn:transitive-closure</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $data := 
-          document{&lt;doc&gt;
-   &lt;person id="0"/&gt;
-   &lt;person id="1" manager="0"/&gt;
-   &lt;person id="2" manager="0"/&gt;
-   &lt;person id="3" manager="2"/&gt;
-   &lt;person id="4" manager="2"/&gt;
-   &lt;person id="5" manager="1"/&gt;
-   &lt;person id="6" manager="3"/&gt;
-   &lt;person id="7" manager="6"/&gt;
-   &lt;person id="8" manager="6"/&gt;
-&lt;/doc&gt;}
-         
-           return 
-
-        
-        let $tc := transitive-closure(function { child::* })
-return $tc($data)/@id/string()
+        transitive-closure(
+  $data, 
+  function { child::* })/@id
+)/string()
       </test>
       <result>
          <assert-deep-eq>("0", "1", "2", "3", "4", "5", "6", "7","8")</assert-deep-eq>
