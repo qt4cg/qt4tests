@@ -11504,18 +11504,19 @@ return $M(collation-key("a", $C))
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
-        parse-csv(`name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`)
+          let $csv-string := 
+          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
+           return 
+
+        
+        map:keys(parse-csv($csv-string))
       </test>
       <result>
-         <assert-deep-eq>(
-   ["name", "city"]
-   ["Bob", "Berlin"],
-   ["Alice", "Aachen"]
-)</assert-deep-eq>
+         <assert-deep-eq>("columns", "rows")</assert-deep-eq>
       </result>
    </test-case>
 
@@ -11525,19 +11526,23 @@ return $M(collation-key("a", $C))
       <environment ref="global"/>
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
-          let $cr := 
-          char('x0D')
+          let $crlf := 
+          char('\r')||char('\n')
            return 
 
         
-        parse-csv(`name,city{$cr}Bob,Berlin{$cr}Alice,Aachen{$cr}`)
+          let $csv-string := 
+          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
+           return 
+
+        
+        parse-csv($csv-string)?columns
       </test>
       <result>
-         <assert-deep-eq>(
-   ["name", "city"]
-   ["Bob", "Berlin"],
-   ["Alice", "Aachen"]
-)</assert-deep-eq>
+         <assert-deep-eq>map {
+  "names": map {},
+  "fields": ()
+}</assert-deep-eq>
       </result>
    </test-case>
 
@@ -11547,19 +11552,20 @@ return $M(collation-key("a", $C))
       <environment ref="global"/>
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
-          let $lf := 
-          char('x0A')
+          let $crlf := 
+          char('\r')||char('\n')
            return 
 
         
-        parse-csv(`name,city{$lf}Bob,Berlin{$lf}Alice,Aachen{$lf}`)
+          let $csv-string := 
+          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
+           return 
+
+        
+        count(parse-csv($csv-string)?rows)
       </test>
       <result>
-         <assert-deep-eq>(
-   ["name", "city"]
-   ["Bob", "Berlin"],
-   ["Alice", "Aachen"]
-)</assert-deep-eq>
+         <assert-deep-eq>3</assert-deep-eq>
       </result>
    </test-case>
 
@@ -11570,18 +11576,19 @@ return $M(collation-key("a", $C))
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
-        parse-csv(`"name","city"${crlf}"Bob","Berlin"${crlf}"Alice","Aachen"${crlf}`)
+          let $csv-string := 
+          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
+           return 
+
+        
+        parse-csv($csv-string)?rows[1]?field("name")
       </test>
       <result>
-         <assert-deep-eq>(
-   ["name", "city"]
-   ["Bob", "Berlin"],
-   ["Alice", "Aachen"]
-)</assert-deep-eq>
+         <error code="FOCV0004"/>
       </result>
    </test-case>
 
@@ -11592,18 +11599,19 @@ return $M(collation-key("a", $C))
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
-        parse-csv(`"name","city"${crlf}"Bob ""The Exemplar"" Mustermann","Berlin"${crlf}`)
+          let $csv-string := 
+          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
+           return 
+
+        
+        parse-csv($csv-string)?rows[1]?field(2)
       </test>
       <result>
-         <assert-deep-eq>(
-   ["name", "city"]
-   ['Bob "The Exemplar" Mustermann', "Berlin"],
-   ["Alice", "Aachen"]
-)</assert-deep-eq>
+         <assert-deep-eq>"city"</assert-deep-eq>
       </result>
    </test-case>
 
@@ -11611,15 +11619,25 @@ return $M(collation-key("a", $C))
       <description>Test case for fn:parse-csv</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
+      <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
-        parse-csv("name;city§Bob;Berlin§Alice;Aachen", map{"record-separator": "§", "field-separator": ";"})
+          let $crlf := 
+          char('\r')||char('\n')
+           return 
+
+        
+          let $csv-string := 
+          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
+           return 
+
+        
+        parse-csv($csv-string, map {"column-names": true()})?columns
       </test>
       <result>
-         <assert-deep-eq>(
-   ["name", "city"]
-   ["Bob", "Berlin"],
-   ["Alice", "Aachen"]
-)</assert-deep-eq>
+         <assert-deep-eq>map {
+  "names": map { "name": 1, "city": 2 },
+  "fields": ("name", "city")
+}</assert-deep-eq>
       </result>
    </test-case>
 
@@ -11630,18 +11648,19 @@ return $M(collation-key("a", $C))
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
-        parse-csv(`|name|,|city|${crlf}|Bob|,|Berlin|${crlf}`, map{"quote-character": "|"})
+          let $csv-string := 
+          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
+           return 
+
+        
+        count(parse-csv($csv-string, map {"column-names": true()})?rows)
       </test>
       <result>
-         <assert-deep-eq>(
-   ["name", "city"]
-   ["Bob", "Berlin"],
-   ["Alice", "Aachen"]
-)</assert-deep-eq>
+         <assert-deep-eq>2</assert-deep-eq>
       </result>
    </test-case>
 
@@ -11652,29 +11671,7 @@ return $M(collation-key("a", $C))
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
-           return 
-
-        
-        parse-csv(`name  ,city  ${crlf}Bob   ,Berlin${crlf}Alice ,Aachen${crlf}`, map{"trim-whitespace: true()})
-      </test>
-      <result>
-         <assert-deep-eq>(
-   ["name", "city"]
-   ["Bob", "Berlin"],
-   ["Alice", "Aachen"]
-)</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-to-xdm-001">
-      <description>Test case for fn:csv-to-xdm</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
@@ -11683,188 +11680,21 @@ return $M(collation-key("a", $C))
            return 
 
         
-        map:keys(csv-to-xdm($csv-string))
-      </test>
-      <result>
-         <assert-deep-eq>("header", "rows")</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-to-xdm-002">
-      <description>Test case for fn:csv-to-xdm</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $crlf := 
-          char('x0D')||char('x0A')
-           return 
-
-        
-          let $csv-string := 
-          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
-           return 
-
-        
-        csv-to-xdm($csv-string)?columns
-      </test>
-      <result>
-         <assert-deep-eq>map {
-  "names": map {},
-  "fields": (),
-}</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-to-xdm-003">
-      <description>Test case for fn:csv-to-xdm</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $crlf := 
-          char('x0D')||char('x0A')
-           return 
-
-        
-          let $csv-string := 
-          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
-           return 
-
-        
-        count(csv-to-xdm($csv-string)?rows)
-      </test>
-      <result>
-         <assert-deep-eq>3</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-to-xdm-004">
-      <description>Test case for fn:csv-to-xdm</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $crlf := 
-          char('x0D')||char('x0A')
-           return 
-
-        
-          let $csv-string := 
-          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
-           return 
-
-        
-        csv-to-xdm($csv-string)?rows[1]?field("name")
-      </test>
-      <result>
-         <error code="CV"/>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-to-xdm-005">
-      <description>Test case for fn:csv-to-xdm</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $crlf := 
-          char('x0D')||char('x0A')
-           return 
-
-        
-          let $csv-string := 
-          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
-           return 
-
-        
-        csv-to-xdm($csv-string)?rows[1]?field(2)
-      </test>
-      <result>
-         <assert-deep-eq>"city"</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-to-xdm-006">
-      <description>Test case for fn:csv-to-xdm</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $crlf := 
-          char('x0D')||char('x0A')
-           return 
-
-        
-          let $csv-string := 
-          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
-           return 
-
-        
-        csv-to-xdm($csv-string, map {"columns": true()})?columns
-      </test>
-      <result>
-         <assert-deep-eq>map {
-  "names": map { "name": 1, "city": 2 },
-  "fields": ("name", "city"),
-}</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-to-xdm-007">
-      <description>Test case for fn:csv-to-xdm</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $crlf := 
-          char('x0D')||char('x0A')
-           return 
-
-        
-          let $csv-string := 
-          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
-           return 
-
-        
-        count(csv-to-xdm($csv-string, map {"columns": true()})?rows)
-      </test>
-      <result>
-         <assert-deep-eq>2</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-to-xdm-008">
-      <description>Test case for fn:csv-to-xdm</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $crlf := 
-          char('x0D')||char('x0A')
-           return 
-
-        
-          let $csv-string := 
-          `name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`
-           return 
-
-        
-        csv-to-xdm($csv-string), map {"columns": true()}?rows[1]?fields
+        parse-csv($csv-string, map {"column-names": true()})?rows[1]?fields
       </test>
       <result>
          <assert-deep-eq>("Bob", "Berlin")</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-csv-to-xdm-009">
-      <description>Test case for fn:csv-to-xdm</description>
+   <test-case name="fo-test-fn-parse-csv-009">
+      <description>Test case for fn:parse-csv</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
@@ -11873,21 +11703,21 @@ return $M(collation-key("a", $C))
            return 
 
         
-        csv-to-xdm($csv-string, map {"columns": true()})?rows[1]?field("name")
+        parse-csv($csv-string, map {"column-names": true()})?rows[1]?field("name")
       </test>
       <result>
          <assert-deep-eq>"Bob"</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-csv-to-xdm-010">
-      <description>Test case for fn:csv-to-xdm</description>
+   <test-case name="fo-test-fn-parse-csv-010">
+      <description>Test case for fn:parse-csv</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
@@ -11896,21 +11726,21 @@ return $M(collation-key("a", $C))
            return 
 
         
-        csv-to-xdm($csv-string, map {"columns": true()})?rows[1]?field(2)
+        parse-csv($csv-string, map {"column-names": true()})?rows[1]?field(2)
       </test>
       <result>
          <assert-deep-eq>"Berlin"</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-csv-to-xdm-011">
-      <description>Test case for fn:csv-to-xdm</description>
+   <test-case name="fo-test-fn-parse-csv-011">
+      <description>Test case for fn:parse-csv</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $options := 
-          map { "record-separator": "§", "field-separator": ";", "quote-character": "|" }
+          map { "row-delimiter": "§", "field-delimiter": ";", "quote-character": "|" }
            return 
 
         
@@ -11919,148 +11749,202 @@ return $M(collation-key("a", $C))
            return 
 
         
-        map:keys(csv-to-xdm($non-std-csv, $options))
-      </test>
-      <result>
-         <assert-deep-eq>("header", "rows")</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-to-xdm-012">
-      <description>Test case for fn:csv-to-xdm</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $options := 
-          map { "record-separator": "§", "field-separator": ";", "quote-character": "|" }
-           return 
-
-        
-          let $non-std-csv := 
-          `|name|;|city|§|Bob|;|Berlin|§|Alice|;|Aachen|`
-           return 
-
-        
-        csv-to-xdm($non-std-csv, $options)?columns
-      </test>
-      <result>
-         <assert-deep-eq>map {
-                  "names": map {},
-                  "fields": (),
-                  }</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-to-xdm-013">
-      <description>Test case for fn:csv-to-xdm</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $options := 
-          map { "record-separator": "§", "field-separator": ";", "quote-character": "|" }
-           return 
-
-        
-          let $non-std-csv := 
-          `|name|;|city|§|Bob|;|Berlin|§|Alice|;|Aachen|`
-           return 
-
-        
-        count(csv-to-xdm($non-std-csv, $options)?rows)
-      </test>
-      <result>
-         <assert-deep-eq>3</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-to-xdm-014">
-      <description>Test case for fn:csv-to-xdm</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $options := 
-          map { "record-separator": "§", "field-separator": ";", "quote-character": "|" }
-           return 
-
-        
-          let $non-std-csv := 
-          `|name|;|city|§|Bob|;|Berlin|§|Alice|;|Aachen|`
-           return 
-
-        
-        csv-to-xdm($non-std-csv, $options)?rows[3]?field(1)
+        parse-csv($non-std-csv, $options)?rows[3]?field(1)
       </test>
       <result>
          <assert-deep-eq>"Alice"</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-csv-to-xdm-015">
-      <description>Test case for fn:csv-to-xdm</description>
+   <test-case name="fo-test-fn-parse-csv-012">
+      <description>Test case for fn:parse-csv</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
-          let $trim-opts := 
-          map { "trim-whitespace": true() }
+          let $csv-string := 
+          `Alice,Aachen{$crlf}Bob,Berlin{$crlf}`
            return 
 
         
-        csv-to-xdm(`name  ,city  ${crlf}Bob   ,Berlin${crlf}Alice ,Aachen${crlf}`, $trim-opts)?rows?fields
+          let $options := 
+          map { "column-names": map { "Person": 1, "Location": 2 } }
+           return 
+
+        
+        map:keys(parse-csv($csv-string, $options))
       </test>
       <result>
-         <assert-deep-eq>("name", "city", "Bob", "Berlin", "Alice", "Aachen")</assert-deep-eq>
+         <assert-deep-eq>("columns", "rows")</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-csv-to-xdm-016">
-      <description>Test case for fn:csv-to-xdm</description>
+   <test-case name="fo-test-fn-parse-csv-013">
+      <description>Test case for fn:parse-csv</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
+           return 
+
+        
+          let $csv-string := 
+          `Alice,Aachen{$crlf}Bob,Berlin{$crlf}`
+           return 
+
+        
+          let $options := 
+          map { "column-names": map { "Person": 1, "Location": 2 } }
+           return 
+
+        
+        parse-csv($csv-string, $options)?columns
+      </test>
+      <result>
+         <assert-deep-eq>map {
+   "names": map { "Person": 1, "Location": 2 },
+   "fields": ("Person", "Location")
+}</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-parse-csv-014">
+      <description>Test case for fn:parse-csv</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <dependency type="spec" value="XQ40+" satisfied="true"/>
+      <test>
+          let $crlf := 
+          char('\r')||char('\n')
+           return 
+
+        
+          let $csv-string := 
+          `Alice,Aachen{$crlf}Bob,Berlin{$crlf}`
+           return 
+
+        
+          let $options := 
+          map { "column-names": map { "Person": 1, "Location": 2 } }
+           return 
+
+        
+        count(parse-csv($csv-string, $options)?rows)
+      </test>
+      <result>
+         <assert-deep-eq>2</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-parse-csv-015">
+      <description>Test case for fn:parse-csv</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <dependency type="spec" value="XQ40+" satisfied="true"/>
+      <test>
+          let $crlf := 
+          char('\r')||char('\n')
+           return 
+
+        
+          let $csv-string := 
+          `Alice,Aachen{$crlf}Bob,Berlin{$crlf}`
+           return 
+
+        
+          let $options := 
+          map { "column-names": map { "Person": 1, "Location": 2 } }
+           return 
+
+        
+        parse-csv($csv-string, $options)?rows[1]?field(1)
+      </test>
+      <result>
+         <assert-deep-eq>"Alice"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-parse-csv-016">
+      <description>Test case for fn:parse-csv</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <dependency type="spec" value="XQ40+" satisfied="true"/>
+      <test>
+          let $crlf := 
+          char('\r')||char('\n')
+           return 
+
+        
+          let $csv-string := 
+          `Alice,Aachen{$crlf}Bob,Berlin{$crlf}`
+           return 
+
+        
+          let $options := 
+          map { "column-names": map { "Person": 1, "Location": 2 } }
+           return 
+
+        
+        parse-csv($csv-string, $options)?rows[2]?field("Location")
+      </test>
+      <result>
+         <assert-deep-eq>"Berlin"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-parse-csv-017">
+      <description>Test case for fn:parse-csv</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <dependency type="spec" value="XQ40+" satisfied="true"/>
+      <test>
+          let $crlf := 
+          char('\r')||char('\n')
            return 
 
         
           let $csv-uneven-cols := 
-          `date,name,city,amount,currency,original amount,note{$crlf}2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}2023-07-20,Alice,Aachen,15.00{$crlf}2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`
+          concat(`date,name,city,amount,currency,original amount,note{$crlf}`,
+`2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}`,
+`2023-07-20,Alice,Aachen,15.00{$crlf}`,
+`2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`)
            return 
 
         
-        csv-to-xdm($csv-uneven-cols, map { "columns": true(), "filter-columns": (2,1,4) })?columns?fields
+        parse-csv($csv-uneven-cols, map { "column-names": true(), "filter-columns": (2,1,4) })?columns?fields
       </test>
       <result>
          <assert-deep-eq>("name","date","amount")</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-csv-to-xdm-017">
-      <description>Test case for fn:csv-to-xdm</description>
+   <test-case name="fo-test-fn-parse-csv-018">
+      <description>Test case for fn:parse-csv</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
           let $csv-uneven-cols := 
-          `date,name,city,amount,currency,original amount,note{$crlf}2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}2023-07-20,Alice,Aachen,15.00{$crlf}2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`
+          concat(`date,name,city,amount,currency,original amount,note{$crlf}`,
+`2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}`,
+`2023-07-20,Alice,Aachen,15.00{$crlf}`,
+`2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`)
            return 
 
         
-        for $r in csv-to-xdm($csv-uneven-cols, map { "columns": true(), "filter-columns": (2,1,4) })?rows return array { $r?fields }
+        for $r in parse-csv($csv-uneven-cols, map { "column-names": true(), "filter-columns": (2,1,4) })?rows return array { $r?fields }
       </test>
       <result>
          <assert-deep-eq>(
@@ -12071,99 +11955,59 @@ return $M(collation-key("a", $C))
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-csv-to-xdm-018">
-      <description>Test case for fn:csv-to-xdm</description>
+   <test-case name="fo-test-fn-parse-csv-019">
+      <description>Test case for fn:parse-csv</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
           let $csv-uneven-cols := 
-          `date,name,city,amount,currency,original amount,note{$crlf}2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}2023-07-20,Alice,Aachen,15.00{$crlf}2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`
+          concat(`date,name,city,amount,currency,original amount,note{$crlf}`,
+`2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}`,
+`2023-07-20,Alice,Aachen,15.00{$crlf}`,
+`2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`)
            return 
 
         
-        csv-to-xdm($csv-uneven-cols, map { "columns": true(), "number-of-columns": "all" })?columns?fields
+        parse-csv($csv-uneven-cols, map { "column-names": map { "Person": 1, "Amount": 3 }, "filter-columns": (2,1,4) })?columns
       </test>
       <result>
-         <assert-deep-eq>("date","name","city","amount","currency","original amount","note")</assert-deep-eq>
+         <assert-deep-eq>map {
+   "names": map { "Person": 1, "Amount": 3 },
+   "fields": ("Person", "", "Amount")
+}</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-csv-to-xdm-019">
-      <description>Test case for fn:csv-to-xdm</description>
+   <test-case name="fo-test-fn-parse-csv-020">
+      <description>Test case for fn:parse-csv</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
           let $csv-uneven-cols := 
-          `date,name,city,amount,currency,original amount,note{$crlf}2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}2023-07-20,Alice,Aachen,15.00{$crlf}2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`
+          concat(`date,name,city,amount,currency,original amount,note{$crlf}`,
+`2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}`,
+`2023-07-20,Alice,Aachen,15.00{$crlf}`,
+`2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`)
            return 
 
         
-        for $r in csv-to-xdm($csv-uneven-cols, map { "columns": true(), "number-of-columns": "all" })?rows return array { $r?fields }
+        for $r in parse-csv($csv-uneven-cols, map { "number-of-columns": "first-row" })?rows return array { $r?fields }
       </test>
       <result>
          <assert-deep-eq>(
-   ["2023-07-19","Bob","Berlin","10.00","USD","13.99"],
-   ["2023-07-20","Alice","Aachen","15.00"],
-   ["2023-07-20","Charlie","Celle","15.00","GBP","11.99","cake","not a lie"]
-)</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-to-xdm-020">
-      <description>Test case for fn:csv-to-xdm</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $crlf := 
-          char('x0D')||char('x0A')
-           return 
-
-        
-          let $csv-uneven-cols := 
-          `date,name,city,amount,currency,original amount,note{$crlf}2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}2023-07-20,Alice,Aachen,15.00{$crlf}2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`
-           return 
-
-        
-        csv-to-xdm($csv-uneven-cols, map { "columns": true(), "number-of-columns": "first-row" })?columns?fields
-      </test>
-      <result>
-         <assert-deep-eq>("date","name","city","amount","currency","original amount","note")</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-to-xdm-021">
-      <description>Test case for fn:csv-to-xdm</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $crlf := 
-          char('x0D')||char('x0A')
-           return 
-
-        
-          let $csv-uneven-cols := 
-          `date,name,city,amount,currency,original amount,note{$crlf}2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}2023-07-20,Alice,Aachen,15.00{$crlf}2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`
-           return 
-
-        
-        for $r in csv-to-xdm($csv-uneven-cols, map { "columns": true(), "number-of-columns": "first-row" })?rows return array { $r?fields }
-      </test>
-      <result>
-         <assert-deep-eq>(
+   ["date","name","city","amount","currency","original amount","note"],
    ["2023-07-19","Bob","Berlin","10.00","USD","13.99",""],
    ["2023-07-20","Alice","Aachen","15.00","","",""],
    ["2023-07-20","Charlie","Celle","15.00","GBP","11.99","cake"]
@@ -12171,52 +12015,229 @@ return $M(collation-key("a", $C))
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-csv-to-xdm-022">
-      <description>Test case for fn:csv-to-xdm</description>
+   <test-case name="fo-test-fn-parse-csv-021">
+      <description>Test case for fn:parse-csv</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
           let $csv-uneven-cols := 
-          `date,name,city,amount,currency,original amount,note{$crlf}2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}2023-07-20,Alice,Aachen,15.00{$crlf}2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`
+          concat(`date,name,city,amount,currency,original amount,note{$crlf}`,
+`2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}`,
+`2023-07-20,Alice,Aachen,15.00{$crlf}`,
+`2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`)
            return 
 
         
-        csv-to-xdm($csv-uneven-cols, map { "columns": true(), "number-of-columns": 6 })?columns?fields
+        parse-csv($csv-uneven-cols, map { "column-names": true(), "number-of-columns": 6 })?columns?fields
       </test>
       <result>
-         <assert-deep-eq>("date","name","city","amount","currency","original amount")</assert-deep-eq>
+         <assert-deep-eq>map {
+   "names": map { "date": 1, "name": 2, "city": 3, "amount": 4, "currency": 5, "original amount": 6 },
+   "fields": ("date","name","city","amount","currency","original amount")
+}</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-csv-to-xdm-023">
-      <description>Test case for fn:csv-to-xdm</description>
+   <test-case name="fo-test-fn-parse-csv-022">
+      <description>Test case for fn:parse-csv</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
           let $csv-uneven-cols := 
-          `date,name,city,amount,currency,original amount,note{$crlf}2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}2023-07-20,Alice,Aachen,15.00{$crlf}2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`
+          concat(`date,name,city,amount,currency,original amount,note{$crlf}`,
+`2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}`,
+`2023-07-20,Alice,Aachen,15.00{$crlf}`,
+`2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`)
            return 
 
         
-        for $r in csv-to-xdm($csv-uneven-cols, map { "columns": true(), "number-of-columns": 6 })?rows return array { $r?fields }
+        for $r in parse-csv($csv-uneven-cols, map { "column-names": true(), "number-of-columns": 6 })?rows return array { $r?fields }
       </test>
       <result>
          <assert-deep-eq>(
    ["2023-07-19","Bob","Berlin","10.00","USD","13.99"],
    ["2023-07-20","Alice","Aachen","15.00","",""],
    ["2023-07-20","Charlie","Celle","15.00","GBP","11.99"]
+)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-csv-to-simple-rows-001">
+      <description>Test case for fn:csv-to-simple-rows</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <dependency type="spec" value="XQ40+" satisfied="true"/>
+      <test>
+          let $crlf := 
+          char('\r')||char('\n')
+           return 
+
+        
+        csv-to-simple-rows(`name,city{$crlf}Bob,Berlin{$crlf}Alice,Aachen{$crlf}`)
+      </test>
+      <result>
+         <assert-deep-eq>(
+   ["name", "city"],
+   ["Bob", "Berlin"],
+   ["Alice", "Aachen"]
+)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-csv-to-simple-rows-002">
+      <description>Test case for fn:csv-to-simple-rows</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <dependency type="spec" value="XQ40+" satisfied="true"/>
+      <test>
+          let $cr := 
+          char('\r')
+           return 
+
+        
+        csv-to-simple-rows(`name,city{$cr}Bob,Berlin{$cr}Alice,Aachen{$cr}`)
+      </test>
+      <result>
+         <assert-deep-eq>(
+   ["name", "city"],
+   ["Bob", "Berlin"],
+   ["Alice", "Aachen"]
+)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-csv-to-simple-rows-003">
+      <description>Test case for fn:csv-to-simple-rows</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <dependency type="spec" value="XQ40+" satisfied="true"/>
+      <test>
+          let $lf := 
+          char('\n')
+           return 
+
+        
+        csv-to-simple-rows(`name,city{$lf}Bob,Berlin{$lf}Alice,Aachen{$lf}`)
+      </test>
+      <result>
+         <assert-deep-eq>(
+   ["name", "city"],
+   ["Bob", "Berlin"],
+   ["Alice", "Aachen"]
+)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-csv-to-simple-rows-004">
+      <description>Test case for fn:csv-to-simple-rows</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <dependency type="spec" value="XQ40+" satisfied="true"/>
+      <test>
+          let $crlf := 
+          char('\r')||char('\n')
+           return 
+
+        
+        csv-to-simple-rows(`"name","city"{$crlf}"Bob","Berlin"{$crlf}"Alice","Aachen"{$crlf}`)
+      </test>
+      <result>
+         <assert-deep-eq>(
+   ["name", "city"],
+   ["Bob", "Berlin"],
+   ["Alice", "Aachen"]
+)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-csv-to-simple-rows-005">
+      <description>Test case for fn:csv-to-simple-rows</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <dependency type="spec" value="XQ40+" satisfied="true"/>
+      <test>
+          let $crlf := 
+          char('\r')||char('\n')
+           return 
+
+        
+        csv-to-simple-rows(`"name","city"{$crlf}"Bob ""The Exemplar"" Mustermann","Berlin"{$crlf}`)
+      </test>
+      <result>
+         <assert-deep-eq>(
+   ["name", "city"],
+   ['Bob "The Exemplar" Mustermann', "Berlin"]
+)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-csv-to-simple-rows-006">
+      <description>Test case for fn:csv-to-simple-rows</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <test>
+        csv-to-simple-rows("name;city§Bob;Berlin§Alice;Aachen", map{"row-delimiter": "§", "field-delimiter": ";"})
+      </test>
+      <result>
+         <assert-deep-eq>(
+   ["name", "city"],
+   ["Bob", "Berlin"],
+   ["Alice", "Aachen"]
+)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-csv-to-simple-rows-007">
+      <description>Test case for fn:csv-to-simple-rows</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <dependency type="spec" value="XQ40+" satisfied="true"/>
+      <test>
+          let $crlf := 
+          char('\r')||char('\n')
+           return 
+
+        
+        csv-to-simple-rows(`|name|,|city|{$crlf}|Bob|,|Berlin|{$crlf}`, map{"quote-character": "|"})
+      </test>
+      <result>
+         <assert-deep-eq>(
+   ["name", "city"],
+   ["Bob", "Berlin"]
+)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-csv-to-simple-rows-008">
+      <description>Test case for fn:csv-to-simple-rows</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
+      <environment ref="global"/>
+      <dependency type="spec" value="XQ40+" satisfied="true"/>
+      <test>
+          let $crlf := 
+          char('\r')||char('\n')
+           return 
+
+        
+        csv-to-simple-rows(`name  ,city  {$crlf}Bob   ,Berlin{$crlf}Alice ,Aachen{$crlf}`, map{"trim-whitespace": true()})
+      </test>
+      <result>
+         <assert-deep-eq>(
+   ["name", "city"],
+   ["Bob", "Berlin"],
+   ["Alice", "Aachen"]
 )</assert-deep-eq>
       </result>
    </test-case>
@@ -12230,9 +12251,9 @@ return $M(collation-key("a", $C))
       </test>
       <result>
          <assert-xml ignore-prefixes="false"><![CDATA[
-<fn:csv>
-   <fn:rows/>
-</fn:csv>
+<csv xmlns="http://www.w3.org/2005/xpath-functions">
+   <rows/>
+</csv>
 ]]></assert-xml>
       </result>
    </test-case>
@@ -12242,14 +12263,14 @@ return $M(collation-key("a", $C))
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
       <test>
-        csv-to-xml("", map { "columns": true() })
+        csv-to-xml("", map { "column-names": true() })
       </test>
       <result>
          <assert-xml ignore-prefixes="false"><![CDATA[
-<fn:csv>
-   <fn:header/>
-   <fn:rows/>
-</fn:csv>
+<csv xmlns="http://www.w3.org/2005/xpath-functions">
+   <columns/>
+   <rows/>
+</csv>
 ]]></assert-xml>
       </result>
    </test-case>
@@ -12259,18 +12280,18 @@ return $M(collation-key("a", $C))
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
       <environment ref="global"/>
       <test>
-        csv-to-xml("", map { "columns": map { "name": 1, "city": 3 })
+        csv-to-xml("", map { "column-names": map { "name": 1, "city": 3 } })
       </test>
       <result>
          <assert-xml ignore-prefixes="false"><![CDATA[
-<fn:csv>
-   <fn:header>
-      <fn:column>name</fn:field>
-      <fn:column/>
-      <fn:column>city</fn:field>
-   </fn:header>
-   <fn:rows/>
-</fn:csv>
+<csv xmlns="http://www.w3.org/2005/xpath-functions">
+   <columns>
+      <column>name</column>
+      <column/>
+      <column>city</column>
+   </columns>
+   <rows/>
+</csv>
 ]]></assert-xml>
       </result>
    </test-case>
@@ -12282,7 +12303,7 @@ return $M(collation-key("a", $C))
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
@@ -12291,26 +12312,26 @@ return $M(collation-key("a", $C))
            return 
 
         
-        csv-to-xml($csv-string, map { "columns": true() })
+        csv-to-xml($csv-string, map { "column-names": true() })
       </test>
       <result>
          <assert-xml ignore-prefixes="false"><![CDATA[
-<fn:csv>
-   <fn:header>
-      <fn:column>name</fn:field>
-      <fn:column>city</fn:field>
-   </fn:header>
-   <fn:rows>
-      <fn:row>
-         <fn:field column="name">Bob</fn:field>
-         <fn:field column="city">Berlin</fn:field>
-      </fn:row>
-      <fn:row>
-         <fn:field column="name">Alice</fn:field>
-         <fn:field column="city">Aachen</fn:field>
-      </fn:row>
-   </fn:rows>
-</fn:csv>
+<csv xmlns="http://www.w3.org/2005/xpath-functions">
+   <columns>
+      <column>name</column>
+      <column>city</column>
+   </columns>
+   <rows>
+      <row>
+         <field column="name">Bob</field>
+         <field column="city">Berlin</field>
+      </row>
+      <row>
+         <field column="name">Alice</field>
+         <field column="city">Aachen</field>
+      </row>
+   </rows>
+</csv>
 ]]></assert-xml>
       </result>
    </test-case>
@@ -12322,7 +12343,7 @@ return $M(collation-key("a", $C))
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
@@ -12331,26 +12352,26 @@ return $M(collation-key("a", $C))
            return 
 
         
-        csv-to-xml($csv-string, map { "columns": true() })
+        csv-to-xml($csv-string, map { "column-names": true() })
       </test>
       <result>
          <assert-xml ignore-prefixes="false"><![CDATA[
-<fn:csv>
-   <fn:header>
-      <fn:field>name</fn:field>
-      <fn:field>city</fn:field>
-   </fn:header>
-   <fn:rows>
-      <fn:row>
-         <fn:field column="name">Bob</fn:field>
-         <fn:field column="city">Berlin</fn:field>
-      </fn:row>
-      <fn:row>
-         <fn:field column="name">Alice</fn:field>
-         <fn:field column="city">Aachen</fn:field>
-      </fn:row>
-   </fn:rows>
-</fn:csv>
+<csv xmlns="http://www.w3.org/2005/xpath-functions">
+   <columns>
+      <column>name</column>
+      <column>city</column>
+   </columns>
+   <rows>
+      <row>
+         <field column="name">Bob</field>
+         <field column="city">Berlin</field>
+      </row>
+      <row>
+         <field column="name">Alice</field>
+         <field column="city">Aachen</field>
+      </row>
+   </rows>
+</csv>
 ]]></assert-xml>
       </result>
    </test-case>
@@ -12362,43 +12383,46 @@ return $M(collation-key("a", $C))
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
           let $csv-uneven-cols := 
-          `date,name,city,amount,currency,original amount,note{$crlf}2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}2023-07-20,Alice,Aachen,15.00{$crlf}2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`
+          concat(`date,name,city,amount,currency,original amount,note{$crlf}`,
+`2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}`,
+`2023-07-20,Alice,Aachen,15.00{$crlf}`,
+`2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`)
            return 
 
         
-        csv-to-xml($csv-string, map { "columns": true(), "filter-columns": (2,1,4) })
+        csv-to-xml($csv-uneven-cols, map { "column-names": true(), "filter-columns": (2,1,4) })
       </test>
       <result>
          <assert-xml ignore-prefixes="false"><![CDATA[
-<fn:csv>
-   <fn:header>
-      <fn:field>name</fn:field>
-      <fn:field>date</fn:field>
-      <fn:field>amount</fn:field>
-   </fn:header>
-   <fn:rows>
-      <fn:row>
-         <fn:field column="name">Bob</fn:field>
-         <fn:field column="date">2023-07-19</fn:field>
-         <fn:field column="amount">10.00</fn:field>
-      </fn:row>
-      <fn:row>
-         <fn:field column="name">Alice</fn:field>
-         <fn:field column="date">2023-07-20</fn:field>
-         <fn:field column="amount">15.00</fn:field>
-      </fn:row>
-      <fn:row>
-         <fn:field column="name">Charlie</fn:field>
-         <fn:field column="date">2023-07-20</fn:field>
-         <fn:field column="amount">15.00</fn:field>
-      </fn:row>
-   </fn:rows>
-</fn:csv>
+<csv xmlns="http://www.w3.org/2005/xpath-functions">
+   <columns>
+      <column>name</column>
+      <column>date</column>
+      <column>amount</column>
+   </columns>
+   <rows>
+      <row>
+         <field column="name">Bob</field>
+         <field column="date">2023-07-19</field>
+         <field column="amount">10.00</field>
+      </row>
+      <row>
+         <field column="name">Alice</field>
+         <field column="date">2023-07-20</field>
+         <field column="amount">15.00</field>
+      </row>
+      <row>
+         <field column="name">Charlie</field>
+         <field column="date">2023-07-20</field>
+         <field column="amount">15.00</field>
+      </row>
+   </rows>
+</csv>
 ]]></assert-xml>
       </result>
    </test-case>
@@ -12410,56 +12434,59 @@ return $M(collation-key("a", $C))
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
           let $csv-uneven-cols := 
-          `date,name,city,amount,currency,original amount,note{$crlf}2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}2023-07-20,Alice,Aachen,15.00{$crlf}2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`
+          concat(`date,name,city,amount,currency,original amount,note{$crlf}`,
+`2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}`,
+`2023-07-20,Alice,Aachen,15.00{$crlf}`,
+`2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`)
            return 
 
         
-        csv-to-xml($csv-uneven-cols, map { "columns": true(), "number-of-columns": "all" })
+        csv-to-xml($csv-uneven-cols, map { "column-names": true(), "number-of-columns": "all" })
       </test>
       <result>
          <assert-xml ignore-prefixes="false"><![CDATA[
-<fn:csv>
-   <fn:header>
-      <fn:field>date</fn:field>
-      <fn:field>name</fn:field>
-      <fn:field>city</fn:field>
-      <fn:field>amount</fn:field>
-      <fn:field>currency</fn:field>
-      <fn:field>original amount</fn:field>
-      <fn:field>note</fn:field>
-   </fn:header>
-   <fn:rows>
-      <fn:row>
-         <fn:field column="date">2023-07-19</fn:field>
-         <fn:field column="name">Bob</fn:field>
-         <fn:field column="city">Berlin</fn:field>
-         <fn:field column="amount">10.00</fn:field>
-         <fn:field column="currency">USD</fn:field>
-         <fn:field column="original amount">13.99</fn:field>
-      </fn:row>
-      <fn:row>
-         <fn:field column="date">2023-07-20</fn:field>
-         <fn:field column="name">Alice</fn:field>
-         <fn:field column="city">Aachen</fn:field>
-         <fn:field column="amount">15.00</fn:field>
-      </fn:row>
-      <fn:row>
-         <fn:field column="date">2023-07-20</fn:field>
-         <fn:field column="name">Charlie</fn:field>
-         <fn:field column="city">Celle</fn:field>
-         <fn:field column="amount">15.00</fn:field>
-         <fn:field column="currency">GBP</fn:field>
-         <fn:field column="original amount">11.99</fn:field>
-         <fn:field column="note">cake</fn:field>
-         <fn:field>not a lie</fn:field>
-      </fn:row>
-   </fn:rows>
-</fn:csv>
+<csv xmlns="http://www.w3.org/2005/xpath-functions">
+   <columns>
+      <column>date</column>
+      <column>name</column>
+      <column>city</column>
+      <column>amount</column>
+      <column>currency</column>
+      <column>original amount</column>
+      <column>note</column>
+   </columns>
+   <rows>
+      <row>
+         <field column="date">2023-07-19</field>
+         <field column="name">Bob</field>
+         <field column="city">Berlin</field>
+         <field column="amount">10.00</field>
+         <field column="currency">USD</field>
+         <field column="original amount">13.99</field>
+      </row>
+      <row>
+         <field column="date">2023-07-20</field>
+         <field column="name">Alice</field>
+         <field column="city">Aachen</field>
+         <field column="amount">15.00</field>
+      </row>
+      <row>
+         <field column="date">2023-07-20</field>
+         <field column="name">Charlie</field>
+         <field column="city">Celle</field>
+         <field column="amount">15.00</field>
+         <field column="currency">GBP</field>
+         <field column="original amount">11.99</field>
+         <field column="note">cake</field>
+         <field>not a lie</field>
+      </row>
+   </rows>
+</csv>
 ]]></assert-xml>
       </result>
    </test-case>
@@ -12471,59 +12498,62 @@ return $M(collation-key("a", $C))
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
           let $csv-uneven-cols := 
-          `date,name,city,amount,currency,original amount,note{$crlf}2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}2023-07-20,Alice,Aachen,15.00{$crlf}2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`
+          concat(`date,name,city,amount,currency,original amount,note{$crlf}`,
+`2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}`,
+`2023-07-20,Alice,Aachen,15.00{$crlf}`,
+`2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`)
            return 
 
         
-        csv-to-xml($csv-uneven-cols, map { "columns": true(), "number-of-columns": "first-row" })
+        csv-to-xml($csv-uneven-cols, map { "column-names": true(), "number-of-columns": "first-row" })
       </test>
       <result>
          <assert-xml ignore-prefixes="false"><![CDATA[
-<fn:csv>
-   <fn:header>
-      <fn:field>date</fn:field>
-      <fn:field>name</fn:field>
-      <fn:field>city</fn:field>
-      <fn:field>amount</fn:field>
-      <fn:field>currency</fn:field>
-      <fn:field>original amount</fn:field>
-      <fn:field>note</fn:field>
-   </fn:header>
-   <fn:rows>
-      <fn:row>
-         <fn:field column="date">2023-07-19</fn:field>
-         <fn:field column="name">Bob</fn:field>
-         <fn:field column="city">Berlin</fn:field>
-         <fn:field column="amount">10.00</fn:field>
-         <fn:field column="currency">USD</fn:field>
-         <fn:field column="original amount">13.99</fn:field>
-         <fn:field column="note"/>
-      </fn:row>
-      <fn:row>
-         <fn:field column="date">2023-07-20</fn:field>
-         <fn:field column="name">Alice</fn:field>
-         <fn:field column="city">Aachen</fn:field>
-         <fn:field column="amount">15.00</fn:field>
-         <fn:field column="currency"/>
-         <fn:field column="original amount"/>
-         <fn:field column="note"/>
-      </fn:row>
-      <fn:row>
-         <fn:field column="date">2023-07-20</fn:field>
-         <fn:field column="name">Charlie</fn:field>
-         <fn:field column="city">Celle</fn:field>
-         <fn:field column="amount">15.00</fn:field>
-         <fn:field column="currency">GBP</fn:field>
-         <fn:field column="original amount">11.99</fn:field>
-         <fn:field column="note">cake</fn:field>
-      </fn:row>
-   </fn:rows>
-</fn:csv>
+<csv xmlns="http://www.w3.org/2005/xpath-functions">
+   <columns>
+      <column>date</column>
+      <column>name</column>
+      <column>city</column>
+      <column>amount</column>
+      <column>currency</column>
+      <column>original amount</column>
+      <column>note</column>
+   </columns>
+   <rows>
+      <row>
+         <field column="date">2023-07-19</field>
+         <field column="name">Bob</field>
+         <field column="city">Berlin</field>
+         <field column="amount">10.00</field>
+         <field column="currency">USD</field>
+         <field column="original amount">13.99</field>
+         <field column="note"/>
+      </row>
+      <row>
+         <field column="date">2023-07-20</field>
+         <field column="name">Alice</field>
+         <field column="city">Aachen</field>
+         <field column="amount">15.00</field>
+         <field column="currency"/>
+         <field column="original amount"/>
+         <field column="note"/>
+      </row>
+      <row>
+         <field column="date">2023-07-20</field>
+         <field column="name">Charlie</field>
+         <field column="city">Celle</field>
+         <field column="amount">15.00</field>
+         <field column="currency">GBP</field>
+         <field column="original amount">11.99</field>
+         <field column="note">cake</field>
+      </row>
+   </rows>
+</csv>
 ]]></assert-xml>
       </result>
    </test-case>
@@ -12535,160 +12565,59 @@ return $M(collation-key("a", $C))
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
           let $crlf := 
-          char('x0D')||char('x0A')
+          char('\r')||char('\n')
            return 
 
         
           let $csv-uneven-cols := 
-          `date,name,city,amount,currency,original amount,note{$crlf}2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}2023-07-20,Alice,Aachen,15.00{$crlf}2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`
+          concat(`date,name,city,amount,currency,original amount,note{$crlf}`,
+`2023-07-19,Bob,Berlin,10.00,USD,13.99{$crlf}`,
+`2023-07-20,Alice,Aachen,15.00{$crlf}`,
+`2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{$crlf}`)
            return 
 
         
-        csv-to-xml($csv-uneven-cols, map { "columns": true(), "number-of-columns": 6 })
+        csv-to-xml($csv-uneven-cols, map { "column-names": true(), "number-of-columns": 6 })
       </test>
       <result>
          <assert-xml ignore-prefixes="false"><![CDATA[
-<fn:csv>
-   <fn:header>
-      <fn:field>date</fn:field>
-      <fn:field>name</fn:field>
-      <fn:field>city</fn:field>
-      <fn:field>amount</fn:field>
-      <fn:field>currency</fn:field>
-      <fn:field>original amount</fn:field>
-   </fn:header>
-   <fn:rows>
-      <fn:row>
-         <fn:field column="date">2023-07-19</fn:field>
-         <fn:field column="name">Bob</fn:field>
-         <fn:field column="city">Berlin</fn:field>
-         <fn:field column="amount">10.00</fn:field>
-         <fn:field column="currency">USD</fn:field>
-         <fn:field column="original amount">13.99</fn:field>
-      </fn:row>
-      <fn:row>
-         <fn:field column="date">2023-07-20</fn:field>
-         <fn:field column="name">Alice</fn:field>
-         <fn:field column="city">Aachen</fn:field>
-         <fn:field column="amount">15.00</fn:field>
-         <fn:field column="currency"/>
-         <fn:field column="original amount"/>
-      </fn:row>
-      <fn:row>
-         <fn:field column="date">2023-07-20</fn:field>
-         <fn:field column="name">Charlie</fn:field>
-         <fn:field column="city">Celle</fn:field>
-         <fn:field column="amount">15.00</fn:field>
-         <fn:field column="currency">GBP</fn:field>
-         <fn:field column="original amount">11.99</fn:field>
-      </fn:row>
-   </fn:rows>
-</fn:csv>
+<csv xmlns="http://www.w3.org/2005/xpath-functions">
+   <columns>
+      <column>date</column>
+      <column>name</column>
+      <column>city</column>
+      <column>amount</column>
+      <column>currency</column>
+      <column>original amount</column>
+   </columns>
+   <rows>
+      <row>
+         <field column="date">2023-07-19</field>
+         <field column="name">Bob</field>
+         <field column="city">Berlin</field>
+         <field column="amount">10.00</field>
+         <field column="currency">USD</field>
+         <field column="original amount">13.99</field>
+      </row>
+      <row>
+         <field column="date">2023-07-20</field>
+         <field column="name">Alice</field>
+         <field column="city">Aachen</field>
+         <field column="amount">15.00</field>
+         <field column="currency"/>
+         <field column="original amount"/>
+      </row>
+      <row>
+         <field column="date">2023-07-20</field>
+         <field column="name">Charlie</field>
+         <field column="city">Celle</field>
+         <field column="amount">15.00</field>
+         <field column="currency">GBP</field>
+         <field column="original amount">11.99</field>
+      </row>
+   </rows>
+</csv>
 ]]></assert-xml>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-fetch-field-by-column-001">
-      <description>Test case for fn:csv-fetch-field-by-column</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $columns := 
-          map {
-   "names": map { "name": 1, "city": 2 },
-   "fields: ("name", "city")
-}
-           return 
-
-        
-          let $fields := 
-          ("Bob", "Berlin")
-           return 
-
-        
-        csv-fetch-field-by-column($columns, $fields, "name")
-      </test>
-      <result>
-         <assert-deep-eq>"Bob"</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-fetch-field-by-column-002">
-      <description>Test case for fn:csv-fetch-field-by-column</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $columns := 
-          map {
-   "names": map { "name": 1, "city": 2 },
-   "fields: ("name", "city")
-}
-           return 
-
-        
-          let $fields := 
-          ("Bob", "Berlin")
-           return 
-
-        
-        csv-fetch-field-by-column($columns, $fields, "amount")
-      </test>
-      <result>
-         <error code="FOCV0004"/>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-fetch-field-by-column-003">
-      <description>Test case for fn:csv-fetch-field-by-column</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $columns := 
-          map {
-   "names": map { "name": 1, "city": 2 },
-   "fields: ("name", "city")
-}
-           return 
-
-        
-          let $fields := 
-          ("Bob", "Berlin")
-           return 
-
-        
-        csv-fetch-field-by-column($columns, $fields, 2)
-      </test>
-      <result>
-         <assert-deep-eq>"Berlin"</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-csv-fetch-field-by-column-004">
-      <description>Test case for fn:csv-fetch-field-by-column</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2023-11-14"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-          let $columns := 
-          map {
-   "names": map { "name": 1, "city": 2 },
-   "fields: ("name", "city")
-}
-           return 
-
-        
-          let $fields := 
-          ("Bob", "Berlin")
-           return 
-
-        
-        csv-fetch-field-by-column($columns, $fields, 3)
-      </test>
-      <result>
-         <assert-deep-eq>""</assert-deep-eq>
       </result>
    </test-case>
 
