@@ -57,8 +57,8 @@
                            'path': '/path/a%2fb/a+b'})</test>
     <result>
       <any-of>
-        <assert-eq>"https://example.com:443/path/a%2fb/a+b"</assert-eq>
-        <assert-eq>"https://example.com:443/path/a%2Fb/a+b"</assert-eq>
+        <assert-eq>"https://example.com:443/path/a%2fb/a%20b"</assert-eq>
+        <assert-eq>"https://example.com:443/path/a%2Fb/a%20b"</assert-eq>
       </any-of>
     </result>
   </test-case>
@@ -128,10 +128,10 @@
 })</test>
     <result>
       <any-of>
-        <assert-eq>'https://example.com:8080/path?s="hello+world"&amp;sort=relevance'</assert-eq>
-        <assert-eq>'https://example.com:8080/path?s="hello%20world"&amp;sort=relevance'</assert-eq>
-        <assert-eq>'https://example.com:8080/path?s="sort=relevance&amp;hello+world"'</assert-eq>
-        <assert-eq>'https://example.com:8080/path?s="sort=relevance&amp;hello%20world"'</assert-eq>
+        <assert-eq>`https://example.com:8080/path?s="hello%20world"&amp;sort=relevance`</assert-eq>
+        <assert-eq>`https://example.com:8080/path?s=sort=relevance&amp;"hello%20world"`</assert-eq>
+        <assert-eq>`https://example.com:8080/path?s=%22hello%20world%22&amp;sort=relevance`</assert-eq>
+        <assert-eq>`https://example.com:8080/path?s=sort=relevance&amp;%22hello%20world%22`</assert-eq>
       </any-of>
     </result>
   </test-case>
@@ -207,10 +207,7 @@
   "path-segments": ("", "C:", "Program Files", "test.jar")
 })</test>
     <result>
-      <any-of>
-        <assert-eq>"file:///C:/Program%20Files/test.jar"</assert-eq>
-        <assert-eq>"file:///C:/Program+Files/test.jar"</assert-eq>
-      </any-of>
+      <assert-eq>"file:///C:/Program%20Files/test.jar"</assert-eq>
     </result>
   </test-case>
 
@@ -312,10 +309,7 @@
   "path-segments": ("", "c=GB")
 })</test>
     <result>
-      <any-of>
-        <assert-eq>"ldap://[2001:db8::7]/c=GB?objectClass%3fone"</assert-eq>
-        <assert-eq>"ldap://[2001:db8::7]/c=GB?objectClass%3Fone"</assert-eq>
-      </any-of>
+      <assert-eq>"ldap://[2001:db8::7]/c=GB?objectClass?one"</assert-eq>
     </result>
   </test-case>
 
@@ -420,10 +414,7 @@
   "path-segments": ("file:", "C:", "Program Files", "test.jar!", "foo", "bar")
 })</test>
     <result>
-      <any-of>
-        <assert-eq>"jar:file:/C:/Program%20Files/test.jar!/foo/bar"</assert-eq>
-        <assert-eq>"jar:file:/C:/Program+Files/test.jar!/foo/bar"</assert-eq>
-      </any-of>
+      <assert-eq>"jar:file:/C:/Program%20Files/test.jar!/foo/bar"</assert-eq>
     </result>
   </test-case>
 
@@ -460,10 +451,10 @@
 }, map { 'query-separator': ';' })</test>
     <result>
       <any-of>
-        <assert-eq>'https://example.com:8080/path?s="hello+world";sort=relevance'</assert-eq>
         <assert-eq>'https://example.com:8080/path?s="hello%20world";sort=relevance'</assert-eq>
-        <assert-eq>'https://example.com:8080/path?s="sort=relevance;hello+world"'</assert-eq>
-        <assert-eq>'https://example.com:8080/path?s="sort=relevance;hello%20world"'</assert-eq>
+        <assert-eq>'https://example.com:8080/path?s=sort=relevance;"hello%20world"'</assert-eq>
+        <assert-eq>'https://example.com:8080/path?s=%22hello%20world%22;sort=relevance'</assert-eq>
+        <assert-eq>'https://example.com:8080/path?s=sort=relevance;%22hello%20world%22'</assert-eq>
       </any-of>
     </result>
   </test-case>
@@ -533,12 +524,12 @@
                             }, map { })</test>
     <result>
       <any-of>
-        <assert-eq>"https://example.com/path/to/file?key1=value1&amp;key2=&amp;value3"</assert-eq>
-        <assert-eq>"https://example.com/path/to/file?key1=value1&amp;value3&amp;key2="</assert-eq>
-        <assert-eq>"https://example.com/path/to/file?key2=&amp;key1=value1&amp;value3"</assert-eq>
-        <assert-eq>"https://example.com/path/to/file?key2=&amp;value3&amp;key1=value1"</assert-eq>
-        <assert-eq>"https://example.com/path/to/file?value3&amp;key1=value1&amp;key2="</assert-eq>
-        <assert-eq>"https://example.com/path/to/file?value3&amp;key2=&amp;key1=value1"</assert-eq>
+        <assert-eq>`https://example.com/path/to/file?key1=value1&amp;key2=&amp;value3`</assert-eq>
+        <assert-eq>`https://example.com/path/to/file?key1=value1&amp;value3&amp;key2=`</assert-eq>
+        <assert-eq>`https://example.com/path/to/file?key2=&amp;key1=value1&amp;value3`</assert-eq>
+        <assert-eq>`https://example.com/path/to/file?key2=&amp;value3&amp;key1=value1`</assert-eq>
+        <assert-eq>`https://example.com/path/to/file?value3&amp;key1=value1&amp;key2=`</assert-eq>
+        <assert-eq>`https://example.com/path/to/file?value3&amp;key2=&amp;key1=value1`</assert-eq>
       </any-of>
     </result>
   </test-case>
@@ -559,8 +550,8 @@
                        }, map { }) ]]></test>
     <result>
       <any-of>
-        <assert-eq>"https://example.com/path+to/a%2fb/file?ke%3dy1=val%26ue1&amp;ke%3fy2=val%27ue2"</assert-eq>
-        <assert-eq>"https://example.com/path+to/a%2Fb/file?ke%3Dy1=val%26ue1&amp;ke%3Fy2=val%27ue2"</assert-eq>
+        <assert-eq>`https://example.com/path%20to/a%2Fb/file?ke%3Dy1=val%26ue1&amp;ke?y2=val'ue2`</assert-eq>
+        <assert-eq>`https://example.com/path%20to/a%2fb/file?ke%3dy1=val%26ue1&amp;ke?y2=val'ue2`</assert-eq>
       </any-of>
     </result>
   </test-case>
@@ -575,8 +566,8 @@
                            }, map { })</test>
     <result>
       <any-of>
-        <assert-eq>'https://example.com/path+to/a%2fb/file#frag+id'</assert-eq>
-        <assert-eq>'https://example.com/path+to/a%2Fb/file#frag+id'</assert-eq>
+        <assert-eq>'https://example.com/path%20to/a%2fb/file#frag%20id'</assert-eq>
+        <assert-eq>'https://example.com/path%20to/a%2Fb/file#frag%20id'</assert-eq>
       </any-of>
     </result>
   </test-case>
@@ -593,7 +584,7 @@
                             },
                             'fragment': 'fragid'}, map { })</test>
     <result>
-      <assert-eq>"https://example.com/path/to/file?key1=value1&amp;key2=value2#fragid"</assert-eq>
+      <assert-eq>`https://example.com/path/to/file?key1=value1&amp;key2=value2#fragid`</assert-eq>
     </result>
   </test-case>
 
@@ -617,6 +608,111 @@
                             'path': 'abc'}, map { })</test>
     <result>
       <assert-eq>"querty:abc"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="fn-build-uri-from-parse-901">
+    <description>Supply path segments as a sequence</description>
+    <created by="Michael Kay" on="2023-10-20"/>
+    <test>fn:build-uri(map {
+      "authority": "example.com",
+      "host": "example.com",
+      "path": "/path/to/file",
+      "path-segments": ("", "path", "to", "file"),
+      "scheme": "https",
+      "uri": "https://example.com\path\to\file"
+      })</test>
+    <result><assert-eq>"https://example.com/path/to/file"</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-009">
+    <description>Tests that a list of query parameter values is handled correctly.</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-24"/>
+    <test>fn:build-uri(<![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           'path-segments': ('','path'),
+                           "query-parameters": map {
+                             "a": ("1", "3"),
+                             "b": "2&amp;4"
+                           }}]]>)</test>
+    <result><assert-eq>`http://example.com/path?a=1&amp;a=3&amp;b=2%264`</assert-eq></result>
+  </test-case>
+
+  <test-case name="fn-build-uri-010a">
+    <description>Tests character encoding</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-26"/>
+    <test>fn:build-uri(<![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           'path-segments': ('',' !"#$%&amp;''()*+,-./0123456789:;&lt;=>?'),
+                           "query-parameters": map {
+                             "a": (" !""#$%&amp;'()*+,-"),
+                             "b": ("./0123456789:;&lt;=>?")
+                           },
+                           "fragment": " !""#$%&amp;'()*+,-./0123456789:;&lt;=>?"
+                         }]]>)</test>
+    <result>
+      <assert-eq>`http://example.com/%20!%22%23$%25&amp;'()*+,-.%2F0123456789:;%3C=%3E%3F?a=%20!%22%23$%25%26'()*+,-&amp;b=./0123456789:;%3C%3D%3E?#%20!%22%23$%25&amp;'()*+,-./0123456789:;%3C=%3E?`</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-010b">
+    <description>Tests character encoding</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-26"/>
+    <test>fn:build-uri(<![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           'path-segments': ('','@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_'),
+                           "query-parameters": map {
+                             "a": ("@ABCDEFGHIJKLMN"),
+                             "b": ("OPQRSTUVWXYZ[\]^_")
+                           },
+                           "fragment": "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_"
+                         }]]>)</test>
+    <result>
+      <assert-eq>`http://example.com/@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_?a=@ABCDEFGHIJKLMN&amp;b=OPQRSTUVWXYZ%5B%5C%5D%5E_#@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_`</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-010c">
+    <description>Tests character encoding</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-26"/>
+    <test>fn:build-uri(<![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           'path-segments': ('','`abcdefghijklmnopqrstuvwxyz{|}~'),
+                           "query-parameters": map {
+                             "a": ("`abcdefghijklmn"),
+                             "b": ("opqrstuvwxyz{|}~")
+                           },
+                           "fragment": "`abcdefghijklmnopqrstuvwxyz{|}~"
+                         }]]>)</test>
+    <result>
+    <assert-eq>`http://example.com/%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~?a=%60abcdefghijklmn&amp;b=opqrstuvwxyz%7B%7C%7D~#%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~`</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-010d">
+    <description>Tests character encoding</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-26"/>
+    <test>fn:build-uri(<![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           'path-segments': ('','🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿'),
+                           "query-parameters": map {
+                             "a": ("🤷 ¡¢£¤ǌ"),
+                             "b": ("†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿")
+                           },
+                           "fragment": "🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿"
+                         }]]>)</test>
+    <result>
+      <assert-eq>`http://example.com/🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿?a=🤷 ¡¢£¤ǌ&amp;b=†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿#🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿`</assert-eq>
     </result>
   </test-case>
 

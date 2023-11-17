@@ -739,4 +739,77 @@
          <error code="XPDY0002"/>
       </result>
    </test-case>
+   
+   <test-case name="default-namespace-40-01" covers-40="default-namespace-fixed">
+      <description> Use declare fixed default namespace: effect on element constructors</description>
+      <created by="Michael Kay" on="2023-10-31"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare fixed default element namespace "http://www.example.com/test";
+        declare variable $in := <e><f>data</f></e>;
+        map{'e':namespace-uri($in), 'f':namespace-uri($in/f)}
+      ]]></test>
+      <result>
+         <assert-deep-eq>map{'e':'http://www.example.com/test', 'f':'http://www.example.com/test'}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="default-namespace-40-02" covers-40="default-namespace-fixed">
+      <description> Use declare fixed default namespace: effect on name tests</description>
+      <created by="Michael Kay" on="2023-10-31"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare fixed default element namespace "http://www.example.com/test";
+        declare variable $in := <e><f>data</f></e>;
+        string($in//f)
+      ]]></test>
+      <result>
+         <assert-eq>"data"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="default-namespace-40-03" covers-40="default-namespace-fixed">
+      <description> Use declare fixed default namespace: effect on element constructors</description>
+      <created by="Michael Kay" on="2023-10-31"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare fixed default element namespace "http://www.example.com/test";
+        declare variable $in := <e xmlns=""><f>data</f></e>;
+        map{'e':namespace-uri($in), 'f':namespace-uri($in/f)}
+      ]]></test>
+      <result>
+         <assert-deep-eq>map{'e':'', 'f':''}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="default-namespace-40-04" covers-40="default-namespace-fixed">
+      <description> Use declare fixed default namespace: effect on name tests within element constructors</description>
+      <created by="Michael Kay" on="2023-10-31"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare fixed default element namespace "http://www.example.com/test";
+        declare variable $in := <a><b>data</b></a>;
+        declare variable $out := <e xmlns=""><f>{string($in//b)}</f></e>;
+        string($out)
+      ]]></test>
+      <result>
+         <assert-eq>"data"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="default-namespace-40-05">
+      <description> Same test without "fixed"</description>
+      <created by="Michael Kay" on="2023-10-31"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[
+        declare default element namespace "http://www.example.com/test";
+        declare variable $in := <a><b>data</b></a>;
+        declare variable $out := <e xmlns=""><f>{string($in//b)}</f></e>;
+        string($out)
+      ]]></test>
+      <result>
+         <assert-eq>""</assert-eq>
+      </result>
+   </test-case>
+   
 </test-set>

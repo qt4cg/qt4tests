@@ -132,14 +132,14 @@
     <result>
       <assert-deep-eq><![CDATA[
 map {
-  "uri": "https://example.com:8080/path?s=%22hello world%22&sort=relevance",
+  "uri": `https://example.com:8080/path?s=%22hello world%22&sort=relevance`,
   "scheme": "https",
   "hierarchical": true(),
   "authority": "example.com:8080",
   "host": "example.com",
   "port": "8080",
   "path": "/path",
-  "query": "s=%22hello world%22&sort=relevance",
+  "query": `s=%22hello world%22&sort=relevance`,
   "query-parameters": map {
     "s": """hello world""",
     "sort": "relevance"
@@ -659,8 +659,8 @@ map {
     "sort": "relevance"
    },
   "path-segments": ("", "path"),
-  "query": "s=%22hello world%22&sort=relevance",
-  "uri": "https://example.com:8080/path?s=%22hello world%22&sort=relevance"
+  "query": `s=%22hello world%22&sort=relevance`,
+  "uri": `https://example.com:8080/path?s=%22hello world%22&sort=relevance`
 }]]></assert-deep-eq>
     </result>
   </test-case>
@@ -723,9 +723,135 @@ map {
   "hierarchical": false(),
   "filepath": "�00",
   "path": "%FF00",
-  "path-segments": ["�00"]
+  "path-segments": "�00"
 }</assert-deep-eq>
     </result>
   </test-case>
 
+  <test-case name="fn-parse-uri-042">
+    <description>Tests that repeated query parameters are represented as a sequence.</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-24"/>
+    <test>fn:parse-uri(`http://example.com/path?a=1&amp;b=2%264&amp;a=3`)</test>
+    <result>
+      <assert-deep-eq><![CDATA[map {
+  `scheme`: `http`,
+  `hierarchical`: true(),
+  `uri`: `http://example.com/path?a=1&b=2%264&a=3`,
+  `authority`: `example.com`,
+  `host`: `example.com`,
+  `path-segments`: (``,`path`),
+  `path`: `/path`,
+  `query`: `a=1&b=2%264&a=3`,
+  `query-parameters`: map {
+   `a`: (`1`, `3`),
+   `b`: `2&4`
+}}]]></assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="fn-parse-uri-043">
+    <description>Parses a URI ending in "#"</description>
+    <created by="Michael Kay" on="2023-10-27"/>
+    <test>fn:parse-uri("https://qt4cg.org/specifications/xpath-functions-40/Overview.html#")</test>
+    <result>
+      <assert-deep-eq>map {
+        "authority": "qt4cg.org",
+        "fragment": "",
+        "host": "qt4cg.org",
+        "path": "/specifications/xpath-functions-40/Overview.html",
+        "path-segments": ("", "specifications", "xpath-functions-40", "Overview.html"),
+        "scheme": "https",
+        "hierarchical": true(),
+        "uri": "https://qt4cg.org/specifications/xpath-functions-40/Overview.html#"
+        }</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-043a">
+    <description>Tests character encoding</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-26"/>
+    <test>fn:parse-uri(`http://example.com/%20!%22%23$%25&amp;'()*%2B,-.%2F0123456789:;%3C=%3E%3F?a=%20!%22%23$%25%26'()*%2B,-&amp;b=./0123456789:;%3C%3D%3E?#%20!%22%23$%25&amp;'()*%2B,-./0123456789:;%3C=%3E?`)</test>
+    <result>
+      <assert-deep-eq><![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           "path": `/%20!%22%23$%25&'()*%2B,-.%2F0123456789:;%3C=%3E%3F`,
+                           'path-segments': ('',` !"#$%&'()*+,-./0123456789:;<=>?`),
+                           'query': `a=%20!%22%23$%25%26'()*%2B,-&b=./0123456789:;%3C%3D%3E?`,
+                           'query-parameters': map {
+                             'a': (` !"#$%&'()*+,-`),
+                             'b': ('./0123456789:;<=>?')
+                           },
+                           'fragment': ` !"#$%&'()*+,-./0123456789:;<=>?`,
+                           'uri': `http://example.com/%20!%22%23$%25&'()*%2B,-.%2F0123456789:;%3C=%3E%3F?a=%20!%22%23$%25%26'()*%2B,-&b=./0123456789:;%3C%3D%3E?#%20!%22%23$%25&'()*%2B,-./0123456789:;%3C=%3E?`
+                         }]]></assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-043b">
+    <description>Tests character encoding</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-26"/>
+    <test>fn:parse-uri(`http://example.com/@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_?a=@ABCDEFGHIJKLMN&amp;b=OPQRSTUVWXYZ%5B%5C%5D%5E_#@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_`)</test>
+    <result>
+      <assert-deep-eq><![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           "path": '/@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_',
+                           'path-segments': ('','@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_'),
+                           'query': `a=@ABCDEFGHIJKLMN&b=OPQRSTUVWXYZ%5B%5C%5D%5E_`,
+                           'query-parameters': map {
+                             'a': ('@ABCDEFGHIJKLMN'),
+                             'b': ('OPQRSTUVWXYZ[\]^_')
+                           },
+                           'fragment': '@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_',
+                           'uri': `http://example.com/@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_?a=@ABCDEFGHIJKLMN&b=OPQRSTUVWXYZ%5B%5C%5D%5E_#@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_`
+                         }]]></assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-043c">
+    <description>Tests character encoding</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-26"/>
+    <test>fn:parse-uri(`http://example.com/%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~?a=%60abcdefghijklmn&amp;b=opqrstuvwxyz%7B%7C%7D~#%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~`)</test>
+    <result>
+      <assert-deep-eq><![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           "path": '/%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~',
+                           'path-segments': ('','`abcdefghijklmnopqrstuvwxyz{|}~'),
+                           'query': `a=%60abcdefghijklmn&b=opqrstuvwxyz%7B%7C%7D~`,
+                           "query-parameters": map {
+                             "a": ("`abcdefghijklmn"),
+                             "b": ("opqrstuvwxyz{|}~")
+                           },
+                           "fragment": "`abcdefghijklmnopqrstuvwxyz{|}~",
+                           'uri': `http://example.com/%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~?a=%60abcdefghijklmn&b=opqrstuvwxyz%7B%7C%7D~#%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~`
+                         }]]></assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-043d">
+    <description>Tests character encoding</description>
+    <created by="Norm Tovey-Walsh" on="2023-10-26"/>
+    <test>fn:parse-uri(`http://example.com/🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿?a=🤷 ¡¢£¤ǌ&amp;b=†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿#🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿`)</test>
+    <result>
+      <assert-deep-eq><![CDATA[map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'host': 'example.com',
+                           "path": '/🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+                           'path-segments': ('','🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿'),
+                           'query': `a=🤷 ¡¢£¤ǌ&b=†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿`,
+                           "query-parameters": map {
+                             "a": "🤷 ¡¢£¤ǌ",
+                             "b": "†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿"
+                           },
+                           "fragment": "🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿",
+                           'uri': `http://example.com/🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿?a=🤷 ¡¢£¤ǌ&b=†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿#🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿`
+                         }]]></assert-deep-eq>
+    </result>
+  </test-case>
 </test-set>

@@ -41,15 +41,6 @@
       and so expect XPST0003.
    -->
 
-   <test-case name="version_declaration-009">
-      <description> A VersionDecl cannot appear after a prolog decl. </description>
-      <created by="Pulkita Tyagi" on="2005-10-05"/>
-      <test>declare boundary-space preserve; xquery version "1.0"; 1,2</test>
-      <result>
-         <error code="XPST0003"/>
-      </result>
-   </test-case>
-
    <test-case name="version_declaration-020">
       <description> You can't leave out the version string. </description>
       <created by="Michael Dyck" on="2012-09-04"/>
@@ -204,6 +195,79 @@
          <error code="XQST0031"/>
       </result>
    </test-case>
+   
+   <test-case name="version_declaration-009">
+      <description> A VersionDecl cannot appear after a prolog decl. </description>
+      <created by="Pulkita Tyagi" on="2005-10-05"/>
+      <test>declare boundary-space preserve; xquery version "1.0"; 1,2</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="version_declaration-010">
+      <description> Asterisk is not allowed in EncName. </description>
+      <created by="Carmelo Montanez" on="2005-02-06"/>
+      <modified by="Michael Dyck" on="2012-09-10" change="Add dependency on XQ10"/>
+      <dependency type="spec" value="XQ10"/>
+      <test>xquery version "1.0" encoding "999-UTF-8-*"; "ABC"</test>
+      <result>
+         <error code="XQST0087"/>
+      </result>
+   </test-case>
+   
+   <test-case name="version_declaration-010-v3">
+      <description> Asterisk is not allowed in EncName. </description>
+      <created by="Michael Dyck" on="2012-09-10"/>
+      <modified by="O'Neil Delpratt" on="2014-12-16" change="Bug fix relating #27180: Added + to dependency value" />
+      <dependency type="spec" value="XQ30+"/>
+      <test>xquery version "3.0" encoding "999-UTF-8-*"; "ABC"</test>
+      <result>
+         <error code="XQST0087"/>
+      </result>
+   </test-case>
+   
+   <test-case name="version_declaration-014">
+      <description>The version must contain two integers separated by ".". </description>
+      <created by="Michael Kay" on="2023-10-26"/>
+      <test>xquery version "4.0.0"; 1,2</test>
+      <result>
+         <error code="XQST0031"/>
+      </result>
+   </test-case>
+   
+   <test-case name="version_declaration-015">
+      <description>The version must contain two integers separated by ".", so 04.00 == 4.0. </description>
+      <created by="Michael Kay" on="2023-10-26"/>
+      <dependency type="spec" value="XQ40"/>
+      <test>xquery version "04.00"; `ok`</test>
+      <result>
+         <assert-eq>"ok"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="version_declaration-016">
+      <description>The version must contain two integers separated by ".", so 3.01 == 3.1. </description>
+      <created by="Michael Kay" on="2023-10-26"/>
+      <dependency type="spec" value="XQ40"/>
+      <test>xquery version "3.01"; ["ok"]</test>
+      <result>
+         <assert-deep-eq>["ok"]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="version_declaration-017">
+      <description>The version must contain two integers separated by ".", so 3.10 != 3.1. </description>
+      <created by="Michael Kay" on="2023-10-26"/>
+      <dependency type="spec" value="XQ31"/>
+      <test>xquery version "3.10"; 93.7</test>
+      <result>
+         <any-of>
+            <assert-eq>93.7</assert-eq>
+            <error code="XQST0031"/>
+         </any-of>
+      </result>
+   </test-case>
 
    <test-case name="version_declaration-021">
       <description> "2.0" is a plausible version string, but not supported. </description>
@@ -257,27 +321,7 @@
             /* Encoding name contains only Latin characters */
    -->
 
-   <test-case name="version_declaration-010">
-      <description> Asterisk is not allowed in EncName. </description>
-      <created by="Carmelo Montanez" on="2005-02-06"/>
-      <modified by="Michael Dyck" on="2012-09-10" change="Add dependency on XQ10"/>
-      <dependency type="spec" value="XQ10"/>
-      <test>xquery version "1.0" encoding "999-UTF-8-*"; "ABC"</test>
-      <result>
-         <error code="XQST0087"/>
-      </result>
-   </test-case>
-
-   <test-case name="version_declaration-010-v3">
-      <description> Asterisk is not allowed in EncName. </description>
-      <created by="Michael Dyck" on="2012-09-10"/>
-      <modified by="O'Neil Delpratt" on="2014-12-16" change="Bug fix relating #27180: Added + to dependency value" />
-      <dependency type="spec" value="XQ30+"/>
-      <test>xquery version "3.0" encoding "999-UTF-8-*"; "ABC"</test>
-      <result>
-         <error code="XQST0087"/>
-      </result>
-   </test-case>
+   
 
    <test-case name="K-VersionProlog-3">
       <description> Whitespace is not allowed in EncName. </description>
