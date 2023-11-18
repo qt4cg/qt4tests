@@ -6,7 +6,7 @@
   <test-case name="iterate-while-001">
     <description>Test successful at first call (no error)</description>
     <created by="Christian Gruen" on="2022-10-13"/>
-    <test><![CDATA[fn:iterate-while(1, not#1, function($_) { error() })]]></test>
+    <test><![CDATA[iterate-while(1, not#1, function($_) { error() })]]></test>
     <result>
       <assert-eq>1</assert-eq>
     </result>
@@ -14,7 +14,7 @@
   <test-case name="iterate-while-002">
     <description>Test fails</description>
     <created by="Christian Gruen" on="2022-10-13"/>
-    <test><![CDATA[fn:iterate-while(1, boolean#1, function($_) { error() })]]></test>
+    <test><![CDATA[iterate-while(1, boolean#1, function($_) { error() })]]></test>
     <result>
       <error code="FOER0000"/>
     </result>
@@ -22,7 +22,7 @@
   <test-case name="iterate-while-003">
     <description>Test successful at first call</description>
     <created by="Christian Gruen" on="2022-10-13"/>
-    <test><![CDATA[fn:iterate-while(1, empty#1, identity#1)]]></test>
+    <test><![CDATA[iterate-while(1, empty#1, identity#1)]]></test>
     <result>
       <assert-eq>1</assert-eq>
     </result>
@@ -30,7 +30,7 @@
   <test-case name="iterate-while-004">
     <description>One iteration, return string of empty sequence</description>
     <created by="Christian Gruen" on="2022-10-13"/>
-    <test><![CDATA[fn:iterate-while((), empty#1, string#1)]]></test>
+    <test><![CDATA[iterate-while((), empty#1, string#1)]]></test>
     <result>
       <assert-string-value/>
     </result>
@@ -38,7 +38,7 @@
   <test-case name="iterate-while-005">
     <description>Skip numbers smaller than 23</description>
     <created by="Christian Gruen" on="2022-10-13"/>
-    <test><![CDATA[fn:iterate-while((21 to 24), function($s) { head($s) < 23 }, tail#1)]]></test>
+    <test><![CDATA[iterate-while((21 to 24), function($s) { head($s) < 23 }, tail#1)]]></test>
     <result>
       <assert-deep-eq>23, 24</assert-deep-eq>
     </result>
@@ -47,7 +47,7 @@
     <description>Decrement integers in sequence until sum is small enough</description>
     <created by="Christian Gruen" on="2022-10-13"/>
     <test><![CDATA[
-      fn:iterate-while((6 to 8), function($s) { sum($s) > 10 }, function($s) { $s ! (. - 1) })
+      iterate-while((6 to 8), function($s) { sum($s) > 10 }, function($s) { $s ! (. - 1) })
     ]]></test>
     <result>
       <assert-deep-eq>2, 3, 4</assert-deep-eq>
@@ -57,7 +57,7 @@
     <description>Skip items of a sequence until one of two conditions is met</description>
     <created by="Christian Gruen" on="2022-10-13"/>
     <test><![CDATA[
-      fn:iterate-while(
+      iterate-while(
         reverse(1 to 100),
         function($s) { sum($s) > 20 or head($s) > 4 },
         function($s) { tail($s) }
@@ -71,7 +71,7 @@
     <description>Increment integer until limit is reached</description>
     <created by="Christian Gruen" on="2022-10-13"/>
     <test><![CDATA[
-      fn:iterate-while(1, function($x) { $x < 10000 }, function($x) { $x + 1 })
+      iterate-while(1, function($x) { $x < 10000 }, function($x) { $x + 1 })
     ]]></test>
     <result>
       <assert-eq>10000</assert-eq>
@@ -81,7 +81,7 @@
     <description>Double integer value until limit is reached</description>
     <created by="Christian Gruen" on="2022-10-13"/>
     <test><![CDATA[
-      fn:iterate-while(2, function($x) { $x < 1000 }, function($x) { $x * $x })
+      iterate-while(2, function($x) { $x < 1000 }, function($x) { $x * $x })
     ]]></test>
     <result>
       <assert-eq>65536</assert-eq>
@@ -91,7 +91,7 @@
     <description>Double length of sequence until limit is reached</description>
     <created by="Christian Gruen" on="2022-10-13"/>
     <test><![CDATA[
-      fn:iterate-while(1, function($x) { count($x) < 3 }, function($x) { $x, $x })
+      iterate-while(1, function($x) { count($x) < 3 }, function($x) { $x, $x })
     ]]></test>
     <result>
       <assert-deep-eq>1, 1, 1, 1</assert-deep-eq>
@@ -101,7 +101,7 @@
     <description>Drop first and last items of a sequence</description>
     <created by="Christian Gruen" on="2022-10-13"/>
     <test><![CDATA[
-      fn:iterate-while(
+      iterate-while(
         (1 to 100),
         function($s) { $s[last()] - $s[1] > 1 },
         function($s) { subsequence($s, 2, count($s) - 2) }
@@ -115,7 +115,7 @@
     <description>Swap numeric type of item</description>
     <created by="Christian Gruen" on="2022-10-13"/>
     <test><![CDATA[
-      fn:iterate-while(
+      iterate-while(
         1e0,
         function($x) { $x instance of xs:float },
         function($x) { if($x instance of xs:double) then xs:float($x) else xs:double($x) }
@@ -129,7 +129,7 @@
     <description>Iteratively change numeric type of item</description>
     <created by="Christian Gruen" on="2022-10-13"/>
     <test><![CDATA[
-      fn:iterate-while(
+      iterate-while(
         1,
         function($x) { not($x instance of xs:byte) },
         function($x) { if($x instance of xs:short) then xs:byte($x) else xs:short($x) }
@@ -143,7 +143,7 @@
     <description>Remove characters from a string until searched character is not found</description>
     <created by="Christian Gruen" on="2022-10-13"/>
     <test><![CDATA[
-      fn:iterate-while(
+      iterate-while(
         map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' },
         function($x) { characters($x?string) = $x?remove },
         function($x) { map {
@@ -161,7 +161,7 @@
     <created by="Christian Gruen" on="2022-10-13"/>
     <test><![CDATA[
       let $s := (1 to 1000)
-      return fn:iterate-while(1, function($x) { $x = $s }, function($x) { $x + 1 })
+      return iterate-while(1, function($x) { $x = $s }, function($x) { $x + 1 })
     ]]></test>
     <result>
       <assert-eq>1001</assert-eq>
@@ -172,7 +172,7 @@
     <created by="Christian Gruen" on="2022-10-13"/>
     <test><![CDATA[
       let $i := 3936256
-      return fn:iterate-while(
+      return iterate-while(
         $i,
         function($x) { abs($x * $x - $i) >= 0.0000000001 },
         function($x) { ($x + $i div $x) div 2 }
@@ -180,6 +180,118 @@
     ]]></test>
     <result>
       <assert-eq>1984</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="iterate-while-017">
+    <description>Static predicate (1)</description>
+    <created by="Christian Gruen" on="2023-11-18"/>
+    <test><![CDATA[iterate-while(1, false#0, identity#1)]]></test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="iterate-while-018">
+    <description>Static predicate (2)</description>
+    <created by="Christian Gruen" on="2023-11-18"/>
+    <test><![CDATA[iterate-while((1, 2), false#0, identity#1)]]></test>
+    <result>
+      <assert-deep-eq>1, 2</assert-deep-eq>
+    </result>
+  </test-case>
+  <test-case name="iterate-while-019">
+    <description>Positional argument, static action</description>
+    <created by="Christian Gruen" on="2023-11-18"/>
+    <test><![CDATA[head(iterate-while((1, 2), fn($x, $p) { $p < 2 }, identity#1))]]></test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="iterate-while-020">
+    <description>Positional argument, dynamic action</description>
+    <created by="Christian Gruen" on="2023-11-18"/>
+    <test><![CDATA[head(iterate-while((1, 2), fn($x, $p) { $p < 2 }, fn($s as xs:integer+) { $s[2], $s[1] }))]]></test>
+    <result>
+      <assert-eq>2</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="iterate-while-021">
+    <description>Positional argument, positional action</description>
+    <created by="Christian Gruen" on="2023-11-18"/>
+    <test><![CDATA[iterate-while(1, fn($_, $p) { $p <= 10 }, op('*'))]]></test>
+    <result>
+      <assert-eq>3628800</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="iterate-while-022">
+    <description>Positional argument, positional action</description>
+    <created by="Christian Gruen" on="2023-11-18"/>
+    <test>iterate-while(1, op('='), op('+'))</test>
+    <result>
+      <assert-eq>4</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="iterate-while-023">
+    <description>Positional arguments, dynamic actions</description>
+    <created by="Christian Gruen" on="2023-11-18"/>
+    <test><![CDATA[
+for $pred in (false#0, op('='))
+for $action in (identity#1, op('+'))
+return iterate-while(1, $pred, $action)]]></test>
+    <result>
+      <assert-deep-eq>1, 1, 1, 4</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="iterate-while-error-001">
+    <description>Wrong predicate type</description>
+    <created by="Christian Gruen" on="2023-11-18"/>
+    <test><![CDATA[
+head(iterate-while(
+  (1, 2),
+  fn($x as xs:integer, $p) { $p < 2 },
+  fn($s) { $s[2], $s[1] }
+))]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  <test-case name="iterate-while-error-002">
+    <description>Wrong predicate type</description>
+    <created by="Christian Gruen" on="2023-11-18"/>
+    <test><![CDATA[
+head(iterate-while(
+  (1, 2),
+  fn($x, $p as xs:string) { $p < 2 },
+  fn($s) { $s[2], $s[1] }
+))]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  <test-case name="iterate-while-error-003">
+    <description>Wrong action type</description>
+    <created by="Christian Gruen" on="2023-11-18"/>
+    <test><![CDATA[
+head(iterate-while(
+  (1, 2),
+  fn($x, $p) { $p < 2 },
+  fn($s as xs:integer) { $s[2], $s[1] }
+))]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  <test-case name="iterate-while-error-004">
+    <description>Wrong action type</description>
+    <created by="Christian Gruen" on="2023-11-18"/>
+    <test><![CDATA[
+head(iterate-while(
+  (1, 2),
+  fn($x, $p) { $p < 2 },
+  fn($s, $p as xs:string) { $s[2], $s[1] }
+))]]></test>
+    <result>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
 </test-set>
