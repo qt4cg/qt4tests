@@ -341,7 +341,7 @@
       <dependency type="spec" value="XP30+ XQ30+"/>
       <test>fn:filter( 1 to 10, function($arg) { if ($arg eq 100) then 0 else fn:true()})</test>
       <result>
-	<assert-count>10</assert-count>
+	      <assert-count>10</assert-count>
       </result>
    </test-case>
 
@@ -372,7 +372,7 @@
       <dependency type="spec" value="XP30+ XQ30+"/>
       <test>fn:filter( 1 to 10, function($arg) { if ($arg eq 100) then (fn:true(), fn:false()) else fn:true()})</test>
       <result>
-	<assert-count>10</assert-count>
+	      <assert-count>10</assert-count>
       </result>
    </test-case>
 
@@ -408,6 +408,26 @@
       </result>
    </test-case>
    
+   <test-case name="fn-filter-024">
+      <description>Evaluates the "filter" function with $f set to a simple system function.</description>
+      <created by="Michael Kay" on="2023-11-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:filter((12e0, 13e0, 14e0, number('NaN')), is-NaN#1 )</test>
+      <result>
+         <assert-deep-eq>number('NaN')</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-filter-025">
+      <description>Evaluates the "filter" function with $f set to a curried system function.</description>
+      <created by="Michael Kay" on="2023-11-30"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>fn:filter(("John", "Jane", "Sue", "Mark"), contains(?, "e") )</test>
+      <result>
+         <assert-deep-eq>"Jane", "Sue"</assert-deep-eq>
+      </result>
+   </test-case>
+   
    <test-case name="fn-filter-401" covers-40="arity-coercion">
       <description>Supply a callback with fewer arguments than expected</description>
       <created by="Michael Kay" on="2023-05-20"/>
@@ -425,6 +445,48 @@
       <test>fn:filter(1 to 10, false#0 )</test>
       <result>
          <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-filter-403" covers-40="arity-coercion">
+      <description>Supply a callback with a position argument</description>
+      <created by="Michael Kay" on="2023-11-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:filter(10 to 20, fn($it, $pos){$pos gt 5} )</test>
+      <result>
+         <assert-deep-eq>15 to 20</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-filter-404" covers-40="arity-coercion">
+      <description>Supply a callback using both arguments</description>
+      <created by="Michael Kay" on="2023-11-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:filter(10 to 20, fn($it, $pos){$it gt 12 and $pos mod 2 = 1} )</test>
+      <result>
+         <assert-deep-eq>14, 16, 18, 20</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-filter-405" covers-40="arity-coercion">
+      <description>Supply a callback where position requires a double</description>
+      <created by="Michael Kay" on="2023-11-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:filter(10 to 20, fn($it as xs:integer, $pos as xs:double) as xs:boolean {
+         $it gt 12 and $pos instance of xs:double} )</test>
+      <result>
+         <assert-deep-eq>13 to 20</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-filter-406" covers-40="arity-coercion">
+      <description>Supply a callback where position requires a long</description>
+      <created by="Michael Kay" on="2023-11-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:filter(10 to 20, fn($it as xs:integer, $pos as xs:long) as xs:boolean {
+         $it gt 12 and $pos instance of xs:long} )</test>
+      <result>
+         <assert-deep-eq>13 to 20</assert-deep-eq>
       </result>
    </test-case>
    
