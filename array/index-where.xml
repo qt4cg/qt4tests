@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="array-array:index-where" covers-40="array-array:index-where">
+  <description>Tests for the array:array:index-where() function (4.0 proposal)</description>
+  <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-array-array:index-where"/>
+
+  <dependency type="feature" value="higherOrderFunctions"/>
+  <dependency type="spec" value="XP40+ XQ40+"/>
+  
+  <test-case name="array-index-where-001">
+    <description>Empty array</description>
+    <created by="Michael Kay" on="2020-02-09"/>
+    <test>array:index-where([], function($x) {true()})</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="array-index-where-002">
+    <description>No matches</description>
+    <created by="Michael Kay" on="2020-02-09"/>
+    <test>array:index-where(array{1 to 100}, function($x) {$x lt 0})</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="array-index-where-003">
+    <description>All matches</description>
+    <created by="Michael Kay" on="2020-02-09"/>
+    <test>array:index-where(array{1 to 100}, function($x) {$x gt 0})</test>
+    <result>
+      <assert-deep-eq>1 to 100</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-index-where-004">
+    <description>Selective matches</description>
+    <created by="Michael Kay" on="2020-02-09"/>
+    <test>array:index-where(array{1 to 100}, function($x) {$x mod 30 = 0})</test>
+    <result>
+      <assert-deep-eq>30, 60, 90</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-index-where-005">
+    <description>Zero-arity callback function</description>
+    <created by="Michael Kay" on="2023-11-30"/>
+    <test>array:index-where(array{101 to 200}, true#0)</test>
+    <result>
+      <assert-deep-eq>1 to 100</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-index-where-006">
+    <description>Zero-arity callback function</description>
+    <created by="Michael Kay" on="2023-11-30"/>
+    <test>array:index-where(array{101 to 200}, false#0)</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="array-index-where-007">
+    <description>Arity-2 callback function</description>
+    <created by="Michael Kay" on="2023-11-30"/>
+    <test>array:index-where(array{1 to 20, 22 to 50}, fn($it, $pos){$it=$pos})</test>
+    <result>
+      <assert-deep-eq>1 to 20</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-index-where-008">
+    <description>Arity-2 callback function</description>
+    <created by="Michael Kay" on="2023-11-30"/>
+    <test>array:index-where(array{100 to 200}, fn($it, $pos){$pos gt 80})</test>
+    <result>
+      <assert-deep-eq>81 to 101</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-index-where-009">
+    <description>Select empty members</description>
+    <created by="Michael Kay" on="2023-11-30"/>
+    <test>array:index-where([1, 2, 3, [], 5, [], 7], deep-equal(?, []))</test>
+    <result>
+      <assert-deep-eq>4, 6</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-index-where-010">
+    <description>Select sequence members</description>
+    <created by="Michael Kay" on="2023-11-30"/>
+    <test>array:index-where([1, 2, 3, (10, 11, 12), 5, (20, 21, 22), 7], fn($mem){count($mem) gt 1})</test>
+    <result>
+      <assert-deep-eq>4, 6</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-index-where-100">
+    <description>Empty sequence, named function reference</description>
+    <created by="Christian Gruen" on="2022-08-10"/>
+    <test><![CDATA[array:index-where([], boolean#1)]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  <test-case name="array-index-where-101">
+    <description>Single integer, named function reference</description>
+    <created by="Christian Gruen" on="2022-08-10"/>
+    <test><![CDATA[array:index-where([0], boolean#1)]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  <test-case name="array-index-where-102">
+    <description>Single integer, named function reference</description>
+    <created by="Christian Gruen" on="2022-08-10"/>
+    <test><![CDATA[array:index-where([1], boolean#1)]]></test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="array-index-where-103">
+    <description>Integer sequence, named function reference</description>
+    <created by="Christian Gruen" on="2022-08-10"/>
+    <test><![CDATA[array:index-where([0, 4, 9], boolean#1)]]></test>
+    <result>
+      <assert-deep-eq>2, 3</assert-deep-eq>
+    </result>
+  </test-case>
+  <test-case name="array-index-where-104">
+    <description>Function item</description>
+    <created by="Christian Gruen" on="2022-08-10"/>
+    <test><![CDATA[array:index-where(array{1 to 9}, function($n) { $n mod 5 = 0 })]]></test>
+    <result>
+      <assert-eq>5</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="array-index-where-105">
+    <description>Partial function application</description>
+    <created by="Christian Gruen" on="2022-08-10"/>
+    <test><![CDATA[array:index-where(['January', 'February', 'March', 'April', 'May', 'June', 'July', 
+      'August', 'September', 'October', 'November', 'December'], contains(?, 'z'))]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  <test-case name="array-index-where-106">
+    <description>Partial function application</description>
+    <created by="Christian Gruen" on="2022-08-10"/>
+    <test><![CDATA[array:index-where(['January', 'February', 'March', 'April', 'May', 'June', 'July', 
+      'August', 'September', 'October', 'November', 'December'], contains(?, 'v'))]]></test>
+    <result>
+      <assert-eq>11</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="array-index-where-107">
+    <description>Partial function application</description>
+    <created by="Christian Gruen" on="2022-08-10"/>
+    <test><![CDATA[array:index-where(['January', 'February', 'March', 'April', 'May', 'June', 'July', 
+      'August', 'September', 'October', 'November', 'December'], starts-with(?, 'J'))]]></test>
+    <result>
+      <assert-deep-eq>1, 6, 7</assert-deep-eq>
+    </result>
+  </test-case>
+  <test-case name="array-index-where-108">
+    <description>Filter expression, named function reference</description>
+    <created by="Christian Gruen" on="2022-08-10"/>
+    <test><![CDATA[array:index-where(array{(0 to 5)[. = 0]}, not#1)]]></test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+  <test-case name="array-index-where-109">
+    <description>Filter expression, named function reference</description>
+    <created by="Christian Gruen" on="2022-08-10"/>
+    <test><![CDATA[array:index-where(array{(0 to 5)[. = 6]}, not#1)]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+</test-set>
