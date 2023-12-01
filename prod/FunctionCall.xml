@@ -1194,6 +1194,24 @@
       </result>
    </test-case>
    
+   <test-case name="FunctionCall-417" covers-40="keywords">
+      <description>Coercion of reduced-arity function that has a higher arity variant</description>
+      <created by="Michael Kay" on="2023-12-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:f($x as xs:string, $y as xs:string, $z as xs:string := '1900-01-01') as xs:string {
+           concat($x, '-', $y, ' on ', $z)
+         };
+         declare function local:g($x as xs:string, $z as function(xs:string, xs:string, xs:integer) as xs:string) {
+           $z($x, $x, 22)
+         };  
+         local:g("ABC", local:f#2)
+      ]]></test>
+      <result>
+         <assert-eq>"ABC-ABC on 1900-01-01"</assert-eq>
+      </result>
+   </test-case>
+   
    <test-case name="K-FunctionCallExpr-1">
       <description> A test whose essence is: `func-does-not-exist(1, 2, 3)`. </description>
       <created by="Frans Englich" on="2007-11-26"/>
