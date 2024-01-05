@@ -176,7 +176,7 @@
    <test-case name="DeepLookup-015">
       <description>Result of Binary lookup is atomized</description>
       <created by="Michael Kay" on="2023-11-26"/>
-      <test>([1, [2], [3]], [[2], 2, [4]])[ .??1 = .??2 ]</test>
+      <test>([1, [2], [3]], [[2], 2, [4]])[ .??1 = 4 ]</test>
       <result>
          <assert-deep-eq>[[2], 2, [4]]</assert-deep-eq>
       </result>
@@ -234,22 +234,23 @@
    </test-case>
 
    <test-case name="DeepLookup-021">
-      <description>Subscript is atomized, and untypedAtomic is converted to xs:integer</description>
+      <description>Subscript is atomized, and untypedAtomic is NOT converted to xs:integer</description>
       <created by="Michael Kay" on="2023-11-26"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         let $x := (<x>1</x>, <y>2</y>) return
-        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[.??($x) = 'b']
+        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[.??($x, 2) = 'b']
       ]]></test>
       <result>
-         <assert-deep-eq>(['a', 'b', 'c'], ['b', 'c', 'd'])</assert-deep-eq>
+         <assert-deep-eq>(['a', 'b', 'c'])</assert-deep-eq>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-022">
       <description>Filtering a sequence of arrays produced using ??*</description>
       <created by="Michael Kay" on="2023-11-26"/>
-      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]??*[.??1 = 'a']</test>
+      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]??*
+               [.??1 instance of xs:string and .??1 = 'a']</test>
       <result>
          <assert-deep-eq>['a', 'b', 'c']</assert-deep-eq>
       </result>
@@ -399,7 +400,7 @@
       <dependency type="spec" value="XP31+ XQ31+"/>
       <test>(['a', 'b'], ['c', 'd'], ['e'])??2</test>
       <result>
-         <assert-empty/>
+         <assert-deep-eq>'b', 'd'</assert-deep-eq>
       </result>
    </test-case>
 
@@ -535,12 +536,12 @@
    </test-case>
 
    <test-case name="DeepLookup-121">
-      <description>Subscript is atomized, and untypedAtomic is converted to xs:integer</description>
+      <description>Subscript is atomized, but untypedAtomic is not converted to xs:integer</description>
       <created by="Michael Kay" on="2023-11-26"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         let $x := (<x>1</x>, <y>2</y>) return
-        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??($x)
+        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??($x!number())
       ]]></test>
       <result>
          <assert-deep-eq>'a', 'b', 'b', 'c', 'e', 'f'</assert-deep-eq>
@@ -883,7 +884,7 @@
    <test-case name="DeepLookup-206">
       <description>Deep Lookup in 2D map</description>
       <created by="Michael Kay" on="2023-11-26"/>
-      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1}}??true()</test>
+      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1}}??(true())</test>
       <result>
          <assert-permutation>0,1</assert-permutation>
       </result>
@@ -892,7 +893,7 @@
    <test-case name="DeepLookup-207">
       <description>Deep Lookup in 2D map</description>
       <created by="Michael Kay" on="2023-11-26"/>
-      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1},'z':3,true():77}??true()</test>
+      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1},'z':3,true():77}??(true())</test>
       <result>
          <assert-permutation>0,1,77</assert-permutation>
       </result>
@@ -916,7 +917,7 @@
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-209">
+   <test-case name="DeepLookup-210">
       <description>Deep Lookup, type-qualified wildcard, in mixed maps and arrays</description>
       <created by="Michael Kay" on="2023-11-26"/>
       <test>[map{1:'x',2:'y'},['p','q']]??*::xs:string</test>
@@ -925,7 +926,7 @@
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-210">
+   <test-case name="DeepLookup-211">
       <description>Deep Lookup, type-qualified wildcard, in mixed maps and arrays</description>
       <created by="Michael Kay" on="2023-11-26"/>
       <test>[map{1:'x',2:'y'},['p','q']]??*::map(*)</test>
@@ -934,7 +935,7 @@
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-211">
+   <test-case name="DeepLookup-212">
       <description>Deep Lookup, type-qualified wildcard, in mixed maps and arrays</description>
       <created by="Michael Kay" on="2023-11-26"/>
       <test>[map{1:'x',2:'y'},['p','q']]??*::array(*)</test>
@@ -977,7 +978,10 @@
       <test>$m?store?*</test>
       <result>
          <all-of>
-            
+            <assert>count($result) = 2</assert>
+            <assert>$result[1] instance of record(color, price)</assert>
+            <assert>$result[2] instance of array(record(author, price, category, *)*)</assert>
+            <assert>array:size($result[2]) = 4</assert>
          </all-of>
       </result>
    </test-case>
@@ -989,8 +993,8 @@
       <test>$m?store??price</test>
       <result>
          <any-of>
-            <assert-deep-eq>8.95, 12.99, 8.99, 22.99, 399</assert-deep-eq>
-            <assert-deep-eq>399, 8.95, 12.99, 8.99, 22.99</assert-deep-eq>
+            <assert-deep-eq>8.95e0, 12.99e0, 8.99e0, 22.99e0, 399e0</assert-deep-eq>
+            <assert-deep-eq>399e0, 8.95e0, 12.99e0, 8.99e0, 22.99e0</assert-deep-eq>
          </any-of>
       </result>
    </test-case>
@@ -1069,8 +1073,8 @@
       <test>$m??book?*[?price lt 10]</test>
       <result>
          <assert-deep-eq>
-            map{"author":"Nigel Rees","price":8.95,"category":"reference","title":"Sayings of the Century"},
-            map{"author":"Herman Melville","price":8.99,"isbn":"0-553-21311-3","category":"fiction","title":"Moby Dick"}
+            map{"author":"Nigel Rees","price":8.95e0,"category":"reference","title":"Sayings of the Century"},
+            map{"author":"Herman Melville","price":8.99e0,"isbn":"0-553-21311-3","category":"fiction","title":"Moby Dick"}
          </assert-deep-eq>
       </result>
    </test-case>
@@ -1080,17 +1084,30 @@
          contained in the input value</description>
       <created by="Michael Kay" on="2023-11-26"/>
       <environment ref="jsonpath"/>
-      <test>$m??*</test>
+      <test>$m??*::union(xs:string, xs:double)</test>
       <result>
-         <assert-deep-eq>
-           map{"store":
-              map{"bicycle":map{"color":"red","price":3.99e2},
-                  "book":[map{"author":"Nigel Rees","price":8.95e0,"category":"reference","title":"Sayings of the Century"},
-                          map{"author":"Evelyn Waugh","price":1.299e1,"category":"fiction","title":"Sword of Honour"},
-                          map{"author":"Herman Melville","price":8.99e0,"isbn":"0-553-21311-3","category":"fiction","title":"Moby Dick"},
-                          map{"author":"J. R. R. Tolkien","price":2.299e1,"isbn":"0-395-19395-8","category":"fiction","title":"The Lord of the Rings"}]
-                 }}
-         </assert-deep-eq>
+         <assert-permutation>
+            "red",
+            3.99e2,
+            "Nigel Rees",
+            8.95e0,
+            "reference",
+            "Sayings of the Century",
+            "Evelyn Waugh",
+            1.299e1,
+            "fiction",
+            "Sword of Honour",
+            "Herman Melville",
+            8.99e0,
+            "0-553-21311-3",
+            "fiction",
+            "Moby Dick",
+            "J. R. R. Tolkien",
+            2.299e1,
+            "0-395-19395-8",
+            "fiction",
+            "The Lord of the Rings"
+         </assert-permutation>
       </result>
    </test-case>
    
