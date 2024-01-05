@@ -138,6 +138,125 @@
             <error code="XPTY0004"/>
         </result>
     </test-case>
+    
+    <test-case name="array-for-each-pair-401">
+        <description>for-each-pair: arity-3 callback</description>
+        <created by="Michael Kay, Saxonica" on="2023-12-01"/>
+        <environment ref="array"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>array:for-each-pair(['a', 'b', 'c'], [1, 2, 4], fn($x,$y,$p){$x=format-integer($y,'a') or $p gt 2})</test>
+        <result>
+            <assert-deep-eq>[true(), true(), true()]</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="array-for-each-pair-402">
+        <description>for-each-pair: arity-3 callback</description>
+        <created by="Michael Kay, Saxonica" on="2023-12-01"/>
+        <environment ref="array"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>array:for-each-pair([1,2,3,4], [2,4,6,8], fn($x,$y,$p){$y=$x+$p})</test>
+        <result>
+            <assert-deep-eq>[true(), true(), true(), true()]</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="array-for-each-pair-410">
+        <description>for-each-pair: arity-0 callback</description>
+        <created by="Michael Kay, Saxonica" on="2023-12-01"/>
+        <environment ref="array"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>array:for-each-pair(['a', 'b', 'c'], [1, 2, 4], true#0)</test>
+        <result>
+            <assert-deep-eq>[true(), true(), true()]</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="array-for-each-pair-411">
+        <description>for-each-pair: arity-1 callback</description>
+        <created by="Michael Kay, Saxonica" on="2023-12-01"/>
+        <environment ref="array"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>array:for-each-pair(['a', 'b', number('NaN')], [1, 2, 4], is-NaN#1)</test>
+        <result>
+            <assert-deep-eq>[false(), false(), true()]</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="array-for-each-pair-420">
+        <description>Compare different equality operators (see appendix I of XQuery spec)</description>
+        <created by="Michael Kay, Saxonica" on="2023-12-05"/>
+        <environment>
+            <collation default="true" uri="http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"/>
+        </environment>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+            let $a := [(), 12, (1,2), 12,   0.2,   number('NaN'), 0e0,  "A", <e>A</e>, <e>12</e>, xs:time('12:00:00Z'), adjust-time-to-timezone(xs:time('13:00:00'))]
+            let $b := [(), (), (2,3), 12e0, 0.2e0, number('NaN'), -0e0, "a", "A", 12, xs:time('13:00:00+01:00'), xs:time('13:00:00')]
+            let $str := fn($mem){`({serialize($mem, map{'method':'adaptive'})})`}
+            for $comp in (["=", op('=')], ["eq", op('eq')], ["DE", deep-equal#2], ["AE", atomic-equal#2])
+            return array:for-each-pair($a, $b, fn($a, $b) {
+               try {
+                  `{$str($a)} {$comp?1} {$str($b)} : {$str($comp?2($a, $b))}`
+               } catch * {
+                  `error {$err:code}`
+               }
+            })?*   
+        ]]></test>
+        <result>
+            <all-of>
+                <assert>$result[1] = "() = () : (false())"</assert>
+                <assert>$result[2] = "(12) = () : (false())"</assert>
+                <assert>normalize-space($result[3]) = normalize-space("(1 2) = (2 3) : (true())")</assert>
+                <assert>$result[4] = "(12) = (1.2e1) : (true())"</assert>
+                <assert>$result[5] = "(0.2) = (2.0e-1) : (true())"</assert>
+                <assert>$result[6] = "(NaN) = (NaN) : (false())"</assert>
+                <assert>$result[7] = "(0.0e0) = (-0.0e0) : (true())"</assert>
+                <assert>$result[8] = "(""A"") = (""a"") : (true())"</assert>
+                <assert><![CDATA[$result[9] = "(<e>A</e>) = (""A"") : (true())"]]></assert>
+                <assert><![CDATA[$result[10] = "(<e>12</e>) = (12) : (true())"]]></assert>
+                <assert>$result[11] = "(xs:time(""12:00:00Z"")) = (xs:time(""13:00:00+01:00"")) : (true())"</assert>
+                <assert>$result[12] => ends-with("(true())")</assert>
+                <assert>$result[13] = "() eq () : ()"</assert>
+                <assert>$result[14] = "(12) eq () : ()"</assert>
+                <assert>$result[15] = "error err:XPTY0004"</assert>
+                <assert>$result[16] = "(12) eq (1.2e1) : (true())"</assert>
+                <assert>$result[17] = "(0.2) eq (2.0e-1) : (true())"</assert>
+                <assert>$result[18] = "(NaN) eq (NaN) : (false())"</assert>
+                <assert>$result[19] = "(0.0e0) eq (-0.0e0) : (true())"</assert>
+                <assert>$result[20] = "(""A"") eq (""a"") : (true())"</assert>
+                <assert><![CDATA[$result[21] = "(<e>A</e>) eq (""A"") : (true())"]]></assert>
+                <assert>$result[22] = "error err:XPTY0004"</assert>
+                <assert>$result[23] = "(xs:time(""12:00:00Z"")) eq (xs:time(""13:00:00+01:00"")) : (true())"</assert>
+                <assert>$result[24] => ends-with("(true())")</assert>
+                <assert>$result[25] = "() DE () : (true())"</assert>
+                <assert>$result[26] = "(12) DE () : (false())"</assert>
+                <assert>normalize-space($result[27]) = normalize-space("(1 2) DE (2 3) : (false())")</assert>
+                <assert>$result[28] = "(12) DE (1.2e1) : (true())"</assert>
+                <assert>$result[29] = "(0.2) DE (2.0e-1) : (false())"</assert>
+                <assert>$result[30] = "(NaN) DE (NaN) : (true())"</assert>
+                <assert>$result[31] = "(0.0e0) DE (-0.0e0) : (true())"</assert>
+                <assert>$result[32] = "(""A"") DE (""a"") : (true())"</assert>
+                <assert><![CDATA[$result[33] = "(<e>A</e>) DE (""A"") : (false())"]]></assert>
+                <assert><![CDATA[$result[34] = "(<e>12</e>) DE (12) : (false())"]]></assert>
+                <assert>$result[35] = "(xs:time(""12:00:00Z"")) DE (xs:time(""13:00:00+01:00"")) : (true())"</assert>
+                <assert>$result[36] => ends-with("(true())")</assert>
+                <assert>$result[37] = "error err:XPTY0004"</assert>
+                <assert>$result[38] = "error err:XPTY0004"</assert>
+                <assert>$result[39] = "error err:XPTY0004"</assert>
+                <assert>$result[40] = "(12) AE (1.2e1) : (true())"</assert>
+                <assert>$result[41] = "(0.2) AE (2.0e-1) : (false())"</assert>
+                <assert>$result[42] = "(NaN) AE (NaN) : (true())"</assert>
+                <assert>$result[43] = "(0.0e0) AE (-0.0e0) : (true())"</assert>
+                <assert>$result[44] = "(""A"") AE (""a"") : (false())"</assert>
+                <assert><![CDATA[$result[45] = "(<e>A</e>) AE (""A"") : (true())"]]></assert>
+                <assert><![CDATA[$result[46] = "(<e>12</e>) AE (12) : (false())"]]></assert>
+                <assert>$result[47] = "(xs:time(""12:00:00Z"")) AE (xs:time(""13:00:00+01:00"")) : (true())"</assert>
+                <assert>$result[48] => ends-with("(false())")</assert>
+                
+            </all-of>
+        </result>
+    </test-case>
 
 
 </test-set>

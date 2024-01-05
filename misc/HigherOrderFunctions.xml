@@ -1930,4 +1930,69 @@ return string($a)
       </result>
    </test-case>
    
+   <test-case name="xqhof40">
+      <description>Partial apply with invalid type argument. 4.0 mandates an error; 3.1 doesn't say.</description>
+      <created by="Michael Kay" on="2023-12-12"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test>
+         function-arity(contains(?, 42))
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="xqhof41">
+      <description>Partial apply with invalid type argument, detected at evaluation time. 
+         4.0 mandates an error; 3.1 doesn't say.</description>
+      <created by="Michael Kay" on="2023-12-12"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test>
+         let $p := if (current-date() lt xs:date('1900-01-01')) then 'abc' else 42
+         return function-arity(contains(?, $p))
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="xqhof42">
+      <description>Partial apply with semantically invalid argument. Raising an error is optional in this case.</description>
+      <created by="Michael Kay" on="2023-12-12"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test>
+         function-arity(matches(?, "("))
+      </test>
+      <result>
+         <any-of>
+            <assert-eq>1</assert-eq>
+            <error code="FORX0002"/>
+         </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="xqhof43">
+      <description>Function reference with missing context. 4.0 mandates an error; 3.1 doesn't say.</description>
+      <created by="Michael Kay" on="2023-12-12"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test>
+         let $f := fn($x){name#0} return function-arity($f)
+      </test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="xqhof44">
+      <description>Function reference with incorrect context. 4.0 mandates an error; 3.1 doesn't say.</description>
+      <created by="Michael Kay" on="2023-12-12"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test>
+         let $f := fn($x){42!name#0} return function-arity($f)
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
 </test-set>

@@ -282,6 +282,7 @@
     <test-case name="atomic-equal-021">
         <description>fn:atomic-equal over xs:boolean, xs:hexBinary, xs:base64Binary, xs:duration, and xs:QName</description>
         <created by="Michael Kay" on="2023-02-07"/>
+        <modified by="Michael Kay" on="2023-12-07" change="diagnostic output if the test fails"/>
         <test>
             let $values := (
                fn:true(),
@@ -292,11 +293,13 @@
                QName((), "abc"),
                QName("http://example.org", "abc")
             ) return
-            every $i in 1 to 7, $j in 1 to 7
-            satisfies (($i eq $j) eq atomic-equal($values[$i], $values[$j]))
+            for $i in 1 to 7, $j in 1 to 7
+            return if (not(($i eq $j) eq atomic-equal($values[$i], $values[$j]))) {
+              `{$values[$i]}/{$values[$j]}`
+            }
        </test>
         <result>
-            <assert-true/>
+            <assert-empty/>
         </result>
     </test-case>
 

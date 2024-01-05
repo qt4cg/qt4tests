@@ -1138,13 +1138,13 @@
    
    <test-case name="FunctionCall-413" covers-40="keywords">
       <description>Use of keyword arguments on user-defined function</description>
-      <created by="Michael Kay" on="2023-03-13"/>
+      <created by="Michael Kay" on="2023-03-13"/>    
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
          declare function local:diff ($s as xs:integer, $t as xs:integer) as xs:integer { 
             $s - $t
          };  
-         local:diff(t := 10, s := 22) 
+         local:diff(t := 10, s := 22)(10) 
       ]]></test>
       <result>
          <assert-eq>12</assert-eq>
@@ -1154,12 +1154,13 @@
    <test-case name="FunctionCall-414" covers-40="keywords">
       <description>Use of keyword arguments with placeholders on user-defined function</description>
       <created by="Michael Kay" on="2023-03-13"/>
+      <modified by="Michael Kay" on="2023-12-13" change="do what the description says"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
          declare function local:diff ($s as xs:integer, $t as xs:integer) as xs:integer { 
             $s - $t
          };  
-         return local:diff(s := 12, t := 8)
+         return local:diff(s := 12, t := ?)(8)
       ]]></test>
       <result>
          <assert-eq>4</assert-eq>
@@ -1169,19 +1170,52 @@
    <test-case name="FunctionCall-415" covers-40="keywords">
       <description>Use of keyword arguments with placeholders on user-defined function</description>
       <created by="Michael Kay" on="2023-03-13"/>
+      <modified by="Michael Kay" on="2023-12-13" change="do what the description says"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
          declare function local:diff ($s as xs:integer, $t as xs:integer) as xs:integer { 
             $s - $t
          };  
-         return local:diff(t := 8, s := 12)
+         return local:diff(s := ?, t := 4)(8)
       ]]></test>
       <result>
-         <assert-eq>-4</assert-eq>
+         <assert-eq>4</assert-eq>
       </result>
    </test-case>
    
    <test-case name="FunctionCall-416" covers-40="keywords">
+      <description>Use of keyword arguments with placeholders to reverse order of args</description>
+      <created by="Michael Kay" on="2023-03-13"/>
+      <modified by="Michael Kay" on="2023-12-13" change="do what the description says"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:diff ($s as xs:integer, $t as xs:integer) as xs:integer { 
+            $s - $t
+         };  
+         return local:diff(t := ?, s := ?)(8, 12)
+      ]]></test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-417" covers-40="keywords">
+      <description>Mix positional and keyword arguments with placeholders</description>
+      <created by="Michael Kay" on="2023-03-13"/>
+      <modified by="Michael Kay" on="2023-12-13" change="do what the description says"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:diff ($s as xs:integer, $t as xs:integer, $u as xs:integer) as xs:integer { 
+            $s - ($t div $u)
+         };  
+         return local:diff(?, u := ?, t := ?)(8, 3, 12)
+      ]]></test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-420" covers-40="keywords">
       <description>Arity in dynamic function call must match (even in 4.0)</description>
       <created by="Michael Kay" on="2023-06-30"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
@@ -1194,7 +1228,7 @@
       </result>
    </test-case>
    
-   <test-case name="FunctionCall-417" covers-40="keywords">
+   <test-case name="FunctionCall-421" covers-40="keywords">
       <description>Coercion of reduced-arity function that has a higher arity variant</description>
       <created by="Michael Kay" on="2023-12-01"/>
       <dependency type="spec" value="XQ40+"/>
