@@ -348,6 +348,136 @@
          <assert-empty/>
       </result>
    </test-case>
+   
+   <test-case name="DeepLookup-050">
+      <description>Select from a deeper structure</description>
+      <created by="Michael Kay" on="2024-01-06"/>
+      <test>
+         let $data := [
+            map{"a": [
+                  map{12: "pink", 13: "orange", 14: "lilac"},
+                  map{12: "mauve", 13: "beige", 14: "vanilla"}
+               ],
+               "b": [
+                  map{12: "teal", 13: "turquoise", 14: "magnolia"},
+                  map{12: "cerise", 13: "mustard", 14: "grey"}
+               ]},
+               map{"a": [
+                  map{12: "puce", 13: "rose", 14: "vermillion"},
+                  map{12: "violet", 13: "indigo", 14: "khaki"}
+               ],
+               "b": [
+                  map{12: "sand", 13: "sky", 14: "silver"},
+                  map{12: "peach", 13: "rust", 14: "gold"}
+               ]}
+          ]
+          return $data??14           
+      </test>
+      <result>
+         <all-of>
+            <assert-permutation>"lilac", "vanilla", "magnolia", "grey", "vermillion", "khaki", "silver", "gold"</assert-permutation>
+            <assert>index-of($result, "lilac") lt index-of($result, "vanilla")</assert>
+            <assert>index-of($result, "lilac") lt index-of($result, "vermillion")</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DeepLookup-051">
+      <description>Multiple select from a deeper structure</description>
+      <created by="Michael Kay" on="2024-01-06"/>
+      <test>
+         let $data := [
+         map{"a": [
+         map{12: "pink", 13: "orange", 24: "lilac"},
+         map{12: "mauve", 13: "beige", 14: "vanilla"}
+         ],
+         "b": [
+         map{12: "teal", 13: "turquoise", 14: "magnolia"},
+         map{12: "cerise", 13: "mustard", 24: "grey"}
+         ]},
+         map{"a": [
+         map{12: "puce", 13: "rose", 14: "vermillion"},
+         map{12: "violet", 13: "indigo", 24: "khaki"}
+         ],
+         "b": [
+         map{12: "sand", 13: "sky", 24: "silver"},
+         map{12: "peach", 13: "rust", 14: "gold"}
+         ]}
+         ]
+         return $data??(24, 14)           
+      </test>
+      <result>
+         <all-of>
+            <assert-permutation>"lilac", "vanilla", "magnolia", "grey", "vermillion", "khaki", "silver", "gold"</assert-permutation>
+            <assert>index-of($result, "lilac") lt index-of($result, "vanilla")</assert>
+            <assert>index-of($result, "lilac") lt index-of($result, "vermillion")</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DeepLookup-052">
+      <description>Multiple select from a deeper structure with dynamic key</description>
+      <created by="Michael Kay" on="2024-01-06"/>
+      <test>
+         let $data := [
+         map{"a": [
+         map{12: "pink", 13: "orange", current-date(): "lilac"},
+         map{12: "mauve", 13: "beige", 14: "vanilla"}
+         ],
+         "b": [
+         map{12: "teal", 13: "turquoise", 14: "magnolia"},
+         map{12: "cerise", 13: "mustard", current-date(): "grey"}
+         ]},
+         map{"a": [
+         map{12: "puce", 13: "rose", 14: "vermillion"},
+         map{12: "violet", 13: "indigo", current-date(): "khaki"}
+         ],
+         "b": [
+         map{12: "sand", 13: "sky", current-date(): "silver"},
+         map{12: "peach", 13: "rust", 14: ["gold", "bronze"]}
+         ]}
+         ]
+         return $data??(current-date(), 14)           
+      </test>
+      <result>
+         <all-of>
+            <assert-permutation>"lilac", "vanilla", "magnolia", "grey", "vermillion", "khaki", "silver", ["gold", "bronze"]</assert-permutation>
+            <assert>index-of($result, "lilac") lt index-of($result, "vanilla")</assert>
+            <assert>index-of($result, "lilac") lt index-of($result, "vermillion")</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DeepLookup-053">
+      <description>Select by type from a deeper structure</description>
+      <created by="Michael Kay" on="2024-01-06"/>
+      <test>
+         let $data := [
+         map{"a": [
+         map{12: "pink", 13: "orange", current-date(): "lilac"},
+         map{12: "mauve", 13: "beige", 14: "vanilla"}
+         ],
+         "b": [
+         map{12: "teal", 13: "turquoise", 14: "magnolia"},
+         map{12: "cerise", 13: "mustard", current-date(): "grey"}
+         ]},
+         map{"a": [
+         map{12: "puce", 13: "rose", 14: "vermillion"},
+         map{12: "violet", 13: "indigo", current-date(): "khaki"}
+         ],
+         "b": [
+         map{12: "sand", 13: "sky", current-date(): "silver"},
+         map{12: "peach", 13: "rust", 14: ["gold", "bronze"]}
+         ]}
+         ]
+         return $data??*::array(xs:string)          
+      </test>
+      <result>
+         <all-of>
+            <assert-deep-eq>["gold", "bronze"]</assert-deep-eq>
+         </all-of>
+      </result>
+   </test-case>
 
    <test-case name="DeepLookup-101">
       <description>Integer subscript into an array</description>

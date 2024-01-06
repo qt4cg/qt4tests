@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="map-values"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" covers-40="map-values">
+    <description>Tests for the map:values function introduced in XPath 4.0</description>
+    <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-map-values"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    
+    <test-case name="map-values-001">
+        <description>Entries in empty map</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+
+        <environment ref="map"/>
+        <test>map:values(map{})</test>
+        <result>
+            <assert-empty/>
+        </result>
+    </test-case>
+    
+    <test-case name="map-values-002">
+        <description>Entries in empty map</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map:merge(()))</test>
+        <result>
+            <assert-empty/>
+        </result>
+    </test-case>
+    
+    <test-case name="map-values-003">
+        <description>Entries in singleton map</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map{"a":1})</test>
+        <result>
+            <all-of>
+                <assert-count>1</assert-count>
+                <assert-type>xs:integer</assert-type>
+                <assert-eq>1</assert-eq>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-values-004">
+        <description>Entries in singleton map</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map:entry("a", 1))</test>
+        <result>
+            <all-of>
+                <assert-count>1</assert-count>
+                <assert-type>xs:integer</assert-type>
+                <assert-eq>1</assert-eq>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-values-005">
+        <description>Entries in two-entry map</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map:merge((map:entry("a", 1), map:entry("b", 2))))</test>
+        <result>
+            <any-of>
+                <assert-deep-eq>1, 2</assert-deep-eq>
+                <assert-deep-eq>2, 1</assert-deep-eq>
+            </any-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-values-006">
+        <description>Size of two-entry map</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map{"a":1, "b":2})</test>
+        <result>
+            <any-of>
+                <assert-deep-eq>1, 2</assert-deep-eq>
+                <assert-deep-eq>2, 1</assert-deep-eq>
+            </any-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-values-007">
+        <description>Elimination of duplicates</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map{"a":1, "a":2})</test>
+        <result>
+           <error code="XQDY0137"/>
+        </result>
+    </test-case>
+    
+    <test-case name="map-values-008">
+        <description>Elimination of duplicates</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map:merge((map:entry("a",1), map:entry("a",2))))</test>
+        <result>
+            <all-of>
+                <assert-count>1</assert-count>
+                <assert-type>xs:integer</assert-type>
+                <assert-eq>1</assert-eq>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-values-009">
+        <description>Values after removing an entry</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map:remove(map{"a":1,"b":2}, "b"))</test>
+        <result>
+            <all-of>
+                <assert-count>1</assert-count>
+                <assert-type>xs:integer</assert-type>
+                <assert-eq>1</assert-eq>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-values-010">
+        <description>Entries after removing the only entry</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map:remove(map:entry(1,2),1))</test>
+        <result>
+            <assert-empty/>
+        </result>
+    </test-case>
+    
+    <test-case name="map-values-011">
+        <description>Values after removing the only two entries</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map:remove(map{"a":1,"b":2},("a","b")))</test>
+        <result>
+            <assert-empty/>
+        </result>
+    </test-case>
+    
+    <test-case name="map-values-012">
+        <description>Entries after adding a NaN entry</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map{number('NaN'):1, "b":2})</test>
+        <result>
+            <assert-count>2</assert-count>
+        </result>
+    </test-case>
+    
+    <test-case name="map-values-013">
+        <description>Size after a null remove operation</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map:remove(map{"a":1,"b":2}, "c"))</test>
+        <result>
+            <all-of>
+                <assert>$result = 1</assert>
+                <assert>$result = 2</assert>
+                <assert-count>2</assert-count>
+            </all-of>
+        </result>
+    </test-case>
+    <test-case name="map-values-014">
+        <description>Values for a large map</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map:merge(for $n in 1 to 500000 return map:entry($n, $n+1)))</test>
+        <result>
+            <all-of>
+                <assert>$result = 2</assert>
+                <assert>$result = 500001</assert>
+                <assert-count>500000</assert-count>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-values-015">
+        <description>Variable-length values</description>
+        <created by="Michael Kay, Saxonica" on="2024-01-06"/>
+        <environment ref="map"/>
+        <test>map:values(map{"a":(1,2,3), "b":10, "c":(20,21,22), "d":()})</test>
+        <result>
+            <all-of>
+                <assert>contains-subsequence($result, (1,2,3))</assert>
+                <assert>contains-subsequence($result, (10))</assert>
+                <assert>contains-subsequence($result, (20,21,22))</assert>
+                <assert-count>7</assert-count>
+            </all-of>
+        </result>
+    </test-case>
+    
+ 
+    
+ 
+    
+ 
+
+</test-set>
