@@ -349,6 +349,15 @@
       </result>
    </test-case>
    
+   <test-case name="DeepLookup-047">
+      <description>Multi-step path may select duplicates</description>
+      <created by="Michael Kay" on="2024-01-06"/>
+      <test>[[["a"],["b"]],[["c"],["d"]]]??1??1</test>
+      <result>
+         <assert-deep-eq>"a"</assert-deep-eq>
+      </result>
+   </test-case>
+   
    <test-case name="DeepLookup-050">
       <description>Select from a deeper structure</description>
       <created by="Michael Kay" on="2024-01-06"/>
@@ -476,6 +485,65 @@
          <all-of>
             <assert-deep-eq>["gold", "bronze"]</assert-deep-eq>
          </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DeepLookup-054">
+      <description>Select from a deeper structure, multi-step path</description>
+      <created by="Michael Kay" on="2024-01-06"/>
+      <test>
+         let $data := [
+         map{"a": [
+         map{12: "pink", 13: "orange", 14: "lilac"},
+         map{12: "mauve", 13: "beige", 14: "vanilla"}
+         ],
+         "b": [
+         map{12: "teal", 13: "turquoise", 14: "magnolia"},
+         map{12: "cerise", 13: "mustard", 14: "grey"}
+         ]},
+         map{"a": [
+         map{12: "puce", 13: "rose", 14: "vermillion"},
+         map{12: "violet", 13: "indigo", 14: "khaki"}
+         ],
+         "b": [
+         map{12: "sand", 13: "sky", 14: "silver"},
+         map{12: "peach", 13: "rust", 14: "gold"}
+         ]}
+         ]
+         return $data??a??14           
+      </test>
+      <result>
+         <assert-permutation>"lilac", "vanilla", "vermillion", "khaki"</assert-permutation>
+      </result>
+   </test-case>
+   
+   <test-case name="DeepLookup-055">
+      <description>Select from a deeper structure, multi-step path. Note that the result
+      includes duplicates.</description>
+      <created by="Michael Kay" on="2024-01-06"/>
+      <test>
+         let $data := [
+         map{"a": [
+         map{12: "pink", 13: "orange", 14: "lilac"},
+         map{12: "mauve", 13: "beige", 14: "vanilla"}
+         ],
+         "b": [
+         map{12: "teal", 13: "turquoise", 14: "magnolia"},
+         map{12: "cerise", 13: "mustard", 14: "grey"}
+         ]},
+         map{"a": [
+         map{12: "puce", 13: "rose", 14: "vermillion"},
+         map{12: "violet", 13: "indigo", 14: "khaki"}
+         ],
+         "b": [
+         map{12: "sand", 13: "sky", 14: "silver"},
+         map{12: "peach", 13: "rust", 14: "gold"}
+         ]}
+         ]
+         return $data??1??14           
+      </test>
+      <result>
+         <assert-permutation>"lilac", "vanilla", "magnolia", "grey", "lilac", "magnolia", "vermillion", "silver"</assert-permutation>
       </result>
    </test-case>
 
