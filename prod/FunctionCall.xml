@@ -1144,7 +1144,7 @@
          declare function local:diff ($s as xs:integer, $t as xs:integer) as xs:integer { 
             $s - $t
          };  
-         local:diff(t := 10, s := 22)(10) 
+         local:diff(t := 10, s := 22) 
       ]]></test>
       <result>
          <assert-eq>12</assert-eq>
@@ -1160,7 +1160,7 @@
          declare function local:diff ($s as xs:integer, $t as xs:integer) as xs:integer { 
             $s - $t
          };  
-         return local:diff(s := 12, t := ?)(8)
+         local:diff(s := 12, t := ?)(8)
       ]]></test>
       <result>
          <assert-eq>4</assert-eq>
@@ -1176,7 +1176,7 @@
          declare function local:diff ($s as xs:integer, $t as xs:integer) as xs:integer { 
             $s - $t
          };  
-         return local:diff(s := ?, t := 4)(8)
+         local:diff(s := ?, t := 4)(8)
       ]]></test>
       <result>
          <assert-eq>4</assert-eq>
@@ -1192,7 +1192,7 @@
          declare function local:diff ($s as xs:integer, $t as xs:integer) as xs:integer { 
             $s - $t
          };  
-         return local:diff(t := ?, s := ?)(8, 12)
+         local:diff(t := ?, s := ?)(8, 12)
       ]]></test>
       <result>
          <assert-eq>4</assert-eq>
@@ -1208,7 +1208,7 @@
          declare function local:diff ($s as xs:integer, $t as xs:integer, $u as xs:integer) as xs:integer { 
             $s - ($t div $u)
          };  
-         return local:diff(?, u := ?, t := ?)(8, 3, 12)
+         local:diff(?, u := ?, t := ?)(8, 3, 12)
       ]]></test>
       <result>
          <assert-eq>4</assert-eq>
@@ -1243,6 +1243,92 @@
       ]]></test>
       <result>
          <assert-eq>"ABC-ABC on 1900-01-01"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-422" covers-40="issue894">
+      <description>Partial application with a wrong-type argument. See issue 894</description>
+      <created by="Michael Kay" on="2024-01-07"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>function-arity(contains(?, 23))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-423" covers-40="issue894">
+      <description>Partial application with a semantically invalid argument. See issue 894</description>
+      <created by="Michael Kay" on="2024-01-07"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>function-arity(matches(?, "))"))</test>
+      <result>
+         <any-of>
+            <assert-eq>1</assert-eq>
+            <error code="FORX0002"/>
+         </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-424">
+      <description>Call a user function with argument defaulting to context item</description>
+      <created by="Michael Kay" on="2024-01-07"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := .){$x + $y};
+         (10 to 11)!local:f(30)
+      </test>
+      <result>
+         <assert-deep-eq>40 to 41</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-425" covers-40="issue894">
+      <description>Partial application of user function with argument defaulting to context item</description>
+      <created by="Michael Kay" on="2024-01-07"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := .){$x + $y};
+         let $f := local:f(?)
+         return (10 to 11)!$f(30)
+      </test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-426" covers-40="issue894">
+      <description>Partial application with absent focus. See issue 894</description>
+      <created by="Michael Kay" on="2024-01-07"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>function-arity(lang(?))</test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-427" covers-40="issue894">
+      <description>Partial application of user function with argument defaulting to context item</description>
+      <created by="Michael Kay" on="2024-01-07"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := .){$x + $y};
+         (10 to 11)!(local:f(?)(30))
+      </test>
+      <result>
+         <assert-deep-eq>40, 41</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-428" covers-40="issue894">
+      <description>Partial application of user function with argument defaulting to context item</description>
+      <created by="Michael Kay" on="2024-01-07"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer, $y as xs:integer := .){$x + $y};
+         (10 to 11)!local:f(?)!.(30)
+      </test>
+      <result>
+         <assert-deep-eq>40, 41</assert-deep-eq>
       </result>
    </test-case>
    
