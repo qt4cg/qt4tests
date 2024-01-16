@@ -486,9 +486,21 @@
    <test-case name="compare-011">
       <description>compare() only works on strings</description>
       <created by="Michael Kay" on="2012-05-30"/>
+      <modified by="Christian Gruen" on="2024-01-16" change="dependencies changed"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"/>
       <test>compare(123, 456)</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="compare-011a">
+      <description>compare integers</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(123, 456)</test>
+      <result>
+         <assert-eq>-1</assert-eq>
       </result>
    </test-case>
    
@@ -1061,6 +1073,535 @@
       <test>let $vA  := ("B STRING", current-time())[1] treat as xs:string, 
                 $vB  := ("no match", current-time())[1] treat as xs:string 
         return compare(lower-case($vA), upper-case($vB))</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-boolean-01">
+      <description>compare booleans</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(false(), true())</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-boolean-02">
+      <description>compare booleans</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(false(), false())</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-boolean-03">
+      <description>compare booleans</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(true(), true())</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-boolean-04">
+      <description>compare boolean</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(true(), false())</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-boolean-05">
+      <description>compare boolean</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+let $v := current-date() ! year-from-date(.) ! (. > 1000, . < 1000)
+for $a in $v
+for $b in $v
+return compare($a, $b)
+      ]]></test>
+      <result>
+         <assert-deep-eq>0, 1, -1, 0</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-integer-01">
+      <description>compare integers</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(-1, 0)</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-integer-02">
+      <description>compare integers</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(0, 0)</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-integer-03">
+      <description>compare integers</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(1, 0)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-integer-04">
+      <description>compare integer limits</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(-0x7FFFFFFFFFFFFFFF, 0x7FFFFFFFFFFFFFFF)</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-integer-05">
+      <description>compare integer limits</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(0x7FFFFFFFFFFFFFFF, -0x7FFFFFFFFFFFFFFF)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="compare-double-01">
+      <description>compare doubles</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(-1e0, 0e0)</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-double-02">
+      <description>compare doubles</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(0e0, 0e0)</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-double-03">
+      <description>compare doubles</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(1e0, 0e0)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-double-04">
+      <description>compare double limits</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(-1.79769313486231580e308, 1.79769313486231580e308)</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-double-05">
+      <description>compare double limits</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(1.79769313486231580e308, -1.79769313486231580e308)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-double-06">
+      <description>compare zero</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(0e0, -0e0)</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-double-07">
+      <description>compare NaN</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(0 div 0e0, 0 div 0e0)</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-double-08">
+      <description>compare NaN</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(0 div 0e0, 0)</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-double-09">
+      <description>compare NaN</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(0, 0 div 0e0)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-double-10">
+      <description>compare INF</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(-1 div 0e0, 1 div 0e0)</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-double-11">
+      <description>compare INF</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(1 div 0e0, -1 div 0e0)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-double-12">
+      <description>compare INF</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+for $a in (-1 div 0e0, 0, 1 div 0e0)
+for $b in (-1 div 0e0, 0, 1 div 0e0)
+return compare($a, $b)
+      ]]></test>
+      <result>
+         <assert-deep-eq>0, -1, -1, 1, 0, -1, 1, 1, 0</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-decimal-01">
+      <description>compare decimals</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(-1.0, 0.0)</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-decimal-02">
+      <description>compare decimals</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(0.0, 0.0)</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-decimal-03">
+      <description>compare decimals</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(1.0, 0.0)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-binary-01">
+      <description>compare binaries</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:hexBinary(''), xs:hexBinary('41'))</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-binary-02">
+      <description>compare binaries</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:hexBinary('41'), xs:hexBinary('41'))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-binary-03">
+      <description>compare binaries</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:hexBinary('41'), xs:hexBinary(''))</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-binary-04">
+      <description>compare binaries</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:base64Binary(''), xs:base64Binary('QQ=='))</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-binary-05">
+      <description>compare binaries</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:base64Binary('QQ=='), xs:base64Binary('QQ=='))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-binary-06">
+      <description>compare binaries</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:base64Binary('QQ=='), xs:base64Binary(''))</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-binary-07">
+      <description>compare binaries</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:hexBinary(''), xs:base64Binary('QQ=='))</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-binary-08">
+      <description>compare binaries</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:hexBinary('41'), xs:base64Binary('QQ=='))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-binary-09">
+      <description>compare binaries</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:hexBinary('41'), xs:base64Binary(''))</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-date-01">
+      <description>compare dates</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:date('2000-01-01'), xs:date('2001-01-01'))</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-date-02">
+      <description>compare dates</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:date('2001-01-01'), xs:date('2001-01-01'))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-date-03">
+      <description>compare dates</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:date('2002-01-01'), xs:date('2001-01-01'))</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-date-04">
+      <description>compare dates</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:date('2001-01-01+07:00'), xs:date('2001-01-01-07:00'))</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-time-01">
+      <description>compare times</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:time('00:00:00'), xs:time('11:59:59'))</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-time-02">
+      <description>compare times</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:time('11:59:59'), xs:time('11:59:59'))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-time-03">
+      <description>compare times</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:time('23:59:59'), xs:time('11:59:59'))</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-time-04">
+      <description>compare times</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:time('11:59:59+07:00'), xs:time('11:59:59-07:00'))</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-dateTime-01">
+      <description>compare dateTimes</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:dateTime('2001-01-01T00:00:00'), xs:dateTime('2001-01-01T11:59:59'))</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-dateTime-02">
+      <description>compare dateTimes</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:dateTime('2001-01-01T11:59:59'), xs:dateTime('2001-01-01T11:59:59'))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-dateTime-03">
+      <description>compare dateTimes</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:dateTime('2001-01-01T23:59:59'), xs:dateTime('2001-01-01T11:59:59'))</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-dateTime-04">
+      <description>compare dateTimes</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:dateTime('2001-01-01T11:59:59+07:00'), xs:dateTime('2001-01-01T11:59:59-07:00'))</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-dayTimeDuration-01">
+      <description>compare dayTimeDurations</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:dayTimeDuration('P09D'), xs:dayTimeDuration('P10D'))</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-dayTimeDuration-02">
+      <description>compare dayTimeDurations</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:dayTimeDuration('P10D'), xs:dayTimeDuration('P10D'))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-dayTimeDuration-03">
+      <description>compare dayTimeDurations</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:dayTimeDuration('P11D'), xs:dayTimeDuration('P10D'))</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-yearMonthDuration-01">
+      <description>compare yearMonthDurations</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:yearMonthDuration('P2000Y'), xs:yearMonthDuration('P2001Y'))</test>
+      <result>
+         <assert-eq>-1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-yearMonthDuration-02">
+      <description>compare yearMonthDurations</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:yearMonthDuration('P2001Y'), xs:yearMonthDuration('P2001Y'))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="compare-yearMonthDuration-03">
+      <description>compare yearMonthDurations</description>
+      <created by="Christian Gruen" on="2024-01-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>compare(xs:yearMonthDuration('P2002Y'), xs:yearMonthDuration('P2001Y'))</test>
       <result>
          <assert-eq>1</assert-eq>
       </result>
