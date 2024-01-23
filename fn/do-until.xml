@@ -1,0 +1,263 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-do-until" covers-40="fn-do-until">
+  <description>Tests for the fn:do-until function</description>
+  <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-do-until"/>
+  <dependency type="spec" value="XP40+ XQ40+"/>
+
+  <test-case name="do-until-001">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[do-until(1, error#0, boolean#1)]]></test>
+    <result>
+      <error code="FOER0000"/>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-002">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[do-until(1, identity#1, exists#1)]]></test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-003">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[do-until((), string#1, exists#1)]]></test>
+    <result>
+      <assert-string-value/>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-004">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[do-until((21 to 24), tail#1, fn($s) { head($s) >= 23 })]]></test>
+    <result>
+      <assert-deep-eq>23, 24</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-005">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[do-until((6 to 8), fn($s) { $s ! (. - 1) }, fn($s) { sum($s) <= 10 })]]></test>
+    <result>
+      <assert-deep-eq>2, 3, 4</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-006">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[
+do-until(reverse(1 to 100), fn($s) { tail($s) }, fn($s) { sum($s) <= 20 and head($s) <= 4 })
+]]></test>
+    <result>
+      <assert-deep-eq>4, 3, 2, 1</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-007">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[do-until(1, fn($x) { $x + 1 }, fn($x) { $x >= 10000 })]]></test>
+    <result>
+      <assert-eq>10000</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-008">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[do-until(2, fn($x) { $x * $x }, fn($x) { $x >= 1000 })]]></test>
+    <result>
+      <assert-eq>65536</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-009">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[do-until(1, fn($x) { $x, $x }, fn($x) { count($x) >= 3 })]]></test>
+    <result>
+      <assert-deep-eq>1, 1, 1, 1</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-010">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[
+do-until(
+  (1 to 100),
+  fn($s) { subsequence($s, 2, count($s) - 2) },
+  fn($s) { $s[last()] - $s[1] <= 1 }
+)
+]]></test>
+    <result>
+      <assert-deep-eq>50, 51</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-011">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[
+do-until(
+  1e0,
+  fn($n) { if($n instance of xs:double) then xs:float($n) else xs:double($n) },
+  fn($n) { $n instance of xs:double }
+)
+]]></test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-012">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[
+do-until(
+  1,
+  fn($n) { if($n instance of xs:short) then xs:byte($n) else xs:short($n) },
+  fn($n) { $n instance of xs:byte }
+)
+]]></test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-013">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[
+do-until(
+  map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' },
+  fn($map) { map {
+    'string': replace($map?string, $map?remove, ''),
+    'remove': $map?remove
+              =!> string-to-codepoints()
+              =!> (fn($n) { $n + 2 })()
+              =!> codepoints-to-string()
+  } },
+  fn($map) { not(characters($map?string) = $map?remove) }
+)?string
+]]></test>
+    <result>
+      <assert-string-value>unhdrduhul</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-014">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[
+let $s := (1 to 1000)
+return  do-until(1, fn { . + 1 }, fn { not(. = $s) })
+]]></test>
+    <result>
+      <assert-eq>1001</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-015">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[
+let $i := 3936256
+return do-until(
+  $i,
+  fn($n) { ($n + $i div $n) div 2 },
+  fn($n) { abs($n * $n - $i) < 0.0000000001 }
+)
+]]></test>
+    <result>
+      <assert-eq>1984</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-016">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[do-until(1, fn($x) { $x * 2 }, fn($x) { $x >= 1000 })]]></test>
+    <result>
+      <assert-eq>1024</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-017">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[do-until(1, fn($x) { $x, $x }, fn($xs) { count($xs) > 3 })]]></test>
+    <result>
+      <assert-deep-eq>1, 1, 1, 1</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-018">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[do-until(1, op('*'), fn($_, $p) { $p >= 10 })]]></test>
+    <result>
+      <assert-eq>3628800</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-019">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[do-until(1, identity#1, true#0)]]></test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-020">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[do-until((1, 2), identity#1, true#0)]]></test>
+    <result>
+      <assert-deep-eq>1, 2</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-021">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[head( do-until((1, 2), identity#1, fn($x, $p) { $p = 1 }))]]></test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-022">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[
+head(
+  do-until(
+    (1, 2),
+    fn($s as xs:integer+) { $s[2], $s[1] },
+    fn($x, $p) { $p = 1 })
+)]]></test>
+    <result>
+      <assert-eq>2</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="do-until-023">
+    <description>do-until</description>
+    <created by="Christian Gruen" on="2023-07-18"/>
+    <test><![CDATA[
+head(do-until((1, 2), fn($s as xs:integer) { $s[2], 1 }, fn($x, $p) { $p = 1 }))
+]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
+</test-set>
