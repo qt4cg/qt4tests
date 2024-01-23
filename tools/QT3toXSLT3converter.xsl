@@ -101,7 +101,7 @@
             <xsl:comment>Generated at <xsl:value-of select="current-dateTime()"/></xsl:comment>
             <catalog xmlns="http://www.w3.org/2012/10/xslt-test-catalog">
                 <xsl:apply-templates select="fots:environment" mode="rename"/>
-                <xsl:for-each select="fots:test-set">
+                <xsl:for-each select="fots:test-set[not(starts-with(@name, 'upd-'))]">
                     <test-set name="{@name}" file="{replace(@file, '/', concat('/', substring-after(@name, '-'), '/_'))}"/>
                 </xsl:for-each>
                 <test-set name="xslt3-catalog" file="catalog/xslt3-catalog/_xslt3-catalog.xml"/>
@@ -154,14 +154,30 @@
             <xsl:sequence select="file:copy(concat($main-dir, 'prod/ModuleImport/test1c1-lib.xq'), concat($xslt-dir, 'prod/ModuleImport/test1c1-lib.xq'))"/>
             <xsl:sequence select="file:copy(concat($main-dir, 'prod/ModuleImport/test2c1-lib.xq'), concat($xslt-dir, 'prod/ModuleImport/test2c1-lib.xq'))"/>
             
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/char/entities.json'), concat($xslt-dir, 'fn/char/char/entities.json'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/function-lookup/collection-1.xml'), concat($xslt-dir, 'fn/function-lookup/function-lookup/collection-1.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/highest/highest-001.xml'), concat($xslt-dir, 'fn/highest/highest/highest-001.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/highest/highest-003.xml'), concat($xslt-dir, 'fn/highest/highest/highest-003.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/highest/highest-005.xml'), concat($xslt-dir, 'fn/highest/highest/highest-005.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/json-to-xml/data002.json'), concat($xslt-dir, 'fn/json-to-xml/data002.json'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/highest/highest-001.xml'), concat($xslt-dir, 'fn/lowest/highest/highest-001.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/highest/highest-003.xml'), concat($xslt-dir, 'fn/lowest/highest/highest-003.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/highest/highest-005.xml'), concat($xslt-dir, 'fn/lowest/highest/highest-005.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/abs/e1.xml'), concat($xslt-dir, 'fn/xdm-to-json/abs/e1.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/abs/e1.xml'), concat($xslt-dir, 'fn/xdm-to-json/abs/e1.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'misc/BuiltInKeywords.xml'), concat($xslt-dir, 'misc/BuiltInKeywords/BuiltInKeywords.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'misc/JSONTestSuite/test_parsing/y_number.json'), concat($xslt-dir, 'misc/BuiltInKeywords/JSONTestSuite/test_parsing/y_number.json'))"/>
+            
             <xsl:sequence select="file:copy(concat($xslt-src-dir, 'tests/misc/catalog/catalog-001.xsl'), concat($xslt-dir, 'catalog/xslt3-catalog/catalog-001.xsl'))"/>
-            <xsl:sequence select="file:copy(concat($xslt-src-dir, 'admin/catalog-schema.xsd'), concat($xslt-dir, 'catalog/xslt3-catalog/catalog-schema.xsd'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'tools/xslt3-catalog-schema.xsd'), concat($xslt-dir, 'catalog/xslt3-catalog/catalog-schema.xsd'))"/>
+            <!--<xsl:sequence select="file:copy(concat($xslt-src-dir, 'admin/catalog-schema.xsd'), concat($xslt-dir, 'catalog/xslt3-catalog/catalog-schema.xsd'))"/>-->
             <xsl:sequence select="file:copy(concat($xslt-src-dir, 'admin/xml.xsd'), concat($xslt-dir, 'catalog/xslt3-catalog/xml.xsd'))"/>
         </xsl:if>
 
     </xsl:template>
     
     <xsl:template match="fots:catalog/fots:test-set" priority="7"/>
+    <xsl:template match="fots:catalog/fots:test-set[starts-with(@name, 'upd-')]" priority="9"/>
 
     <xsl:template match="fots:catalog/fots:test-set[@name = $test-set or $test-set='*']" priority="8">
         <xsl:variable name="testSetFile" select="concat($main-dir,@file)"/>
@@ -236,13 +252,24 @@
         </xsl:element>
     </xsl:template>
     
-    <xsl:template match="fots:dependency[@type='spec']" mode="rename" priority="4">
+    <xsl:template match="fots:dependency[@type='spec']" mode="rename" priority="3">
         <spec xmlns="http://www.w3.org/2012/10/xslt-test-catalog" value="XSLT30+"/>
+    </xsl:template>
+    
+    <xsl:template match="fots:dependency[@type='spec'][(contains(@value,'XP31') and
+        not(contains(@value,'XP31+'))) or (contains(@value,'XP30') and
+        not(contains(@value,'XP30+')))]" mode="rename" priority="4">
+        <spec xmlns="http://www.w3.org/2012/10/xslt-test-catalog" value="XSLT30"/>
     </xsl:template>
     
     <xsl:template match="fots:dependency[@type='spec'][contains(@value,'XP31')]" mode="rename" priority="5">
         <xsl:next-match/>
         <feature xmlns="http://www.w3.org/2012/10/xslt-test-catalog" value="XPath_3.1"/>
+    </xsl:template>
+    
+    <xsl:template match="fots:dependency[@type='spec'][contains(@value,'XP40')]" mode="rename" priority="6">
+        <spec xmlns="http://www.w3.org/2012/10/xslt-test-catalog" value="XSLT40+"/>
+        <!--<feature xmlns="http://www.w3.org/2012/10/xslt-test-catalog" value="XPath_4.0"/>-->
     </xsl:template>
     
     <xsl:template match="fots:dependency[@type='feature'][@value='higherOrderFunctions']" mode="rename">
@@ -259,9 +286,9 @@
     <xsl:template match="fots:dependency[@type='feature'][@value='non_unicode_codepoint_collation']" mode="rename">
         <!--<collation_uri xmlns="http://www.w3.org/2012/10/xslt-test-catalog" value="{@value}"/>-->
     </xsl:template> <!-- collation_uri added in QT3 fn-substring-after-24 2016-10 -->
-    <xsl:template match="fots:dependency[@type='feature'][@value='fn-transform-XSLT']" mode="rename"/>
     <xsl:template match="fots:dependency[@type='feature'][@value='fn-transform-XSLT30']" mode="rename"/>
     <xsl:template match="fots:dependency[@type='feature'][@value='fn-format-integer-CLDR']" mode="rename"/>
+    <xsl:template match="fots:dependency[@type='feature'][@value='remote_http']" mode="rename"/>
     <xsl:template match="fots:dependency[@type='feature'][@value='typedData']" mode="rename"/>
     <xsl:template match="fots:dependency[@type='feature'][@value='serialization']" mode="rename"/>
     <xsl:template match="fots:dependency[@type='feature'][@value='schema-location-hint']" mode="rename"/>
@@ -275,7 +302,19 @@
     </xsl:template> <!-- simple-uca-fallback added in QT3 misc/UCACollation and fn/deep-equal 2015-12 -->
     
     <xsl:template match="fots:dependency[@type='feature'][@value='fn-load-xquery-module']" mode="rename">
-        <feature xmlns="http://www.w3.org/2012/10/xslt-test-catalog" value="xquery_invocation"/>        
+        <feature xmlns="http://www.w3.org/2012/10/xslt-test-catalog" value="xquery_invocation">
+            <xsl:if test="@satisfied='false'">
+                <xsl:attribute name="satisfied" select="@satisfied"/>
+            </xsl:if>
+        </feature>
+    </xsl:template>
+    
+    <xsl:template match="fots:dependency[@type='feature'][@value='fn-transform-XSLT']" mode="rename">
+        <feature xmlns="http://www.w3.org/2012/10/xslt-test-catalog" value="fn-transform-XSLT">
+            <xsl:if test="@satisfied='false'">
+                <xsl:attribute name="satisfied" select="@satisfied"/>
+            </xsl:if>
+        </feature>
     </xsl:template>
     
     <xsl:template match="fots:dependency[@type='feature'][@value='infoset-dtd']" mode="rename">
@@ -389,8 +428,8 @@
 
         <xsl:variable name="testCaseDependency" select="fots:dependency[@type='spec']"/>
 
-        <xsl:variable name="specDependency" select="if(matches($testCaseDependency/@value, 'XQ') and not(matches($testCaseDependency/@value, 'XT|XP'))) then $testCaseDependency else  ($testCaseDependency, $testSetDependency)"/>
-
+        <xsl:variable name="specDependency" select="($testCaseDependency, $testSetDependency)[1]"/>
+        
         <xsl:variable name="requiredFeatures"
             select="(fots:dependency | ../fots:dependency)[@type='feature']"/>
 
@@ -398,7 +437,8 @@
         
         <xsl:variable name="checkForXT"
             select="($specDependency[matches(@value, 'XT|XP') 
-                         and not(contains(@value, 'XP20') and not(contains(@value, 'XP20+')))] or not($specDependency))
+                         and not(contains(@value, 'XP20') and not(contains(@value, 'XP20+') or
+                         contains(@value, 'XP3')))] or not($specDependency))
                     and not($requiredFeatures[@value='staticTyping'])
                     and not(@name = $excluded-tests)"/>
         
@@ -484,7 +524,7 @@
                     xmlns:map="http://www.w3.org/2005/xpath-functions/map"
                     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
                     exclude-result-prefixes="fn err math map xs array"
-                    version="3.0">
+                    version="{if (matches($specDependency/@value, 'XP40')) then '4.0' else '3.0'}">
                     <!-- always version='3.0' because it needs try/catch -->
                     <!-- TODO: could avoid the try/catch (and generate 2.0) if we are not expecting any errors -->
                     
@@ -530,12 +570,30 @@
                                     <xsl:otherwise>
                                         <x:choose>
                                             <xsl:for-each select="fots:result//fots:error">
-                                              <x:when test="local-name-from-QName($err:code)='{@code}'">
+                                                <x:when test="local-name-from-QName($err:code)='{if
+                                                    (starts-with(@code,'Q{')) then
+                                                    substring-after(@code, '}') else
+                                                    @code}'">
                                                 <ok/>
                                               </x:when>
                                             </xsl:for-each>
                                             <x:otherwise>
-                                                <ok wrongError="expected {string-join(fots:result//fots:error/@code, ' or ')}, got {{$err:code}}"/>
+                                                <xsl:choose>
+                                                    <xsl:when test="fots:result//fots:error[starts-with(@code,'Q{')]">
+                                                        <xsl:variable name="simplified" as="xs:string*">
+                                                            <xsl:for-each select="fots:result//fots:error">
+                                                                <xsl:value-of select="if
+                                                                    (starts-with(@code,'Q{')) then
+                                                                    substring-after(@code, '}') else
+                                                                    @code"/>
+                                                            </xsl:for-each>
+                                                        </xsl:variable>
+                                                        <ok wrongError="expected {string-join($simplified, ' or ')}, got {{$err:code}}"/>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <ok wrongError="expected {string-join(fots:result//fots:error/@code, ' or ')}, got {{$err:code}}"/>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
                                             </x:otherwise>
                                         </x:choose>
                                     </xsl:otherwise>
@@ -604,7 +662,7 @@
                 <ok/>
             </x:when>
             <x:otherwise>
-                <fail assertion="assert-true"><x:value-of select="serialize($result)"/><!--<x:copy-of select="$result"/>--></fail>
+                <fail assertion="assert-true"><x:value-of select="serialize($result)"/></fail>
             </x:otherwise>
         </x:choose>
     </xsl:template>
@@ -615,7 +673,7 @@
                 <ok/>
             </x:when>
             <x:otherwise>
-                <fail assertion="assert-true"><x:value-of select="serialize($result)"/><!--<x:copy-of select="$result"/>--></fail>
+                <fail assertion="assert-true"><x:value-of select="serialize($result)"/></fail>
             </x:otherwise>
         </x:choose>
     </xsl:template>
@@ -627,7 +685,7 @@
                 <ok/>
             </x:when>
             <x:otherwise>
-                <fail assertion="assert-string-value"><x:value-of select="serialize($result)"/><!--<x:copy-of select="$result"/>--></fail>
+                <fail assertion="assert-string-value"><x:value-of select="serialize($result)"/></fail>
             </x:otherwise>
         </x:choose>
     </xsl:template>
@@ -639,7 +697,7 @@
                 <ok/>
             </x:when>
             <x:otherwise>
-                <fail assertion="assert-string-value"><x:value-of select="serialize($result)"/><!--<x:copy-of select="$result"/>--></fail>
+                <fail assertion="assert-string-value"><x:value-of select="serialize($result)"/></fail>
             </x:otherwise>
         </x:choose>
     </xsl:template>
@@ -651,7 +709,7 @@
                 <ok/>
             </x:when>
             <x:otherwise>
-                <fail assertion="assert-eq"><x:value-of select="serialize($result)"/><!--<x:copy-of select="$result"/>--></fail>
+                <fail assertion="assert-eq"><x:value-of select="serialize($result)"/></fail>
             </x:otherwise>
         </x:choose>
     </xsl:template>
@@ -662,12 +720,9 @@
             <x:when test="deep-equal($result, ({$assertion}))">
                 <ok/>
             </x:when>
-            <x:otherwise> <!-- 2015-05-14 DL: Cannot write a function item to an XML tree. But this may be too strong. -->
+            <x:otherwise>
                     <fail assertion="assert-deep-eq">
-                        <x:value-of select="serialize($result)"/>
-                        <!--<xsl:if test="not(starts-with($assertion, 'map'))">                      
-                            <x:copy-of select="$result"/> 
-                        </xsl:if>-->
+                        <x:value-of select="serialize($result, map{{'method':'adaptive'}})"/>
                     </fail>          
             </x:otherwise>
         </x:choose>
@@ -679,7 +734,7 @@
                 <ok/>
             </x:when>
             <x:otherwise>
-                <fail assertion="assert-empty"><x:value-of select="serialize($result)"/><!--<x:copy-of select="$result"/>--></fail>
+                <fail assertion="assert-empty"><x:value-of select="serialize($result)"/></fail>
             </x:otherwise>
         </x:choose>
     </xsl:template>
@@ -691,7 +746,7 @@
                 <ok/>
             </x:when>
             <x:otherwise>
-                <fail assertion="assert-count"><x:value-of select="serialize($result)"/><!--<x:copy-of select="$result"/>--></fail>
+                <fail assertion="assert-count"><x:value-of select="serialize($result)"/></fail>
             </x:otherwise>
         </x:choose>
     </xsl:template>
@@ -703,8 +758,7 @@
                 <ok/>
             </x:when>
             <x:otherwise>
-                <!-- 2015-05-14 DL: Cannot write a function item to an XML tree. But this may be too strong. -->  
-                <fail assertion="assert-type"><x:value-of select="serialize($result)"/><!--<x:copy-of select="$result[not(. instance of function(*))]"/>--></fail>                                               
+                <fail assertion="assert-type"><x:value-of select="serialize($result, map{{'method':'adaptive'}})"/></fail>                                               
             </x:otherwise>
         </x:choose>
     </xsl:template>
@@ -717,7 +771,7 @@
                 <ok/>
             </x:when>
             <x:otherwise>
-                <fail assertion="assert-permutation"><x:value-of select="serialize($result)"/><!--<x:copy-of select="$result"/>--></fail>
+                <fail assertion="assert-permutation"><x:value-of select="serialize($result)"/></fail>
             </x:otherwise>
         </x:choose>
     </xsl:template>
@@ -736,7 +790,7 @@
                 <ok/>
             </x:when>
             <x:otherwise>
-                <fail assertion="assert-xml"><x:value-of select="serialize($result)"/><!--<x:copy-of select="$result"/>--></fail>
+                <fail assertion="assert-xml"><x:value-of select="serialize($result)"/></fail>
             </x:otherwise>
         </x:choose>
     </xsl:template>
@@ -753,7 +807,8 @@
                 <ok/>
             </x:when>
             <x:otherwise>
-                <fail assertion="assert {$assertion}"><x:value-of select="serialize($result)"/><!--<x:copy-of select="$result[not(. instance of function(*))]"/>--></fail> 
+                <!--<fail assertion="assert {$assertion}"><x:value-of select="serialize($result)"/></fail>-->
+                <fail assertion="assert"><x:value-of select="serialize($result)"/></fail> 
             </x:otherwise>
         </x:choose>
     </xsl:template>
@@ -789,7 +844,6 @@
     <xsl:template match="fots:error">
         <fail reason="error not detected">
             <x:value-of select="serialize($result)"/>
-            <!--<x:copy-of select="$result[not(. instance of function(*))]"/>-->
         </fail>
     </xsl:template>
     
