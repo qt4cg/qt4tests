@@ -11303,29 +11303,25 @@ chain((1, 2, 3, 4), $product3)
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-iterate-while-001">
-      <description>Test case for fn:iterate-while</description>
+   <test-case name="fo-test-fn-while-do-001">
+      <description>Test case for fn:while-do</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-01-23"/>
       <environment ref="global"/>
       <test>
-        iterate-while(
-  2,
-  function { . &lt; 100 },
-  function { . * . }
-)
+        while-do(2, fn { . &lt;= 100 }, fn { . * . })
       </test>
       <result>
          <assert-deep-eq>256</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-iterate-while-002">
-      <description>Test case for fn:iterate-while</description>
+   <test-case name="fo-test-fn-while-do-002">
+      <description>Test case for fn:while-do</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-01-23"/>
       <environment ref="global"/>
       <test>
         
-iterate-while(
+while-do(
   1,
   fn($num, $pos) { $pos &lt;= 10 },
   fn($num, $pos) { $num * $pos }
@@ -11337,13 +11333,13 @@ iterate-while(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-iterate-while-003">
-      <description>Test case for fn:iterate-while</description>
+   <test-case name="fo-test-fn-while-do-003">
+      <description>Test case for fn:while-do</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-01-23"/>
       <environment ref="global"/>
       <test>
         let $input := (0 to 4, 6 to 10)
-return iterate-while(
+return while-do(
   0, 
   function($n) { $n = $input }, 
   function($n) { $n + 1 }
@@ -11354,15 +11350,16 @@ return iterate-while(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-iterate-while-004">
-      <description>Test case for fn:iterate-while</description>
+   <test-case name="fo-test-fn-while-do-004">
+      <description>Test case for fn:while-do</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-01-23"/>
       <environment ref="global"/>
       <test>
-        iterate-while(
+        
+while-do(
   1 to 9,
-  function($seq) { head($seq) &lt; 5 },
-  function($seq) { tail($seq) }
+  function($value) { head($value) &lt; 5 },
+  function($value) { tail($value) }
 )
       </test>
       <result>
@@ -11370,20 +11367,58 @@ return iterate-while(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-iterate-while-005">
-      <description>Test case for fn:iterate-while</description>
+   <test-case name="fo-test-fn-while-do-005">
+      <description>Test case for fn:while-do</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-01-23"/>
       <environment ref="global"/>
       <test>
-        let $input := 3936256
-return iterate-while(
+        
+let $input := 3936256
+return while-do(
   $input,
   function($result) { abs($result * $result - $input) &gt;= 0.0000000001 },
   function($guess) { ($guess + $input div $guess) div 2 }
 ) =&gt; round(5)
+
       </test>
       <result>
          <assert-deep-eq>1984</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-do-until-001">
+      <description>Test case for fn:do-until</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-01-23"/>
+      <environment ref="global"/>
+      <test>
+        
+do-until(
+  (),
+  fn($value, $pos) { $value, $pos * $pos },
+  fn($value) { foot($value) &gt; 50  }
+)
+
+      </test>
+      <result>
+         <assert-deep-eq>1, 4, 9, 16, 25, 36, 49, 64</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-do-until-002">
+      <description>Test case for fn:do-until</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-01-23"/>
+      <environment ref="global"/>
+      <test>
+        
+do-until(
+  (1, 0),
+  fn($value) { $value[1] + $value[2], $value },
+  fn($value) { avg($value) &gt; 10 }
+)
+
+      </test>
+      <result>
+         <assert-deep-eq>55, 34, 21, 13, 8, 5, 3, 2, 1, 1, 0</assert-deep-eq>
       </result>
    </test-case>
 
