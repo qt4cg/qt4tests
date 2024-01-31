@@ -283,23 +283,35 @@
         <description>fn:atomic-equal over xs:boolean, xs:hexBinary, xs:base64Binary, xs:duration, and xs:QName</description>
         <created by="Michael Kay" on="2023-02-07"/>
         <modified by="Michael Kay" on="2023-12-07" change="diagnostic output if the test fails"/>
+        <modified by="Michael Kay" on="2024-01-23" 
+            change="dropped test for binary comparisons; hexBinary/b64Binary comparison using eq
+                    now differs from fn:atomic-equal"/>
         <test>
             let $values := (
                fn:true(),
                fn:false(),
-               xs:hexBinary("ff"),
-               xs:base64Binary(xs:hexBinary("ff")),
                xs:duration("P12M"),
                QName((), "abc"),
                QName("http://example.org", "abc")
             ) return
-            for $i in 1 to 7, $j in 1 to 7
+            for $i in 1 to 5, $j in 1 to 5
             return if (not(($i eq $j) eq atomic-equal($values[$i], $values[$j]))) {
               `{$values[$i]}/{$values[$j]}`
             }
        </test>
         <result>
             <assert-empty/>
+        </result>
+    </test-case>
+    
+    <test-case name="atomic-equal-021a">
+        <description>fn:atomic-equal over xs:hexBinary, xs:base64Binary</description>
+        <created by="Michael Kay" on="2024-01-23"/>
+        <test>
+            atomic-equal(xs:hexBinary("ff"), xs:base64Binary(xs:hexBinary("ff")))
+        </test>
+        <result>
+            <assert-false/>
         </result>
     </test-case>
 
