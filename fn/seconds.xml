@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-seconds">
+   <description>Tests for the seconds() function</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/"
+         idref="func-seconds"/>
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="seconds-001">
+      <description>Empty sequence argument</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(())</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-002">
+      <description>One second</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(1)</test>
+      <result>
+         <assert-eq>xs:dayTimeDuration('PT1S')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-003">
+      <description>One minute</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(60)</test>
+      <result>
+         <assert-eq>xs:dayTimeDuration('PT1M')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-004">
+      <description>One hour</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(3600)</test>
+      <result>
+         <assert-eq>xs:dayTimeDuration('PT1H')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-005">
+      <description>One day</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(3600*24)</test>
+      <result>
+         <assert-eq>xs:dayTimeDuration('P1D')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-006">
+      <description>One week</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(3600*24*7)</test>
+      <result>
+         <assert-eq>xs:dayTimeDuration('P7D')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-007">
+      <description>One year</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(3600*24*365)</test>
+      <result>
+         <assert-eq>xs:dayTimeDuration('P365D')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-008">
+      <description>One millisecond</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(0.001)</test>
+      <result>
+         <assert-eq>xs:dayTimeDuration('PT0.001S')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-009">
+      <description>Negative duration</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(-90)</test>
+      <result>
+         <assert-eq>xs:dayTimeDuration('-PT1M30S')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-010">
+      <description>Precise duration</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(3.14159_26535_89793_23846)</test>
+      <result>
+         <assert-eq>xs:dayTimeDuration('PT3.14159265358979323846S')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-011">
+      <description>Zero-length duration</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(0)</test>
+      <result>
+         <assert-eq>xs:dayTimeDuration('PT0S')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-012">
+      <description>Untyped atomic argument</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(xs:untypedAtomic('80'))</test>
+      <result>
+         <assert-eq>xs:dayTimeDuration('PT1M20S')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-100">
+      <description>Conversion from Unix timestamp</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>xs:dateTime('1970-01-01T00:00:00Z') + 1706702400 * seconds(1)</test>
+      <result>
+         <assert-eq>xs:dateTime('2024-01-31T12:00:00Z')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-101">
+      <description>Conversion to Unix timestamp</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>(xs:dateTime('2024-01-31T12:00:00Z') - xs:dateTime('1970-01-01T00:00:00Z')) 
+         div seconds(1)</test>
+      <result>
+         <assert-eq>1706702400</assert-eq>
+      </result>
+   </test-case>
+ 
+   <test-case name="seconds-900">
+      <description>NaN case</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(number('NaN'))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-901">
+      <description>INF case</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(xs:double('INF'))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-902">
+      <description>Wrong arity</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds()</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-903">
+      <description>Wrong arity</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds(12, 60)</test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-904">
+      <description>Wrong type</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds('60')</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="seconds-905">
+      <description>Wrong cardinality</description>
+      <created by="Michael Kay" on="2024-01-31"/>
+      <test>seconds((30, 90))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+
+
+
+</test-set>
