@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-seconds">
+   <description>Tests for the invisible-xml() function</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/"
+         idref="func-invisible-xml"/>
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="invisible-xml-001">
+      <description>Empty sequence argument</description>
+      <created by="Michael Kay" on="2024-02-02"/>
+      <test>invisible-xml(()) instance of function(*)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="invisible-xml-002">
+      <description>Simple date grammar from spec</description>
+      <created by="Michael Kay" on="2024-02-02"/>
+      <test>
+         let $grammar := "
+           date = year, -'-', month, -'-', day .
+           year = d, d, d, d .
+           month = '0', d | '1', ['0'|'1'|'2'] .
+           day = ['0'|'1'|'2'], d | '3', ['0'|'1'] .
+           -d = ['0'-'9'] .
+         "
+         let $parse := invisible-xml($grammar)
+         return $parse("2023-10-31")
+      </test>
+      <result>
+         <assert-xml><![CDATA[<date><year>2023</year><month>10</month><day>31</day></date>]]></assert-xml>
+      </result>
+   </test-case>
+   
+ 
+   
+   <test-case name="invisible-xml-901">
+      <description>Bad grammar, fail-on-error=true</description>
+      <created by="Michael Kay" on="2024-02-02"/>
+      <test>invisible-xml("(((((", map{"fail-on-error":true())</test>
+      <result>
+         <error code="FOIX0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="invisible-xml-902">
+      <description>Bad grammar, fail-on-error=false</description>
+      <created by="Michael Kay" on="2024-02-02"/>
+      <test>invisible-xml("(((((", map{"fail-on-error":false())</test>
+      <result>
+         <error code="FOIX0001"/>
+      </result>
+   </test-case>
+   
+ 
+
+</test-set>
