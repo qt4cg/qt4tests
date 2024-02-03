@@ -2189,4 +2189,94 @@ count((-1, 0, 1, 2147483647, 2147483648, 2147483649, 4294967295, 4294967296, 429
          <assert-string-value>15</assert-string-value>
       </result>
    </test-case>
+   
+   <test-case name="predicate-401">
+      <description>Predicate in 4.0 can be a sequence of numbers</description>
+      <created by="Michael Kay" on="2024-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(0 to 20)[3, 4, 5]</test>
+      <result>
+         <assert-deep-eq>2, 3, 4</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-402">
+      <description>Numbers out of order</description>
+      <created by="Michael Kay" on="2024-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(0 to 20)[5, 4, 3]</test>
+      <result>
+         <assert-deep-eq>2, 3, 4</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-403">
+      <description>If one item is numeric, all must be numeric</description>
+      <created by="Michael Kay" on="2024-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(0 to 20)[3, 4, 'x']</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-404">
+      <description>Negative numbers are allowed and effectively ignored</description>
+      <created by="Michael Kay" on="2024-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(0 to 20)[3, 4, -2]</test>
+      <result>
+         <assert-deep-eq>2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-405">
+      <description>Non-integral numbers are allowed and effectively ignored</description>
+      <created by="Michael Kay" on="2024-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(0 to 20)[3, 4, 8.7]</test>
+      <result>
+         <assert-deep-eq>2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-406">
+      <description>Numeric predicate can depend on focus</description>
+      <created by="Michael Kay" on="2024-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(8, 6, 4, 2)[(.-1) to (.+1)]</test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-407">
+      <description>Type of predicate not known statically</description>
+      <created by="Michael Kay" on="2024-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(8, 6, 4, 2)[if (current-date() lt xs:date('1900-01-01')) then true() else (3 to 4)]</test>
+      <result>
+         <assert-deep-eq>4, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-408">
+      <description>Type of predicate not known statically, error case</description>
+      <created by="Michael Kay" on="2024-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(8, 6, 4, 2)[2, if (current-date() gt xs:date('1900-01-01')) then 'x' else (3 to 4)]</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-409">
+      <description>Performance hopefully is not quadratic</description>
+      <created by="Michael Kay" on="2024-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>count((1 to 10000)[random-number-generator()?permute(1 to 10000)[. mod 2 = 0]])</test>
+      <result>
+         <assert-eq>5000</assert-eq>
+      </result>
+   </test-case>
 </test-set>
