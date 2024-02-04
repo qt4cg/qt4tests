@@ -1147,6 +1147,8 @@
    <test-case name="K-FilterExpr-92">
       <description> A predicate whose expression EBV cannot be extracted from. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Michael Kay" on="2024-02-04" change="not applicable to 4.0"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"/>
       <test>(1, 2, 3)[1, 2]</test>
       <result>
          <error code="FORG0006"/>
@@ -1577,8 +1579,12 @@
    <test-case name="predicates-29">
       <description> A negative test for numeric range used as filter expression. </description>
       <created by="Carmelo Montanez" on="2006-03-17"/>
-      <dependency type="spec" value="XQ10+"/>
-      <test><![CDATA[let $foo := <element1><element2>some content</element2></element1> return $foo[(2 to 5)]]]></test>
+      <modified by="Michael Kay" on="2024-02-04" change="not applicable to 4.0"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
+      <test><![CDATA[
+         let $foo := <element1><element2>some content</element2></element1> 
+         return $foo[(2 to 5)]
+      ]]></test>
       <result>
          <error code="FORG0006"/>
       </result>
@@ -2190,6 +2196,16 @@ count((-1, 0, 1, 2147483647, 2147483648, 2147483649, 4294967295, 4294967296, 429
       </result>
    </test-case>
    
+   <test-case name="predicate-400">
+      <description>Predicate in 4.0 can be a sequence of numbers</description>
+      <created by="Michael Kay" on="2024-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(0 to 20)[3 to 5]</test>
+      <result>
+         <assert-deep-eq>2, 3, 4</assert-deep-eq>
+      </result>
+   </test-case>
+   
    <test-case name="predicate-401">
       <description>Predicate in 4.0 can be a sequence of numbers</description>
       <created by="Michael Kay" on="2024-02-03"/>
@@ -2274,9 +2290,45 @@ count((-1, 0, 1, 2147483647, 2147483648, 2147483649, 4294967295, 4294967296, 429
       <description>Performance hopefully is not quadratic</description>
       <created by="Michael Kay" on="2024-02-03"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>count((1 to 10000)[random-number-generator()?permute(1 to 10000)[. mod 2 = 0]])</test>
+      <test>
+         let $selection := random-number-generator()?permute(1 to 10000)[. mod 2 = 0]
+         return count((1 to 10000)[$selection])</test>
       <result>
          <assert-eq>5000</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-410">
+      <description>Range using variables</description>
+      <created by="Michael Kay" on="2024-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $two := year-from-date(current-date()) idiv 1000
+         return (0 to 20)[$two to $two*3]</test>
+      <result>
+         <assert-deep-eq>1 to 5</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-411">
+      <description>Range using last()</description>
+      <created by="Michael Kay" on="2024-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $two := year-from-date(current-date()) idiv 1000
+         return (0 to 20)[$two to last()]</test>
+      <result>
+         <assert-deep-eq>1 to 20</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-412">
+      <description>Type of predicate not known statically, and dependent on focus</description>
+      <created by="Michael Kay" on="2024-02-03"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(10, 8, 6, 4, 2)[if (. mod 3 = 0) then true() else (., .+1)]</test>
+      <result>
+         <assert-deep-eq>6, 4</assert-deep-eq>
       </result>
    </test-case>
 </test-set>
