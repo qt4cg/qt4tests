@@ -12387,35 +12387,35 @@ for-each-pair(
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-06"/>
       <environment ref="global"/>
       <test>
-        map:keys(map{1:"yes", 2:"no"})
+        map:keys(map { 1: "yes", 2:" no" })
       </test>
       <result>
-         <assert-permutation>(1,2)</assert-permutation>
+         <assert-permutation>(1, 2)</assert-permutation>
       </result>
    </test-case>
 
-   <test-case name="fo-test-map-keys-002">
-      <description>Test case for map:keys</description>
+   <test-case name="fo-test-map-keys-where-001">
+      <description>Test case for map:keys-where</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-06"/>
       <environment ref="global"/>
       <test>
         
 let $numbers := map {
-  0: 'zero',
-  1: 'one',
-  2: 'two',
-  3: 'three'
+  0: "zero",
+  1: "one",
+  2: "two",
+  3: "three"
 }
-return map:keys($numbers, function { . = ('two', 'three') })
+return map:keys-where($numbers, fn($key, $value) { $value = ("two", "three") })
                
       </test>
       <result>
-         <assert-deep-eq>(2, 3)</assert-deep-eq>
+         <assert-permutation>(2, 3)</assert-permutation>
       </result>
    </test-case>
 
-   <test-case name="fo-test-map-keys-003">
-      <description>Test case for map:keys</description>
+   <test-case name="fo-test-map-keys-where-002">
+      <description>Test case for map:keys-where</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-06"/>
       <environment ref="global"/>
       <test>
@@ -12423,27 +12423,27 @@ return map:keys($numbers, function { . = ('two', 'three') })
 let $square := map:merge(
   (1 to 5) ! map:entry(., . * .)
 )
-return map:keys($square, function { . &gt; 5 and . &lt; 20 })
+return map:keys-where($square, fn($key, $value) { $value &gt; 5 and $value &lt; 20 })
                
       </test>
       <result>
-         <assert-deep-eq>(3, 4)</assert-deep-eq>
+         <assert-permutation>(3, 4)</assert-permutation>
       </result>
    </test-case>
 
-   <test-case name="fo-test-map-keys-004">
-      <description>Test case for map:keys</description>
+   <test-case name="fo-test-map-keys-where-003">
+      <description>Test case for map:keys-where</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-06"/>
       <environment ref="global"/>
       <test>
         
 let $birthdays := map {
-  'jack': xs:date('1980-12-31'),
-  'joel': xs:date('1969-11-10'),
-  'john': xs:date('2001-05-05')
+  "jack": xs:date("1980-12-31"),
+  "joel": xs:date("1969-11-10"),
+  "john": xs:date("2001-05-05")
 }
-return map:keys($birthdays, function($date) {
-  year-from-date($date) = 1969
+return map:keys-where($birthdays, fn($name, $date) {
+  starts-with($name, "j") and year-from-date($date) = 1969
 })
                
       </test>
@@ -12581,6 +12581,30 @@ return map:keys($birthdays, function($date) {
       </test>
       <result>
          <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-map-empty-001">
+      <description>Test case for map:empty</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-06"/>
+      <environment ref="global"/>
+      <test>
+        map:empty(map {})
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-map-empty-002">
+      <description>Test case for map:empty</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-06"/>
+      <environment ref="global"/>
+      <test>
+        map:empty(map { 1: () })
+      </test>
+      <result>
+         <assert-false/>
       </result>
    </test-case>
 
@@ -14601,54 +14625,6 @@ return $M(collation-key("a", $C))
       </test>
       <result>
          <assert-false/>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-array-exists-001">
-      <description>Test case for array:exists</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-06"/>
-      <environment ref="global"/>
-      <test>
-        array:exists(["a", "b", "c"])
-      </test>
-      <result>
-         <assert-true/>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-array-exists-002">
-      <description>Test case for array:exists</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-06"/>
-      <environment ref="global"/>
-      <test>
-        array:exists([])
-      </test>
-      <result>
-         <assert-false/>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-array-exists-003">
-      <description>Test case for array:exists</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-06"/>
-      <environment ref="global"/>
-      <test>
-        array:exists([[]])
-      </test>
-      <result>
-         <assert-true/>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-array-exists-004">
-      <description>Test case for array:exists</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-06"/>
-      <environment ref="global"/>
-      <test>
-        array:exists([()])
-      </test>
-      <result>
-         <assert-true/>
       </result>
    </test-case>
 
