@@ -37,7 +37,7 @@
     <created by="Michael Kay" on="2020-02-09"/>
     <test>array:index-of(array{(1 to 100) ! (. mod 30)}, 1)</test>
     <result>
-      <assert-deep-eq>31, 61, 91</assert-deep-eq>
+      <assert-deep-eq>1, 31, 61, 91</assert-deep-eq>
     </result>
   </test-case>
   
@@ -53,7 +53,7 @@
   <test-case name="array-index-of-009">
     <description>Select empty members</description>
     <created by="Michael Kay" on="2023-11-30"/>
-    <test>array:index-of([1, 2, 3, [], 5, [], 7], ())</test>
+    <test>array:index-of([1, 2, 3, (), [], (), 7], ())</test>
     <result>
       <assert-deep-eq>4, 6</assert-deep-eq>
     </result>
@@ -71,21 +71,33 @@
   <test-case name="array-index-of-011">
     <description>Atomize sequence</description>
     <created by="Michael Kay" on="2023-11-30"/>
-    <test><![CDATA[array:index-of(array{parse-xml("<doc><a>1</a><a>2</a><a>4</a></doc>")//a}, 4)]]></test>
+    <test><![CDATA[array:index-of(array{parse-xml("<doc><a>1</a><a>2</a><a>4</a></doc>")//a}, '4')]]></test>
     <result>
       <assert-eq>3</assert-eq>
     </result>
   </test-case>
   
   <test-case name="array-index-of-012">
-    <description>Atomize search key</description>
+    <description>Atomize sequence</description>
     <created by="Michael Kay" on="2023-11-30"/>
-    <test><![CDATA[array:index-of([11 to 15], parse-xml("<doc><a>44</a></doc>")//a})]]></test>
+    <test><![CDATA[array:index-of(array{parse-xml("<doc><a>1</a><a>2</a><a>4</a></doc>")//a}, 4)]]></test>
     <result>
-      <assert-eq>4</assert-eq>
+      <assert-empty/>
     </result>
   </test-case>
   
-  
+  <test-case name="array-index-of-013">
+    <description>Atomize search key</description>
+    <created by="Michael Kay" on="2023-11-30"/>
+    <test><![CDATA[
+array:index-of(
+  array { 11 to 50 },
+  parse-xml("<doc><a>44</a></doc>")//a ! xs:integer()
+)
+]]></test>
+    <result>
+      <assert-eq>34</assert-eq>
+    </result>
+  </test-case>
 
 </test-set>
