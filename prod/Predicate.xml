@@ -1158,9 +1158,20 @@
    <test-case name="K-FilterExpr-93">
       <description> A predicate whose expression EBV cannot be extracted from. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"></dependency>
       <test>(1, 2, 3)[1, "a string"]</test>
       <result>
          <error code="FORG0006"/>
+      </result>
+   </test-case>
+
+   <test-case name="K-FilterExpr-93a">
+      <description> A predicate whose expression EBV cannot be extracted from. </description>
+      <created by="Christian Gruen" on="2024-02-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(1, 2, 3)[1, "a string"]</test>
+      <result>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
@@ -2331,4 +2342,59 @@ count((-1, 0, 1, 2147483647, 2147483648, 2147483649, 4294967295, 4294967296, 429
          <assert-deep-eq>6, 4</assert-deep-eq>
       </result>
    </test-case>
+
+   <test-case name="predicate-500">
+      <description> A predicate starting with a number and ending with a string. </description>
+      <created by="Christian Gruen" on="2024-02-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>1[1, ""]</test>
+      <result>
+         <any-of>
+            <assert-eq>1</assert-eq>
+            <error code="XPTY0004"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-501">
+      <description> A predicate starting with a number and ending with a string. </description>
+      <created by="Christian Gruen" on="2024-02-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(5, 4, 3, 2, 1)[1, 2, 3, 4, ""]</test>
+      <result>
+         <any-of>
+            <assert-eq>1</assert-eq>
+            <error code="XPTY0004"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-502">
+      <description> A predicate starting with a number and ending with a string. </description>
+      <created by="Christian Gruen" on="2024-02-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(1 to 1000)[reverse(1 to 1000), ""]</test>
+      <result>
+         <any-of>
+            <assert-deep-eq>1 to 1000</assert-deep-eq>
+            <error code="XPTY0004"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-503">
+      <description> A predicate starting with a number and ending with a string. </description>
+      <created by="Christian Gruen" on="2024-02-08"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+1[ number(<?_ 1?>), "" ]
+]]></test>
+      <result>
+         <any-of>
+            <assert-eq>1</assert-eq>
+            <error code="XPTY0004"/>
+         </any-of>
+      </result>
+   </test-case>
+
 </test-set>
