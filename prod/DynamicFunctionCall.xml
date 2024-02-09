@@ -1,0 +1,1142 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-DynamicFunctionCall">
+   <description>Tests for dynamic function calls, in particular, the 4.0 coercion rules.</description>
+   <link type="spec" document="http://www.w3.org/TR/xquery-40/"
+         idref="doc-xquery40-DynamicFunctionCall"/>
+         
+   <environment name="ListUnionTypes">
+      <schema uri="http://www.w3.org/XQueryTest/ListUnionTypes" file="ValidateExpr/listunion.xsd">
+         <description>A schema defining a list of unions.</description>
+         <created by="Anonymous" on="2024-02-09"/>
+      </schema>
+   </environment>
+   
+   <environment name="unionListDefined">
+      <schema uri="http://www.w3.org/XQueryTest/unionListDefined" file="SchemaImport/unionListDefined.xsd">
+         <description>A schema defining list and union types.</description>
+         <created by="Anonymous" on="2024-02-09"/>
+      </schema>
+   </environment>
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+   
+   <test-case name="DynamicFunctionCall-001">
+      <description>Test that arguments are atomized - built in function</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         let $f := format-integer(?, 'Ww')
+         return $f(<a>13</a>)
+         ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-eq>'Thirteen'</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-002">
+      <description>Test that arguments are atomized - constructor function</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         let $f := xs:boolean#1
+         return $f(<a>0</a>)
+      ]]></test>
+      <result>
+        <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-003">
+      <description>Test that arguments are atomized - constructor function</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test><![CDATA[
+         let $f := xs:integer#1
+         return $f(validate type xs:decimal {<a>93.7</a>})]]></test>
+      <result>
+        <all-of>
+          <assert-type>xs:integer</assert-type>
+          <assert-eq>93</assert-eq>
+        </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-004">
+      <description>Test that arguments are atomized - user-defined function</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+         let $f := fn($in as xs:boolean) as xs:boolean { $in }
+         return $f(<a>0</a>)]]></test>
+      <result>
+        <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-005">
+      <description>Test that arguments are atomized - user-defined function</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test><![CDATA[
+         let $f := fn($in as xs:anyAtomicType) as xs:boolean { $in instance of xs:decimal }
+         return $f(validate type xs:integer {<a>12</a>})]]></test>
+      <result>
+        <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-006">
+      <description>Test that arguments are atomized - enumeration type</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test><![CDATA[
+         let $f := fn($in as enum("a", "b", "c")) as xs:string { upper-case($in) }
+         return $f(<a>b</a>)]]></test>
+      <result>
+         <assert-eq>"B"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-007">
+      <description>Test atomization failure - enumeration type</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test><![CDATA[
+         let $f := fn($in as enum("a", "b", "c")) as xs:string { upper-case($in) }
+         return $f(<a>z</a>)]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-008" covers-30="dynamic-function-call">
+      <description>Test that arguments are atomized - dynamic call to a user-defined function</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test><![CDATA[
+         declare function local:f($in as xs:anyAtomicType) as xs:boolean { $in instance of xs:decimal };
+         let $f := function-lookup(xs:QName('local:f'), 1)
+         return $f(validate type xs:integer {<a>12</a>})]]></test>
+      <result>
+        <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-009">
+      <description>Test that a sequence of untypedAtomic values is cast to the target type: user-defined function.
+         Also tests XPath 3.0 casting to list, and bang operator.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+        let $f := fn($in as xs:decimal*) as xs:decimal {sum($in, 0.0)}
+        return $f(xs:NMTOKENS('1 1.2 1.3 1.4')!xs:untypedAtomic(.))
+      ]]></test>
+      <result>
+        <all-of>
+          <assert-type>xs:decimal</assert-type>
+          <assert-eq>4.9</assert-eq>
+        </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-010">
+      <description>Test that a sequence of untypedAtomic values is cast to the target type: inline function.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>function($in as xs:decimal*) as xs:decimal {sum($in, 0.0)}(xs:NMTOKENS('1 1.2 1.3 1.4')!xs:untypedAtomic(.))</test>
+      <result>
+        <all-of>
+          <assert-type>xs:decimal</assert-type>
+          <assert-eq>4.9</assert-eq>
+        </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-011" covers-30="cast-to-list bang-operator">
+      <description>Test that a sequence of untypedAtomic values is cast to the target type: built-in function.
+         Also tests casting to list, and bang operator.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := codepoints-to-string#1
+         return $f(xs:NMTOKENS('48 49 50 51')!xs:untypedAtomic(.))</test>
+      <result>
+        <all-of>
+          <assert-type>xs:string</assert-type>
+          <assert-string-value>0123</assert-string-value>
+        </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-012">
+      <description>Test that a sequence of NON-untypedAtomic values is NOT cast to the target type: built-in function.
+         Also tests casting to list.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := codepoints-to-string#1
+         return $f(xs:NMTOKENS('30 31 32 33'))
+      </test>
+      <result>
+        <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-013">
+      <description>Supply untypedAtomic, expected type is an enumeration.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+        let $f := function($a as enum("x", "y", "z")*) as xs:integer {
+          string-length(string-join($a, '|'))
+        }
+        return $f(('z', 'x') ! xs:untypedAtomic(.))
+      ]]></test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-014" covers-30="inline-function">
+      <description>Test that the untypedAtomic result of an inline function is cast to the declared type.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+        let $f := function($a as xs:integer, $b as xs:integer) as xs:integer {
+          data(<a>{$a}{$b}</a>)
+        }
+        return $f(12, 34)
+      ]]></test>
+      <result>
+        <all-of>
+          <assert-type>xs:integer</assert-type>
+          <assert-eq>1234</assert-eq>
+        </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-015">
+      <description>Supply untypedAtomic where required type is namespace sensitive. Rule 1(b)(ii)(B)(I).</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+        let $f := function($a as union(xs:string, xs:QName)) as xs:integer {
+          string-length($a)
+        }
+        return $f(xs:untypedAtomic('banana'))
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:integer</assert-type>
+            <assert-eq>6</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-016">
+      <description>Supply untypedAtomic where required type is namespace sensitive. Rule 1(b)(ii)(B)(II).</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+        let $f := function($a as union(xs:NCName, xs:QName)) as xs:integer {
+          string-length($a)
+        }
+        return $f(xs:untypedAtomic('banana'))
+      ]]></test>
+      <result>
+         <error code="XPTY0117"/>
+      </result>
+   </test-case>
+   
+
+   <test-case name="DynamicFunctionCall-022" covers="array-general">
+      <description>Test that array arguments are atomized - user-defined function</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+         let $f := fn($in as xs:integer*) as xs:boolean { count($in) = count(distinct-values($in)) }
+         return ($f([1,2,3,4,5]), $f([1,2,3,4,4]))]]></test>
+      <result>
+        <assert-deep-eq>true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-023">
+      <description>Test that a sequence of arguments is atomized</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+         let $f := string-join(?, '|')
+         return $f((<a>X</a>, <a>Y</a>, <a>Z</a>))
+      ]]></test>
+      <result>
+        <assert-string-value>X|Y|Z</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-024">
+      <description>Test that a sequence of arguments is atomized</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+         let $f := fn($s as xs:NCName*) {deep-equal($s, ("X", "Y", "Z"))} 
+         return $f((<a>X</a>, <a>Y</a>, <a>Z</a>))]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   
+   <test-case name="DynamicFunctionCall-080">
+      <description>Relabeling</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:positiveInteger) as xs:negativeInteger {
+         -$in
+         }
+         return $f(5)</test>
+      <result>
+         <all-of>
+            <assert-type>xs:negativeInteger</assert-type>
+            <assert-eq>-5</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-081">
+      <description>Failed Relabeling</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:positiveInteger) as xs:negativeInteger {
+         -$in
+         }
+         return $f(-5)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-082">
+      <description>Relabeling as union type</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as union(xs:positiveInteger, xs:negativeInteger)) as 
+         union(xs:positiveInteger, xs:negativeInteger) {
+         -$in
+         }
+         return $f(5)</test>
+      <result>
+         <all-of>
+            <assert-type>xs:negativeInteger</assert-type>
+            <assert-eq>-5</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-083">
+      <description>Relabeling as union type</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as union(xs:positiveInteger, xs:negativeInteger)) as 
+         union(xs:positiveInteger, xs:negativeInteger) {
+         -$in
+         }
+         return $f(-5)</test>
+      <result>
+         <all-of>
+            <assert-type>xs:negativeInteger</assert-type>
+            <assert-eq>5</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-084">
+      <description>Failed Relabeling as union type</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as union(xs:positiveInteger, xs:negativeInteger)) as 
+         union(xs:positiveInteger, xs:negativeInteger) {
+         -$in
+         }
+         return $f(0)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-085">
+      <description>Relabeling as enumeration type</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as enum("a", "b", "c") as 
+         enum("A", "B", "C") {
+         upper-case($in)
+         }
+         return $f("c")</test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-type>enum("A", "B", "C")</assert-type>
+            <assert-eq>"C"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-086">
+      <description>Failed relabeling as enumeration type</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as enum("a", "b", "c", "d") as 
+         enum("A", "B", "C") {
+         upper-case($in)
+         }
+         return $f("d")</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-087">
+      <description>Relabeling</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:positiveInteger) as item() {
+           $in
+         }
+         return $f(5)</test>
+      <result>
+         <all-of>
+            <assert-type>xs:positiveInteger</assert-type>
+            <assert-eq>5</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-088">
+      <description>Relabeling not necessary</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:nonNegativeInteger) as item() {
+           $in
+         }
+         return $f(xs:positiveInteger(5))</test>
+      <result>
+         <all-of>
+            <assert-type>xs:positiveInteger</assert-type>
+            <assert-eq>5</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   
+   
+   
+
+   <test-case name="DynamicFunctionCall-125">
+      <description>Test numeric promotion to xs:double.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:double*) as xs:double* {$in!(. + 1)}
+         return $f((1, xs:double(3.1e0), xs:float(0.25), xs:decimal(0.5)))</test>
+      <result>
+        <all-of>
+          <assert-type>xs:double*</assert-type>
+          <assert-deep-eq>2e0, 4.1e0, 1.25e0, 1.5e0</assert-deep-eq>
+        </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-126">
+      <description>Test numeric promotion to xs:decimal.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:decimal*) as xs:decimal* {$in!(. + 1)}
+         return $f((1, xs:double(3.1e0), xs:float(0.25), xs:decimal(0.5))) =!> round(2)</test>
+      <result>
+         <all-of>
+            <assert-type>xs:decimal*</assert-type>
+            <assert-deep-eq>2, 4.1, 1.25, 1.5</assert-deep-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-127">
+      <description>Test numeric promotion to xs:float.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:float*) as xs:float* {$in!(. + 1)}
+         return $f((1, xs:double(3.1e0), xs:float(0.25), xs:decimal(0.5))) =!> round(2)</test>
+      <result>
+         <all-of>
+            <assert-type>xs:float*</assert-type>
+            <assert-deep-eq>(2e0, 4.1e0, 1.25e0, 1.5e0) =!> xs:float()</assert-deep-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-128">
+      <description>Test no numeric promotion to xs:integer.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:integer) as xs:integer {$in + 1}
+         return $f(3.1)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-129">
+      <description>Test promotion anyURI to string.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:string*) as xs:string {string-join($in!string-length(.), ';')}
+         return $f((xs:anyURI('http://one.com/'), xs:anyURI('http://two.com/')))</test>
+      <result>
+        <all-of>
+          <assert-type>xs:string</assert-type>
+          <assert-string-value>15;15</assert-string-value>
+        </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-130">
+      <description>Test promotion string to anyURI.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:anyURI*) as xs:anyURI* {$in ! resolve-uri(., 'http://example.com')}
+         return $f(('one.xml', 'two.xml'))</test>
+      <result>
+         <all-of>
+            <assert-type>xs:anyURI*</assert-type>
+            <assert-deep-eq>xs:anyURI('http://example.com/one.xml'),xs:anyURI('http://example.com/two.xml')</assert-deep-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-131">
+      <description>Test promotion hexBinary to base64Binary.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:base64Binary*) as xs:string {
+            string-join($in ! lower-case(string(.)), ';')
+         }
+         return $f((xs:base64Binary('ABCD'), xs:hexBinary('01020304')))</test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-string-value>abcd;aqidba==</assert-string-value>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-132">
+      <description>Test promotion base64Binary to hexBinary.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:hexBinary*) as xs:string {
+            string-join($in ! lower-case(string(.)), ';')
+         }
+         return $f((xs:base64Binary('ABCD'), xs:hexBinary('01020304')))</test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-string-value>001083;01020304</assert-string-value>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-133">
+      <description>No promotion for union types</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as union(xs:decimal, xs:float)) as xs:string {
+            string($in)
+         }
+         return $f(xs:double('-INF'))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-134">
+      <description>No promotion for union types</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as union(xs:string, xs:untypedAtomic)) as xs:string {
+            string($in)
+         }
+         return $f(xs:anyURI('http://example.com/'))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-135">
+      <description>No promotion for restricted types</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:NCName) as xs:string {
+            string($in)
+         }
+         return $f(xs:anyURI('para'))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-136">
+      <description>No promotion for enumeration types</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as enum("a", "b", "c")) as xs:string {
+            string($in)
+         }
+         return $f(xs:anyURI('a'))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-137">
+      <description>Promotion from derived type</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as xs:anyURI) as xs:string {
+            resolve-uri($in, 'http://example.com/')
+         }
+         return $f(xs:NCName(local-name-from-QName(QName('http://saxon.sf.net/', 'output'))))</test>
+      <result>
+         <assert-eq>"http://example.com/output"</assert-eq>
+      </result>
+   </test-case>
+   
+   
+   
+   <test-case name="DynamicFunctionCall-R-004">
+      <description>Test that arguments are atomized - user-defined function - record test</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+         let $f := fn($in as record(x as xs:boolean)) as xs:boolean { $in?x }
+         return $f(map{'x':<a>0</a>})]]></test>
+      <result>
+        <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-005">
+      <description>Test that arguments are atomized - user-defined function - record test</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test><![CDATA[
+         let $f := fn($in as record(x as xs:anyAtomicType)) as xs:boolean { $in?x instance of xs:decimal }
+         return $f(map{'x': validate type xs:integer {<a>12</a>}})]]></test>
+      <result>
+        <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-006">
+      <description>Test that arguments are atomized - enumeration type - record test</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test><![CDATA[
+         let $f := fn($in as record(x as enum("a", "b", "c"))) as xs:string { upper-case($in?x) }
+         return $f(map{'x':<a>b</a>})]]></test>
+      <result>
+         <assert-eq>"B"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-007">
+      <description>Test atomization failure - enumeration type - record test</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test><![CDATA[
+         let $f := fn($in as record(x as enum("a", "b", "c"))) as xs:string { upper-case($in?x) }
+         return $f(map{'x':<a>z</a>})]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-008">
+      <description>Test that arguments are atomized - dynamic call to a user-defined function - record test</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test><![CDATA[
+         declare function local:f($in as record('x' as xs:anyAtomicType)) as xs:boolean { 
+             $in?x instance of xs:decimal 
+         };
+         let $f := function-lookup(xs:QName('local:f'), 1)
+         return $f(map{'x':validate type xs:integer {<a>12</a>}})]]></test>
+      <result>
+        <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-009">
+      <description>Test that a sequence of untypedAtomic values is cast to the target type: 
+         user-defined function. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+        let $f := fn($in as record(x as xs:decimal*)) as xs:decimal {sum($in?x, 0.0)}
+        return $f(map{'x':xs:NMTOKENS('1 1.2 1.3 1.4')!xs:untypedAtomic(.)})
+      ]]></test>
+      <result>
+        <all-of>
+          <assert-type>xs:decimal</assert-type>
+          <assert-eq>4.9</assert-eq>
+        </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-009a">
+      <description>Test that a sequence of untypedAtomic values is cast to the target type: 
+         user-defined function. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+        let $f := fn($in as record(x as xs:decimal)*) as xs:decimal {sum($in?x, 0.0)}
+        return $f(xs:NMTOKENS('1 1.2 1.3 1.4') ! map{'x':xs:untypedAtomic(.)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:decimal</assert-type>
+            <assert-eq>4.9</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-010">
+      <description>Test that a sequence of untypedAtomic values is cast to the target type: 
+         inline function. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>function($in as record(x as xs:decimal*)) as xs:decimal {
+         sum($in?x, 0.0)}(map{'x':xs:NMTOKENS('1 1.2 1.3 1.4')!xs:untypedAtomic(.)})</test>
+      <result>
+        <all-of>
+          <assert-type>xs:decimal</assert-type>
+          <assert-eq>4.9</assert-eq>
+        </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-011">
+      <description>Nested record tests</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as record(y as xs:decimal))) as xs:decimal {
+            $in?x?y + 1
+         }
+      return $f(map{'x':map{'y':xs:untypedAtomic('3.9')}})</test>
+      <result>
+         <all-of>
+            <assert-type>xs:decimal</assert-type>
+            <assert-eq>4.9</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-013">
+      <description>Supply untypedAtomic, expected type is an enumeration. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+        let $f := function($a as record(xx as enum("x", "y", "z")*)) as xs:integer {
+          string-length(string-join($a?xx, '|'))
+        }
+        return $f(map{'xx':('z', 'x') ! xs:untypedAtomic(.)})
+      ]]></test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-014">
+      <description>Test that the untypedAtomic result of an inline function is cast 
+         to the declared type. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+        let $f := function($a as xs:integer, $b as xs:integer) as record(x as xs:integer) {
+          map{'x':data(<a>{$a}{$b}</a>)}
+        }
+        return $f(12, 34)?x
+      ]]></test>
+      <result>
+        <all-of>
+          <assert-type>xs:integer</assert-type>
+          <assert-eq>1234</assert-eq>
+        </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-015">
+      <description>Supply untypedAtomic where required type is namespace sensitive. 
+         Rule 1(b)(ii)(B)(I). Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+        let $f := function($a as record(x as union(xs:string, xs:QName))) as xs:integer {
+          string-length($a?x)
+        }
+        return $f(map{'x':xs:untypedAtomic('banana')})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-type>xs:integer</assert-type>
+            <assert-eq>6</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-016">
+      <description>Supply untypedAtomic where required type is namespace sensitive. 
+         Rule 1(b)(ii)(B)(II). Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+        let $f := function($a as record(x as union(xs:NCName, xs:QName))) as xs:integer {
+          string-length($a?x)
+        }
+        return $f(map{'x':xs:untypedAtomic('banana')})
+      ]]></test>
+      <result>
+         <error code="XPTY0117"/>
+      </result>
+   </test-case>
+   
+
+   <test-case name="DynamicFunctionCall-R-022">
+      <description>Test that array arguments are atomized - user-defined function. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+         let $f := fn($in as record(x as xs:integer*)) as xs:boolean { count($in) = count(distinct-values($in)) }
+         return ($f(map{'x':[1,2,3,4,5]}), $f(map{'x':[1,2,3,4,4]}))]]></test>
+      <result>
+        <assert-deep-eq>true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-024">
+      <description>Test that a sequence of arguments is atomized. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test><![CDATA[
+         let $f := fn($s as record(x as xs:NCName*)) {deep-equal($s?x, ("X", "Y", "Z"))} 
+         return $f(map{'x':(<a>X</a>, <a>Y</a>, <a>Z</a>)})]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   
+   <test-case name="DynamicFunctionCall-R-080">
+      <description>Relabeling. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as xs:positiveInteger)) as xs:negativeInteger {
+         -$in?x
+         }
+         return $f(map{'x':5})</test>
+      <result>
+         <all-of>
+            <assert-type>xs:negativeInteger</assert-type>
+            <assert-eq>-5</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-081">
+      <description>Failed Relabeling. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as recod(x as xs:positiveInteger)) as xs:negativeInteger {
+         -$in?x
+         }
+         return $f(map{'x':-5})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-082">
+      <description>Relabeling as union type. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as union(xs:positiveInteger, xs:negativeInteger))) as 
+         union(xs:positiveInteger, xs:negativeInteger) {
+         -$in?x
+         }
+         return $f(map{'x':5})</test>
+      <result>
+         <all-of>
+            <assert-type>xs:negativeInteger</assert-type>
+            <assert-eq>-5</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-083">
+      <description>Relabeling as union type. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as union(xs:positiveInteger, xs:negativeInteger))) as 
+         union(xs:positiveInteger, xs:negativeInteger) {
+         -$in?x
+         }
+         return $f(map{'x':-5})</test>
+      <result>
+         <all-of>
+            <assert-type>xs:negativeInteger</assert-type>
+            <assert-eq>5</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-084">
+      <description>Failed Relabeling as union type. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as union(xs:positiveInteger, xs:negativeInteger))) as 
+         union(xs:positiveInteger, xs:negativeInteger) {
+         -$in?x
+         }
+         return $f(map{'x':0})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-085">
+      <description>Relabeling as enumeration type. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as enum("a", "b", "c"))) as 
+            enum("A", "B", "C") {
+              upper-case($in?x)
+         }
+         return $f(map{'x':"c"})</test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-type>enum("A", "B", "C")</assert-type>
+            <assert-eq>"C"</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-086">
+      <description>Failed relabeling as enumeration type. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as enum("a", "b", "c", "d")) as 
+            enum("A", "B", "C") {
+               upper-case($in?x)
+         }
+         return $f(map{'x':"d"})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-087">
+      <description>Relabeling. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as xs:positiveInteger)) as item() {
+           $in?x
+         }
+         return $f(map{'x':5})</test>
+      <result>
+         <all-of>
+            <assert-type>xs:positiveInteger</assert-type>
+            <assert-eq>5</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-088">
+      <description>Relabeling not necessary. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as xs:nonNegativeInteger)) as item() {
+           $in?x
+         }
+         return $f(map{'x':xs:positiveInteger(5)})</test>
+      <result>
+         <all-of>
+            <assert-type>xs:positiveInteger</assert-type>
+            <assert-eq>5</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-125">
+      <description>Test numeric promotion to xs:double. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as xs:double*)) as xs:double* {($in?x)!(. + 1)}
+         return $f(map{'x':(1, xs:double(3.1e0), xs:float(0.25), xs:decimal(0.5))})</test>
+      <result>
+        <all-of>
+          <assert-type>xs:double*</assert-type>
+          <assert-deep-eq>2e0, 4.1e0, 1.25e0, 1.5e0</assert-deep-eq>
+        </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-126">
+      <description>Test numeric promotion to xs:decimal. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as xs:decimal*)) as xs:decimal* {($in?x)!(. + 1)}
+         return $f(map{'x':(1, xs:double(3.1e0), xs:float(0.25), xs:decimal(0.5))}) =!> round(2)</test>
+      <result>
+         <all-of>
+            <assert-type>xs:decimal*</assert-type>
+            <assert-deep-eq>2, 4.1, 1.25, 1.5</assert-deep-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-127">
+      <description>Test numeric promotion to xs:float. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as xs:float*)) as xs:float* {($in?x)!(. + 1)}
+         return $f(map{'x':(1, xs:double(3.1e0), xs:float(0.25), xs:decimal(0.5))}) =!> round(2)</test>
+      <result>
+         <all-of>
+            <assert-type>xs:float*</assert-type>
+            <assert-deep-eq>(2e0, 4.1e0, 1.25e0, 1.5e0) =!> xs:float()</assert-deep-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-128">
+      <description>Test no numeric promotion to xs:integer. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as map{x as xs:integer}) as xs:integer {$in?x + 1}
+         return $f(map{'x':3.1})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-129">
+      <description>Test promotion anyURI to string. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as xs:string*) as xs:string {
+                      string-join(($in?x)!string-length(.), ';')}
+         return $f(map{'x':(xs:anyURI('http://one.com/'), xs:anyURI('http://two.com/'))})</test>
+      <result>
+        <all-of>
+          <assert-type>xs:string</assert-type>
+          <assert-string-value>15;15</assert-string-value>
+        </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-130">
+      <description>Test promotion string to anyURI. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as xs:anyURI*)) as xs:anyURI {($in?x) ! resolve-uri(., 'http://example.com')}
+         return $f(map{'x':('one.xml', 'two.xml')})</test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-string-value>http://example.com/one.xml;http://example.com/two.xml</assert-string-value>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-131">
+      <description>Test promotion hexBinary to base64Binary. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as xs:base64Binary*)) as xs:string {
+            string-join($in?x ! lower-case(string(.)), ';')
+         }
+         return $f(map{'x':(xs:base64Binary('ABCD'), xs:hexBinary('01020304'))})</test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-string-value>abcd;aqidba==</assert-string-value>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-132">
+      <description>Test promotion base64Binary to hexBinary. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as xs:hexBinary*)) as xs:string {
+            string-join($in?x ! lower-case(string(.)), ';')
+         }
+         return $f(map{'x':(xs:base64Binary('ABCD'), xs:hexBinary('01020304'))})</test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-string-value>001083;01020304</assert-string-value>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-133">
+      <description>No promotion for union types. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as union(xs:decimal, xs:float))) as xs:string {
+            string($in?x)
+         }
+         return $f(map{'x':xs:double('-INF')})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-134">
+      <description>No promotion for union types. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as union(xs:string, xs:untypedAtomic))) as xs:string {
+            string($in?x)
+         }
+         return $f(map{'x':xs:anyURI('http://example.com/')})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-135">
+      <description>No promotion for restricted types. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as xs:NCName)) as xs:string {
+            string($in?x)
+         }
+         return $f(map{'x':xs:anyURI('para')})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-136">
+      <description>No promotion for enumeration types. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as enum("a", "b", "c"))) as xs:string {
+            string($in?x)
+         }
+         return $f(map{'x':xs:anyURI('a')})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-R-137">
+      <description>Promotion from derived type. Within record test.</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <test>
+         let $f := function($in as record(x as xs:anyURI)) as xs:string {
+            resolve-uri($in?x, 'http://example.com/')
+         }
+         return $f(map{'x':xs:NCName(local-name-from-QName(QName('http://saxon.sf.net/', 'output')))})</test>
+      <result>
+         <assert-eq>"http://example.com/output"</assert-eq>
+      </result>
+   </test-case>
+   
+   
+ 
+
+</test-set>
