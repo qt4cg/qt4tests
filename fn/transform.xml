@@ -2814,7 +2814,58 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
         <result>
             <assert>string($result("http://example.com/")) = 'RIGHT'</assert>
         </result>
-    </test-case> 
+    </test-case>
+    
+    <test-case name="fn-transform-89">
+        <description>Transform constructs a text node: delivery format = document</description>
+        <created by="Michael Kay" on="2024-02-07"/>
+        <modified by="Debbie Lockett" on="2022-08-26" change="Remove XQ31+ dependency; use default XQ31+ XP31+"/>
+        <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
+        <test><![CDATA[
+            let $xsl  :="<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='2.0'>
+                <xsl:template match='/'>
+                    <xsl:value-of select='1 to 5'/>
+                </xsl:template>
+            </xsl:stylesheet>"
+            return
+            transform(map{"stylesheet-text": $xsl, 
+                          "source-node": parse-xml("<doc>this</doc>") })
+        ]]></test>
+        <result>
+            <all-of>
+                <assert-type>map(*)</assert-type>
+                <assert>map:contains($result, "output")</assert>
+                <assert>$result?output instance of document-node()</assert>
+                <assert>$result?output/text() = '1 2 3 4 5'</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="fn-transform-90">
+        <description>Transform constructs a text node: delivery format = raw</description>
+        <created by="Michael Kay" on="2024-02-07"/>
+        <modified by="Debbie Lockett" on="2022-08-26" change="Remove XQ31+ dependency; use default XQ31+ XP31+"/>
+        <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
+        <test><![CDATA[
+            let $xsl  :="<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='2.0'>
+                <xsl:template match='/'>
+                    <xsl:value-of select='1 to 5'/>
+                </xsl:template>
+            </xsl:stylesheet>"
+            return
+            transform(map{"stylesheet-text": $xsl, 
+                          "source-node": parse-xml("<doc>this</doc>"), 
+                          "delivery-format": "raw"})
+        ]]></test>
+        <result>
+            <all-of>
+                <assert-type>map(*)</assert-type>
+                <assert>map:contains($result, "output")</assert>
+                <assert>$result?output instance of text()</assert>
+                <assert>$result?output = '1 2 3 4 5'</assert>
+            </all-of>
+        </result>
+    </test-case>
    
     <test-case name="fn-transform-401" covers-40="fn-transform">
         <description>Invoke an XSLT 4.0 stylesheet</description>
