@@ -312,8 +312,8 @@
       <created by="Michael Kay" on="2024-02-09"/>
       <test>
          let $f := function($in as union(xs:positiveInteger, xs:negativeInteger)) as 
-         union(xs:positiveInteger, xs:negativeInteger) {
-         -$in
+                                   union(xs:positiveInteger, xs:negativeInteger) {
+           -$in
          }
          return $f(5)</test>
       <result>
@@ -359,9 +359,8 @@
       <description>Relabeling as enumeration type</description>
       <created by="Michael Kay" on="2024-02-09"/>
       <test>
-         let $f := function($in as enum("a", "b", "c") as 
-         enum("A", "B", "C") {
-         upper-case($in)
+         let $f := function($in as enum("a", "b", "c")) as enum("A", "B", "C") {
+            upper-case($in)
          }
          return $f("c")</test>
       <result>
@@ -377,9 +376,8 @@
       <description>Failed relabeling as enumeration type</description>
       <created by="Michael Kay" on="2024-02-09"/>
       <test>
-         let $f := function($in as enum("a", "b", "c", "d") as 
-         enum("A", "B", "C") {
-         upper-case($in)
+         let $f := function($in as enum("a", "b", "c", "d")) as enum("A", "B", "C") {
+            upper-case($in)
          }
          return $f("d")</test>
       <result>
@@ -601,6 +599,42 @@
       </result>
    </test-case>
    
+   <test-case name="DynamicFunctionCall-140">
+      <description>Promotion based on declared not supplied type</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <dependency type="spec" value="XQ40"/>
+      <test>
+         let $f := function($in as xs:double) as xs:boolean {
+             ($in * 2) instance of xs:double
+         }
+         let $g as function(xs:integer) as xs:boolean := $f;
+         $g(123)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="DynamicFunctionCall-141">
+      <description>Promotion based on declared not actual type</description>
+      <created by="Michael Kay" on="2024-02-09"/>
+      <dependency type="spec" value="XQ40"/>
+      <test>
+         (: Note that even though the signature of $f is a subtype of the declared type of $g,
+            function coercion applies, and the call on $g() is actually a call on a coerced function
+            that wraps $f; this function has a required type of xs:integer, for which the supplied
+            xs:double is not acceptable :)
+         let $f := function($in as xs:double) as xs:int {
+            string-length(string($in))
+         }
+         let $g as function(xs:integer) as xs:integer := $f
+         return $g(123e0)
+      </test>
+      <result>
+         <error code="XPTY004"/>
+      </result>
+   </test-case>
+   
    
    
    <test-case name="DynamicFunctionCall-R-004">
@@ -718,7 +752,7 @@
          let $f := function($in as record(x as record(y as xs:decimal))) as xs:decimal {
             $in?x?y + 1
          }
-      return $f(map{'x':map{'y':xs:untypedAtomic('3.9')}})</test>
+         return $f(map{'x':map{'y':xs:untypedAtomic('3.9')}})</test>
       <result>
          <all-of>
             <assert-type>xs:decimal</assert-type>
@@ -797,7 +831,7 @@
       <description>Test that array arguments are atomized - user-defined function. Within record test.</description>
       <created by="Michael Kay" on="2024-02-09"/>
       <test><![CDATA[
-         let $f := fn($in as record(x as xs:integer*)) as xs:boolean { count($in) = count(distinct-values($in)) }
+         let $f := fn($in as record(x as xs:integer*)) as xs:boolean { count($in?x) = count(distinct-values($in?x)) }
          return ($f(map{'x':[1,2,3,4,5]}), $f(map{'x':[1,2,3,4,4]}))]]></test>
       <result>
         <assert-deep-eq>true(), false()</assert-deep-eq>
@@ -1003,7 +1037,7 @@
       <description>Test no numeric promotion to xs:integer. Within record test.</description>
       <created by="Michael Kay" on="2024-02-09"/>
       <test>
-         let $f := function($in as map{x as xs:integer}) as xs:integer {$in?x + 1}
+         let $f := function($in as record(x as xs:integer)) as xs:integer {$in?x + 1}
          return $f(map{'x':3.1})</test>
       <result>
          <error code="XPTY0004"/>
@@ -1014,7 +1048,7 @@
       <description>Test promotion anyURI to string. Within record test.</description>
       <created by="Michael Kay" on="2024-02-09"/>
       <test>
-         let $f := function($in as record(x as xs:string*) as xs:string {
+         let $f := function($in as record(x as xs:string*)) as xs:string {
                       string-join(($in?x)!string-length(.), ';')}
          return $f(map{'x':(xs:anyURI('http://one.com/'), xs:anyURI('http://two.com/'))})</test>
       <result>
@@ -1029,12 +1063,14 @@
       <description>Test promotion string to anyURI. Within record test.</description>
       <created by="Michael Kay" on="2024-02-09"/>
       <test>
-         let $f := function($in as record(x as xs:anyURI*)) as xs:anyURI {($in?x) ! resolve-uri(., 'http://example.com')}
-         return $f(map{'x':('one.xml', 'two.xml')})</test>
+         let $f := function($in as record(x as xs:anyURI*)) as xs:anyURI* {
+             ($in?x) ! resolve-uri(., 'http://example.com')
+         }
+         return $f(map{'x':('one.xml', 'two.xml')}) ! string()</test>
       <result>
          <all-of>
-            <assert-type>xs:string</assert-type>
-            <assert-string-value>http://example.com/one.xml;http://example.com/two.xml</assert-string-value>
+            <assert-type>xs:string*</assert-type>
+            <assert-deep-eq>"http://example.com/one.xml","http://example.com/two.xml"</assert-deep-eq>
          </all-of>
       </result>
    </test-case>
