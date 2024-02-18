@@ -615,6 +615,42 @@
       </result>
    </test-case>
    
+   <test-case name="VarDecl065">
+      <description>
+         Purpose - function coercion is not applied to global variables in 3.0/3.1 
+      </description>
+      <created by="Michael Kay" on="2024-02-11"/>
+      <dependency type="spec" value="XQ30 XQ31"/>
+      <test>
+         declare variable $f as function(xs:integer) as xs:string 
+                 := function($x as item()) as xs:string {string($x)};
+         $f("banana")
+      </test>  
+      <result>
+         <assert-eq>"banana"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="VarDecl066">
+      <description>
+         Purpose - function coercion IS applied to global variables in 3.0/3.1,
+         even if the supplied value is an instance of the required type
+      </description>
+      <created by="Michael Kay" on="2024-02-11"/>
+      <dependency type="spec" value="XQ40"/>
+      <test>
+         declare variable $f as function(xs:integer) as xs:string 
+                 := function($x as item()) as xs:string {string($x)};
+         $f("banana")
+      </test>  
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   
+   
+   
    <test-case name="vardeclerr" covers-30="declaration-cycles">
       <description> Test circularity on variable/function declaration . </description>
       <created by="Carmelo Montanez" on="2006-02-06"/>

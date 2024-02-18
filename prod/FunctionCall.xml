@@ -938,6 +938,24 @@
       </result>
    </test-case>
    
+   <test-case name="FunctionCall-058">
+      <description>
+         Function coercion applies even if the supplied function matches the required type.
+         See Saxon bug 6343.
+      </description>
+      <created by="Michael Kay" on="2024-02-11"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         declare function local:f($callback as function(xs:integer) as xs:boolean) as xs:boolean {
+             $callback(year-from-date(current-date()) div 1900)
+         };
+         local:f(function($d as xs:decimal) as xs:boolean { $d lt 0 })
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
    <test-case name="FunctionCall-400" covers-40="downcasting">
       <description>Coercion rules allow downcasting (type relabeling) in 4.0</description>
       <created by="Michael Kay" on="2021-01-11"/>

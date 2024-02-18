@@ -1,0 +1,49 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-parse-csv" covers-40="fn-parse-csv">
+  <description>Tests for the fn:parse-csv function</description>
+  <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-parse-csv"/>
+  <dependency type="spec" value="XP40+ XQ40+"/>
+  
+  <test-case name="parse-csv-001">
+    <description>Empty sequence</description>
+    <created by="Michael Kay" on="2024-02-10"/>
+    <test><![CDATA[fn:parse-csv(())]]></test>
+    <result>
+      <assert-deep-eq>
+        map{"columns": map{"names": map{}, "fields": ()},
+            "rows": ()
+           }   
+      </assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-002">
+    <description>Empty string</description>
+    <created by="Michael Kay" on="2024-02-10"/>
+    <test>fn:parse-csv("")</test>
+    <result>
+      <assert-deep-eq>
+        map{"columns": map{"names": map{}, "fields": ()},
+        "rows": ()
+        }   
+      </assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-003">
+    <description>Single row, single column</description>
+    <created by="Michael Kay" on="2024-02-10"/>
+    <test>fn:parse-csv("one")</test>
+    <result>
+      <all-of>
+        <assert-type>record("rows", "columns")</assert-type>
+        <assert>deep-equal(?columns, map{"names": map{}, "fields": ()})</assert>
+        <assert>count(?rows) eq 1</assert>
+        <assert>deep-equal(?rows[1]?fields, "one")</assert>
+        <assert>?rows[1]?field(1) eq "one"</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  
+ 
+</test-set>
