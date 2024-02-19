@@ -1,0 +1,167 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-sort-with" covers-40="fn-sort-with">
+  <description>Tests for the fn:sort-with function</description>
+  <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-sort-with"/>
+  <dependency type="spec" value="XP40+ XQ40+"/>
+  
+  <test-case name="sort-with-001">
+    <description>Empty sequence</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>sort-with((), ())</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-002">
+    <description>No comparator</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>sort-with(1 to 3, ())</test>
+    <result>
+      <assert-deep-eq>1, 2, 3</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-003">
+    <description>No comparator</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>sort-with(reverse(1 to 3), ())</test>
+    <result>
+      <assert-deep-eq>3, 2, 1</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-004">
+    <description>Compare input as numbers</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>sort-with(reverse(8 to 10), compare#2)</test>
+    <result>
+      <assert-deep-eq>8, 9, 10</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-005">
+    <description>Compare input as numbers</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>sort-with(reverse(8 to 10), op('-'))</test>
+    <result>
+      <assert-deep-eq>8, 9, 10</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-006">
+    <description>Compare input as numbers</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>sort-with(reverse(8 to 10), fn($a, $b) { $a - $b })</test>
+    <result>
+      <assert-deep-eq>8, 9, 10</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-007">
+    <description>Compare input as numbers</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>sort-with(8 to 10, fn($a, $b) { $b - $a })</test>
+    <result>
+      <assert-deep-eq>10, 9, 8</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-008">
+    <description>Compare input as strings</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>sort-with(reverse(8 to 10), fn($a, $b) { compare(string($a), string($b)) })</test>
+    <result>
+      <assert-deep-eq>10, 8, 9</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-009">
+    <description>Compare input as strings</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>sort-with(reverse(8 to 10), fn($a, $b) { compare(string($b), string($a)) })</test>
+    <result>
+      <assert-deep-eq>9, 8, 10</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-010">
+    <description>Compare multiple types</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>
+sort-with(
+  (xs:date('2001-01-01'), '2001', 2001.3e0, 2001.5),
+  fn($a, $b) { compare(string($a), string($b)) }
+)
+    </test>
+    <result>
+      <assert-deep-eq>'2001', xs:date('2001-01-01'), 2001.3e0, 2001.5</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-011">
+    <description>Stable sort</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>sort-with((1, 1e0, 1.0, 1e0, 1), compare#2)</test>
+    <result>
+      <any-of>
+        <assert-deep-equal>1, 1e0, 1.0, 1e0, 1</assert-deep-equal>
+        <assert>$result[1] instance of xs:integer</assert>
+        <assert>$result[2] instance of xs:double</assert>
+        <assert>$result[3] instance of xs:decimal</assert>
+        <assert>$result[4] instance of xs:double</assert>
+        <assert>$result[5] instance of xs:integer</assert>
+      </any-of>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-012">
+    <description>Multiple comparators</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>sort-with(('c', 'b', 'a'), (compare#2, compare#2, compare#2))</test>
+    <result>
+      <assert-deep-eq>'a', 'b', 'c'</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-013">
+    <description>Multiple comparators</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>
+sort-with(
+  ([ 1, 'uno' ], [ 2, 'dos' ], [ 3, 'tres' ],
+   [ 1, 'un' ], [ 2, 'deux' ], [ 3, 'trois' ]),
+  (
+    fn($a, $b) { compare($a(1), $b(1)) },
+    fn($a, $b) { compare($a(2), $b(2)) }
+  )
+)
+    </test>
+    <result>
+      <assert-deep-eq>
+[ 1, "un" ], [ 1, "uno" ], [ 2, "deux" ], [ 2, "dos" ], [ 3, "tres" ], [ 3, "trois" ]
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="sort-with-014">
+    <description>Custom comparator</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>
+sort-with(
+  ([ 1, 'uno' ], [ 2, 'dos' ], [ 3, 'tres' ],
+   [ 1, 'un' ], [ 2, 'deux' ], [ 3, 'trois' ]),
+  fn($a, $b) {
+    fold-left(1 to array:size($a), 0, fn($df, $i) {
+      if($df != 0) then $df else compare($a($i), $b($i))
+    })
+  }
+)
+    </test>
+    <result>
+      <assert-deep-eq>
+[ 1, "un" ], [ 1, "uno" ], [ 2, "deux" ], [ 2, "dos" ], [ 3, "tres" ], [ 3, "trois" ]
+      </assert-deep-eq>
+    </result>
+  </test-case>
+  
+</test-set>
