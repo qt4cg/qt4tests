@@ -11927,6 +11927,82 @@ for-each-pair(
       </result>
    </test-case>
 
+   <test-case name="fo-test-fn-sort-with-001">
+      <description>Test case for fn:sort-with</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-20"/>
+      <environment ref="global"/>
+      <test>
+        sort-with((1, 4, 6, 5, 3), compare#2)
+      </test>
+      <result>
+         <assert-deep-eq>(1, 3, 4, 5, 6)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-sort-with-002">
+      <description>Test case for fn:sort-with</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-20"/>
+      <environment ref="global"/>
+      <test>
+        sort-with((1, 4, 6, 5, 3), op('-'))
+      </test>
+      <result>
+         <assert-deep-eq>(1, 3, 4, 5, 6)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-sort-with-003">
+      <description>Test case for fn:sort-with</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-20"/>
+      <environment ref="global"/>
+      <test>
+        sort-with((1, 4, 4e0, 6, 5, 3), fn($a, $b) { compare($b, $a) })
+      </test>
+      <result>
+         <assert-deep-eq>(6, 5, 4, 4e0, 3, 1)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-sort-with-004">
+      <description>Test case for fn:sort-with</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-20"/>
+      <environment ref="global"/>
+      <test>
+        sort-with(
+  (1, -2, 5, 10, -12, 8),
+  fn($a, $b) { abs($a) - abs($b) }
+)
+      </test>
+      <result>
+         <assert-deep-eq>(1, -2, 5, 8, 10, -12)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-sort-with-005">
+      <description>Test case for fn:sort-with</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-20"/>
+      <environment ref="global"/>
+      <test>
+        
+let $persons := &lt;persons&gt;
+  &lt;person name='Josipa' age='8'/&gt;
+  &lt;person name='Jade' age='6'/&gt;
+  &lt;person name='Jie' age='8'/&gt;
+&lt;/persons&gt;
+return sort-with($persons/person, (
+  fn($a, $b) { compare($a/@age, $b/@age) },
+  fn($a, $b) { compare($a/@name, $b/@name) }
+))
+
+      </test>
+      <result>
+         <assert-xml ignore-prefixes="false"><![CDATA[
+<person name="Jade" age="6"/>
+<person name="Jie" age="8"/>
+<person name="Josipa" age="8"/>]]></assert-xml>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-fn-transitive-closure-001">
       <description>Test case for fn:transitive-closure</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-02-20"/>
