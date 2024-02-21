@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-pin">
+   <description>Tests for the pin() function</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-40/"
+         idref="func-pin"/>
+         
+ 
+
+   <test-case name="fn-pin-001">
+      <description>Empty sequence</description>
+      <created by="Michael Kay" on="2024-02-17"/>
+      <test>pin(())</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-pin-002">
+      <description>Empty array</description>
+      <created by="Michael Kay" on="2024-02-17"/>
+      <test>pin([])</test>
+      <result>
+         <all-of>
+            <assert-type>array(*)</assert-type>
+            <assert>array:size($result) = 0</assert>
+            <assert>label($result) instance of map(xs:string, item()*)</assert>
+            <assert>label($result)?pinned</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-pin-003">
+      <description>Empty map</description>
+      <created by="Michael Kay" on="2024-02-17"/>
+      <test>pin(map{})</test>
+      <result>
+         <all-of>
+            <assert-type>map(*)</assert-type>
+            <assert>map:size($result) = 0</assert>
+            <assert>label($result) instance of map(xs:string, item()*)</assert>
+            <assert>label($result)?pinned</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-pin-004">
+      <description>Not a map or array</description>
+      <created by="Michael Kay" on="2024-02-17"/>
+      <test>pin(42)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-pin-005">
+      <description>Single-entry array</description>
+      <created by="Michael Kay" on="2024-02-17"/>
+      <test>pin(["a"])</test>
+      <result>
+         <all-of>
+            <assert-type>array(*)</assert-type>
+            <assert>array:size($result) = 1</assert>
+            <assert>$result?1 = "a"</assert>
+            <assert>label($result?1)?parent?1 = "a"</assert>
+            <assert>label($result?1)?key = 1</assert>
+            <assert>label($result?1)?position = 1</assert>
+            <assert>deep-equal(label($result?1)?ancestors(), ["a"])</assert>
+            <assert>deep-equal(label($result?1)?path(), 1)</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-pin-006">
+      <description>Single-entry map</description>
+      <created by="Michael Kay" on="2024-02-17"/>
+      <test>pin(map{"z":true()})</test>
+      <result>
+         <all-of>
+            <assert-type>map(*)</assert-type>
+            <assert>map:size($result) = 1</assert>
+            <assert>$result?z</assert>
+            <assert>label($result?z)?parent?z</assert>
+            <assert>label($result?z)?key = "z"</assert>
+            <assert>label($result?z)?position = 1</assert>
+            <assert>deep-equal(label($result?z)?ancestors(), map{"z":true()})</assert>
+            <assert>deep-equal(label($result?z)?path(), "z")</assert>
+         </all-of>
+      </result>
+   </test-case>
+
+
+</test-set>
