@@ -14,9 +14,9 @@ declare function mock:subsequence-where (
   $to	as (function(item(), xs:integer) as xs:boolean)?	:= false#0
 ) as item()*
 {
-   let $start := trace(index-where($input, $from)[1] 
-              otherwise (count($input) + 1), '$start')
-   let $end :=   trace(index-where($input, $to)[. ge $start][1] 
-              otherwise (count($input) + 1), '$end')
+   let $start := index-where($input, $from)[1] 
+                    otherwise (count($input) + 1)
+   let $end :=   index-where($input, $to)[. ge $start][1] 
+                    otherwise (count($input) + 1)
    return slice($input, $start, $end)
 };
