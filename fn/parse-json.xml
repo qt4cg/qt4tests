@@ -915,6 +915,7 @@
          <assert-deep-eq>map{"a":1, "b":2}</assert-deep-eq>
       </result>
    </test-case>
+   -->
    
    <test-case name="fn-parse-json-709">
       <description>Use supplied number-parser</description>
@@ -1034,7 +1035,99 @@
       </result>
    </test-case>
    
--->
+   <test-case name="fn-parse-json-740">
+      <description>Select default null representation explicitly</description>
+      <created by="Michael Kay, Saxonica" on="2024-02-20"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA['["a", null, "b"]' => parse-json(map { 'null': ()})]]></test>
+      <result>
+         <assert-deep-eq>["a", (), "b"]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-741">
+      <description>Select default null representation explicitly</description>
+      <created by="Michael Kay, Saxonica" on="2024-02-20"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA['{"1":true, "2":false, "3":null}' => parse-json(map { 'null': ()})]]></test>
+      <result>
+         <assert-deep-eq>map{"1":true(), "2":false(), "3":()}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-742">
+      <description>Select alternative null representation (in array)</description>
+      <created by="Michael Kay, Saxonica" on="2024-02-20"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA['["a", null, "b"]' => parse-json(map { 'null': xs:hexBinary("")})]]></test>
+      <result>
+         <assert-deep-eq>["a", xs:hexBinary(""), "b"]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-743">
+      <description>Select alternative null representation explicitly (in map)</description>
+      <created by="Michael Kay, Saxonica" on="2024-02-20"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA['{"1":true, "2":false, "3":null}' => parse-json(map { 'null': false()})]]></test>
+      <result>
+         <assert-deep-eq>map{"1":true(), "2":false(), "3":false()}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-744">
+      <description>Select alternative null representation (as function)</description>
+      <created by="Michael Kay, Saxonica" on="2024-02-20"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA['["a", null, "b"]' 
+                  => parse-json(map { 'null': fn:void#1})
+                  => deep-equal(["a", fn:void#1, "b"])
+             ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-745">
+      <description>Select alternative null representation (as multi-item sequence)</description>
+      <created by="Michael Kay, Saxonica" on="2024-02-20"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA['["a", null, "b"]' 
+                  => parse-json(map { 'null': 1 to 10})
+                  => deep-equal(["a", 1 to 10, "b"])
+             ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-746">
+      <description>Select magic null representation that serializes as null</description>
+      <created by="Michael Kay, Saxonica" on="2024-02-20"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA['["a", null, "b"]' 
+                  => parse-json(map { 'null': xs:QName("fn:null")})
+                  => serialize(map{"method":"json", "indent":false()})
+             ]]></test>
+      <result>
+         <assert-string-value>["a",null,"b"]</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-json-747">
+      <description>Select magic null representation that serializes as null</description>
+      <created by="Michael Kay, Saxonica" on="2024-02-20"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA['null' 
+                  => parse-json(map { 'null': xs:QName("fn:null")})
+                  => serialize(map{"method":"json", "indent":false()})
+             ]]></test>
+      <result>
+         <assert-string-value>null</assert-string-value>
+      </result>
+   </test-case>
+   
+
   
    <!-- things that a liberal parser might allow -->
 
