@@ -1125,6 +1125,113 @@
     </result>
   </test-case>
   
+  <test-case name="modules-40">
+    <description>
+      Call function in a library module using keyword parameters.
+    </description>
+    <created by="Michael Kay" on="2024-02-23"/>
+    <module uri="http://www.w3.org/TestModules/test40" location="http://www.w3.org/TestModules/test40" file="ModuleImport/test40-lib.xq"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+        import module namespace test40 = "http://www.w3.org/TestModules/test40" 
+                                      at "http://www.w3.org/TestModules/test40";
+        document {
+          <result>
+            <A>{test40:echo("x", "y", "z")}</A>
+            <B>{test40:echo("x", "y")}</B>
+            <C>{test40:echo("x")}</C>
+            <D>{test40:echo()}</D>
+            <E>{test40:echo(a:="x", b:="y")}</E>
+            <F>{test40:echo(b:="y", a:="x")}</F>
+            <G>{test40:echo(c:="z")}</G>
+          </result>
+        }
+      ]]></test>
+    <result>
+      <all-of>
+        <assert>/result/A="xyz"</assert>
+        <assert>/result/B="xy(c)"</assert>
+        <assert>/result/C="x(b)(c)"</assert>
+        <assert>/result/D="(a)(b)(c)"</assert>
+        <assert>/result/E="xy(c)"</assert>
+        <assert>/result/F="xy(c)"</assert>
+        <assert>/result/G="(a)(b)z"</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="modules-41">
+    <description>
+      Variable-arity references to functions in a library module.
+    </description>
+    <created by="Michael Kay" on="2024-02-23"/>
+    <module uri="http://www.w3.org/TestModules/test40" location="http://www.w3.org/TestModules/test40" file="ModuleImport/test40-lib.xq"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+        import module namespace test40 = "http://www.w3.org/TestModules/test40" 
+                                      at "http://www.w3.org/TestModules/test40";
+        let $echo0 := test40:echo#0,
+            $echo1 := test40:echo#1,
+            $echo2 := test40:echo#2,
+            $echo3 := test40:echo#3 return
+        document {
+          <result>
+            <A>{$echo0()}</A>
+            <B>{$echo1("x")}</B>
+            <C>{$echo2("x","y")}</C>
+            <D>{$echo3("x","y","z")}</D>
+          </result>
+        }
+      ]]></test>
+    <result>
+      <all-of>
+        <assert>/result/A="(a)(b)(c)"</assert>
+        <assert>/result/B="x(b)(c)"</assert>
+        <assert>/result/C="xy(c)"</assert>
+        <assert>/result/D="xyz"</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="modules-42">
+    <description>
+      Partial application of variable-arity functions in a library module.
+    </description>
+    <created by="Michael Kay" on="2024-02-23"/>
+    <module uri="http://www.w3.org/TestModules/test40" location="http://www.w3.org/TestModules/test40" file="ModuleImport/test40-lib.xq"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+        import module namespace test40 = "http://www.w3.org/TestModules/test40" 
+                                      at "http://www.w3.org/TestModules/test40";
+        let $echo0 := test40:echo#0,
+            $echo1 := test40:echo(?),
+            $echo2 := test40:echo(?,?),
+            $echo3 := test40:echo(?,?,?),
+            $echo2pa := test40:echo(?,"W",?),
+            $echo1pa := test40:echo(?,"V") return
+        document {
+          <result>
+            <A>{$echo0()}</A>
+            <B>{$echo1("x")}</B>
+            <C>{$echo2("x","y")}</C>
+            <D>{$echo3("x","y","z")}</D>
+            <E>{$echo2pa("x","y")}</E>
+            <F>{$echo1pa("x")}</F>
+          </result>
+        }
+      ]]></test>
+    <result>
+      <all-of>
+        <assert>/result/A="(a)(b)(c)"</assert>
+        <assert>/result/B="x(b)(c)"</assert>
+        <assert>/result/C="xy(c)"</assert>
+        <assert>/result/D="xyz"</assert>
+        <assert>/result/E="xWy"</assert>
+        <assert>/result/F="xV(c)"</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
   
   
    
