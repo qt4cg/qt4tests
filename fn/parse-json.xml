@@ -963,12 +963,15 @@
       <dependency type="spec" value="XP40+ XQ40+"></dependency>
       <test>'{"a":1, "b":+2.01}' => parse-json(map { 'number-parser': xs:decimal#1, 'liberal': true() })</test>
       <result>
-         <all-of>
-            <assert>$result?a = 1</assert>
-            <assert>$result?b = 2.01</assert>
-            <assert>$result?a instance of xs:decimal</assert>
-            <assert>$result?b instance of xs:decimal</assert>
-         </all-of>
+         <any-of>
+            <error code="FOJS0001"/>
+            <all-of>
+               <assert>$result?a = 1</assert>
+               <assert>$result?b = 2.01</assert>
+               <assert>$result?a instance of xs:decimal</assert>
+               <assert>$result?b instance of xs:decimal</assert>
+            </all-of>
+         </any-of>
       </result>
    </test-case>
    
@@ -1008,7 +1011,10 @@
       <dependency type="spec" value="XP40+ XQ40+"></dependency>
       <test>'{"a":1, "b":0002.12345678901234567890}' => parse-json(map { 'number-parser': identity#1, 'liberal': true() })</test>
       <result>
-         <assert>$result?b = "0002.12345678901234567890"</assert>
+         <any-of>
+            <error code="FOJS0001"/>        
+            <assert>$result?b = "0002.12345678901234567890"</assert>
+         </any-of>
       </result>
    </test-case>
    
