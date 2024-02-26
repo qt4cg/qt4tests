@@ -1,0 +1,469 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-csv-to-xml" covers-40="fn-csv-to-xml">
+  <description>Tests for the fn:csv-to-xml function</description>
+  <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-csv-to-xml"/>
+  <dependency type="spec" value="XP40+ XQ40+"/>
+  
+  <test-case name="csv-to-xml-001">
+    <description>Empty sequence</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test><![CDATA[fn:csv-to-xml(())]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-002">
+    <description>Empty string</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("")</test>
+    <result>
+      <all-of>
+        <assert-type>element(Q{http://www.w3.org/2005/xpath-functions}csv)</assert-type>
+        <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"><rows/></csv>]]></assert-xml>
+      </all-of>     
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-003">
+    <description>Single row, single column</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one")</test>
+    <result>
+      <all-of>
+        <assert-type>element(Q{http://www.w3.org/2005/xpath-functions}csv)</assert-type>
+        <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field></row></rows></csv>]]></assert-xml>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-004">
+    <description>Single row, two columns</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two")</test>
+    <result>
+      <all-of>
+        <assert-type>element(Q{http://www.w3.org/2005/xpath-functions}csv)</assert-type>
+        <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row></rows></csv>]]></assert-xml>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-005">
+    <description>Two rows, two columns</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two"||char(10)||"three,four")</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three</field><field>four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-006">
+    <description>Two rows, two columns; extra newline at end</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two"||char(10)||"three,four"||char(10))</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three</field><field>four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-007">
+    <description>Two rows, ragged columns</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two"||char(10)||"three,four,five")</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three</field><field>four</field><field>five</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-008">
+    <description>Blank line</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two"||char(10)||char(10)||"three,four")</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row/><row><field>three</field><field>four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-009">
+    <description>Quoted field</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two"||char(10)||'"three,four",five')</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three</field><field>four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-010">
+    <description>Quoted field with escaped quotes</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two"||char(10)||'"three,""four""",five')</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three,"four"</field><field>five</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-011">
+    <description>CRLF delimiter</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two"||char(13)||char(10)||"three,four")</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three</field><field>four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-012">
+    <description>CR delimiter</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two"||char(13)||"three,four"||char(13))</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three</field><field>four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-013">
+    <description>Empty fields</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,"||char(10)||",four"||char(10)||","||char(10)||",,,")</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field/></row
+          ><row><field/><field>four</field></row
+          ><row><field/><field/></row
+          ><row><field/><field/><field/><field/></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-014">
+    <description>Empty quoted fields</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml('one,""'||char(10)||'"","four"')</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field/></row
+          ><row><field/><field>four</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-015">
+    <description>Newline in quoted field</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml('one,"["'||char(10)||']'||char(10)||'"","four"')</test>
+    <result>
+      <assert-deep-eq>["one","["||char(10)||"]"],["","four"]</assert-deep-eq>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>[&#10;]</field></row
+          ><row><field/><field>four</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-020">
+    <description>Field delimiter semicolon</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one;two"||char(10)||"three;four", map{'field-delimiter':';'})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three</field><field>four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-021">
+    <description>Row delimiter vertical bar</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two|three,four", map{'row-delimiter':'|'})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three</field><field>four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-022">
+    <description>Reset both delimiters</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one.two|three.four", map{'row-delimiter':'|','field-delimiter':'.'})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three</field><field>four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-023">
+    <description>Alternative row delimiters</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one.two|three.four"||char(10)||"five.six", 
+                           map{'row-delimiter':('|',char(10)),'field-delimiter':'.'})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three</field><field>four</field></row
+          ><row><field>five</field><field>six</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-024">
+    <description>Single quotes</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,'two,2'|three,'four,4'", 
+      map{'row-delimiter':'|','quote-character':"'"})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two,2</field></row
+          ><row><field>three</field><field>four,4</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-025">
+    <description>Single quotes, escaped</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,'two,''2'''|three,'four,''4'''", 
+      map{'row-delimiter':'|','quote-character':"'"})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two,'2'</field></row
+          ><row><field>three</field><field>four,'4'</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-026">
+    <description>Whitespace not trimmed</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one ,two | three, four", 
+      map{'row-delimiter':'|'})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one </field><field>two </field></row
+          ><row><field> three</field><field> four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-027">
+    <description>Whitespace explicitly not trimmed</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one ,two | three, four", 
+      map{'row-delimiter':'|', 'trim-whitespace':false()})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one </field><field>two </field></row
+          ><row><field> three</field><field> four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-028">
+    <description>Whitespace trimmed</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one ,two | three, twenty  four ", 
+      map{'row-delimiter':'|', 'trim-whitespace':true()})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three</field><field>twenty  four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-040">
+    <description>column-names:true</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("left,right|one,two|three,four", 
+      map{'row-delimiter':'|', 'column-names':true()})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><columns><column>left</column><column>right</column></columns
+          ><rows><row><field column="left">one</field><field column="right">two</field></row
+          ><row><field column="left">three</field><field column="right">four</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-041">
+    <description>column-names:explicit</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two|three,four", 
+      map{'row-delimiter':'|', 'column-names':map{'left':1,'right':2}})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><columns><column>left</column><column>right</column></columns
+          ><rows><row><field column="left">one</field><field column="right">two</field></row
+          ><row><field column="left">three</field><field column="right">four</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-042">
+    <description>column-names:false</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two|three,four", 
+      map{'row-delimiter':'|', 'column-names':false()})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three</field><field>four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-043">
+    <description>column-names:explicit but incomplete</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two|three,four", 
+      map{'row-delimiter':'|', 'column-names':map{'left':1}})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><columns><column>left</column><column/></columns
+          ><rows><row><field column="left">one</field><field>two</field></row
+          ><row><field column="left">three</field><field>four</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-044">
+    <description>column-names:explicit but incomplete</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two|three,four", 
+      map{'row-delimiter':'|', 'column-names':map{'right':2}})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><columns><column/><column>right</column></columns
+          ><rows><row><field>one</field><field column="right">two</field></row
+          ><row><field>three</field><field column="right">four</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-045">
+    <description>column-names:explicit but incomplete</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("one,two|three,four", 
+      map{'row-delimiter':'|', 'column-names':map{}})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><columns><column/><column/></columns
+          ><rows><row><field>one</field><field>two</field></row
+          ><row><field>three</field><field>four</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-901">
+    <description>Unclosed quotes</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml('one,two,"three')</test>
+    <result>
+      <error code="FOCV0001"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-902">
+    <description>Quotes in mid-field</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml('one,two"three"')</test>
+    <result>
+      <error code="FOCV0001"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-903">
+    <description>Quotes in mid-field</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml('one,"two"three')</test>
+    <result>
+      <error code="FOCV0001"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-904">
+    <description>Field delimiter not a single char</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml('one,two', map{'field-delimiter':'::'})</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-905">
+    <description>Field delimiter not a single char</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml('one,two', map{'field-delimiter':''})</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-906">
+    <description>Row delimiter not a single char</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml('one,two', map{'row-delimiter':'||'})</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-907">
+    <description>Row delimiter not a single char</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml('one,two', map{'row-delimiter':('|','||')})</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-908">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml('one,two', map{'row-delimiter':','})</test>
+    <result>
+      <error code="FOCV0003"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-909">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml('one,two', map{'field-delimiter':char(10)})</test>
+    <result>
+      <error code="FOCV0003"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-910">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml('one,two', map{'field-delimiter':'"'})</test>
+    <result>
+      <error code="FOCV0003"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-911">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml('one,two', map{'field-delimiter':';', 'row-delimiter':';'})</test>
+    <result>
+      <error code="FOCV0003"/>
+    </result>
+  </test-case>
+  
+  
+  
+ 
+</test-set>
