@@ -47,16 +47,16 @@
    <test-case name="some-5">
       <description>some() with function returning non-boolean</description>
       <created by="Michael Kay" on="2020-11-29"/>
-      <test>some(1 to 10, function($x){$x + 1})</test>
+      <test>some(1 to 10, function($x){seconds($x + 1)})</test>
       <result>
-         <error code="XPTY0004"/>
+         <error code="FORG0006"/>
       </result>
    </test-case>
    
    <test-case name="some-6">
       <description>some() with function having wrong arity</description>
       <created by="Michael Kay" on="2020-11-29"/>
-      <test>some(10 to 20, function($x, $y){$x + 1})</test>
+      <test>some(10 to 20, function($x, $y, $z){$x + 1})</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -137,16 +137,19 @@
    <test-case name="some-23">
       <description>fn:some#1, returning error</description>
       <created by="Michael Kay" on="2022-09-13"/>
-      <test>some((1=2, 17, 2=4))</test>
+      <test>some((1=2, 17, 2=4, current-date()))</test>
       <result>
-         <error code="XPTY0004"/>
+         <any-of>
+            <assert-true/>
+            <error code="FORG0006"/>
+         </any-of>        
       </result>
    </test-case>
    
    <test-case name="some-24">
       <description>fn:some#1, returning true or error</description>
       <created by="Michael Kay" on="2022-09-13"/>
-      <test>some((1=1, 2=3, 17))</test>
+      <test>some((1=1, 2=3, 17, current-date()))</test>
       <result>
          <any-of>
             <assert-true/>
@@ -167,9 +170,9 @@
    <test-case name="some-26">
       <description>fn:some#2, function requires coercion, failure case</description>
       <created by="Michael Kay" on="2022-09-13"/>
-      <test>some((false(), 'zizzy'), function($x){$x})</test>
+      <test>some((false(), current-date(), 'zizzy'), function($x){$x})</test>
       <result>
-         <error code="XPTY0004"/>
+         <error code="FORG0006"/>
       </result>
    </test-case>
    
@@ -233,6 +236,69 @@
       <test>some((), fn($it, $pos){$it eq $pos})</test>
       <result>
          <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="some-34">
+      <description>some#1, use EBV</description>
+      <created by="Michael Kay" on="2024-02-21"/>
+      <test>some(("a", "b", "c"))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="some-35">
+      <description>some#1, use EBV</description>
+      <created by="Michael Kay" on="2024-02-21"/>
+      <test>some(("a", "b", "", "c"))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="some-36">
+      <description>some#2, use EBV</description>
+      <created by="Michael Kay" on="2024-02-21"/>
+      <test>some(("a", "b", "c"), op('||')(?, 'xxx'))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="some-37">
+      <description>some#2, use EBV</description>
+      <created by="Michael Kay" on="2024-02-21"/>
+      <test>some(("", "", "", ""), string-length#1)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="some-38">
+      <description>some#2, value has no EBV</description>
+      <created by="Michael Kay" on="2024-02-21"/>
+      <test>some(("2000-01-01", "2000-01-02"), xs:date#1)</test>
+      <result>
+         <error code="FORG0006"/>
+      </result>
+   </test-case>
+   
+   <test-case name="some-39">
+      <description>some#2, use EBV with arity-0 function</description>
+      <created by="Michael Kay" on="2024-02-21"/>
+      <test>some(("a", "b", "", "c"), math:pi#0)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="some-40">
+      <description>some#2, use EBV with arity-2 function</description>
+      <created by="Michael Kay" on="2024-02-21"/>
+      <test>some(("a", "b", "", "c"), fn($it,$pos){$pos - 1})</test>
+      <result>
+         <assert-true/>
       </result>
    </test-case>
    
