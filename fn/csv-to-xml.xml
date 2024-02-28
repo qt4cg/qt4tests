@@ -282,6 +282,76 @@
     </result>
   </test-case>
   
+  <test-case name="csv-to-xml-029">
+    <description>Single row delimiter</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test><![CDATA[fn:csv-to-xml(char(10))]]></test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row/></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-030">
+    <description>Single row delimiter with significant whitespace</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test><![CDATA[fn:csv-to-xml(" " || char(10))]]></test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field> </field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-031">
+    <description>Single row delimiter with significant whitespace</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test><![CDATA[fn:csv-to-xml(char(10) || " ")]]></test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row/><row><field> </field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-032">
+    <description>Single row delimiter with significant whitespace</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test><![CDATA[fn:csv-to-xml(" " || char(10), map{'trim-whitespace':true()})]]></test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row/></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-033">
+    <description>Single row delimiter with significant whitespace</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test><![CDATA[fn:csv-to-xml(char(10) || " "), map{'trim-whitespace':true()}]]></test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row/></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-034">
+    <description>Multiple blank rows</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test><![CDATA[fn:csv-to-xml(char(10) || char(10)), map{'trim-whitespace':true()}]]></test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row/></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-035">
+    <description>Multiple blank rows</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test><![CDATA[fn:csv-to-xml(char(10) || char(10) || char(10), map{'trim-whitespace':true()}]]></test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row/></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
   <test-case name="csv-to-xml-040">
     <description>column-names:true</description>
     <created by="Michael Kay" on="2024-02-26"/>
@@ -471,13 +541,143 @@
     <description>number-of-columns:all, column-names:false</description>
     <created by="Michael Kay" on="2024-02-26"/>
     <test>fn:csv-to-xml("1,2,3,4|11,12,13,14,15,16", 
-      map{'row-delimiter':'|', 'number-of-columns':'all})</test>
+      map{'row-delimiter':'|', 'number-of-columns':'all', 'column-names':false()})</test>
     <result>
       <!-- TBA?? -->
       <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
           ><rows><row><field>1</field><field>2</field><field>3</field><field>4</field></row
           ><row><field>11</field><field>12</field><field>13</field><field>14</field><field>15</field><field>16</field></row
           ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-080">
+    <description>filter-columns</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("1,2,3,4|11,12,13,14", 
+      map{'filter-columns':(4,3,2,1)})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>4</field><field>3</field><field>2</field><field>1</field></row
+          ><row><field>14</field><field>13</field><field>12</field><field>11</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-081">
+    <description>filter-columns</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("1,2,3,4|11,12,13,14", 
+      map{'filter-columns':(1,4)})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>1</field><field>4</field></row
+          ><row><field>11</field><field>14</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-082">
+    <description>filter-columns</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("1,2,3,4|11,12,13,14", 
+      map{'filter-columns':(1,4,17)})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>1</field><field>4</field><field/></row
+          ><row><field>11</field><field>14</field><field/></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-083">
+    <description>filter-columns</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("1,2,3,4|11,12,13,14", 
+      map{'filter-columns':(1,17,4)})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>1</field><field/><field>4</field></row
+          ><row><field>11</field><field/><field>14</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-084">
+    <description>filter-columns</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("1,2,3,4|11,12,13,14,15", 
+      map{'filter-columns':(1,4,5)})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>1</field><field>4</field><field/></row
+          ><row><field>11</field><field>14</field><field>15</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-086">
+    <description>filter-columns plus column-names</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("first,second,third,fourth|1,2,3,4|11,12,13,14", 
+      map{'filter-columns':(1,4,3), 'column-names':true()})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><columns><column>first</column><column>fourth</column><column>third</column></columns
+          ><rows><row><field column="first">1</field>field column="fourth">4</field>field column="third">3</field></row
+          ><rows><row><field column="first">11</field>field column="fourth">14</field>field column="third">13</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-087">
+    <description>filter-columns plus column-names</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-xml("first,second,third,fourth|1,2,3,4|11,12,13,14", 
+      map{'filter-columns':(1,0,-12,4)})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><columns><column>first</column><column/><column/><column>fourth</column></columns
+          ><rows><row><field column="first">1</field><field/><field/><field column="fourth">4</field></row
+          ><row><field column="first">11</field><field/><field/><field column="fourth">14</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-201">
+    <description>Returned element is parentless</description>
+    <created by="Michael Kay" on="2024-02-28"/>
+    <test>fn:csv-to-xml("one,two|three,four", map{'row-delimiter':'|'})/..</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-202">
+    <description>Returned element is valid against schema</description>
+    <created by="Michael Kay" on="2024-02-28"/>
+    <dependency type="spec" value="XQ40+"/>
+    <dependency type="feature" value="schemaValidation"/>
+    <test>
+      import schema namespace "http://www.w3.org/2005/xpath-functions";
+      exists(validate strict {fn:csv-to-xml("one,two|three,four", map{'row-delimiter':'|'})})</test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-203">
+    <description>Returned element is valid against schema</description>
+    <created by="Michael Kay" on="2024-02-28"/>
+    <dependency type="spec" value="XQ40+"/>
+    <dependency type="feature" value="schemaValidation"/>
+    <test>
+      import schema namespace "http://www.w3.org/2005/xpath-functions";
+      let $psvi := validate strict {fn:csv-to-xml("one,two|three,four", map{'row-delimiter':'|'})}
+      return every $f in $psvi//fn:field satisfies $f instance of element(*, xs:string)
+    </test>
+    <result>
+      <assert-empty/>
     </result>
   </test-case>
   
