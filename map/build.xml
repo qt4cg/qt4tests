@@ -201,6 +201,52 @@
         </result>
     </test-case>
     
+    <test-case name="map-build-115">
+        <description>Key expression selects multiple items (PR 1041)</description>
+        <created by="Michael Kay" on="2024-02-27"/>
+        <test>let $m := map:build(1 to 10, fn{., .+10, .+20}) return ($m?1, $m?12, $m?23)</test>
+        <result>
+            <assert-deep-eq>1, 2, 3</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-116">
+        <description>Key expression selects multiple items (PR 1041)</description>
+        <created by="Michael Kay" on="2024-02-28"/>
+        <test>let $m := map:build(tokenize("The cat sat on the mat"), characters#1)
+              return $m("a")
+        </test>
+        <result>
+            <assert-deep-eq>"cat", "sat", "mat"</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-117">
+        <description>Result of defaulted key function is atomized</description>
+        <created by="Michael Kay" on="2024-02-28"/>
+        <test><![CDATA[
+            let $data := parse-xml("<doc><a p='1'>one</a><a p='2'>two</a><a p='3'>three</a></doc>")
+            let $map := map:build($data//a)
+            return $map?two/string(@p)
+        ]]></test>
+        <result>
+            <assert-eq>'2'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-118">
+        <description>Result of defaulted key function is atomized</description>
+        <created by="Michael Kay" on="2024-02-28"/>
+        <test><![CDATA[
+            let $data := parse-xml("<doc><a p='1'>one</a><a p='2'>two</a><a p='3'>three</a></doc>")
+            let $map := map:build($data//a/@p, value:=fn{..})
+            return string($map?'2')
+        ]]></test>
+        <result>
+            <assert-eq>'two'</assert-eq>
+        </result>
+    </test-case>
+    
     <!-- Following tests copied (mutatis mutandis) from map-group-by (MHK, 2023-06-28) -->
     
     <test-case name="map-build-201">
