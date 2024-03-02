@@ -1,0 +1,331 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-UpdateExpr" covers-40="UpdateExpr">
+  <description>Tests for the fn:sort-with function</description>
+  <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-sort-with"/>
+  <dependency type="spec" value="XQ40+"/>
+  
+  <test-case name="update-001">
+    <description>Simple map update</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map map{'a':1, 'b':2} replace ?b with 3</test>
+    <result>
+      <assert-deep-eq>map{'a':1, 'b':3}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-002">
+    <description>Simple array update</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [10, 11, 12, 13, 14] replace ?3 with 42</test>
+    <result>
+      <assert-deep-eq>[10, 11, 42, 13, 14]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-003">
+    <description>Context-dependent map update</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map map{'a':1, 'b':2} replace ?b with .+1</test>
+    <result>
+      <assert-deep-eq>map{'a':1, 'b':3}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-004">
+    <description>Context-dependent array update</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [10, 11, 12, 13, 14] replace ?5 with .*2</test>
+    <result>
+      <assert-deep-eq>[10, 11, 12, 13, 28]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-005">
+    <description>Multiple-entry map update</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map map{'a':1, 'b':2} replace ?* with .*2</test>
+    <result>
+      <assert-deep-eq>map{'a':2, 'b':4}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-006">
+    <description>Multiple-member array update</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [10, 11, 12, 13, 14] replace ?* with .*2</test>
+    <result>
+      <assert-deep-eq>[20, 22, 24, 26, 28]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-007">
+    <description>Selected-entry map update</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map map{'a':true(), 'b':2} replace ?*[. instance of xs:integer] with .*2</test>
+    <result>
+      <assert-deep-eq>map{'a':true(), 'b':4}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-008">
+    <description>Selected-entry array update</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [10, 'a', 12, false(), current-date()] replace ?*[. instance of xs:integer] with .*2</test>
+    <result>
+      <assert-deep-eq>[20, 'a', 24, false(), current-date()]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-009">
+    <description>array update with position dependency</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [10, 11, 12, 13, 14] replace ?* with . + position()</test>
+    <result>
+      <assert-deep-eq>[11, 13, 15, 17, 19]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-010">
+    <description>update array of maps</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [map{'a':1}, map{'a':2,'b':3}, map{'c':4}] replace ?*?a with 42</test>
+    <result>
+      <assert-deep-eq>[map{'a':42}, map{'a':42,'b':3}, map{'c':4}]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-011">
+    <description>update array of maps using deep lookup</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [map{'a':1}, map{'a':2,'b':3}, map{'c':4}] replace ??a with 42</test>
+    <result>
+      <assert-deep-eq>[map{'a':42}, map{'a':42,'b':3}, map{'c':4}]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-012">
+    <description>update map of arrays</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map map{'a':[1,2,3,4], 'b':[10,11,12,13], 'c':[]} 
+                     replace ?*[array:size(.)=4]?2 with 42
+    </test>
+    <result>
+      <assert-deep-eq>map{'a':[1,42,3,4], 'b':[10,42,12,13], 'c':[]}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-013">
+    <description>update map of arrays using deep lookup</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map map{'a':[1,2,3,4], 'b':[10,11,12,13], 'c':[]} replace ??2 with .*3</test>
+    <result>
+      <assert-deep-eq>map{'a':[1,6,3,4], 'b':[10,33,12,13], 'c':[]}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-014">
+    <description>Update subarray</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [10, 11, 12, 13, 14] replace array:subarray(., 3, 2)?* with -1</test>
+    <result>
+      <assert-deep-eq>[10, 11, -1, -1, 14]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-015">
+    <description>Update array with exceptions</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [10, 11, 12, 13, 14] replace array:remove(., (1, 2, 5))?* with -1</test>
+    <result>
+      <assert-deep-eq>[10, 11, -1, -1, 14]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-016">
+    <description>Update first in array</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [10, 11, 12, 13, 14] replace array:head(.) with ()</test>
+    <result>
+      <assert-deep-eq>[(), 11, 12, 13, 14]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-017">
+    <description>Update last in array</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [10, 11, 12, 13, 14] replace array:foot(.) with (6,6,6)</test>
+    <result>
+      <assert-deep-eq>[10, 11, 12, 13, (6,6,6)]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-018">
+    <description>Update tail of array</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [10, 11, 12, 13, 14] replace array:tail(.)?* with [.]</test>
+    <result>
+      <assert-deep-eq>[10, [11], [12], [13], [14]]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-019">
+    <description>Update all but last of array</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [10, 11, 12, 13, 14] replace array:trunk(.)?* with (.,0)</test>
+    <result>
+      <assert-deep-eq>[(10,0), (11,0), (12,0), (13,0), 14]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-020">
+    <description>Update nested arrays with predicate selection</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [[1,2,3], [[4,5,6], [7,8,9]], 10, 11, 12] 
+          replace ??*::xs:integer[. mod 3 = 0] with -.</test>
+    <result>
+      <assert-deep-eq>[[1,2,-3], [[4,5,-6], [7,8,-9]], 10, 11, -12]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-021">
+    <description>Update nested maps</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map map{'a':map{1:true(),2:false()},'b':map{1:current-date(),2:current-dateTime()}}
+          replace ?*?2 with "n/a"</test>
+    <result>
+      <assert-deep-eq>map{'a':map{1:true(),2:"n/a"},'b':map{1:current-date(),2:"n/a"}}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-022">
+    <description>Use map:get() directly</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map map{'a':1,'b':2}
+      replace . => map:get('a') with 23</test>
+    <result>
+      <assert-deep-eq>map{'a':23,'b':2}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-023">
+    <description>Use array:get() directly</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [55, 66, 77]
+      replace . => array:get(2) with 23</test>
+    <result>
+      <assert-deep-eq>[55, 23, 77]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-024">
+    <description>Use map:find() </description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map map{'a':map{1:true(),2:false()},'b':map{1:xs:date('1920-03-04'), 2:current-dateTime()}}
+      replace map:find(., 2)?* with "n/a"</test>
+    <result>
+      <assert-deep-eq>map{'a':map{1:true(), 2:"n/a"},'b':map{1:xs:date('1920-03-04'), 2:"n/a"}}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-901">
+    <description>Empty sequence</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map map{}[current-date() lt xs:date('1900-01-01')] replace ?* with 42</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="update-902">
+    <description>Empty sequence</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [1,2,3][current-date() lt xs:date('1900-01-01')] replace ?* with 42</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="update-903">
+    <description>Not a singleton</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array ([1,2,3],[]) replace ?* with 42</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="update-904">
+    <description>Not a singleton</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map (map{}, map{}) replace ?* with 42</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="update-905">
+    <description>Not an array</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array map{} replace ?* with 42</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="update-906">
+    <description>Not a map</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map array{} replace ?* with 42</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="update-907">
+    <description>Not an array</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array 23 replace ?* with 42</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="update-908">
+    <description>Not a map</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map current-date() replace ?* with 42</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="update-909">
+    <description>Selection outside subtree</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map map{1:true(),2:false()} replace true() with false()</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="update-910">
+    <description>Selection outside subtree</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [[map{1:true(),2:false()}]] replace true() with false()</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="update-911">
+    <description>Selection outside subtree</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>let $a := [[map{1:true(),2:false()}]]
+          return update array $a replace $a??1 with false()</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  
+  
+</test-set>
