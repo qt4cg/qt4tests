@@ -3,6 +3,39 @@
   <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-sort-with"/>
   <dependency type="spec" value="XQ40+"/>
   
+  <environment name="warehouse">
+    <static-base-uri uri="http://www.w3.org/fots/UpdateExpr/" />
+    <resource file="UpdateExpr/warehouse.json"
+      media-type="text/plain" 
+      encoding="utf-8"
+      uri="http://www.w3.org/fots/UpdateExpr/warehouse.json">
+      <description>A JSON document from jsonschema.org</description>
+      <created by="Michael Kay" on="2024-03-02"/>
+    </resource>
+  </environment>
+  
+  <environment name="distances">
+    <static-base-uri uri="http://www.w3.org/fots/UpdateExpr/" />
+    <resource file="UpdateExpr/distances.json"
+      media-type="text/plain" 
+      encoding="utf-8"
+      uri="http://www.w3.org/fots/UpdateExpr/distances.json">
+      <description>A JSON document from the XSLT 3.0 specification</description>
+      <created by="Michael Kay" on="2024-03-02"/>
+    </resource>
+  </environment>
+  
+  <environment name="glossary">
+    <static-base-uri uri="http://www.w3.org/fots/UpdateExpr/" />
+    <resource file="UpdateExpr/glossary.json"
+      media-type="text/plain" 
+      encoding="utf-8"
+      uri="http://www.w3.org/fots/UpdateExpr/warehouse.json">
+      <description>A JSON document representing a trivial glossary</description>
+      <created by="Michael Kay" on="2024-03-02"/>
+    </resource>
+  </environment>
+  
   <test-case name="update-001">
     <description>Simple map update</description>
     <created by="Michael Kay" on="2024-03-01"/>
@@ -225,6 +258,303 @@
       <assert-deep-eq>map{'a':map{1:true(), 2:"n/a"},'b':map{1:xs:date('1920-03-04'), 2:"n/a"}}</assert-deep-eq>
     </result>
   </test-case>
+  
+  <test-case name="update-025">
+    <description>Update a node</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test><![CDATA[update map map{'a':parse-xml('<a/>')/*,'b':parse-xml('<b/>')/*}
+                   replace ?* with element{node-name()}{position()}
+    ]]></test>
+    <result>
+      <all-of>
+        <assert>?a!name() = 'a'</assert>
+        <assert>?b!name() = 'b'</assert>
+        <assert>?a!string() = '1'</assert>
+        <assert>?b!string() = '2'</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="update-026">
+    <description>Duplicate selection - update is only applied once</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [10, 11, 12, 13, 14] replace (?1, ?4, ?1)  with .+100</test>
+    <result>
+      <assert-deep-eq>[110, 11, 12, 113, 14]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-027">
+    <description>Duplicate selection - update is only applied once</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map map{'a':[10, 11, 12], 'b':[10, 11, 12]} replace (?*?1, ?a?1) with .+100</test>
+    <result>
+      <assert-deep-eq>map{'a':[110, 11, 12], 'b':[110, 11, 12]}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-028">
+    <description>Nodes in copied map retain their identity</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test><![CDATA[
+      let $tree := parse-xml('<a><b/></a>')
+      let $data0 := [1, map{'name': "aba", 'value': $tree}, [30, 40, 50]]
+      let $data1 := update array $data0 replace ?3?1 with 20
+      return $data1?2?value is $data0?2?value
+    ]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="update-029">
+    <description>Original map is unaffected</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test><![CDATA[
+      let $data0 := [10, map{'a':[30,40,50], 'b':xs:duration('PT34S')}, 30]
+      let $data1 := update array $data0 replace ?2?a with [60,70,80]
+      return if ($data1?1 = 10) then $data0 else $data1
+    ]]></test>
+    <result>
+      <assert-deep-eq>[10, map{'a':[30,40,50], 'b':xs:duration('PT34S')}, 30]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-030">
+    <description>Update one item in a sequence</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update map map{'a':(1 to 10), 'b':(11 to 20)}
+                 replace ??a[5] with 76</test>
+    <result>
+      <assert-deep-eq>map{'a':(1 to 4, 76, 5 to 10), 'b':(11 to 20)}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-031">
+    <description>Update one item in a sequence</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [(1,2,3), (4,5,6), (7,8,9)] replace ?2[3] with 99</test>
+    <result>
+      <assert-deep-eq>[(1,2,3), (4,5,99), (7,8,9)]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-032">
+    <description>Update one item in a sequence</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [(1,2,3), (4,5,6), (7,8,9)] replace ?2[3] with ()</test>
+    <result>
+      <assert-deep-eq>[(1,2,3), (4,5), (7,8,9)]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-033">
+    <description>Update one item in a sequence</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <test>update array [(1,2,3), (4,5,6), (7,8,9)] replace ?2[3] with (66,67,68)</test>
+    <result>
+      <assert-deep-eq>[(1,2,3), (4,5,66,67,68), (7,8,9)]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="update-050">
+    <description>For all products having the tag "ice", increase the price by 10%, 
+      leaving all other data unchanged
+    </description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <environment ref="warehouse"/>
+    <test>
+      let $data := json-doc('http://www.w3.org/fots/UpdateExpr/warehouse.json',
+                            map{'number-parser':xs:decimal#1})
+      return update array $data
+             replace ?*[?tags = 'ice']?price
+             with . * 1.1
+    </test>
+    <result>
+      <all-of>
+        <assert-type>array(record(id, name, price, *))</assert-type>
+        <assert>array:size($result) = 2</assert>
+        <assert>$result?1?price = 13.75</assert>
+        <assert>$result?2?price = 25.50</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="update-051">
+    <description>For all products having the tag "ice", increase the price by 10%, 
+      leaving all other data unchanged
+    </description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <environment ref="warehouse"/>
+    <test>
+      let $parent := fn{label(.)?parent}
+      let $data := json-doc('http://www.w3.org/fots/UpdateExpr/warehouse.json',
+                            map{'number-parser':xs:decimal#1})
+      return update array $data
+             replace ??price[$parent(.)?tags = 'ice']
+             with . * 1.1
+    </test>
+    <result>
+      <all-of>
+        <assert-type>array(record(id, name, price, *))</assert-type>
+        <assert>array:size($result) = 2</assert>
+        <assert>$result?1?price = 13.75</assert>
+        <assert>$result?2?price = 25.50</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="update-052">
+    <description>For all products, compute the volume and add it to the data</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <environment ref="warehouse"/>
+    <test>
+      let $data := json-doc('http://www.w3.org/fots/UpdateExpr/warehouse.json',
+                           map{'number-parser':xs:decimal#1})
+      return update array $data
+             replace ??dimensions
+             with map:put(., "volume", ?length * ?width * ?height)
+    </test>
+    <result>
+      <all-of>
+        <assert-type>array(record(id, name, price, *))</assert-type>
+        <assert>array:size($result) = 2</assert>
+        <assert>deep-equal(?1?dimensions, map{"width":12,"length":7,"height":9.5,"volume":798})</assert>
+        <assert>deep-equal(?2?dimensions, map{"width":1,"length":3.1,"height":1,"volume":3.1})</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="update-053">
+    <description>Rename "width" as "breadth"</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <environment ref="warehouse"/>
+    <test>
+      let $parent := fn{label(.)?parent}
+      let $data := json-doc('http://www.w3.org/fots/UpdateExpr/warehouse.json',
+                            map{'number-parser':xs:decimal#1})
+      return update array $data
+             replace ??width =!> $parent()
+             with map:put(., "breadth", ?width) => map:remove("width")
+    </test>
+    <result>
+      <all-of>
+        <assert-type>array(record(id, name, price, *))</assert-type>
+        <assert>array:size($result) = 2</assert>
+        <assert>deep-equal(?1?dimensions, map{"breadth":12,"length":7,"height":9.5})</assert>
+        <assert>deep-equal(?2?dimensions, map{"breadth":1,"length":3.1,"height":1})</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="update-054">
+    <description>Add "id" into "longitude" (nonsensically)</description>
+    <created by="Michael Kay" on="2024-03-01"/>
+    <environment ref="warehouse"/>
+    <test>
+      let $ancestorId := fn{label(.)?ancestors()[. instance of record(id, *)]?id}
+      let $data := json-doc('http://www.w3.org/fots/UpdateExpr/warehouse.json',
+                   map{'number-parser':xs:decimal#1})
+      return update array $data
+             replace ??longitude
+             with . + $ancestorId(.)
+    </test>
+    <result>
+      <all-of>
+        <assert-type>array(record(id, name, price, *))</assert-type>
+        <assert>array:size($result) = 2</assert>
+        <assert>deep-equal(?1??longitude, 22.4)</assert>
+        <assert>deep-equal(?2??longitude, -29.7)</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="update-060">
+    <description>Change last modified date
+    </description>
+    <created by="Michael Kay" on="2024-03-04"/>
+    <environment ref="distances"/>
+    <test>
+      let $data := json-doc('http://www.w3.org/fots/UpdateExpr/distances.json',
+                             map{'number-parser':xs:decimal#1}) return
+      update map $data replace ?updated with string(current-dateTime())
+    </test>
+    <result>
+      <assert>xs:dateTime(?updated) gt xs:dateTime('2024-03-04T00:00:00')</assert>
+    </result>
+  </test-case>
+  
+  <test-case name="update-061">
+    <description>Change distances from kilometers to miles</description>
+    <created by="Michael Kay" on="2024-03-04"/>
+    <environment ref="distances"/>
+    <test>
+      let $data := json-doc('http://www.w3.org/fots/UpdateExpr/distances.json',
+                            map{'number-parser':xs:decimal#1}) return
+      update map $data replace ??distance with round(. * 0.621)
+    </test>
+    <result>
+      <assert>??Brussels?*[?to="London"]?distance = 200</assert>
+    </result>
+  </test-case>
+  
+  <test-case name="update-062">
+    <description>Correct the distance between two cities</description>
+    <created by="Michael Kay" on="2024-03-04"/>
+    <environment ref="distances"/>
+    <test>
+      let $data := json-doc('http://www.w3.org/fots/UpdateExpr/distances.json',
+                            map{'number-parser':xs:decimal#1}) return
+      update map $data 
+      replace (??Brussels?*[?to="London"]?distance, 
+               ??London?*[?to="Brussels"]?distance) 
+      with 325
+    </test>
+    <result>
+      <all-of>
+        <assert>??Brussels?*[?to="London"]?distance = 325</assert>
+        <assert>??London?*[?to="Brussels"]?distance = 325</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="update-063">
+    <description>Add units of measure to the data</description>
+    <created by="Michael Kay" on="2024-03-04"/>
+    <environment ref="distances"/>
+    <test>
+      let $data := json-doc('http://www.w3.org/fots/UpdateExpr/distances.json',
+                            map{'number-parser':xs:decimal#1}) return
+      update map $data 
+      replace ??*[?distance] 
+      with map:put(., "units", "miles")
+    </test>
+    <result>
+      <assert>??Brussels?*[?to="London"]?units = "miles"</assert>
+    </result>
+  </test-case>
+  
+  <test-case name="update-064">
+    <description>Add cities to the table</description>
+    <created by="Michael Kay" on="2024-03-04"/>
+    <environment ref="distances"/>
+    <test>
+      let $data := json-doc('http://www.w3.org/fots/UpdateExpr/distances.json',
+                   map{'number-parser':xs:decimal#1}) return
+      let $temp := 
+         update map $data 
+         replace ??Paris 
+         with array:append(map{"to":"Frankfurt", "distance":480})
+      return update $temp 
+             replace ??cities 
+             with map:put("Frankfurt", [map{"to":"Paris", "distance":357}])
+    </test>
+    <result>
+      <assert>??Frankfurt?*[?to="Paris"]?distance = 357</assert>
+    </result>
+  </test-case>
+  
+
   
   <test-case name="update-901">
     <description>Empty sequence</description>
