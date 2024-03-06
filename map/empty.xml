@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="map-empty"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" covers-40="map-empty">
+    <description>Tests for the map:empty function introduced in XPath 4.0</description>
+    <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-map-empty"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="map-empty-01">
+      <description>Empty argument</description>
+      <created by="Christian Gruen" on="2024-03-06"/>
+      <test>map:empty(())</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-empty-02">
+      <description>Wrong argument</description>
+      <created by="Christian Gruen" on="2024-03-06"/>
+      <test>map:empty('x')</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-empty-03">
+      <description>Empty map</description>
+      <created by="Christian Gruen" on="2024-03-06"/>
+      <test>map:empty(map { })</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="map-empty-04">
+      <description>Single entry</description>
+      <created by="Christian Gruen" on="2024-03-06"/>
+      <test>map:empty(map { 1: 2 })</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="map-empty-05">
+      <description>Empty map</description>
+      <created by="Christian Gruen" on="2024-03-06"/>
+      <test>() => map:build() => map:empty()</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="map-empty-06">
+      <description>Multiple maps</description>
+      <created by="Christian Gruen" on="2024-03-06"/>
+      <test><![CDATA[
+for $i in 0 to 1
+let $m := map:merge((1 to $i) ! map { .: . })
+return map:empty($m)
+      ]]></test>
+      <result>
+         <assert-deep-eq>true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+</test-set>

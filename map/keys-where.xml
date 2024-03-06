@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="map-keys-where"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" covers-40="map-keys-where">
+    <description>Tests for the map:keys-where function introduced in XPath 4.0</description>
+    <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-map-keys-where"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+
+    <test-case name="map-keys-where-000">
+        <description>Predicate function</description>
+        <created by="Christian Gruen" on="2024-03-06"/>
+        <test><![CDATA[map:keys-where(map { 123: 456 }, function($v) { true() })]]></test>
+        <result>
+            <assert-eq>123</assert-eq>
+        </result>
+    </test-case>
+    <test-case name="map-keys-where-001">
+        <description>Predicate function</description>
+        <created by="Christian Gruen" on="2024-03-06"/>
+        <test><![CDATA[map:keys-where(map { 123: 456 }, function($v) { false() })]]></test>
+        <result>
+            <assert-empty/>
+        </result>
+    </test-case>
+    <test-case name="map-keys-where-002">
+        <description>Predicate function</description>
+        <created by="Christian Gruen" on="2024-03-06"/>
+        <test><![CDATA[
+map:keys-where(
+  map:merge((1 to 3) ! map:entry(. + 10, string())),
+  fn($k, $v) { $k = 12 }
+)
+        ]]></test>
+        <result>
+            <assert-eq>12</assert-eq>
+        </result>
+    </test-case>
+    <test-case name="map-keys-where-003">
+        <description>Predicate function</description>
+        <created by="Christian Gruen" on="2024-03-06"/>
+        <test><![CDATA[
+map:keys-where(
+  map:merge((1 to 3) ! map:entry(. + 10, string())),
+  fn($k, $v) { $v = '2' }
+)
+        ]]></test>
+        <result>
+            <assert-eq>12</assert-eq>
+        </result>
+    </test-case>
+    <test-case name="map-keys-where-004">
+        <description>Predicate function</description>
+        <created by="Christian Gruen" on="2024-03-06"/>
+        <test><![CDATA[
+map:keys-where(
+  map:merge((1 to 3) ! map:entry(. + 10, string())),
+  fn($k, $v) { $k = 12 and $v = '2' }
+)
+        ]]></test>
+        <result>
+            <assert-eq>12</assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="map-keys-where-010">
+        <description>Error: wrong result type</description>
+        <created by="Christian Gruen" on="2024-03-06"/>
+        <test><![CDATA[
+map:keys-where(
+  map:merge((1 to 3) ! map:entry(. + 10, string())),
+  identity#1
+)
+        ]]></test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    <test-case name="map-keys-where-011">
+        <description>Error: empty predicate</description>
+        <created by="Christian Gruen" on="2024-03-06"/>
+        <test>map:keys-where(map { 1: 2 }, ())</test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+</test-set>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="array-empty"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" covers-40="array-empty">
+    <description>Tests for the array:empty function introduced in XPath 4.0</description>
+    <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-array-empty"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="array-empty-01">
+      <description>Empty argument</description>
+      <created by="Christian Gruen" on="2024-03-06"/>
+      <test>array:empty(())</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="array-empty-02">
+      <description>Wrong argument</description>
+      <created by="Christian Gruen" on="2024-03-06"/>
+      <test>array:empty('x')</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="array-empty-03">
+      <description>Empty array</description>
+      <created by="Christian Gruen" on="2024-03-06"/>
+      <test>array:empty(array { })</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="array-empty-04">
+      <description>Single member</description>
+      <created by="Christian Gruen" on="2024-03-06"/>
+      <test>array:empty(array { 1 })</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="array-empty-05">
+      <description>Empty array</description>
+      <created by="Christian Gruen" on="2024-03-06"/>
+      <test>() => array:build() => array:empty()</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="array-empty-06">
+      <description>Multiple arrays</description>
+      <created by="Christian Gruen" on="2024-03-06"/>
+      <test><![CDATA[
+for $i in 0 to 1
+let $m := array:join((1 to $i) ! array { . })
+return array:empty($m)
+      ]]></test>
+      <result>
+         <assert-deep-eq>true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+</test-set>
