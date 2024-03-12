@@ -115,11 +115,12 @@
         <assert-count>3</assert-count>
         <assert>array:size($result[1]) eq 2</assert>
         <assert>array:size($result[2]) eq 0</assert>
-        <assert>array:size($result[3]) eq 3</assert>
+        <assert>array:size($result[3]) eq 2</assert>
         <assert>$result[1]?1 = "one"</assert>
         <assert>$result[1]?2 = "two"</assert>
         <assert>$result[3]?1 = "three"</assert>
         <assert>$result[3]?2 = "four"</assert>
+        <assert-deep-eq>["one","two"],[],["three","four"]</assert-deep-eq>
       </all-of>
     </result>
   </test-case>
@@ -163,7 +164,8 @@
   <test-case name="csv-to-arrays-011">
     <description>CRLF delimiter</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays("one,two"||char(13)||char(10)||"three,four")</test>
+    <test>fn:csv-to-arrays("one,two"||char(13)||char(10)||"three,four",
+             map{'normalize-newlines':true()})</test>
     <result>
       <assert-deep-eq>["one","two"],["three","four"]</assert-deep-eq>
     </result>
@@ -172,7 +174,8 @@
   <test-case name="csv-to-arrays-012">
     <description>CR delimiter</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays("one,two"||char(13)||"three,four"||char(13))</test>
+    <test>fn:csv-to-arrays("one,two"||char(13)||"three,four"||char(13),
+      map{'normalize-newlines':true()})</test>
     <result>
       <assert-deep-eq>["one","two"],["three","four"]</assert-deep-eq>
     </result>
@@ -199,7 +202,7 @@
   <test-case name="csv-to-arrays-015">
     <description>Newline in quoted field</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays('one,"["'||char(10)||']'||char(10)||'"","four"')</test>
+    <test>fn:csv-to-arrays('one,"['||char(10)||']"'||char(10)||'"","four"')</test>
     <result>
       <assert-deep-eq>["one","["||char(10)||"]"],["","four"]</assert-deep-eq>
     </result>
@@ -238,7 +241,7 @@
     <test>fn:csv-to-arrays("one.two|three.four"||char(10)||"five.six", 
                            map{'row-delimiter':('|',char(10)),'field-delimiter':'.'})</test>
     <result>
-      <assert-deep-eq>["one","two"],["three","four"],["five","six"]</assert-deep-eq>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
   
@@ -320,7 +323,7 @@
   </test-case>
   
   <test-case name="csv-to-arrays-032">
-    <description>Single row delimiter with significant whitespace</description>
+    <description>Single row delimiter with trimmed whitespace</description>
     <created by="Michael Kay" on="2024-02-26"/>
     <test><![CDATA[fn:csv-to-arrays(" " || char(10), map{'trim-whitespace':true()})]]></test>
     <result>
@@ -329,9 +332,9 @@
   </test-case>
   
   <test-case name="csv-to-arrays-033">
-    <description>Single row delimiter with significant whitespace</description>
+    <description>Single row delimiter with trimmed whitespace</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test><![CDATA[fn:csv-to-arrays(char(10) || " "), map{'trim-whitespace':true()}]]></test>
+    <test><![CDATA[fn:csv-to-arrays(char(10) || " ", map{'trim-whitespace':true()})]]></test>
     <result>
       <assert-deep-eq>[]</assert-deep-eq>
     </result>
@@ -340,7 +343,7 @@
   <test-case name="csv-to-arrays-034">
     <description>Multiple blank rows</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test><![CDATA[fn:csv-to-arrays(char(10) || char(10)), map{'trim-whitespace':true()}]]></test>
+    <test><![CDATA[fn:csv-to-arrays(char(10) || char(10), map{'trim-whitespace':true()})]]></test>
     <result>
       <assert-deep-eq>[], []</assert-deep-eq>
     </result>
@@ -349,13 +352,114 @@
   <test-case name="csv-to-arrays-035">
     <description>Multiple blank rows</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test><![CDATA[fn:csv-to-arrays(char(10) || char(10) || char(10), map{'trim-whitespace':true()}]]></test>
+    <test><![CDATA[fn:csv-to-arrays(char(10) || char(10) || char(10), map{'trim-whitespace':true()})]]></test>
     <result>
       <assert-deep-eq>[], [], []</assert-deep-eq>
     </result>
   </test-case>
   
-
+  <test-case name="csv-to-arrays-036">
+    <description>Close quote at end of file</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-arrays('one,two,"z"')</test>
+    <result>
+      <assert-deep-eq>["one", "two", "z"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-037">
+    <description>Close quote at end of record</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-arrays('one,two,"z"'||char(10))</test>
+    <result>
+      <assert-deep-eq>["one", "two", "z"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  
+  <test-case name="csv-to-arrays-801">
+    <description>
+      Array behaviour.
+      Saxon uses a custom implementation of arrays for the results of the csv-to-arrays function. The
+      following tests are written to ensure that this array implementation behaves properly.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u", map{'row-delimiter':'|'})[1] => array:append("x") </test>
+    <result>
+      <assert-deep-eq>["a","b","c","d","e","f","x"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-802">
+    <description>
+      Array behaviour.
+      Saxon uses a custom implementation of arrays for the results of the csv-to-arrays function. The
+      following tests are written to ensure that this array implementation behaves properly.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u", map{'row-delimiter':'|'})[1] => array:remove(1) </test>
+    <result>
+      <assert-deep-eq>["b","c","d","e","f"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-803">
+    <description>
+      Array behaviour.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u", map{'row-delimiter':'|'})[1] => array:remove((1,3))</test>
+    <result>
+      <assert-deep-eq>["b","d","e","f"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-804">
+    <description>
+      Array behaviour.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u", map{'row-delimiter':'|'})[1] => array:subarray(3,2)</test>
+    <result>
+      <assert-deep-eq>["c","d"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-805">
+    <description>
+      Array behaviour.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <test>csv-to-arrays("a,b,c|p,q,r", map{'row-delimiter':'|'}) => array:join()</test>
+    <result>
+      <assert-deep-eq>["a","b","c","p","q","r"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  
+  
+  <test-case name="csv-to-arrays-809">
+    <description>
+      Array behaviour.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u", map{'row-delimiter':'|'})[2] 
+      => array:put(3,"z")</test>
+    <result>
+      <assert-deep-eq>["p","q","z","s","t","u"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-810">
+    <description>
+      Array behaviour.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u", map{'row-delimiter':'|'})?3</test>
+    <result>
+      <assert-deep-eq>"c","r"</assert-deep-eq>
+    </result>
+  </test-case>
   
   <test-case name="csv-to-arrays-901">
     <description>Unclosed quotes</description>
@@ -412,11 +516,11 @@
   </test-case>
   
   <test-case name="csv-to-arrays-907">
-    <description>Row delimiter not a single char</description>
+    <description>Row delimiter not a single string</description>
     <created by="Michael Kay" on="2024-02-26"/>
     <test>fn:csv-to-arrays('one,two', map{'row-delimiter':('|','||')})</test>
     <result>
-      <error code="FOCV0002"/>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
   
@@ -455,6 +559,16 @@
       <error code="FOCV0003"/>
     </result>
   </test-case>
+  
+  <test-case name="csv-to-arrays-912">
+    <description>Open quote at end of file</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-arrays('one,two,"')</test>
+    <result>
+      <error code="FOCV0001"/>
+    </result>
+  </test-case>
+  
   
   
   
