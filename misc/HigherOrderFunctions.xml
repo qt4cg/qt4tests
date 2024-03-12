@@ -1006,7 +1006,7 @@
       (function(xs:double) as xs:double) because it doesn't accept a double as an argument.
       </description>
       <created by="Michael Kay" on="2012-01-03"/>
-      <dependency type="spec" value="XQ30+"/>
+      <dependency type="spec" value="XQ30 XQ31"/>
       <test>
       declare function local:round($x as xs:double) as xs:double { fn:floor($x) }; 
       declare function local:ops() as (function(xs:double) as xs:double)* 
@@ -1015,6 +1015,22 @@
       </test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="hof-919a" covers-30="partial-function-application">
+      <description> Same as hof-919, but expecting a result for XQ40+ rather than a coercion error as with XQ3x 
+      </description>
+      <created by="Gunther Rademacher" on="2024-03-12"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+      declare function local:round($x as xs:double) as xs:double { fn:floor($x) }; 
+      declare function local:ops() as (function(xs:double) as xs:double)* 
+      	{ (abs#1, local:round#1, function($x as xs:float){$x+1}, round-half-to-even(?, 2)) }; 
+      string-join(for $f in local:ops() return string(round-half-to-even($f(xs:decimal('123.456')), 4)), '~')
+      </test>
+      <result>
+         <assert-string-value>123.456~123~124.456~123.46</assert-string-value>
       </result>
    </test-case>
 
