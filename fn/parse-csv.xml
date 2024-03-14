@@ -1,4 +1,4 @@
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-parse-csv" covers-40="fn-parse-csv">
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-parse-csv" covers-40="PR1052">
   <description>Tests for the fn:parse-csv function</description>
   <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-parse-csv"/>
   <dependency type="spec" value="XP40+ XQ40+"/>
@@ -652,6 +652,45 @@
         "rows":(["1","2","3","4"],["11","12","13","14","15","16"])})</assert>
     </result>
   </test-case>
+   
+   <test-case name="parse-csv-065">
+     <description>number-of-columns option causes row padding</description>
+     <created by="Michael Kay" on="2024-03-14"/>
+     <test>fn:parse-csv("1,2,3,4,5,6|14,15,16", 
+       map{'row-delimiter':'|', 'select-columns':1 to 4})</test>
+     <result>
+       <assert>deep-equal($result => map:remove("get"), 
+         map{"columns":(), 
+         "column-index": map{}, 
+         "rows":(["1","2","3","4"],["14","15","16",""])})</assert>
+     </result>
+   </test-case>
+   
+   <test-case name="parse-csv-066">
+     <description>trim-rows option causes row padding</description>
+     <created by="Michael Kay" on="2024-03-14"/>
+     <test>fn:parse-csv("1,2,3,4,5,6|14,15,16", 
+       map{'row-delimiter':'|', 'trim-rows':true()})</test>
+     <result>
+       <assert>deep-equal($result => map:remove("get"), 
+         map{"columns":(), 
+         "column-index": map{}, 
+         "rows":(["1","2","3","4","5","6"],["14","15","16","","",""])})</assert>
+     </result>
+   </test-case>
+   
+   <test-case name="parse-csv-067">
+     <description>trim-rows option with header causes row padding</description>
+     <created by="Michael Kay" on="2024-03-14"/>
+     <test>fn:parse-csv("a,b,c,d,e|1,2,3|14,15,16", 
+       map{'row-delimiter':'|', 'trim-rows':true(), 'header':true()})</test>
+     <result>
+       <assert>deep-equal($result => map:remove("get"), 
+         map{"columns":("a","b","c","d","e"), 
+         "column-index": map{"a":1,"b":2,"c":3,"d":4,"e":5}, 
+         "rows":(["1","2","3","",""],["14","15","16","",""])})</assert>
+     </result>
+   </test-case>
   
   <test-case name="parse-csv-080">
     <description>select-columns</description>
