@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="map-build" covers-40="map-build">
-    <description>Tests for the map:contains function proposed for XPath 4.0</description>
-    <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-map-build"/>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="map-build" covers-40="PR203">
+    <description>Tests for the map:build function in XPath 4.0</description>
     <dependency type="spec" value="XP40+ XQ40+"/>
 
     <test-case name="map-build-001">
@@ -201,8 +200,8 @@
         </result>
     </test-case>
     
-    <test-case name="map-build-115">
-        <description>Key expression selects multiple items (PR 1041)</description>
+    <test-case name="map-build-115" covers40="PR1041">
+        <description>Key expression selects multiple items</description>
         <created by="Michael Kay" on="2024-02-27"/>
         <test>let $m := map:build(1 to 10, fn{., .+10, .+20}) return ($m?1, $m?12, $m?23)</test>
         <result>
@@ -210,7 +209,7 @@
         </result>
     </test-case>
     
-    <test-case name="map-build-116">
+    <test-case name="map-build-116" covers40="PR1041">
         <description>Key expression selects multiple items (PR 1041)</description>
         <created by="Michael Kay" on="2024-02-28"/>
         <test>let $m := map:build(tokenize("The cat sat on the mat"), characters#1)
@@ -246,6 +245,28 @@
             <assert-eq>'two'</assert-eq>
         </result>
     </test-case>
+    
+    <test-case name="map-build-119" covers40="PR1041">
+        <description>Test equivalence of implementation given in spec</description>
+        <created by="Michael Kay" on="2024-03-13"/>
+        <test>let $m := map:build(tokenize("The cat sat on the mat"), characters#1, upper-case#1, concat#2)
+              let $n := fold-left(tokenize("The cat sat on the mat"), map { }, fn($map, $item) {
+                           let $v := upper-case($item)
+                           return fold-left(characters($item), $map, fn($m, $k) {
+                                if (map:contains($m, $k)) then (
+                                   map:put($m, $k, concat($m($k), $v))
+                                ) else (
+                                   map:put($m, $k, $v)
+                                )
+                           })
+                        })
+             return deep-equal($m, $n)
+        </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
     
     <!-- Following tests copied (mutatis mutandis) from map-group-by (MHK, 2023-06-28) -->
     
