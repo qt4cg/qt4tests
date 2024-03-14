@@ -1539,4 +1539,214 @@
       </result>
    </test-case>
 
+   <test-case name="fn-json-to-xml-709" covers-40="PR975">
+      <description>Use supplied number-parser</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <modified by="Christian Gruen" on="2024-03-14" change="adopted from parse-json.xml"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":2.01}' => json-to-xml(map { 'number-parser': function($x){$x=>xs:double()=>xs:integer()} })</test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<map xmlns="http://www.w3.org/2005/xpath-functions"><number key="a">1</number><number key="b">2</number></map>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-json-to-xml-710" covers-40="PR975">
+      <description>Use supplied number-parser</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <modified by="Christian Gruen" on="2024-03-14" change="adopted from parse-json.xml"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":2}' => json-to-xml(map { 'number-parser': xs:integer#1 })</test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<map xmlns="http://www.w3.org/2005/xpath-functions"><number key="a">1</number><number key="b">2</number></map>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-json-to-xml-711" covers-40="PR975">
+      <description>Use supplied number-parser</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <modified by="Christian Gruen" on="2024-03-14" change="adopted from parse-json.xml"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":2.01}' => json-to-xml(map { 'number-parser': xs:integer#1 })</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-json-to-xml-712" covers-40="PR975">
+      <description>Use supplied number-parser with liberal=true</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <modified by="Christian Gruen" on="2024-03-14" change="adopted from parse-json.xml"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":+2.01}' => json-to-xml(map { 'number-parser': xs:decimal#1, 'liberal': true() })</test>
+      <result>
+         <any-of>
+            <error code="FOJS0001"/>
+            <assert-xml ignore-prefixes="true"><![CDATA[<map xmlns="http://www.w3.org/2005/xpath-functions"><number key="a">1</number><number key="b">2.01</number></map>]]></assert-xml>
+         </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-json-to-xml-713" covers-40="PR975">
+      <description>Use supplied number-parser with liberal=false</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <modified by="Christian Gruen" on="2024-03-14" change="adopted from parse-json.xml"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":+2.01}' => json-to-xml(map { 'number-parser': xs:decimal#1, 'liberal': false() })</test>
+      <result>
+         <error code="FOJS0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-json-to-xml-714" covers-40="PR975">
+      <description>Use supplied number-parser with invalid decimal</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <modified by="Christian Gruen" on="2024-03-14" change="adopted from parse-json.xml"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":2.01e0}' => json-to-xml(map { 'number-parser': xs:decimal#1 })</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-json-to-xml-715" covers-40="PR975">
+      <description>Use supplied number-parser with extended decimal precision</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <modified by="Christian Gruen" on="2024-03-14" change="adopted from parse-json.xml"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":2.12345678901234567890}' => json-to-xml(map { 'number-parser': xs:decimal#1 })</test>
+      <result>
+         <assert>$result//fn:number[@key = 'b'] = 2.12345678901234567890</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-json-to-xml-716" covers-40="PR975">
+      <description>Use supplied number-parser returning a string</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <modified by="Christian Gruen" on="2024-03-14" change="adopted from parse-json.xml"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>'{"a":1, "b":0002.12345678901234567890}' => json-to-xml(map { 'number-parser': identity#1, 'liberal': true() })</test>
+      <result>
+         <any-of>
+            <error code="FOJS0001"/>
+            <assert>$result//fn:number[@key = 'b'] = "0002.12345678901234567890"</assert>
+         </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-json-to-xml-717" covers-40="PR975">
+      <description>Use supplied number-parser returning a node (which gets atomized)</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <modified by="Christian Gruen" on="2024-03-14" change="adopted from parse-json.xml"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA[
+'{"a":1, "b":1.2}'
+=> json-to-xml(map { 'number-parser': function($x) { parse-xml("<a>" || $x || "</a>") } })
+      ]]></test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<map xmlns="http://www.w3.org/2005/xpath-functions"><number key="a">1</number><number key="b">1.2</number></map>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-json-to-xml-718" covers-40="PR975">
+      <description>Use supplied number-parser returning a sequence (which is an error</description>
+      <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <modified by="Christian Gruen" on="2024-03-14" change="adopted from parse-json.xml"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA['{"a":1, "b":1.2}' => json-to-xml(map { 'number-parser': function($x) {$x, 20} })]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-json-to-xml-730" covers-40="PR975">
+      <description>number-parser option yielding atomic item</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>json-to-xml('1', map { 'number-parser': true#0 })</test>
+      <result>
+         <assert>$result//fn:number = 'true'</assert>
+      </result>
+   </test-case>
+
+   <test-case name="fn-json-to-xml-731" covers-40="PR975">
+      <description>number-parser option yielding function item</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>json-to-xml('1', map { 'number-parser': fn($n) { fn() { $n } } })</test>
+      <result>
+         <error code="FOTY0013"/>
+      </result>
+   </test-case>
+
+    <test-case name="fn-json-to-xml-732" covers-40="PR975">
+      <description>number-parser option yielding empty sequence</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA[json-to-xml('1', map { 'number-parser': void#1 })]]></test>
+      <result>
+         <assert>exists($result//fn:number)</assert>
+         <assert>empty($result//fn:number/node())</assert>
+      </result>
+   </test-case>
+
+   <test-case name="fn-json-to-xml-733" covers-40="PR975">
+      <description>number-parser option yielding a sequence of items</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA[json-to-xml('0', map { 'number-parser': fn { ., . } })]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-json-to-xml-734" covers-40="PR975">
+      <description>fallback option yielding a string</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>json-to-xml('"\b"', map { 'fallback': fn { 'INVALID' } })</test>
+      <result>
+         <assert-string-value>INVALID</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-json-to-xml-735" covers-40="PR975">
+      <description>fallback option yielding a number</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>json-to-xml('"a\bc"', map { 'fallback': number#1 })</test>
+      <result>
+         <assert-string-value>aNaNc</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-json-to-xml-736" covers-40="PR975">
+      <description>fallback option yielding an empty sequence</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>json-to-xml('"a\bc"', map { 'fallback': void#1 })</test>
+      <result>
+         <assert-string-value>ac</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-json-to-xml-737" covers-40="PR975">
+      <description>fallback option yielding a function item</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>json-to-xml('"a\bc"', map { 'fallback': fn { void#1 } })</test>
+      <result>
+         <error code="FOTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-json-to-xml-738" covers-40="PR975">
+      <description>fallback option yielding a sequence</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>json-to-xml('"a\bc"', map { 'fallback': fn { ., . } })</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
 </test-set>

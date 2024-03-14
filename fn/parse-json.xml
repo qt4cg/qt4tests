@@ -1045,6 +1045,96 @@
       </result>
    </test-case>
    
+   <test-case name="fn-parse-json-730" covers-40="PR975">
+      <description>number-parser option yielding atomic item</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>parse-json('1', map { 'number-parser': true#0 })</test>
+      <result>
+         <assert>$result</assert>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-731" covers-40="PR975">
+      <description>number-parser option yielding function item</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>parse-json('1', map { 'number-parser': fn($n) { fn() { $n } } })</test>
+      <result>
+         <assert>$result() = 1</assert>
+      </result>
+   </test-case>
+
+    <test-case name="fn-parse-json-732" covers-40="PR975">
+      <description>number-parser option yielding empty sequence</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA[parse-json('1', map { 'number-parser': void#1 })]]></test>
+      <result>
+         <assert>empty($result)</assert>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-733" covers-40="PR975">
+      <description>number-parser option yielding a sequence of items</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test><![CDATA[parse-json('0', map { 'number-parser': fn { ., . } })]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-734" covers-40="PR975">
+      <description>fallback option yielding a string</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>parse-json('"\b"', map { 'fallback': fn { 'INVALID' } })</test>
+      <result>
+         <assert-string-value>INVALID</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-735" covers-40="PR975">
+      <description>fallback option yielding a number</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>parse-json('"a\bc"', map { 'fallback': number#1 })</test>
+      <result>
+         <assert-string-value>aNaNc</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-736" covers-40="PR975">
+      <description>fallback option yielding an empty sequence</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>parse-json('"a\bc"', map { 'fallback': void#1 })</test>
+      <result>
+         <assert-string-value>ac</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-737" covers-40="PR975">
+      <description>fallback option yielding a function item</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>parse-json('"a\bc"', map { 'fallback': fn { void#1 } })</test>
+      <result>
+         <error code="FOTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-738" covers-40="PR975">
+      <description>fallback option yielding a sequence</description>
+      <created by="Christian Gruen" on="2024-03-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"></dependency>
+      <test>parse-json('"a\bc"', map { 'fallback': fn { ., . } })</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
    <test-case name="fn-parse-json-740">
       <description>Select default null representation explicitly</description>
       <created by="Michael Kay, Saxonica" on="2024-02-20"/>
