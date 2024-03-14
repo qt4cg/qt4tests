@@ -1,6 +1,6 @@
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-partition" covers-40="fn-partition">
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-partition" covers-40="PR47">
   <description>Tests for the fn:partition function</description>
-  <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-partition"/>
+  
   <dependency type="feature" value="higherOrderFunctions"/>
   <dependency type="spec" value="XP40+ XQ40+"/>
   <test-case name="partition-001">
@@ -153,6 +153,7 @@
       <assert-deep-eq>[1,4],[6],[3,1,1]</assert-deep-eq>
     </result>
   </test-case>
+  
   <test-case name="partition-019">
     <description>Partition based on length of tokens</description>
     <created by="Christian Gruen" on="2022-08-15"/>
@@ -162,6 +163,7 @@
       <assert-deep-eq>["In","the"],["beginning"],["was","the","word"]</assert-deep-eq>
     </result>
   </test-case>
+  
   <test-case name="partition-020">
     <description>Densely numbered partitions</description>
     <created by="Christian Gruen" on="2022-08-15"/>
@@ -171,6 +173,7 @@
       <assert-deep-eq>[1,2,3],[6,7],[9,10]</assert-deep-eq>
     </result>
   </test-case>
+  
   <test-case name="partition-021">
     <description>Group nodes</description>
     <created by="Michael Kay" on="2023-04-24"/>
@@ -186,6 +189,24 @@
       ]]></test>
     <result>
       <assert-xml><![CDATA[<out><group><h1>Intro</h1><p>blah</p><p>blah2</p></group><group><h1>Outtro</h1><p>blath</p><p>blath2</p></group></out>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="partition-022" covers-40="PR254">
+    <description>Arity-1 callback</description>
+    <created by="Michael Kay" on="2024-03-14"/>
+    <test><![CDATA[partition(tokenize('In the beginning was the word'), function($a) { count($a) = 2 })]]></test>
+    <result>
+      <assert-deep-eq>["In","the"],["beginning","was"],["the","word"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="partition-023" covers-40="PR828">
+    <description>Arity-3 (positional) callback</description>
+    <created by="Michael Kay" on="2024-03-14"/>
+    <test><![CDATA[partition(tokenize('In the beginning was the word'), function($a,$b,$pos) { $pos mod 2 = 1 })]]></test>
+    <result>
+      <assert-deep-eq>["In","the"],["beginning","was"],["the","word"]</assert-deep-eq>
     </result>
   </test-case>
   
