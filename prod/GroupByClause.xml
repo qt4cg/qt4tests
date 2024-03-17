@@ -553,6 +553,32 @@
     </result>
   </test-case>
   
+  <test-case name="group-025">
+    <description>Group a sequence using a dynamic collation</description>
+    <created by="Michael Kay" on="2024-03-17"/>
+    <dependency type="spec" value="XQ31+"/>
+    <test><![CDATA[
+         let $input := tokenize("aorta Aorta AORTA aortA äorta ÄORTA AORTÄ")
+         for $collation in (
+           "http://www.w3.org/2005/xpath-functions/collation/codepoint",
+           "http://www.w3.org/2013/collation/UCA?lang=se;strength=primary;fallback=yes",
+           "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"
+         )
+         return array {
+            for $token in $input
+            group by $key := collation-key($token, $collation)
+            return array{$token}
+        } 
+      ]]></test>
+    <result>
+      <assert-deep-eq>
+        [["Aorta"],["AORTA"],["aorta"],["aortA"],["ÄORTA"],["äorta"],["AORTÄ"]],
+        [["aorta","Aorta","AORTA","aortA"],["äorta","ÄORTA"],["AORTÄ"]],
+        [["aorta","Aorta","AORTA","aortA"],["ÄORTA"],["äorta"],["AORTÄ"]]
+      </assert-deep-eq>
+    </result>
+  </test-case>
+  
   
   
    

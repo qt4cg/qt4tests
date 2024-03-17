@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="us-ascii"?>
+<?xml version="1.0" encoding="utf-8"?>
 <test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-OrderByClause">
    <description>Tests for the OrderByClause production</description>
    <link type="spec" document="http://www.w3.org/TR/xquery-30/"
@@ -1078,6 +1078,32 @@
       ]]></test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="orderBy69">
+      <description>Sort a sequence using a dynamic collation</description>
+      <created by="Michael Kay" on="2024-03-17"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test><![CDATA[
+         let $input := tokenize("aorta Aorta AORTA aortA äorta ÄORTA AORTÄ")
+         for $collation in (
+           "http://www.w3.org/2005/xpath-functions/collation/codepoint",
+           "http://www.w3.org/2013/collation/UCA?lang=se;strength=primary;fallback=yes",
+           "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"
+         )
+         return array {
+            for $token in $input
+            order by collation-key($token, $collation)
+            return $token
+        } 
+      ]]></test>
+      <result>
+         <assert-deep-eq>
+            ["AORTA","AORTÄ","Aorta","aortA","aorta","ÄORTA","äorta"],
+            ["aorta","Aorta","AORTA","aortA","AORTÄ","äorta","ÄORTA"],
+            ["aorta","Aorta","AORTA","aortA","AORTÄ","ÄORTA","äorta"]
+         </assert-deep-eq>
       </result>
    </test-case>
    
