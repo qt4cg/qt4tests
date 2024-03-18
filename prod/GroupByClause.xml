@@ -381,13 +381,13 @@
       <description>Use case-blind collation, if supported</description>
       <created by="Michael Kay" on="2014-03-24"/>
       <environment>
-         <collation uri="http://www.w3.org/2010/09/qt-fots-catalog/collation/caseblind"/>
+         <collation uri="http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"/>
       </environment>
       <dependency type="feature" value="non_unicode_codepoint_collation"/>
       <test><![CDATA[
       count(
          for $y in ("ax", "bx", "cx", "Ay", "By", "Cy")
-         group by $k := substring($y, 1, 1) collation "http://www.w3.org/2010/09/qt-fots-catalog/collation/caseblind"
+         group by $k := substring($y, 1, 1) collation "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"
          return <group>{$y}</group>
        )
        ]]></test>
@@ -556,6 +556,7 @@
   <test-case name="group-025">
     <description>Group a sequence using a dynamic collation</description>
     <created by="Michael Kay" on="2024-03-17"/>
+    <modified by="Christian Gruen" on="2024-03-18" change="enforce result order"/>
     <dependency type="spec" value="XQ31+"/>
     <test><![CDATA[
          let $input := tokenize("aorta Aorta AORTA aortA äorta ÄORTA AORTÄ")
@@ -565,16 +566,18 @@
            "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"
          )
          return array {
-            for $token in $input
-            group by $key := collation-key($token, $collation)
-            return array{$token}
+           sort(
+             for $token-group in $input
+             group by $key := collation-key($token-group, $collation)
+             return array { sort($token-group) }
+           )
         } 
       ]]></test>
     <result>
       <assert-deep-eq>
-        [["Aorta"],["AORTA"],["aorta"],["aortA"],["ÄORTA"],["äorta"],["AORTÄ"]],
-        [["aorta","Aorta","AORTA","aortA"],["äorta","ÄORTA"],["AORTÄ"]],
-        [["aorta","Aorta","AORTA","aortA"],["ÄORTA"],["äorta"],["AORTÄ"]]
+        [["AORTA"],["AORTÄ"],["Aorta"],["aortA"],["aorta"],["ÄORTA"],["äorta"]],
+        [["AORTA","Aorta","aortA","aorta"],["AORTÄ"],["ÄORTA","äorta"]],
+        [["AORTA","Aorta","aortA","aorta"],["AORTÄ"],["ÄORTA"],["äorta"]]
       </assert-deep-eq>
     </result>
   </test-case>
