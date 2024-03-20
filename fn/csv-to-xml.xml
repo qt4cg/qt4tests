@@ -1,4 +1,4 @@
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-csv-to-xml" covers-40="fn-csv-to-xml">
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-csv-to-xml" covers-40="PR1066">
   <description>Tests for the fn:csv-to-xml function</description>
   <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-csv-to-xml"/>
   <dependency type="spec" value="XP40+ XQ40+"/>
@@ -547,10 +547,49 @@
     <test>fn:csv-to-xml("1,2,3,4|11,12,13,14,15,16", 
       map{'row-delimiter':'|', 'trim-rows':false(), 'header':false()})</test>
     <result>
-      <!-- TBA?? -->
       <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
           ><rows><row><field>1</field><field>2</field><field>3</field><field>4</field></row
           ><row><field>11</field><field>12</field><field>13</field><field>14</field><field>15</field><field>16</field></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-065">
+    <description>number-of-columns option causes row padding</description>
+    <created by="Michael Kay" on="2024-03-14"/>
+    <test>fn:csv-to-xml("1,2,3,4,5,6|14,15,16", 
+      map{'row-delimiter':'|', 'select-columns':1 to 4})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>1</field><field>2</field><field>3</field><field>4</field></row
+          ><row><field>14</field><field>15</field><field>16</field><field/></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-066">
+    <description>trim-rows option causes row padding</description>
+    <created by="Michael Kay" on="2024-03-14"/>
+    <test>fn:csv-to-xml("1,2,3,4,5,6|14,15,16", 
+      map{'row-delimiter':'|', 'trim-rows':true()})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><rows><row><field>1</field><field>2</field><field>3</field><field>4</field><field>5</field><field>6</field></row
+          ><row><field>14</field><field>15</field><field>16</field><field/><field/><field/></row
+          ></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-xml-067">
+    <description>trim-rows option with header causes row padding</description>
+    <created by="Michael Kay" on="2024-03-14"/>
+    <test>fn:csv-to-xml("a,b,c,d,e|1,2,3,4,5|14,15,16", 
+      map{'row-delimiter':'|', 'trim-rows':true(), 'header':true()})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
+          ><columns><column>a</column><column>b</column><column>c</column><column>d</column><column>e</column></columns
+          ><rows><row><field column="a">1</field><field column="b">2</field><field column="c">3</field><field column="d">4</field><field column="e">5</field></row
+          ><row><field column="a">14</field><field column="b">15</field><field column="c">16</field><field column="d"/><field column="e"/></row
           ></rows></csv>]]></assert-xml>
     </result>
   </test-case>
