@@ -1,3 +1,4 @@
+xquery version "4.0";
 (:*******************************************************:)
 (: Test: mock.xq                                         :)
 (: Written By: Michael Kay                               :)
