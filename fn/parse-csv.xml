@@ -2,11 +2,7 @@
   <description>Tests for the fn:parse-csv function</description>
   <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-parse-csv"/>
   <dependency type="spec" value="XP40+ XQ40+"/>
-  
- <test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-parse-csv" covers-40="fn-parse-csv">
-  <description>Tests for the fn:parse-csv function</description>
-  <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-parse-csv"/>
-  <dependency type="spec" value="XP40+ XQ40+"/>
+
   
   <test-case name="parse-csv-001">
     <description>Empty sequence</description>
@@ -911,10 +907,76 @@
       <error code="FOCV0003"/>
     </result>
   </test-case>
+   
+  <test-case name="parse-csv-912">
+     <description>Negative column numbers</description>
+     <created by="Michael Kay" on="2024-03-11"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
+       map{'row-delimiter':'|',
+           'select-columns':(4,3,-1)})?rows 
+       => array:join()</test>
+     <result>
+       <error code="XPTY0004"/>
+     </result>
+  </test-case>
+   
+   <test-case name="parse-csv-913">
+     <description>Zero column numbers</description>
+     <created by="Michael Kay" on="2024-03-11"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
+       map{'row-delimiter':'|',
+       'select-columns':(4,3,0)})?rows 
+       => array:join()</test>
+     <result>
+       <error code="XPTY0004"/>
+     </result>
+   </test-case>
+   
+   <test-case name="parse-csv-914">
+     <description>Negative row number passed to get() function</description>
+     <created by="Michael Kay" on="2024-03-11"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
+       map{'row-delimiter':'|',
+           'select-columns':(4,3,1)})?get(-1, 2)</test>
+     <result>
+       <error code="XPTY0004"/>
+     </result>
+   </test-case>
+   
+   <test-case name="parse-csv-915">
+     <description>Zero row number passed to get() function</description>
+     <created by="Michael Kay" on="2024-03-11"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
+       map{'row-delimiter':'|',
+       'select-columns':(4,3,1)})?get(0, 2)</test>
+     <result>
+       <error code="XPTY0004"/>
+     </result>
+   </test-case>
+   
+   <test-case name="parse-csv-916">
+     <description>Negative column number passed to get() function</description>
+     <created by="Michael Kay" on="2024-03-11"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
+       map{'row-delimiter':'|',
+       'select-columns':(4,3,1)})?get(2, -1)</test>
+     <result>
+       <error code="XPTY0004"/>
+     </result>
+   </test-case>
+   
+   <test-case name="parse-csv-917">
+     <description>Zero column number passed to get() function</description>
+     <created by="Michael Kay" on="2024-03-11"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
+       map{'row-delimiter':'|',
+       'select-columns':(4,3,1)})?get(2, 0)</test>
+     <result>
+       <error code="XPTY0004"/>
+     </result>
+   </test-case>
   
   
-  
- 
-</test-set>
- 
+
+
 </test-set>
