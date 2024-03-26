@@ -200,7 +200,7 @@
 
    <test-case name="enum-015">
       <description>instance of enum()</description>
-      <created by="Gunther Rademacher" on="2026-03-26"/>
+      <created by="Gunther Rademacher" on="2024-03-26"/>
       <test>("A" cast as enum("A", "B")) instance of enum("A", "B")</test>
       <result>
          <assert-true/>
@@ -209,12 +209,110 @@
 
    <test-case name="enum-016">
       <description>instance of enum()</description>
-      <created by="Gunther Rademacher" on="2026-03-26"/>
+      <created by="Gunther Rademacher" on="2024-03-26"/>
       <test>("A" cast as enum("A", "B")) instance of enum("A", "C")</test>
       <result>
          <assert-true/>
       </result>
    </test-case>
+   
+   <test-case name="enum-017">
+      <description>coercion of enum()</description>
+      <created by="Michael Kay" on="2024-03-26"/>
+      <test>
+         let $f := function($e as enum("A", "B")) as item(){$e}
+         return $f("A") instance of enum("A", "B")
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="enum-018">
+      <description>coercion of enum()</description>
+      <created by="Michael Kay" on="2024-03-26"/>
+      <test>
+         let $f := function($e as enum("A", "B")) as item(){$e}
+         return $f("A") instance of enum("A", "C")
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="enum-019">
+      <description>coercion of enum() - failure case</description>
+      <created by="Michael Kay" on="2024-03-26"/>
+      <test>
+         let $f := function($e as enum("A", "B")) as item(){$e}
+         return $f("C") instance of enum("A", "C")
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="enum-020">
+      <description>substitutable for xs:string in string-length</description>
+      <created by="Michael Kay" on="2024-03-26"/>
+      <test>
+         string-length(("A" cast as enum("A","B","C")))
+      </test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="enum-021">
+      <description>substitutable for xs:string in regex match</description>
+      <created by="Michael Kay" on="2024-03-26"/>
+      <test>
+         matches(("ABC" cast as enum("ABC","BBC","CBC")), '.BC')
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="enum-022">
+      <description>substitutable by xs:string in function signature</description>
+      <created by="Michael Kay" on="2024-03-26"/>
+      <test>
+         let $f := fn($x as xs:string) as xs:integer {string-length($x)}
+         return $f instance of function(enum("A","B","C")) as xs:integer
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="enum-023">
+      <description>coercion when used in function signature</description>
+      <created by="Michael Kay" on="2024-03-26"/>
+      <test>
+         let $g := fn($x as function(enum("A","B","C")) as xs:string, $y as xs:string) as xs:boolean { $x($y) eq $y }  
+         let $f := fn($x as xs:string) as xs:string {$x}
+         return $g($f, "A")
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="enum-024">
+      <description>function coercion when used in function signature</description>
+      <created by="Michael Kay" on="2024-03-26"/>
+      <test>
+         let $g := fn($x as function(enum("A","B","C")) as xs:string, $y as xs:string) as xs:boolean { $x($y) eq $y }  
+         let $f := fn($x as xs:string) as xs:string {$x}
+         return $g($f, "Z")
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+
    
  
    
