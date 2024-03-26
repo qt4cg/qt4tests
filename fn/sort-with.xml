@@ -163,4 +163,83 @@ sort-with(
     </result>
   </test-case>
   
+  <test-case name="sort-with-015">
+    <description>Sort nodes</description>
+    <created by="Michael Kay" on="2024-03-22"/>
+    <test><![CDATA[
+      sort-with(parse-xml("<doc><a>x</a><a>t</a><a>e</a></doc>")//a, 
+                compare#2)]]></test>
+    <result>
+      <all-of>
+        <assert-type>element(a)+</assert-type>
+        <assert-count>3</assert-count>
+        <assert>string($result[1]) eq 'e'</assert>
+        <assert>string($result[2]) eq 't'</assert>
+        <assert>string($result[3]) eq 'x'</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-016">
+    <description>Sort maps</description>
+    <created by="Michael Kay" on="2024-03-22"/>
+    <test>
+      sort-with((map{12:'x'}, map{15:'y', 3:'z'}, map{11:'a', 6:'b'}), 
+                fn($a,$b){max(map:keys($a)) - max(map:keys($b))})
+    </test>
+    <result>
+      <all-of>
+        <assert-type>map(xs:integer, xs:string)+</assert-type>
+        <assert-count>3</assert-count>
+        <assert>($result[1]?11) = 'a'</assert>
+        <assert>($result[2]?12) = 'x'</assert>
+        <assert>($result[3]?15) = 'y'</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-017">
+    <description>Sort arrays</description>
+    <created by="Michael Kay" on="2024-03-22"/>
+    <test>
+      let $in := "q,w,e,r,t,y"||char(10)||"a,s,d,f,g,h"||char(10)||"a,z,e,r,t,y"
+      let $arrays := csv-to-arrays($in)
+      return sort-with($arrays, for $cell in 1 to 6 return fn($a,$b){compare($a?$cell, $b?$cell)})
+    </test>
+    <result>
+      <all-of>
+        <assert-type>array(xs:string)+</assert-type>
+        <assert-count>3</assert-count>
+        <assert>string-join($result[1]?*) eq "asdfgh"</assert>
+        <assert>string-join($result[2]?*) eq "azerty"</assert>
+        <assert>string-join($result[3]?*) eq "qwerty"</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-018">
+    <description>Sort nodes</description>
+    <created by="Michael Kay" on="2024-03-22"/>
+    <test><![CDATA[
+      let $doc1 := parse-xml("<doc><a>1</a><a>2</a><a>3</a></doc>")
+      let $doc2 := parse-xml("<cod><a>4</a><a>5</a><a>6</a></cod>")
+      let $doc-order := fn($x, $y) {if ($x is $y) {0} else if ($x << $y) {-1} else {+1}}
+      let $root-name := fn($x){local-name($x/ancestor::*[last()])}     
+      return sort-with(($doc1//a, $doc2//a), 
+                       (fn($x,$y){compare($root-name($x), $root-name($y))}, $doc-order))
+      ]]></test>
+    <result>
+      <assert>string-join($result!string()) eq "456123"</assert>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-019">
+    <description>Empty list of comparators</description>
+    <created by="Michael Kay" on="2024-03-22"/>
+    <test>sort-with(('c', 'b', 'a'), ())</test>
+    <result>
+      <assert-deep-eq>'c', 'b', 'a'</assert-deep-eq>
+    </result>
+  </test-case>
+  
 </test-set>
