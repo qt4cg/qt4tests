@@ -25,7 +25,7 @@
       <description>Test the adaptive serialization output method - empty map</description>
       <created by="Andrew Coleman" on="2015-02-11"/>
       <modified by="Michael Kay" on="2015-07-18" change="Spec change; and anchor the assertion regex"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
  
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -37,6 +37,24 @@
         <serialization-matches>^map\{\}$</serialization-matches>
       </result>
    </test-case>
+  
+  <test-case name="Serialization-adaptive-02a" covers="adaptive-serialization">
+    <description>Test the adaptive serialization output method - empty map</description>
+    <created by="Andrew Coleman" on="2015-02-11"/>
+    <modified by="Michael Kay" on="2015-07-18" change="Spec change; and anchor the assertion regex"/>
+    <modified by="Michael Kay" on="2024-03-27" change="Spec change for 4.0"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+ 
+     	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        map { } 
+
+      ]]></test>
+    <result>
+      <serialization-matches>^\{\}$</serialization-matches>
+    </result>
+  </test-case>
 
    <test-case name="Serialization-adaptive-03" covers="adaptive-serialization">
       <description>Test the adaptive serialization output method - empty sequence</description>
@@ -346,7 +364,7 @@
       <description>Test the adaptive serialization output method - map with duplicate names</description>
       <created by="Andrew Coleman" on="2015-02-11"/>
       <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
  
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -362,6 +380,28 @@
         </any-of>    
       </result>
    </test-case>
+  
+  <test-case name="Serialization-adaptive-19a" covers="adaptive-serialization">
+    <description>Test the adaptive serialization output method - map with duplicate names</description>
+    <created by="Andrew Coleman" on="2015-02-11"/>
+    <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
+    <modified by="Michael Kay" on="2024-03-27" change="Spec change for 4.0"/>
+    <dependency type="spec" value="XQ31+"/>
+    <test><![CDATA[
+ 
+     	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+  
+        map { "one" : 1, xs:QName("one") : 1 }  
+
+      ]]></test>
+    <result>
+      <any-of>
+        <serialization-matches>^\{"one":1,Q\{\}one:1\}</serialization-matches>
+        <serialization-matches>^\{Q\{\}one:1,"one":1\}</serialization-matches>
+      </any-of>    
+    </result>
+  </test-case>
 
    <test-case name="Serialization-adaptive-20" covers="adaptive-serialization">
       <description>Test the adaptive serialization output method - array with attribute node</description>
@@ -386,7 +426,7 @@
    <test-case name="Serialization-adaptive-21" covers="adaptive-serialization">
       <description>Test the adaptive serialization output method - map with attribute value</description>
       <created by="Andrew Coleman" on="2015-02-11"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
  
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -399,6 +439,25 @@
         <serialization-matches>^map\{"key":att-name="att-value"\}$</serialization-matches>
       </result>
    </test-case>
+  
+  <test-case name="Serialization-adaptive-21a" covers="adaptive-serialization">
+    <description>Test the adaptive serialization output method - map with attribute value</description>
+    <created by="Andrew Coleman" on="2015-02-11"/>
+    <modified by="Michael Kay" on="2024-03-27"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+ 
+     	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+
+        map { "key": attribute att-name { "att-value" }}
+
+      ]]></test>
+    <result>
+      <serialization-matches>^\{"key":att-name="att-value"\}$</serialization-matches>
+    </result>
+  </test-case>
+  
 
    <test-case name="Serialization-adaptive-22" covers="adaptive-serialization">
       <description>Test the adaptive serialization output method - array with numeric INF</description>
@@ -423,7 +482,7 @@
       <created by="Andrew Coleman" on="2015-02-11"/>
       <modified by="Christian Gruen" on="2012-02-19" change="query fixed"/>
       <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
  
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -436,6 +495,26 @@
         <serialization-matches>map\{"infinity":xs:float\("INF"\)\}</serialization-matches>
       </result>
    </test-case>
+  
+  <test-case name="Serialization-adaptive-23a" covers="adaptive-serialization">
+    <description>Test the adaptive serialization output method - map with numeric INF</description>
+    <created by="Andrew Coleman" on="2015-02-11"/>
+    <modified by="Christian Gruen" on="2012-02-19" change="query fixed"/>
+    <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
+    <modified by="Michael Kay" on="2024-03-27" change="Spec change for 4.0"/>
+    <dependency type="spec" value="XQ31+"/>
+    <test><![CDATA[
+ 
+     	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        
+        map { "infinity": xs:float("INF") }
+
+      ]]></test>
+    <result>
+      <serialization-matches>^\{"infinity":xs:float\("INF"\)\}</serialization-matches>
+    </result>
+  </test-case>
 
    <test-case name="Serialization-adaptive-24" covers="adaptive-serialization">
       <description>Test the adaptive serialization output method - array with NaN</description>
@@ -461,7 +540,7 @@
       <created by="Andrew Coleman" on="2015-02-11"/>
       <modified by="Christian Gruen" on="2012-02-19" change="query fixed"/>
       <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
  
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -474,6 +553,26 @@
         <serialization-matches>^map\{"not-a-number":NaN\}$</serialization-matches>
       </result>
    </test-case>
+  
+  <test-case name="Serialization-adaptive-25a" covers="adaptive-serialization">
+    <description>Test the adaptive serialization output method - map with NaN value</description>
+    <created by="Andrew Coleman" on="2015-02-11"/>
+    <modified by="Christian Gruen" on="2012-02-19" change="query fixed"/>
+    <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
+    <modified by="Michael Kay" on="2024-03-27" change="Spec change for 4.0"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+ 
+     	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        
+        map { "not-a-number": xs:double("NaN") }
+
+      ]]></test>
+    <result>
+      <serialization-matches>^\{"not-a-number":NaN\}$</serialization-matches>
+    </result>
+  </test-case>
 
    <test-case name="Serialization-adaptive-26" covers="adaptive-serialization">
       <description>Test the adaptive serialization output method - array of functions</description>
@@ -504,7 +603,7 @@
       <modified by="Michael Kay" on="2015-11-27" change="Add HOF dependency"/>
       <modified by="Debbie Lockett" on="2020-10-27" 
        change="Corrected expected results. Inclusion of XML declaration is implementation defined. See Saxon bug 4647"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <dependency type="feature" value="higherOrderFunctions"/>
      
       <test><![CDATA[
@@ -519,6 +618,31 @@
         <serialization-matches><![CDATA[^\[[(]?fn:exists#1[)]?,[(]?1[)]?,[(]?(<\?xml[^<]+>)?<element>content</element>[)]?,\(\),[(]?\(anonymous-function\)#1[)]?,[(]?map\{"infinity":INF[)]?\},[(]?"json-string"[)]?\]$]]></serialization-matches>
       </result>
    </test-case>
+  
+  <test-case name="Serialization-adaptive-27a" covers="adaptive-serialization">
+    <description>Test the adaptive serialization output method - mixed array</description>
+    <created by="Andrew Coleman" on="2015-02-11"/>
+    <modified by="Christian Gruen" on="2015-02-19" change="query and regular expression fixed"/>
+    <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
+    <modified by="Michael Kay" on="2015-11-27" change="Add HOF dependency"/>
+    <modified by="Debbie Lockett" on="2020-10-27" 
+      change="Corrected expected results. Inclusion of XML declaration is implementation defined. See Saxon bug 4647"/>
+    <modified by="Michael Kay" on="2024-03-27" change="Spec change for 4.0"/>
+    <dependency type="spec" value="XQ31+"/>
+    <dependency type="feature" value="higherOrderFunctions"/>
+    
+    <test><![CDATA[
+ 
+     	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        
+        [fn:exists#1, 1, <element>content</element>, (), function($a) { $a }, map { "infinity":xs:double("INF") }, "json-string"]
+
+      ]]></test>
+    <result>
+      <serialization-matches><![CDATA[^\[[(]?fn:exists#1[)]?,[(]?1[)]?,[(]?(<\?xml[^<]+>)?<element>content</element>[)]?,\(\),[(]?\(anonymous-function\)#1[)]?,[(]?\{"infinity":INF[)]?\},[(]?"json-string"[)]?\]$]]></serialization-matches>
+    </result>
+  </test-case>
    
    <test-case name="Serialization-adaptive-28" covers="adaptive-serialization">
       <description>Test the adaptive serialization output method - empty sequence</description>
@@ -600,7 +724,7 @@
       <description>Test the adaptive serialization output method - escaping in map keys</description>
       <created by="Michael Kay" on="2015-07-13"/>
       <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
  
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -616,13 +740,35 @@
         </any-of>  
       </result>
    </test-case>
+  
+  <test-case name="Serialization-adaptive-32a" covers="adaptive-serialization">
+    <description>Test the adaptive serialization output method - escaping in map keys</description>
+    <created by="Michael Kay" on="2015-07-13"/>
+    <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
+    <modified by="Michael Kay" on="2024-03-27" change="Spec change for 4.0"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+ 
+     	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        
+        map{ "O'Neil says ""no""": 1 }
+
+      ]]></test>
+    <result>
+      <any-of>
+        <serialization-matches><![CDATA[^\{"O'Neil says ""no""":1\}]]></serialization-matches>
+        <serialization-matches><![CDATA[^\{'O''Neil says "no"':1\}]]></serialization-matches>
+      </any-of>  
+    </result>
+  </test-case>
    
    <test-case name="Serialization-adaptive-33" covers="adaptive-serialization">
       <description>Test the adaptive serialization output method - escaping in map values</description>
       <created by="Michael Kay" on="2015-07-13"/>
       <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
       <modified by="Christian Gruen" on="2015-09-29" change="Regex fixed"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
  
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -638,13 +784,36 @@
         </any-of>  
       </result>
    </test-case>
+  
+  <test-case name="Serialization-adaptive-33a" covers="adaptive-serialization">
+    <description>Test the adaptive serialization output method - escaping in map values</description>
+    <created by="Michael Kay" on="2015-07-13"/>
+    <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
+    <modified by="Christian Gruen" on="2015-09-29" change="Regex fixed"/>
+    <modified by="Christian Gruen" on="2024-03-27" change="Spec change for 4.0"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+ 
+     	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        
+        map{ 1:"O'Neil says ""no""" }
+
+      ]]></test>
+    <result>
+      <any-of>
+        <serialization-matches><![CDATA[^\{1:"O'Neil says ""no"""\}]]></serialization-matches>
+        <serialization-matches><![CDATA[^\{1:'O''Neil says "no"'\}]]></serialization-matches>
+      </any-of>  
+    </result>
+  </test-case>
    
    <test-case name="Serialization-adaptive-34" covers="adaptive-serialization">
       <description>No quotes and no escaping when a map value has length > 1</description>
       <created by="Michael Kay" on="2015-07-13"/>
       <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
       <modified by="Benito van der Zander" on="2020-10-23" change="allow different quotes"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
  
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -663,6 +832,32 @@
         </any-of>
       </result>
    </test-case>
+  
+  <test-case name="Serialization-adaptive-34a" covers="adaptive-serialization">
+    <description>No quotes and no escaping when a map value has length > 1</description>
+    <created by="Michael Kay" on="2015-07-13"/>
+    <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
+    <modified by="Benito van der Zander" on="2020-10-23" change="allow different quotes"/>
+    <modified by="Michael Kay" on="2024-03-27" change="Spec change for 4.0"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+ 
+     	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        declare option output:item-separator "~";
+        
+        map{ "a":("quotes ("")", "apos (')") }
+
+      ]]></test>
+    <result>
+      <any-of>
+        <serialization-matches><![CDATA[^\{"a":\("quotes \(""\)","apos \('\)"\)\}$]]></serialization-matches>
+        <serialization-matches><![CDATA[^\{"a":\('quotes \("\)','apos \(''\)'\)\}$]]></serialization-matches>
+        <serialization-matches><![CDATA[^\{"a":\("quotes \(""\)",'apos \(''\)'\)\}$]]></serialization-matches>
+        <serialization-matches><![CDATA[^\{"a":\('quotes \("\)',"apos \('\)"\)\}$]]></serialization-matches>
+      </any-of>
+    </result>
+  </test-case>
 
   <test-case name="Serialization-adaptive-35" covers="adaptive-serialization">
       <description>Test the adaptive serialization output method - xs:untypedAtomic</description>
