@@ -2814,7 +2814,7 @@
       <test><![CDATA[
          deep-equal(1, 2, (), map{
             "base-uri":false(), "comments":false(), "debug":false(), 
-            "false-on-error":false(), "id-property":false(), "idref-property":false(),
+            "false-on-error":false(), "id-property":false(), "idrefs-property":false(),
             "in-scope-namespaces":false(), "namespace-prefixes":false(), "nilled-property":false(),
             "processing-instructions":false(), "timezones":false(), "type-annotations":false(),
             "type-variety":false(), "typed-values":false()})
@@ -2855,19 +2855,19 @@
       </result>
    </test-case>
    
-   <test-case name="deep-equal-40-options-005" covers-40="fn-deep-equal">
-      <description> Test that unknown string-valued options are ignored </description>
+   <test-case name="deep-equal-40-options-005" covers-40="fn-deep-equal PR1059">
+      <description> Test that unknown string-valued options are rejected</description>
       <created by="Michael Kay" on="2023-02-03"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
          deep-equal(1, 2, (), map{'bifurcation': true()})           
             ]]></test>
       <result>
-         <assert-false/>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
    
-   <test-case name="deep-equal-40-options-006" covers-40="fn-deep-equal">
+   <test-case name="deep-equal-40-options-006" covers-40="fn-deep-equal PR1059">
       <description> Test that unknown QName-valued options are ignored </description>
       <created by="Michael Kay" on="2023-02-03"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
@@ -2876,6 +2876,42 @@
             ]]></test>
       <result>
          <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-options-007" covers-40="fn-deep-equal PR1059">
+      <description> Test that options in no namespace are rejected</description>
+      <created by="Christian Gruen" on="2024-03-26"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(1, 2, (), map{parse-QName('Q{}bifurcation'): true()})
+            ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-options-008" covers-40="fn-deep-equal PR1059">
+      <description> Test that unknown string-valued options are rejected</description>
+      <created by="Christian Gruen" on="2024-03-26"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(1, 2, (), map{'': ()})
+            ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-options-009" covers-40="fn-deep-equal PR1059">
+      <description> Test that parsing of option keys is case sensitive</description>
+      <created by="Christian Gruen" on="2024-03-26"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal(1, 2, (), map{'COMMENTS': ()})
+            ]]></test>
+      <result>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
    
