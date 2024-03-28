@@ -431,14 +431,33 @@
       <modified by="Michael Kay" on="2020-01-14" change="Test requires XQuery; change dependencies"/>
       <modified by="Michael Kay" on="2020-08-23" change="See https://github.com/w3c/qt3tests/issues/28"/>
       <modified by="Michael Kay" on="2020-10-16" change="Add HOF dependency"/>
+      <modified by="Michael Kay" on="2024-03-28" change="Change expected result. See qt4tests issue 109."/>
       <environment ref="map"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>let $s as function(xs:anyAtomicType) as xs:string? := map { 1:'A','x':'B' }
+         return $s?*
+      </test>
+      <result>
+         <assert-permutation>"A", "B"</assert-permutation>
+      </result>
+   </test-case>
+   
+   <test-case name="MapTest-058a" covers="map-general">
+      <description>Map as a function of xs:anyAtomicType. A coerced function is not a map.</description>
+      <created by="Michael Kay after Christian Gruen" on="2019-09-06"/>
+      <modified by="Michael Kay" on="2020-01-14" change="Test requires XQuery; change dependencies"/>
+      <modified by="Michael Kay" on="2020-08-23" change="See https://github.com/w3c/qt3tests/issues/28"/>
+      <modified by="Michael Kay" on="2020-10-16" change="Add HOF dependency"/>
+      <modified by="Michael Kay" on="2024-03-28" change="Change expected result. See qt4tests issue 109."/>
+      <environment ref="map"/>
+      <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="higherOrderFunctions"/>
       <test>let $s as function(xs:anyAtomicType) as xs:string? := map { 1:'A','x':'B' }
             return $s?*
       </test>
       <result>
-         <assert-permutation>'A', 'B'</assert-permutation>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
    
@@ -609,6 +628,55 @@
          <error code="XPST0051"/>
       </result>
    </test-case>
+   
+   <test-case name="MapTest-071" >
+      <description>Map as a function: once coerced, it is no longer a map</description>
+      <created by="Michael Kay" on="2024-03-28"/>
+      <environment ref="map"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>
+         let $f as function(xs:integer) as xs:string := map { 1:'A','x':'B' }
+         return $f instance of map(*)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="MapTest-072" >
+      <description>Coercion applied to a map returned from a function</description>
+      <created by="Michael Kay" on="2024-03-28"/>
+      <environment ref="map"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>
+         let $f as (function() as (function(xs:integer) as xs:string)) := fn() {
+            map { 1:'A','x':'B' }
+         }
+         return $f() instance of map(*)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="MapTest-073" >
+      <description>Treat a map as a function</description>
+      <created by="Michael Kay after Christian Gruen" on="2024-03-28"/>
+      <environment ref="map"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>
+         let $s := map { 1: 'A', 'x': 'B' } treat as function(xs:anyAtomicType) as xs:string?
+         return $s?*
+      </test>
+      <result>
+         <assert-permutation>"A", "B"</assert-permutation>
+      </result>
+   </test-case>
+   
+   
+   
+   
    
    
    
