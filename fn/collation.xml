@@ -220,6 +220,75 @@
          <error code="FOCH0002"/>
       </result>
    </test-case>
+   
+   <test-case name="fn-collation-025">
+      <description>Empty map supplied</description>
+      <created by="Michael Kay" on="2024-04-03"/>
+      <test>collation({})</test>
+      <result>
+         <all-of>
+            <assert-type>xs:string</assert-type>
+            <assert-string-value>http://www.w3.org/2013/collation/UCA</assert-string-value>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-collation-026">
+      <description>QName option supplied</description>
+      <created by="Michael Kay" on="2024-04-03"/>
+      <test>collation(xs:QName('fn:collation'):'uca'})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-collation-027">
+      <description>Extension option supplied with non-string value</description>
+      <created by="Michael Kay" on="2024-04-03"/>
+      <test>collation('private':(1 to 10)})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-collation-028">
+      <description>Recognized option supplied as untyped atomic</description>
+      <created by="Michael Kay" on="2024-04-03"/>
+      <test>collation({xs:untypedAtomic('lang'):'en'})</test>
+      <result>
+         <assert-string-value>http://www.w3.org/2013/collation/UCA?lang=en</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-collation-029">
+      <description>Recognized option supplied as xs:anyURI</description>
+      <created by="Michael Kay" on="2024-04-03"/>
+      <test>collation({xs:anyURI('lang'):'en'})</test>
+      <result>
+         <assert-string-value>http://www.w3.org/2013/collation/UCA?lang=en</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-collation-030">
+      <description>Recognized option value is atomized</description>
+      <created by="Michael Kay" on="2024-04-03"/>
+      <test>collation({'lang':['en']})</test>
+      <result>
+         <assert-string-value>http://www.w3.org/2013/collation/UCA?lang=en</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-collation-031">
+      <description>Extension boolean value</description>
+      <created by="Michael Kay" on="2024-04-03"/>
+      <test>collation({'private':false(), 'fallback':true()})</test>
+      <result>
+         <any-of>
+            <assert-string-value>http://www.w3.org/2013/collation/UCA?private=no;fallback=yes</assert-string-value>
+            <assert-string-value>http://www.w3.org/2013/collation/UCA?fallback=yes;private=no</assert-string-value>
+         </any-of>
+      </result>
+   </test-case>
 
   <test-case name="fn-collation-reorder-codes-001">
       <description>Reorder with unknown code - error</description>
@@ -396,7 +465,7 @@
    <test-case name="fn-collation-params-006">
       <description>strength 1</description>
       <created by="Michael Kay" on="2024-04-03"/>
-      <test>compare('abc','aBC',collation({'strength':1,'fallback':false()}))</test>
+      <test>compare('abc','aBC',collation({'strength':'1','fallback':false()}))</test>
       <result>
          <any-of>
             <assert-eq>0</assert-eq>
@@ -407,7 +476,7 @@
    <test-case name="fn-collation-params-007">
       <description>strength 2</description>
       <created by="Michael Kay" on="2024-04-03"/>
-      <test>compare('abc','aBC',collation({'strength':2,'fallback':false()}))</test>
+      <test>compare('abc','aBC',collation({'strength':'2','fallback':false()}))</test>
       <result>
          <any-of>
             <assert-eq>0</assert-eq>
@@ -418,7 +487,7 @@
    <test-case name="fn-collation-params-008">
       <description>strength 3</description>
       <created by="Michael Kay" on="2024-04-03"/>
-      <test>compare('abc','aBC',collation({'strength':3,'fallback':false()}))</test>
+      <test>compare('abc','aBC',collation({'strength':'3','fallback':false()}))</test>
       <result>
          <any-of>
             <assert-eq>-1</assert-eq>
@@ -429,7 +498,7 @@
    <test-case name="fn-collation-params-009">
       <description>strength 4</description>
       <created by="Michael Kay" on="2024-04-03"/>
-      <test>compare('abc','aBC',collation({'strength':4,'fallback':false()}))</test>
+      <test>compare('abc','aBC',collation({'strength':'4','fallback':false()}))</test>
       <result>
          <any-of>
             <assert-eq>-1</assert-eq>
@@ -440,7 +509,7 @@
    <test-case name="fn-collation-params-010">
       <description>strength 5</description>
       <created by="Michael Kay" on="2024-04-03"/>
-      <test>compare('abc','aBC',collation({'strength':5,'fallback':false()}))</test>
+      <test>compare('abc','aBC',collation({'strength':'5','fallback':false()}))</test>
       <result>
          <any-of>
             <assert-eq>-1</assert-eq>
@@ -451,7 +520,7 @@
    <test-case name="fn-collation-params-011">
       <description>Ignore punctuation - primary</description>
       <created by="Michael Kay" on="2024-04-03"/>
-      <test>compare('a-bc','abc',collation({'strength':1,'alternate':'shifted','fallback':false()}))</test>
+      <test>compare('a-bc','abc',collation({'strength':'1','alternate':'shifted','fallback':false()}))</test>
       <result>
          <any-of>
             <assert-eq>0</assert-eq>
@@ -462,7 +531,7 @@
    <test-case name="fn-collation-params-012">
       <description>Ignore punctuation - secondary</description>
       <created by="Michael Kay" on="2024-04-03"/>
-      <test>compare('a-bc','abc',collation({'strength':2,'alternate':'shifted','fallback':false()}))</test>
+      <test>compare('a-bc','abc',collation({'strength':'2','alternate':'shifted','fallback':false()}))</test>
       <result>
          <any-of>
             <assert-eq>0</assert-eq>
@@ -473,7 +542,7 @@
    <test-case name="fn-collation-params-013">
       <description>Ignore punctuation - tertiary</description>
       <created by="Michael Kay" on="2024-04-03"/>
-      <test>compare('a-bc','abc',collation({'strength':3,'alternate':'shifted','fallback':false()}))</test>
+      <test>compare('a-bc','abc',collation({'strength':'3','alternate':'shifted','fallback':false()}))</test>
       <result>
          <any-of>
             <assert-eq>0</assert-eq>
@@ -484,7 +553,7 @@
    <test-case name="fn-collation-params-014">
       <description>Ignore punctuation - quaternary</description>
       <created by="Michael Kay" on="2024-04-03"/>
-      <test>compare('a-bc','abc',collation({'strength':4,'alternate':'shifted','fallback':false()}))</test>
+      <test>compare('a-bc','abc',collation({'strength':'4','alternate':'shifted','fallback':false()}))</test>
       <result>
          <any-of>
             <assert-eq>-1</assert-eq>
@@ -495,7 +564,7 @@
    <test-case name="fn-collation-params-015">
       <description>Ignore punctuation - identical</description>
       <created by="Michael Kay" on="2024-04-03"/>
-      <test>compare('a-bc','abc',collation({'strength':5,'alternate':'shifted','fallback':false()}))</test>
+      <test>compare('a-bc','abc',collation({'strength':'5','alternate':'shifted','fallback':false()}))</test>
       <result>
          <any-of>
             <assert-eq>-1</assert-eq>
