@@ -123,7 +123,7 @@
    </test-case>
 
    <test-case name="ForExpr009">
-      <description> For+Return - error, use variable in it's own declaration </description>
+      <description> For+Return - error, use variable in its own declaration </description>
       <created by="Jinghao Liu" on="2003-02-10"/>
       <test>for $a in $a/* return $a</test>
       <result>
@@ -375,33 +375,36 @@
       </result>
    </test-case>
 
-   <test-case name="ForExpr022">
+   <test-case name="ForExpr022" covers-40="PR1131">
       <description> FLWOR expressions with positional variable </description>
       <created by="Mike Rorke" on="2005-06-27"/>
+      <modified by="Michael Kay" on="2024-04-02" change="allowed in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $file at $pos in (//Folder)[1]/File return (string($file/FileName[1]), $pos)</test>
       <result>
          <assert-string-value>File00000000000 1 File00000000001 2 File00000000002 3 File00000000003 4 File00000000004 5 File00000000005 6 File00000000006 7 File00000000007 8 File00000000008 9 File00000000009 10 File00000000010 11 File00000000011 12 File00000000012 13 File00000000013 14 File00000000014 15 File00000000015 16 File00000000016 17 File00000000017 18 File00000000018 19 File00000000019 20 File00000000020 21 File00000000021 22 File00000000022 23 File00000000023 24 File00000000024 25 File00000000025 26 File00000000026 27 File00000000027 28 File00000000028 29 File00000000029 30 File00000000030 31</assert-string-value>
       </result>
    </test-case>
 
-   <test-case name="ForExpr023">
+   <test-case name="ForExpr023" covers-40="PR1131">
       <description> Use positional variable in binding for new variable </description>
       <created by="Mike Rorke" on="2005-06-27"/>
+      <modified by="Michael Kay" on="2024-04-02" change="allowed in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $file at $pos in (//Folder)[1]/File, $pos2 in $pos+1 return (string($file/FileName[1]), $pos, $pos2)</test>
       <result>
          <assert-string-value>File00000000000 1 2 File00000000001 2 3 File00000000002 3 4 File00000000003 4 5 File00000000004 5 6 File00000000005 6 7 File00000000006 7 8 File00000000007 8 9 File00000000008 9 10 File00000000009 10 11 File00000000010 11 12 File00000000011 12 13 File00000000012 13 14 File00000000013 14 15 File00000000014 15 16 File00000000015 16 17 File00000000016 17 18 File00000000017 18 19 File00000000018 19 20 File00000000019 20 21 File00000000020 21 22 File00000000021 22 23 File00000000022 23 24 File00000000023 24 25 File00000000024 25 26 File00000000025 26 27 File00000000026 27 28 File00000000027 28 29 File00000000028 29 30 File00000000029 30 31 File00000000030 31 32</assert-string-value>
       </result>
    </test-case>
 
-   <test-case name="ForExpr024">
+   <test-case name="ForExpr024" covers-40="PR1131">
       <description> Reuse existing variable name for positional variable </description>
       <created by="Mike Rorke" on="2005-06-27"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XQ40+"/>
       <test>for $file at $file in (//Folder)[1]/File return (string($file/FileName[1]), $file)</test>
       <result>
          <error code="XQST0089"/>
@@ -428,11 +431,12 @@
       </result>
    </test-case>
 
-   <test-case name="ForExpr027">
+   <test-case name="ForExpr027" covers-40="PR1131">
       <description> Wrong order for positional variable </description>
       <created by="Mike Rorke" on="2005-06-27"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $file in (//Folder)[1]/File at $pos return (string($file/FileName[1]), $pos)</test>
       <result>
          <error code="XPST0003"/>
@@ -453,7 +457,7 @@
    <test-case name="ForExpr029">
       <description> Embedded FLOWR expression that binds same variable on boths expressions (two for clauses) </description>
       <created by="NIST" on="2006-01-24"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP31+"/>
       <test>for $var in (1,2) for $var in (2,2) return $var * $var</test>
       <result>
          <assert-string-value>4 4 4 4</assert-string-value>
@@ -469,10 +473,11 @@
       </result>
    </test-case>
 
-   <test-case name="ForExpr031">
+   <test-case name="ForExpr031" covers-40="PR1131">
       <description> FLOWR expression that binds same variable on both ends of "at" </description>
       <created by="NIST" on="2006-01-24"/>
-      <dependency type="spec" value="XQ10+"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $var at $var in (1, 2) return $var * $var</test>
       <result>
          <error code="XQST0089"/>
@@ -1049,23 +1054,43 @@
    </test-case>
    
    <test-case name="K-ForExprWithout-57">
-      <description> XPath does not allow for and let to be mixed. </description>
+      <description> XPath (prior to 4.0) does not allow for and let to be mixed. </description>
       <created by="Michael Kay" on="2023-05-27"/>
-      <dependency type="spec" value="XP20+"/>
+      <dependency type="spec" value="XP20 XP30 XP31"/>
       <test>for $i in 1 to 50 let $j := $i + 1 return $i + $j</test>
       <result>
          <error code="XPST0003"/>
       </result>
    </test-case>
    
+   <test-case name="K-ForExprWithout-57a" covers-40="PR1131">
+      <description> XPath (from 4.0) does allow for and let to be mixed. </description>
+      <created by="Michael Kay" on="2024-04-03"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
+      <test>for $i in 1 to 5 let $j := $i + 1 return $i + $j</test>
+      <result>
+         <assert-deep-eq>3, 5, 7, 9, 11 </assert-deep-eq>
+      </result>
+   </test-case>
+   
    <test-case name="K-ForExprWithout-58">
-      <description> XPath does not allow for and let to be mixed. </description>
+      <description> XPath (prior to 4.0) does not allow for and let to be mixed. </description>
       <created by="Michael Kay" on="2023-05-27"/>
-      <dependency type="spec" value="XP20+"/>
-         <test>let $j := 82 for $i in 1 to $j return $i + $j</test>
-         <result>
-            <error code="XPST0003"/>
-         </result>
+      <dependency type="spec" value="XP20 XP30 XP31"/>
+      <test>let $j := 82 for $i in 1 to $j return $i + $j</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K-ForExprWithout-58a" covers-40="PR1131">
+      <description> XPath (from 4.0) does not allow for and let to be mixed. </description>
+      <created by="Michael Kay" on="2023-05-27"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
+      <test>let $j := 4 for $i in 1 to $j return $i + $j</test>
+      <result>
+         <assert-deep-eq>5, 6, 7, 8</assert-deep-eq>
+      </result>
    </test-case>
 
    <test-case name="K2-ForExprWithout-1">
@@ -1154,11 +1179,16 @@
       </result>
    </test-case>
 
-   <test-case name="K2-ForExprWithout-9">
+   <test-case name="K2-ForExprWithout-9" covers-40="PR1131">
       <description> Ensure positional variables and bindings handles nesting. </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <dependency type="spec" value="XQ10+"/>
-      <test>for $a at $pos1 in (1, 2, 3) return for $b at $pos2 in (4, 5, 6) return for $c at $pos3 in (7, 8, 9) return ($a, $pos1, $b, $pos2, $c, $pos2)</test>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
+      <test>
+         for $a at $pos1 in (1, 2, 3) return 
+         for $b at $pos2 in (4, 5, 6) return 
+         for $c at $pos3 in (7, 8, 9) return 
+            ($a, $pos1, $b, $pos2, $c, $pos2)</test>
       <result>
          <assert-string-value>1 1 4 1 7 1 1 1 4 1 8 1 1 1 4 1 9 1 1 1 5 2 7 2 1 1 5 2 8 2 1 1 5 2 9 2 1 1 6 3 7 3 1 1 6 3 8 3 1 1 6 3 9 3 2 2 4 1 7 1 2 2 4 1 8 1 2 2 4 1 9 1 2 2 5 2 7 2 2 2 5 2 8 2 2 2 5 2 9 2 2 2 6 3 7 3 2 2 6 3 8 3 2 2 6 3 9 3 3 3 4 1 7 1 3 3 4 1 8 1 3 3 4 1 9 1 3 3 5 2 7 2 3 3 5 2 8 2 3 3 5 2 9 2 3 3 6 3 7 3 3 3 6 3 8 3 3 3 6 3 9 3</assert-string-value>
       </result>
@@ -1533,88 +1563,96 @@
       </result>
    </test-case>
    
-      <test-case name="ForExprType001">
+      <test-case name="ForExprType001" covers-40="PR1131">
       <description> FLWOR expressions with type declaration (element type) </description>
       <created by="Mike Rorke" on="2005-06-27"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $file as element(File,xs:untyped) in (//Folder)[1]/File return $file/FileName</test>
       <result>
          <assert-xml><![CDATA[<FileName>File00000000000</FileName><FileName>File00000000001</FileName><FileName>File00000000002</FileName><FileName>File00000000003</FileName><FileName>File00000000004</FileName><FileName>File00000000005</FileName><FileName>File00000000006</FileName><FileName>File00000000007</FileName><FileName>File00000000008</FileName><FileName>File00000000009</FileName><FileName>File00000000010</FileName><FileName>File00000000011</FileName><FileName>File00000000012</FileName><FileName>File00000000013</FileName><FileName>File00000000014</FileName><FileName>File00000000015</FileName><FileName>File00000000016</FileName><FileName>File00000000017</FileName><FileName>File00000000018</FileName><FileName>File00000000019</FileName><FileName>File00000000020</FileName><FileName>File00000000021</FileName><FileName>File00000000022</FileName><FileName>File00000000023</FileName><FileName>File00000000024</FileName><FileName>File00000000025</FileName><FileName>File00000000026</FileName><FileName>File00000000027</FileName><FileName>File00000000028</FileName><FileName>File00000000029</FileName><FileName>File00000000030</FileName>]]></assert-xml>
       </result>
    </test-case>
 
-   <test-case name="ForExprType002">
+   <test-case name="ForExprType002" covers-40="PR1131">
       <description> FLWOR expressions with type declaration (attribute type) </description>
       <created by="Mike Rorke" on="2005-06-27"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $fileName as attribute(name,xs:untypedAtomic) in (//Folder)[1]/File/@name return data($fileName)</test>
       <result>
          <assert-string-value>File00000000000 File00000000001 File00000000002 File00000000003 File00000000004 File00000000005 File00000000006 File00000000007 File00000000008 File00000000009 File00000000010 File00000000011 File00000000012 File00000000013 File00000000014 File00000000015 File00000000016 File00000000017 File00000000018 File00000000019 File00000000020 File00000000021 File00000000022 File00000000023 File00000000024 File00000000025 File00000000026 File00000000027 File00000000028 File00000000029 File00000000030</assert-string-value>
       </result>
    </test-case>
 
-   <test-case name="ForExprType003">
+   <test-case name="ForExprType003" covers-40="PR1131">
       <description> FLWOR expressions with type declaration (PI type) </description>
       <created by="Mike Rorke" on="2005-06-27"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $PI as processing-instruction() in //processing-instruction() return $PI</test>
       <result>
          <assert-xml><![CDATA[<?FileSystem scale='0'?><?FileSystem maxDepth='64'?>]]></assert-xml>
       </result>
    </test-case>
 
-   <test-case name="ForExprType004">
+   <test-case name="ForExprType004" covers-40="PR1131">
       <description> FLWOR expressions with type declaration (comment type) </description>
       <created by="Mike Rorke" on="2005-06-27"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $comment as comment() in //comment() return $comment</test>
       <result>
          <assert-xml><![CDATA[<!-- This is an official fsx file -->]]></assert-xml>
       </result>
    </test-case>
 
-   <test-case name="ForExprType005">
+   <test-case name="ForExprType005" covers-40="PR1131">
       <description> FLWOR expressions with type declaration (simple type) </description>
       <created by="Mike Rorke" on="2005-06-27"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $int as xs:int in (xs:int(1), xs:int(2)) return $int</test>
       <result>
          <assert-string-value>1 2</assert-string-value>
       </result>
    </test-case>
 
-   <test-case name="ForExprType006">
+   <test-case name="ForExprType006" covers-40="PR1131">
       <description> Wrong type in type declaration </description>
       <created by="Mike Rorke" on="2005-06-27"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $int as xs:string in (xs:int(1), xs:int(2)) return $int</test>
       <result>
          <error code="XPTY0004"/>
       </result>
    </test-case>
 
-   <test-case name="ForExprType007">
+   <test-case name="ForExprType007" covers-40="PR1131">
       <description> Wrong order for type declaration </description>
       <created by="Mike Rorke" on="2005-06-27"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
-      <test>for $file in (//Folder)[1]/File as element(Folder,xs:untypedAny) return $file/FileName</test>
+      <dependency type="spec" value="XQ10+ XP40+"/>
+      <test>for $file in (//Folder)[1]/File as element(Folder,xs:untyped) return $file/FileName</test>
       <result>
          <error code="XPST0003"/>
       </result>
    </test-case>
 
-   <test-case name="ForExprType008">
+   <test-case name="ForExprType008" covers-40="PR1131">
       <description> Wrong order for positional and typing parts of FLWOR expression </description>
       <created by="Mike Rorke" on="2005-06-27"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $file at $pos as element(Folder,xs:untyped) in (//Folder)[1]/File return (string($file/FileName[1]), $pos)</test>
       <result>
          <error code="XPST0003"/>
@@ -1650,22 +1688,24 @@
       </result>
    </test-case>
 
-   <test-case name="ForExprType012">
+   <test-case name="ForExprType012" covers-40="PR1131">
       <description> Missing type declaration on type expression </description>
       <created by="Mike Rorke" on="2005-06-27"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $file as in (//Folder)[1]/File return $file</test>
       <result>
          <error code="XPST0003"/>
       </result>
    </test-case>
 
-   <test-case name="ForExprType013">
+   <test-case name="ForExprType013" covers-40="PR1131">
       <description> Type declaration containing multiple 'as' keywords </description>
       <created by="Mike Rorke" on="2005-06-28"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="orderData"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>
         declare namespace xqt="http://www.w3.org/XQueryTestOrderBy"; 
         for $num as xs:decimal as xs:decimal in data( /xqt:DataValues/xqt:NegativeNumbers/xqt:orderData ) return $num</test>
@@ -1687,55 +1727,60 @@
       </result>
    </test-case>
 
-   <test-case name="ForExprType015">
+   <test-case name="ForExprType015" covers-40="PR1131">
       <description> Type declaration is a super type </description>
       <created by="Mike Rorke" on="2005-06-28"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $num as xs:decimal in (xs:integer(1), xs:integer(2), xs:integer(3)) return $num</test>
       <result>
          <assert-string-value>1 2 3</assert-string-value>
       </result>
    </test-case>
 
-   <test-case name="ForExprType016">
+   <test-case name="ForExprType016" covers-40="PR1131">
       <description> Type declaration is a super type of the union type bound to the variable </description>
       <created by="Mike Rorke" on="2005-06-28"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $num as xs:decimal in (xs:integer(1), xs:decimal(2), xs:integer(3)) return $num</test>
       <result>
          <assert-string-value>1 2 3</assert-string-value>
       </result>
    </test-case>
 
-   <test-case name="ForExprType017">
+   <test-case name="ForExprType017" covers-40="PR1131">
       <description> Bound sequence is a union type containing a single instance that does not match the type declaration </description>
       <created by="Mike Rorke" on="2005-06-28"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $num as xs:double in (xs:int("1"), xs:integer("2"), xs:string("3")) return $num</test>
       <result>
          <error code="XPTY0004"/>
       </result>
    </test-case>
 
-   <test-case name="ForExprType018">
+   <test-case name="ForExprType018" covers-40="PR1131">
       <description> Match a 'node' type </description>
       <created by="Mike Rorke" on="2005-06-28"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $file as node() in (//Folder)[1]/File return $file/FileName</test>
       <result>
          <assert-xml><![CDATA[<FileName>File00000000000</FileName><FileName>File00000000001</FileName><FileName>File00000000002</FileName><FileName>File00000000003</FileName><FileName>File00000000004</FileName><FileName>File00000000005</FileName><FileName>File00000000006</FileName><FileName>File00000000007</FileName><FileName>File00000000008</FileName><FileName>File00000000009</FileName><FileName>File00000000010</FileName><FileName>File00000000011</FileName><FileName>File00000000012</FileName><FileName>File00000000013</FileName><FileName>File00000000014</FileName><FileName>File00000000015</FileName><FileName>File00000000016</FileName><FileName>File00000000017</FileName><FileName>File00000000018</FileName><FileName>File00000000019</FileName><FileName>File00000000020</FileName><FileName>File00000000021</FileName><FileName>File00000000022</FileName><FileName>File00000000023</FileName><FileName>File00000000024</FileName><FileName>File00000000025</FileName><FileName>File00000000026</FileName><FileName>File00000000027</FileName><FileName>File00000000028</FileName><FileName>File00000000029</FileName><FileName>File00000000030</FileName>]]></assert-xml>
       </result>
    </test-case>
 
-   <test-case name="ForExprType019">
+   <test-case name="ForExprType019" covers-40="PR1131">
       <description> Match a text node type </description>
       <created by="Mike Rorke" on="2005-06-28"/>
+      <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $fileName as text() in (//Folder)[1]/File/FileName/text() return string( $fileName )</test>
       <result>
          <assert-string-value>File00000000000 File00000000001 File00000000002 File00000000003 File00000000004 File00000000005 File00000000006 File00000000007 File00000000008 File00000000009 File00000000010 File00000000011 File00000000012 File00000000013 File00000000014 File00000000015 File00000000016 File00000000017 File00000000018 File00000000019 File00000000020 File00000000021 File00000000022 File00000000023 File00000000024 File00000000025 File00000000026 File00000000027 File00000000028 File00000000029 File00000000030</assert-string-value>
