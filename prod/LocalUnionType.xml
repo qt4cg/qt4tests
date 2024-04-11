@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-LocalUnionType"
-          covers-40="prod-LocalUnionType">
-   <description>Tests for union types of the form union(hexBinary,base64Binary): 4.0 proposal</description>
+          covers-40="prod-LocalUnionType PR1132">
+   <description>Tests for union types of the form (hexBinary|base64Binary): 4.0 proposal.
+   Syntax modified by PR1132</description>
    <link type="spec" document="http://www.w3.org/TR/xpath-functions-11/"
          idref="func-abs"/>
          
@@ -10,8 +11,9 @@
    <test-case name="union-001">
       <description>instance of test</description>
       <created by="Michael Kay" on="2016-10-07"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <test><![CDATA[
-      	2 instance of union(xs:integer, xs:double, xs:string)
+      	2 instance of (xs:integer | xs:double | xs:string)
       ]]></test>
       <result>
          <assert-true/>
@@ -21,8 +23,9 @@
    <test-case name="union-002">
       <description>instance of test</description>
       <created by="Michael Kay" on="2016-10-07"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <test><![CDATA[
-      	current-date() instance of union(xs:hexBinary, xs:base64Binary)
+      	current-date() instance of (xs:hexBinary | xs:base64Binary)
       ]]></test>
       <result>
          <assert-false/>
@@ -32,8 +35,9 @@
    <test-case name="union-003">
       <description>cast as test</description>
       <created by="Michael Kay" on="2016-10-07"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <test><![CDATA[
-      	"2016-10-07" cast as union(xs:dateTime, xs:date, xs:time)
+      	"2016-10-07" cast as (xs:dateTime | xs:date | xs:time)
       ]]></test>
       <result>
          <assert-type>xs:date</assert-type>
@@ -43,9 +47,10 @@
    <test-case name="union-004">
       <description>function argument test</description>
       <created by="Michael Kay" on="2016-10-07"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
-      	declare function local:f($a as union(xs:dateTime, xs:date, xs:time)) as xs:string {
+      	declare function local:f($a as (xs:dateTime | xs:date | xs:time)) as xs:string {
       	  typeswitch($a)
       	    case xs:dateTime return "dateTime"
       	    case xs:date return "date"
@@ -63,9 +68,10 @@
       <description>function argument test, failure case</description>
       <created by="Michael Kay" on="2016-10-07"/>
       <modified by="Debbie Lockett" on="2024-01-10" change="requires XQuery"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
-      	declare function local:f($a as union(xs:dateTime, xs:date, xs:time)) as xs:string {
+      	declare function local:f($a as (xs:dateTime | xs:date | xs:time)) as xs:string {
       	  typeswitch($a)
       	    case xs:dateTime return "dateTime"
       	    case xs:date return "date"
@@ -83,14 +89,15 @@
    <test-case name="union-007">
       <description>polymorphic function test</description>
       <created by="Michael Kay" on="2016-10-07"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
-   declare function local:format($in as union(xs:dateTime, xs:date, xs:time, xs:string), $fmt as xs:string) as xs:string {
+   declare function local:format($in as (xs:dateTime | xs:date | xs:time | xs:string), $fmt as xs:string) as xs:string {
       typeswitch ($in) 
       case xs:dateTime return format-dateTime($in, $fmt)
       case xs:date return format-date($in, $fmt)
       case xs:time return format-time($in, $fmt)
-      case xs:string return local:format($in cast as union(xs:dateTime, xs:date, xs:time), $fmt)
+      case xs:string return local:format($in cast as (xs:dateTime | xs:date | xs:time), $fmt)
       default return error()
    };    
    local:format("2016-10-07", "[D] [MNn] [Y]")
@@ -104,14 +111,15 @@
       <description>polymorphic function test - error case</description>
       <created by="Michael Kay" on="2016-10-07"/>
       <modified by="Debbie Lockett" on="2024-01-10" change="requires XQuery"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
-   declare function local:format($in as union(xs:dateTime, xs:date, xs:time, xs:string), $fmt as xs:string) as xs:string {
+   declare function local:format($in as (xs:dateTime | xs:date | xs:time | xs:string), $fmt as xs:string) as xs:string {
       typeswitch ($in) 
       case xs:dateTime return format-dateTime($in, $fmt)
       case xs:date return format-date($in, $fmt)
       case xs:time return format-time($in, $fmt)
-      case xs:string return local:format($in cast as union(xs:dateTime, xs:date, xs:time), $fmt)
+      case xs:string return local:format($in cast as (xs:dateTime | xs:date | xs:time), $fmt)
       default return error()
    };    
    local:format("2016-10-32", "[D] [MNn] [Y]")
@@ -124,9 +132,10 @@
    <test-case name="union-009">
       <description>namespace prefix used before declaration</description>
       <created by="Michael Kay" on="2023-10-20"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
-      	<elem att="{current-date() instance of union(t:hexBinary, t:base64Binary)}" xmlns:t="http://www.w3.org/2001/XMLSchema"/>
+      	<elem att="{current-date() instance of (t:hexBinary | t:base64Binary)}" xmlns:t="http://www.w3.org/2001/XMLSchema"/>
       ]]></test>
       <result>
          <assert>./@att='false'</assert>
@@ -136,9 +145,10 @@
    <test-case name="union-010">
       <description>namespace prefix used before declaration</description>
       <created by="Michael Kay" on="2023-10-20"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
-      	<elem att="{(current-date() || "") castable as union(t:hexBinary, t:base64Binary, t:string)}" 
+      	<elem att="{(current-date() || "") castable as (t:hexBinary | t:base64Binary | t:string)}" 
       	      xmlns:t="http://www.w3.org/2001/XMLSchema"/>
       ]]></test>
       <result>
