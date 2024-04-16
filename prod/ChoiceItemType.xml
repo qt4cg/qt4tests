@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-ChoiceItemType"
+          covers-40="PR1132">
+   <description>Tests for choice item types of the form (hexBinary|base64Binary): 4.0 proposal.
+   Syntax modified by PR1132</description>
+
+         
+   <dependency type="spec" value="XP40+ XQ40+"/>
+      
+   <test-case name="union-type-001">
+      <description>instance of test</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <test><![CDATA[
+      	2 instance of (xs:integer | xs:double | xs:string)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-002">
+      <description>instance of test</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <test><![CDATA[
+      	current-date() instance of (xs:hexBinary | xs:base64Binary)
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-003">
+      <description>cast as test</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <test><![CDATA[
+      	"2016-10-07" cast as (xs:dateTime | xs:date | xs:time)
+      ]]></test>
+      <result>
+         <assert-type>xs:date</assert-type>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-004">
+      <description>function argument test</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+      	declare function local:f($a as (xs:dateTime | xs:date | xs:time)) as xs:string {
+      	  typeswitch($a)
+      	    case xs:dateTime return "dateTime"
+      	    case xs:date return "date"
+      	    case xs:time return "time"
+      	    default return "***"
+      	};
+      	local:f(current-time())
+      ]]></test>
+      <result>
+         <assert-eq>"time"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-005">
+      <description>function argument test, failure case</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <modified by="Debbie Lockett" on="2024-01-10" change="requires XQuery"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+      	declare function local:f($a as (xs:dateTime | xs:date | xs:time)) as xs:string {
+      	  typeswitch($a)
+      	    case xs:dateTime return "dateTime"
+      	    case xs:date return "date"
+      	    case xs:time return "time"
+      	    default return "***"
+      	};
+      	local:f("tomorrow")
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   
+   <test-case name="union-type-007">
+      <description>polymorphic function test</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+   declare function local:format($in as (xs:dateTime | xs:date | xs:time | xs:string), $fmt as xs:string) as xs:string {
+      typeswitch ($in) 
+      case xs:dateTime return format-dateTime($in, $fmt)
+      case xs:date return format-date($in, $fmt)
+      case xs:time return format-time($in, $fmt)
+      case xs:string return local:format($in cast as (xs:dateTime | xs:date | xs:time), $fmt)
+      default return error()
+   };    
+   local:format("2016-10-07", "[D] [MNn] [Y]")
+      ]]></test>
+      <result>
+         <assert-eq>"7 October 2016"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-008">
+      <description>polymorphic function test - error case</description>
+      <created by="Michael Kay" on="2016-10-07"/>
+      <modified by="Debbie Lockett" on="2024-01-10" change="requires XQuery"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+   declare function local:format($in as (xs:dateTime | xs:date | xs:time | xs:string), $fmt as xs:string) as xs:string {
+      typeswitch ($in) 
+      case xs:dateTime return format-dateTime($in, $fmt)
+      case xs:date return format-date($in, $fmt)
+      case xs:time return format-time($in, $fmt)
+      case xs:string return local:format($in cast as (xs:dateTime | xs:date | xs:time), $fmt)
+      default return error()
+   };    
+   local:format("2016-10-32", "[D] [MNn] [Y]")
+      ]]></test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-009">
+      <description>namespace prefix used before declaration</description>
+      <created by="Michael Kay" on="2023-10-20"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+      	<elem att="{current-date() instance of (t:hexBinary | t:base64Binary)}" xmlns:t="http://www.w3.org/2001/XMLSchema"/>
+      ]]></test>
+      <result>
+         <assert>./@att='false'</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-010">
+      <description>namespace prefix used before declaration</description>
+      <created by="Michael Kay" on="2023-10-20"/>
+      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+      	<elem att="{(current-date() || "") castable as (t:hexBinary | t:base64Binary | t:string)}" 
+      	      xmlns:t="http://www.w3.org/2001/XMLSchema"/>
+      ]]></test>
+      <result>
+         <assert>./@att='true'</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-011">
+      <description>instance of test, enumerations</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	2 instance of (enum("a","b") | xs:integer)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-012">
+      <description>instance of test, nested union type</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	2 instance of (enum("a","b") | (xs:date | xs:integer))
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-013">
+      <description>castable as test</description>
+      <created by="Michael Kay" on="2024-04-10" />
+      <test><![CDATA[
+      	"2016-10-07" castable as (xs:dateTime | xs:date | xs:time)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-014">
+      <description>castable as test</description>
+      <created by="Michael Kay" on="2024-04-10" />
+      <test><![CDATA[
+      	"2016-10-07:123" castable as (xs:dateTime | xs:date | xs:time)
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-015">
+      <description>castable as test</description>
+      <created by="Michael Kay" on="2024-04-10" />
+      <test><![CDATA[
+      	"alpha" castable as (xs:dateTime | enum("a","b","c") | enum("alpha", "beta", "gamma"))
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-016">
+      <description>castable as test</description>
+      <created by="Michael Kay" on="2024-04-10" />
+      <test><![CDATA[
+      	"delta" castable as (xs:dateTime | enum("a","b","c") | enum("alpha", "beta", "gamma"))
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="union-type-017">
+      <description>treat as test</description>
+      <created by="Michael Kay" on="2024-04-10" />
+      <test><![CDATA[
+      	(xs:date("2016-10-07") treat as (xs:dateTime | xs:duration | xs:date)) => year-from-date()
+      ]]></test>
+      <result>
+         <assert-eq>2016</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-101">
+      <description>instance of test, generalized choice</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	2 instance of (xs:integer | map(*))
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-102">
+      <description>instance of test, generalized choice</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	[2] instance of (map(*) | array(*))
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-103">
+      <description>instance of test, generalized choice</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	parse-xml('<a/>') instance of (element(a) | document-node(element(a)) | comment())
+      ]]></test>)
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-104">
+      <description>instance of test, generalized choice</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	parse-xml('<b/>') instance of (element(a) | document-node(element(a)) | comment())
+      ]]></test>)
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-105">
+      <description>instance of test, generalized choice</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	{1:true(),0:false()} instance of (map(xs:string,xs:boolean) | map(xs:integer,xs:boolean))
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-106">
+      <description>instance of test, generalized choice within sequence type</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	(33, true(), current-date()) instance of (xs:boolean | xs:date | xs:dateTime | xs:numeric)+
+      ]]></test>)
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-107">
+      <description>instance of test, generalized choice within sequence type</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	(33, true(), current-date(), 'x') instance of (xs:boolean | xs:date | xs:dateTime | xs:numeric)+
+      ]]></test>)
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-150">
+      <description>coercion rules</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	let $x as (xs:integer | xs:string) := (1,3,5,"x")[4] return $x
+      ]]></test>)
+      <result>
+         <assert-type>xs:string</assert-type>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-151">
+      <description>coercion rules</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	let $x as (xs:integer | xs:string) := parse-xml('<a>23</a>') return $x
+      ]]></test>)
+      <result>
+         <all-of>
+            <assert-type>xs:integer</assert-type>
+            <assert-eq>23</assert-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-152">
+      <description>coercion rules</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	let $x as (xs:string | xs:integer)* := (parse-xml('<a>23</a>'), 17) return $x
+      ]]></test>)
+      <result>
+         <all-of>
+            <assert-deep-eq>"23", 17</assert-deep-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-153" covers-40="PR1148">
+      <description>coercion rules. See PR1148</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	let $x as (xs:string | xs:integer | array(*))* := (parse-xml('<a>23</a>'), 17) return $x
+      ]]></test>)
+      <result>
+         <all-of>
+            <assert>$result[1] instance of element(a)</assert>
+            <assert>$result[1] eq '23'</assert>
+            <assert>$result[2] instance of xs:integer</assert>
+            <assert>$result[2] eq 17</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-154">
+      <description>coercion rules</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	let $x as (xs:string | xs:integer | array(*))* := [1,2,3] return $x
+      ]]></test>)
+      <result>
+         <all-of>
+            <assert-deep-eq>1, 2, 3</assert-deep-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-155">
+      <description>coercion rules</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	let $x as (array(xs:string), array(xs:integer), xs:string | xs:integer)* := [1,2,3] return $x
+      ]]></test>)
+      <result>
+         <all-of>
+            <assert-deep-eq>[1, 2, 3]</assert-deep-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-156">
+      <description>coercion rules</description>
+      <created by="Michael Kay" on="2024-04-10"/>
+      <test><![CDATA[
+      	let $x as (record(x as xs:positiveInteger, y as xs:negativeInteger) |
+      	           record(y as xs:positiveInteger, x as xs:negativeInteger)* := {'x':-1, 'y':+1} return $x
+      ]]></test>)
+      <result>
+         <all-of>
+            <assert-deep-eq>{'x':-1, 'y':+1}</assert-deep-eq>
+            <assert>$result?x instance of xs:negativeInteger</assert>
+            <assert>$result?y instance of xs:positiveInteger</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   
+   
+   
+ 
+
+</test-set>

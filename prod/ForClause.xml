@@ -404,7 +404,7 @@
       <created by="Mike Rorke" on="2005-06-27"/>
       <modified by="Michael Kay" on="2024-04-02" change="runnable in XP40"/>
       <environment ref="fsx"/>
-      <dependency type="spec" value="XQ10+ XQ40+"/>
+      <dependency type="spec" value="XQ10+ XP40+"/>
       <test>for $file at $file in (//Folder)[1]/File return (string($file/FileName[1]), $file)</test>
       <result>
          <error code="XQST0089"/>
@@ -497,6 +497,32 @@
       </test>
       <result>
          <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="ForExpr033" covers-40="PR1131">
+      <description> Type of positional variable </description>
+      <created by="Michael Kay" on="2024-04-12"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>
+         every(for $x at $p in -2000 to -1800
+               return $p instance of xs:positiveInteger)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="ForExpr034" covers-40="PR1131">
+      <description> Type of positional variable </description>
+      <created by="Michael Kay" on="2024-04-12"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         every(for $x allowing empty at $p in -2000 to -2005
+               return $p instance of xs:nonNegativeInteger)
+      </test>
+      <result>
+         <assert-true/>
       </result>
    </test-case>
 
@@ -1994,11 +2020,12 @@
       </result>
    </test-case>
    
-   <test-case name="ForExprType046a" covers-40="coercion-in-variables">
+   <test-case name="ForExprType046a" covers-40="coercion-in-variables PR1131">
       <description> FLWOR expressions with type declaration. Attempt to promote xs:decimal | xs:double | xs:integer - no common subtype </description>
       <created by="Michael Kay" on="2023-06-16"/>
+      <modified by="Michael Kay" on="2024-04-12" change="runnable in XP40"/>
       <environment ref="SpecialTypes"/>
-      <dependency type="spec" value="XQ40+"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
       <test>for $test as xs:double in ( 1, 1e2, 0.3 ) return $test</test>
       <result>
          <assert-type>xs:double*</assert-type>
@@ -2334,10 +2361,11 @@
       </result>
    </test-case>
    
-   <test-case name="K2-ForExprWith-2" covers-40="coercion-in-variables">
+   <test-case name="K2-ForExprWith-2" covers-40="coercion-in-variables PR1131">
       <description> For declarations does cause type promotions to apply in 4.0. </description>
       <created by="Michael Kay" on="2023-06-16"/>
-      <dependency type="spec" value="XQ40+"/>
+      <modified by="Michael Kay" on="2024-04-12" change="runnable in XP40"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
       <test>for $i as xs:string in xs:untypedAtomic("input") return $i</test>
       <result>
          <assert-type>xs:string</assert-type>
