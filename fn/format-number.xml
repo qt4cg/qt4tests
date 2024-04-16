@@ -3576,30 +3576,32 @@
       </result>
    </test-case>
   
-  <test-case name="numberformat-40-87" covers-40="fn-format-number">
+  <test-case name="numberformat-40-87" covers-40="PR1151">
     <description>
       PURPOSE: test format-number() with xs:QName for third argument, known statically;
     </description> 
     <created by="Michael Kay, Saxonica" on="2023-02-01"/>
+    <modified by="Michael Kay, Saxonica" on="2024-04-16" change="Move QName into options argument"/>
     <environment>
       <decimal-format xmlns:a="http://a.ns/" name="a:test" decimal-separator="," grouping-separator="."/>
     </environment>
     <dependency type="spec" value="XP40+ XQ40+"></dependency>
-    <test>format-number(12.34, '0.000,00', fn:QName('http://a.ns/', 'test'))</test>
+    <test>format-number(12.34, '0.000,00', {'format-name':fn:QName('http://a.ns/', 'test')})</test>
     <result>
       <assert-string-value>0.012,34</assert-string-value>
     </result>
   </test-case>
   
-  <test-case name="numberformat-40-88" covers-40="fn-format-number">
+  <test-case name="numberformat-40-88" covers-40="PR1151">
     <description>
       PURPOSE: test format-number() with xs:QName for third argument, not known statically; also tests use of whitespace in name
     </description> 
     <created by="Michael Kay, Saxonica" on="2023-02-01"/>
+    <modified by="Michael Kay, Saxonica" on="2024-04-16" change="Move QName into options argument"/>
     <environment>
       <decimal-format xmlns:a="http://a.ns/" name="a:test" decimal-separator="," grouping-separator="."/>
     </environment>
-    <test>format-number(12.34, '0.000,00', if (current-date() lt xs:date('1900-01-01')) then () else fn:QName('http://a.ns/', 'test'))</test>
+    <test>format-number(12.34, '0.000,00', {'format-name':if (current-date() lt xs:date('1900-01-01')) then () else fn:QName('http://a.ns/', 'test')})</test>
     <result>
       <assert-string-value>0.012,34</assert-string-value>
     </result>
@@ -3608,8 +3610,9 @@
   <test-case name="numberformat-500" covers-40="PR1049">
     <description>Custom decimal format</description>
     <created by="Christian Gruen" on="2024-03-18"/>
+    <modified by="Michael Kay, Saxonica" on="2024-04-16" change="Options argument renamed"/>
     <dependency type="spec" value="XP40+ XQ40+"/>
-    <test>format-number(1.1, '0|0', format := map { 'decimal-separator': '|' })</test>
+    <test>format-number(1.1, '0|0', options := map { 'decimal-separator': '|' })</test>
     <result>
        <assert-string-value>1|1</assert-string-value>
     </result>
@@ -3618,8 +3621,9 @@
   <test-case name="numberformat-501" covers-40="PR1049">
     <description>Custom decimal format</description>
     <created by="Christian Gruen" on="2024-03-18"/>
+    <modified by="Michael Kay, Saxonica" on="2024-04-16" change="Options argument renamed"/>
     <dependency type="spec" value="XP40+ XQ40+"/>
-    <test>format-number(1234.56, '#.##0,#', format := map {
+    <test>format-number(1234.56, '#.##0,#', options := map {
   'decimal-separator': ',', 'grouping-separator': '.' }
 )</test>
     <result>
@@ -3630,11 +3634,12 @@
   <test-case name="numberformat-502" covers-40="PR1049">
     <description>Custom decimal format</description>
     <created by="Christian Gruen" on="2024-03-18"/>
+    <modified by="Michael Kay, Saxonica" on="2024-04-16" change="Options argument renamed"/>
     <dependency type="spec" value="XP40+ XQ40+"/>
     <environment>
       <decimal-format decimal-separator="|" grouping-separator="."/>
     </environment>
-    <test>format-number(1234.56, '#.##0,#', format := map {
+    <test>format-number(1234.56, '#.##0,#', options := map {
   'decimal-separator': ',', 'grouping-separator': '.' }
 )</test>
     <result>
@@ -3645,11 +3650,12 @@
   <test-case name="numberformat-503" covers-40="PR1049">
     <description>Custom decimal format</description>
     <created by="Christian Gruen" on="2024-03-18"/>
+    <modified by="Michael Kay, Saxonica" on="2024-04-16" change="Options argument renamed"/>
     <dependency type="spec" value="XP40+ XQ40+"/>
     <environment>
        <decimal-format name="myminus" minus-sign="_"/>
     </environment>
-    <test>format-number(-5, '0', 'myminus', format := map { 'minus-sign': '!'})</test>
+    <test>format-number(-5, '0', 'myminus', options := map { 'minus-sign': '!'})</test>
     <result>
        <assert-string-value>!5</assert-string-value>
     </result>
@@ -3658,8 +3664,9 @@
   <test-case name="numberformat-504" covers-40="PR1049">
     <description>Custom decimal format</description>
     <created by="Christian Gruen" on="2024-03-18"/>
+    <modified by="Michael Kay, Saxonica" on="2024-04-16" change="Options argument renamed"/>
     <dependency type="spec" value="XP40+ XQ40+"/>
-    <test>format-number(1, '0', (), map {
+    <test>format-number(1, '0', map {
   'decimal-separator': '|', 'grouping-separator': '|'
 })</test>
     <result>
@@ -3670,11 +3677,12 @@
   <test-case name="numberformat-505" covers-40="PR1049">
     <description>Custom decimal format</description>
     <created by="Christian Gruen" on="2024-03-18"/>
+    <modified by="Michael Kay, Saxonica" on="2024-04-16" change="Options argument renamed"/>
     <dependency type="spec" value="XP40+ XQ40+"/>
     <environment>
       <decimal-format decimal-separator="'" grouping-separator="|"/>
     </environment>
-    <test>format-number(1, '0', (), map { 'decimal-separator': '|' })</test>
+    <test>format-number(1, '0', map { 'decimal-separator': '|' })</test>
     <result>
       <error code="FODF1290"/>
     </result>
@@ -3683,11 +3691,12 @@
   <test-case name="numberformat-506" covers-40="PR1049">
     <description>Custom decimal format</description>
     <created by="Christian Gruen" on="2024-03-18"/>
+    <modified by="Michael Kay, Saxonica" on="2024-04-16" change="format-name now part of options argument"/>
     <dependency type="spec" value="XP40+ XQ40+"/>
     <environment>
       <decimal-format name="custom" decimal-separator="'" grouping-separator="|"/>
     </environment>
-    <test>format-number(1, '0', 'custom', map { 'decimal-separator': '|' })</test>
+    <test>format-number(1, '0', { 'format-name':'custom', 'decimal-separator': '|' })</test>
     <result>
       <error code="FODF1290"/>
     </result>
