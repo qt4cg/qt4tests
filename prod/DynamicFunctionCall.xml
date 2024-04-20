@@ -235,6 +235,7 @@
       <description>Supply untypedAtomic where required type is namespace sensitive. Rule 1(b)(ii)(B)(II).</description>
       <created by="Michael Kay" on="2024-02-09"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <modified by="Michael Kay" on="2024-04-18" change="reflect latest rules in spec"/>
       <test><![CDATA[
         let $f := function($a as (xs:NCName | xs:QName)) as xs:integer {
           string-length($a)
@@ -242,7 +243,10 @@
         return $f(xs:untypedAtomic('banana'))
       ]]></test>
       <result>
-         <error code="XPTY0117"/>
+         <all-of>
+            <assert-type>xs:integer</assert-type>
+            <assert-eq>6</assert-eq>
+         </all-of>
       </result>
    </test-case>
    
@@ -346,7 +350,7 @@
          return $f(-5)</test>
       <result>
          <all-of>
-            <assert-type>xs:negativeInteger</assert-type>
+            <assert-type>xs:positiveInteger</assert-type>
             <assert-eq>5</assert-eq>
          </all-of>
       </result>
@@ -546,30 +550,33 @@
    </test-case>
    
    <test-case name="DynamicFunctionCall-133" covers-40="PR1132">
-      <description>No promotion for union types</description>
+      <description>Promotion for union types</description>
       <created by="Michael Kay" on="2024-02-09"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <modified by="Michael Kay" on="2024-04-18" change="new rules say promotion happens here"/>
       <test>
          let $f := function($in as (xs:decimal| xs:float)) as xs:string {
-            string($in)
+            `{$in} {$in instance of xs:float}`
          }
-         return $f(xs:double('-INF'))</test>
+         return $f(xs:double('-INF'))
+      </test>
       <result>
-         <error code="XPTY0004"/>
+         <assert-string-value>-INF true</assert-string-value>
       </result>
    </test-case>
    
    <test-case name="DynamicFunctionCall-134" covers-40="PR1132">
-      <description>No promotion for union types</description>
+      <description>Promotion for union types</description>
       <created by="Michael Kay" on="2024-02-09"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <modified by="Michael Kay" on="2024-04-18" change="new rules say promotion happens here"/>
       <test>
          let $f := function($in as (xs:string| xs:untypedAtomic)) as xs:string {
             string($in)
          }
          return $f(xs:anyURI('http://example.com/'))</test>
       <result>
-         <error code="XPTY0004"/>
+         <assert-string-value>http://example.com/</assert-string-value>
       </result>
    </test-case>
    
@@ -587,15 +594,16 @@
    </test-case>
    
    <test-case name="DynamicFunctionCall-136">
-      <description>No promotion for enumeration types</description>
+      <description>Promotion for enumeration types</description>
       <created by="Michael Kay" on="2024-02-09"/>
+      <modified by="Michael Kay" on="2024-04-18" change="new rules say promotion happens here"/>
       <test>
          let $f := function($in as enum("a", "b", "c")) as xs:string {
             string($in)
          }
          return $f(xs:anyURI('a'))</test>
       <result>
-         <error code="XPTY0004"/>
+         <assert-string-value>a</assert-string-value>
       </result>
    </test-case>
    
@@ -832,6 +840,7 @@
          Rule 1(b)(ii)(B)(II). Within record test.</description>
       <created by="Michael Kay" on="2024-02-09"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <modified by="Michael Kay" on="2024-04-18" change="reflect latest rules in spec"/>
       <test><![CDATA[
         let $f := function($a as record(x as (xs:NCName | xs:QName))) as xs:integer {
           string-length($a?x)
@@ -839,7 +848,10 @@
         return $f(map{'x':xs:untypedAtomic('banana')})
       ]]></test>
       <result>
-         <error code="XPTY0117"/>
+         <all-of>
+            <assert-type>xs:integer</assert-type>
+            <assert-eq>6</assert-eq>
+         </all-of>
       </result>
    </test-case>
    
@@ -926,7 +938,7 @@
          return $f(map{'x':-5})</test>
       <result>
          <all-of>
-            <assert-type>xs:negativeInteger</assert-type>
+            <assert-type>xs:positiveInteger</assert-type>
             <assert-eq>5</assert-eq>
          </all-of>
       </result>
@@ -1127,30 +1139,33 @@
    </test-case>
    
    <test-case name="DynamicFunctionCall-R-133" covers-40="PR1132">
-      <description>No promotion for union types. Within record test.</description>
+      <description>Promotion for union types. Within record test.</description>
       <created by="Michael Kay" on="2024-02-09"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <modified by="Michael Kay" on="2024-04-18" change="new rules say promotion happens here"/>
       <test>
-         let $f := function($in as record(x as (xs:decimal | xs:float))) as xs:string {
-            string($in?x)
+         let $f := function($in as (xs:decimal| xs:float)) as xs:string {
+         `{$in} {$in instance of xs:float}`
          }
-         return $f(map{'x':xs:double('-INF')})</test>
+         return $f(xs:double('-INF'))
+      </test>
       <result>
-         <error code="XPTY0004"/>
+         <assert-string-value>-INF true</assert-string-value>
       </result>
    </test-case>
    
    <test-case name="DynamicFunctionCall-R-134" covers-40="PR1132">
-      <description>No promotion for union types. Within record test.</description>
+      <description>Promotion for union types. Within record test.</description>
       <created by="Michael Kay" on="2024-02-09"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+      <modified by="Michael Kay" on="2024-04-18" change="new rules say promotion happens here"/>
       <test>
          let $f := function($in as record(x as (xs:string | xs:untypedAtomic))) as xs:string {
             string($in?x)
          }
          return $f(map{'x':xs:anyURI('http://example.com/')})</test>
       <result>
-         <error code="XPTY0004"/>
+         <assert-string-value>http://example.com/</assert-string-value>
       </result>
    </test-case>
    
@@ -1168,15 +1183,16 @@
    </test-case>
    
    <test-case name="DynamicFunctionCall-R-136">
-      <description>No promotion for enumeration types. Within record test.</description>
+      <description>Promotion for enumeration types. Within record test.</description>
       <created by="Michael Kay" on="2024-02-09"/>
+      <modified by="Michael Kay" on="2024-04-18" change="new rules say promotion happens here"/>
       <test>
          let $f := function($in as record(x as enum("a", "b", "c"))) as xs:string {
             string($in?x)
          }
          return $f(map{'x':xs:anyURI('a')})</test>
       <result>
-         <error code="XPTY0004"/>
+         <assert-string-value>a</assert-string-value>
       </result>
    </test-case>
    

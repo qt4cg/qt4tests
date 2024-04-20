@@ -351,7 +351,7 @@
       <description>coercion rules. See PR1148</description>
       <created by="Michael Kay" on="2024-04-10"/>
       <test><![CDATA[
-      	let $x as (xs:string | xs:integer | array(*))* := (parse-xml('<a>23</a>'), 17) return $x
+      	let $x as (xs:string | xs:integer | element(a))* := (parse-xml('<a>23</a>')/*, 17) return $x
       ]]></test>)
       <result>
          <all-of>
@@ -367,11 +367,11 @@
       <description>coercion rules</description>
       <created by="Michael Kay" on="2024-04-10"/>
       <test><![CDATA[
-      	let $x as (xs:string | xs:integer | array(*))* := [1,2,3] return $x
+      	let $x as (xs:string | xs:integer | array(*))* := ([1,2,3], 1, 2) return $x
       ]]></test>)
       <result>
          <all-of>
-            <assert-deep-eq>1, 2, 3</assert-deep-eq>
+            <assert-deep-eq>[1, 2, 3], 1, 2</assert-deep-eq>
          </all-of>
       </result>
    </test-case>
@@ -380,11 +380,12 @@
       <description>coercion rules</description>
       <created by="Michael Kay" on="2024-04-10"/>
       <test><![CDATA[
-      	let $x as (array(xs:string), array(xs:integer), xs:string | xs:integer)* := [1,2,3] return $x
+      	let $x as (array(xs:string) | array(xs:integer) | xs:string | xs:integer)* := [1,2,3] return $x
       ]]></test>)
       <result>
          <all-of>
             <assert-deep-eq>[1, 2, 3]</assert-deep-eq>
+            <assert-type>array(xs:integer)</assert-type>
          </all-of>
       </result>
    </test-case>
@@ -394,7 +395,7 @@
       <created by="Michael Kay" on="2024-04-10"/>
       <test><![CDATA[
       	let $x as (record(x as xs:positiveInteger, y as xs:negativeInteger) |
-      	           record(y as xs:positiveInteger, x as xs:negativeInteger)* := {'x':-1, 'y':+1} return $x
+      	           record(y as xs:positiveInteger, x as xs:negativeInteger))* := {'x':-1, 'y':+1} return $x
       ]]></test>)
       <result>
          <all-of>
