@@ -2372,17 +2372,25 @@
       <description> One of the operands has two text nodes, and hence it evaluate to false. </description>
       <created by="Frans Englich" on="2007-11-26"/>
       <dependency type="spec" value="XQ10 XQ30 XQ31"/>
-      <test><![CDATA[declare variable $d1 := <e a="1" b="2">te<?target data?>xt</e>; declare variable $d2 := <e b="2" a="1">text</e>; deep-equal($d1, $d2), deep-equal($d2, $d1)]]></test>
+      <test><![CDATA[
+         declare variable $d1 := <e a="1" b="2">te<?target data?>xt</e>; 
+         declare variable $d2 := <e b="2" a="1">text</e>; 
+         deep-equal($d1, $d2), deep-equal($d2, $d1)
+      ]]></test>
       <result>
          <assert-string-value>false false</assert-string-value>
       </result>
    </test-case>
 
-   <test-case name="K2-SeqDeepEqualFunc-20a">
+   <test-case name="K2-SeqDeepEqualFunc-20a" changes-40="TBA">
       <description> One of the operands has two text nodes, and hence it evaluate to false. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Christian Gruen" on="2024-03-07" change="text nodes are now merged in 4.0"/>
       <dependency type="spec" value="XQ40+"/>
-      <test><![CDATA[declare variable $d1 := <e a="1" b="2">te<?target data?>xt</e>; declare variable $d2 := <e b="2" a="1">text</e>; deep-equal($d1, $d2), deep-equal($d2, $d1)]]></test>
+      <test><![CDATA[
+         declare variable $d1 := <e a="1" b="2">te<?target data?>xt</e>; 
+         declare variable $d2 := <e b="2" a="1">text</e>; 
+         deep-equal($d1, $d2), deep-equal($d2, $d1)]]></test>
       <result>
          <assert-string-value>true true</assert-string-value>
       </result>
@@ -2392,7 +2400,11 @@
       <description> Processing instructions inside elements are ignored. </description>
       <created by="Frans Englich" on="2007-11-26"/>
       <dependency type="spec" value="XQ10+"/>
-      <test><![CDATA[declare variable $d1 := <e a="1" b="2"><?target data?>text</e>; declare variable $d2 := <e b="2" a="1">text</e>; deep-equal($d1, $d2), deep-equal($d2, $d1)]]></test>
+      <test><![CDATA[
+         declare variable $d1 := <e a="1" b="2"><?target data?>text</e>; 
+         declare variable $d2 := <e b="2" a="1">text</e>; 
+         deep-equal($d1, $d2), deep-equal($d2, $d1)
+      ]]></test>
       <result>
          <assert-string-value>true true</assert-string-value>
       </result>
@@ -2402,18 +2414,26 @@
       <description> One of the operands has two text nodes besides the comment, and hence it evaluate to false. </description>
       <created by="Frans Englich" on="2007-11-26"/>
       <dependency type="spec" value="XQ10 XQ30 XQ31"/>
-      <test><![CDATA[declare variable $d1 := <e a="1" b="2">te<!-- content -->xt</e>; declare variable $d2 := <e b="2" a="1">text</e>; deep-equal($d1, $d2), deep-equal($d2, $d1)]]></test>
+      <test><![CDATA[
+         declare variable $d1 := <e a="1" b="2">te<!-- content -->xt</e>; 
+         declare variable $d2 := <e b="2" a="1">text</e>; 
+         deep-equal($d1, $d2), deep-equal($d2, $d1)
+      ]]></test>
       <result>
          <assert-string-value>false false</assert-string-value>
       </result>
    </test-case>
 
-   <test-case name="K2-SeqDeepEqualFunc-22a">
+   <test-case name="K2-SeqDeepEqualFunc-22a" covers-40="TBA">
       <description> One of the operands has two text nodes besides the comment. </description>
       <created by="Frans Englich" on="2007-11-26"/>
       <modified by="Christian Gruen" on="2024-03-07"/>
       <dependency type="spec" value="XQ40+"/>
-      <test><![CDATA[declare variable $d1 := <e a="1" b="2">te<!-- content -->xt</e>; declare variable $d2 := <e b="2" a="1">text</e>; deep-equal($d1, $d2), deep-equal($d2, $d1)]]></test>
+      <test><![CDATA[
+         declare variable $d1 := <e a="1" b="2">te<!-- content -->xt</e>; 
+         declare variable $d2 := <e b="2" a="1">text</e>; 
+         deep-equal($d1, $d2), deep-equal($d2, $d1)
+      ]]></test>
       <result>
          <assert-string-value>true true</assert-string-value>
       </result>
@@ -2798,8 +2818,8 @@
       <test><![CDATA[
          deep-equal((), (), (), map{
             "base-uri":true(), "comments":true(), "debug":true(), 
-            "false-on-error":true(), "id-property":true(), "idrefs-property":true(),
-            "in-scope-namespaces":true(), "namespace-prefixes":true(), "nilled-property":true(), "normalize-space":true(),
+            "id-property":true(), "idrefs-property":true(),
+            "in-scope-namespaces":true(), "namespace-prefixes":true(), "nilled-property":true(),
             "processing-instructions":true(), "timezones":true(), "type-annotations":true(),
             "type-variety":true(), "typed-values":true()})
             
@@ -2809,14 +2829,50 @@
       </result>
    </test-case>
    
-   <test-case name="deep-equal-40-options-001a" covers-40="fn-deep-equal">
-      <description> Test that invalid boolean options are rejected </description>
+   <test-case name="deep-equal-40-options-001a" covers-40="PR1059">
+      <description> Test that invalid boolean options are rejected ("idref-property")</description>
       <created by="Christian Gruen" on="2024-04-18"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
          deep-equal((), (), (), map{
             "base-uri":true(), "comments":true(), "debug":true(), 
-            "false-on-error":true(), "id-property":true(), "idref-property":true(),
+            "id-property":true(), "idref-property":true(),
+            "in-scope-namespaces":true(), "namespace-prefixes":true(), "nilled-property":true(), "normalize-space":true(),
+            "processing-instructions":true(), "timezones":true(), "type-annotations":true(),
+            "type-variety":true(), "typed-values":true()})
+            
+            ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-options-001b" covers-40="PR1059">
+      <description> Test that invalid boolean options are rejected ("false-on-error")</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal((), (), (), map{
+            "false-on-error":true(), "comments":true(), "debug":true(), 
+            "id-property":true(), "idref-property":true(),
+            "in-scope-namespaces":true(), "namespace-prefixes":true(), "nilled-property":true(), "normalize-space":true(),
+            "processing-instructions":true(), "timezones":true(), "type-annotations":true(),
+            "type-variety":true(), "typed-values":true()})
+            
+            ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-options-001c" covers-40="PR1059">
+      <description> Test that invalid boolean options are rejected ("normalize-space")</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         deep-equal((), (), (), map{
+            "comments":true(), "debug":true(), 
+            "id-property":true(), "idref-property":true(),
             "in-scope-namespaces":true(), "namespace-prefixes":true(), "nilled-property":true(), "normalize-space":true(),
             "processing-instructions":true(), "timezones":true(), "type-annotations":true(),
             "type-variety":true(), "typed-values":true()})
@@ -2834,7 +2890,7 @@
       <test><![CDATA[
          deep-equal(1, 2, (), map{
             "base-uri":false(), "comments":false(), "debug":false(), 
-            "false-on-error":false(), "id-property":false(), "idrefs-property":false(),
+            "id-property":false(), "idrefs-property":false(),
             "in-scope-namespaces":false(), "namespace-prefixes":false(), "nilled-property":false(),
             "processing-instructions":false(), "timezones":false(), "type-annotations":false(),
             "type-variety":false(), "typed-values":false()})
@@ -3587,6 +3643,7 @@
    <test-case name="deep-equal-40-id-property-001" covers-40="fn-deep-equal">
       <description> Test id-property option of deep equal - on</description>
       <created by="Michael Kay" on="2023-02-03"/>
+      <modified by="Michael Kay" on="2024-04-22" change="corrected property name type-annotations"/>
       <environment ref="id-validation"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="schemaImport"/> 
@@ -3598,7 +3655,7 @@
          deep-equal(
             $validated//*:elementwithid-1,
             $unvalidated//*:elementwithid-1,
-            options := map{'id-property':true(), 'type-annotation':false(), 'type-variety': false()})
+            options := map{'id-property':true(), 'type-annotations':false(), 'type-variety': false()})
             ]]></test>
       <result>
          <assert-false/>
@@ -3608,6 +3665,7 @@
    <test-case name="deep-equal-40-id-property-002" covers-40="fn-deep-equal">
       <description> Test id-property option of deep equal - off</description>
       <created by="Michael Kay" on="2023-02-03"/>
+      <modified by="Michael Kay" on="2024-04-22" change="corrected property name type-annotations"/>
       <environment ref="id-validation"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="schemaImport"/> 
@@ -3619,7 +3677,7 @@
          deep-equal(
             $validated//*:elementwithid-1,
             $unvalidated//*:elementwithid-1,
-            options := map{'id-property':false(), 'type-annotation':false(), 'type-variety': false(), 'debug':true()})
+            options := map{'id-property':false(), 'type-annotations':false(), 'type-variety': false(), 'debug':true()})
             ]]></test>
       <result>
          <assert-true/>
@@ -3629,6 +3687,7 @@
    <test-case name="deep-equal-40-idref-property-001" covers-40="fn-deep-equal">
       <description> Test idrefs-property option of deep equal - on</description>
       <created by="Michael Kay" on="2023-02-03"/>
+      <modified by="Michael Kay" on="2024-04-22" change="corrected property name type-annotations"/>
       <environment ref="id-validation"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="schemaImport"/> 
@@ -3640,7 +3699,7 @@
          deep-equal(
             $validated//*:elementwithidref-1,
             $unvalidated//*:elementwithidref-1,
-            options := map{'idrefs-property':true(), 'type-annotation':false(), 'type-variety': false()})
+            options := map{'idrefs-property':true(), 'type-annotations':false(), 'type-variety': false()})
             ]]></test>
       <result>
          <assert-false/>
@@ -3650,6 +3709,7 @@
    <test-case name="deep-equal-40-idref-property-002" covers-40="fn-deep-equal">
       <description> Test idrefs-property option of deep equal - off</description>
       <created by="Michael Kay" on="2023-02-03"/>
+      <modified by="Michael Kay" on="2024-04-22" change="corrected property name type-annotations"/>
       <environment ref="id-validation"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="schemaImport"/> 
@@ -3661,7 +3721,7 @@
          deep-equal(
             $validated//*:elementwithidref-1,
             $unvalidated//*:elementwithidref-1,
-            options := map{'idrefs-property':false(), 'type-annotation':false(), 'type-variety': false(), 'debug':true()})
+            options := map{'idrefs-property':false(), 'type-annotations':false(), 'type-variety': false(), 'debug':true()})
             ]]></test>
       <result>
          <assert-true/>
@@ -3671,6 +3731,7 @@
    <test-case name="deep-equal-40-nilled-property-001" covers-40="fn-deep-equal">
       <description> Test idrefs-property option of deep equal - on</description>
       <created by="Michael Kay" on="2023-02-03"/>
+      <modified by="Michael Kay" on="2024-04-22" change="corrected property name type-annotations"/>
       <environment ref="nilled-validation"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="schemaImport"/> 
@@ -3682,7 +3743,7 @@
          deep-equal(
             $validated//*:date,
             $unvalidated//*:date,
-            options := map{'nilled-property':false(), 'type-annotation':false(), 
+            options := map{'nilled-property':false(), 'type-annotations':false(), 
                      'typed-values':false(), 'type-variety': false(), 'debug': true()})
             ]]></test>
       <result>
@@ -3693,6 +3754,7 @@
    <test-case name="deep-equal-40-nilled-property-002" covers-40="fn-deep-equal">
       <description> Test idrefs-property option of deep equal - on</description>
       <created by="Michael Kay" on="2023-02-03"/>
+      <modified by="Michael Kay" on="2024-04-22" change="corrected property name type-annotations"/>
       <environment ref="nilled-validation"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="schemaImport"/> 
@@ -3704,7 +3766,7 @@
          deep-equal(
             $validated//*:date,
             $unvalidated//*:date,
-            options := map{'nilled-property':true(), 'type-annotation':false(), 
+            options := map{'nilled-property':true(), 'type-annotations':false(), 
                            'typed-values':false(), 'type-variety': false(), 'debug':true()})
             ]]></test>
       <result>
@@ -4830,6 +4892,204 @@ return deep-equal(
          <assert-true/>
       </result>
    </test-case>
+   
+   <test-case name="deep-equal-40-items-equal-001" covers-40="PR1120">
+      <description>Basic example, modulo arithmetic</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(1 to 30, 61 to 90, (), {'items-equal':fn($x,$y){$x mod 30 = $y mod 30}})</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-items-equal-002" covers-40="PR1120">
+      <description>Basic example, false</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(1 to 30, 1 to 30, (), {'items-equal':fn($x,$y){$x ne 25}})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-items-equal-003" covers-40="PR1120">
+      <description>NaN comparison returning false</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(
+              ("1","2","3","x"), 
+              ("1","2","3","x"),
+              (),
+              {'items-equal':fn($x, $y){number($x) eq number($y)}})
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-items-equal-004" covers-40="PR1120">
+      <description>Callback returns true, but sequences differ in length</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(2 to 31, 1 to 29, (), {'items-equal':true#0})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-items-equal-005" covers-40="PR1120">
+      <description>Ignore one attribute</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[        
+         deep-equal(
+            parse-xml('<A x="1" y="2" z="892"/>'),
+            parse-xml('<A z="3299" x="1" y="2"/>'), 
+            (), 
+            {'items-equal':fn($x,$y){if (($x,$y) instance of attribute(z)+) {true()}}})
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-items-equal-006" covers-40="PR1120">
+      <description>Ignore all but one attribute</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[        
+         deep-equal(
+            parse-xml('<A x="1" y="2" z="892"/>'),
+            parse-xml('<A z="3299" x="1" y="22"/>'), 
+            (), 
+            {'items-equal':fn($x,$y){
+                             if (($x,$y) instance of attribute(*)+ and not(local-name($x) = 'x'))  {
+                               true()
+                             }
+                           },
+             'debug': true()              
+            })
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-items-equal-007" covers-40="PR1120">
+      <description>Compare nodes by ID</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[        
+         deep-equal(
+            parse-xml('<A x="1" y="2" z="892"/>'),
+            parse-xml('<A x="1" y="2" z="892"/>'), 
+            (), 
+            {'items-equal':fn($x,$y){if (($x,$y) instance of element(A)+) {$x is $y}}})
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-items-equal-008" covers-40="PR1120">
+      <description>Compare elements ignoring most attributes using a recursive call</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[        
+         deep-equal(
+            parse-xml('<A x="1" y="2" z="892"/>'),
+            parse-xml('<A x="1" y="2" z="231" w="juscyn"/>'), 
+            (), 
+            {'items-equal':fn($x,$y){
+                             if (($x,$y) instance of element(A)+) {
+                                 deep-equal($x/@x, $y/@x) and deep-equal($x/@y, $y/@y)
+                              }
+                            }
+            })
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-items-equal-009" covers-40="PR1120">
+      <description>Compare unordered sequence with items-equal callback</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[        
+         deep-equal(1 to 8, reverse(21 to 28), 
+            (), 
+            {'items-equal': fn($x,$y){$x mod 10 = $y mod 10},
+             'ordered': false()
+            })
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-items-equal-010" covers-40="PR1120">
+      <description>Compare unordered sequence with items-equal callback</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[        
+         deep-equal(1 to 8, reverse(22 to 29), 
+            (), 
+            {'items-equal': fn($x,$y){$x mod 10 = $y mod 10},
+             'ordered': false()
+            })
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-items-equal-011" covers-40="PR1120">
+      <description>Compare unordered elements with items-equal callback</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[        
+         deep-equal(
+            parse-xml('<doc><a>1</a><b>2</b><c>3</c></doc>'), 
+            parse-xml('<doc><c>13</c><a>11</a><b>12</b></doc>'), 
+            (), 
+            {'items-equal': fn($x,$y){
+                              if (($x,$y) instance of text()+) {
+                                 $x mod 10 = $y mod 10
+                              }
+                            },
+             'unordered-elements': fn:QName("", "doc")
+            })
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-items-equal-012" covers-40="PR1120">
+      <description>Compare unordered elements with items-equal callback</description>
+      <created by="Michael Kay" on="2024-04-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[        
+         deep-equal(
+            parse-xml('<doc><a>1</a><b>2</b><c>3</c></doc>'), 
+            parse-xml('<doc><c>13</c><a>11</a><b>15</b></doc>'), 
+            (), 
+            {'items-equal': fn($x,$y){
+                              if (($x,$y) instance of xs:untypedAtomic+) {
+                                 $x mod 10 = $y mod 10
+                              }
+                            },
+             'unordered-elements': fn:QName("", "doc")
+            })
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+  
 
    <test-case name="fn-deep-equal-empty">
       <description>Optional argument: empty sequence</description>

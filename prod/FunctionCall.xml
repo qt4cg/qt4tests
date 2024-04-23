@@ -435,7 +435,7 @@
       <description>Test that numeric promotion does not occur when the target type is a union type.</description>
       <created by="Michael Kay" on="2011-10-31"/>
       <environment ref="ListUnionTypes"/>
-      <dependency type="spec" value="XQ30+"/>
+      <dependency type="spec" value="XQ30 XQ31"/>
       <dependency type="feature" value="schemaImport"/>
       <dependency type="feature" value="higherOrderFunctions"/>
       <test>
@@ -444,6 +444,38 @@
       	function($in as lu:unionType) as xs:boolean {$in instance of xs:integer}(12.3)</test>
       <result>
         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-030a" covers-40="TBA">
+      <description>Test that numeric promotion does occur when the target type is a union type.</description>
+      <created by="Michael Kay" on="2011-10-31"/>
+      <modified by="Michael Kay" on="2024-04-22" change="Coercion rules have changed in 4.0"/>
+      <environment ref="ListUnionTypes"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test>
+         declare namespace lu = 'http://www.w3.org/XQueryTest/ListUnionTypes' ;
+         import schema "http://www.w3.org/XQueryTest/ListUnionTypes";
+         function($in as lu:unionType) as xs:boolean {$in instance of xs:integer}(12.3)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="FunctionCall-030b" covers-40="TBA">
+      <description>Test that numeric promotion does occur when the target type is a union type.</description>
+      <created by="Michael Kay" on="2011-10-31"/>
+      <modified by="Michael Kay" on="2024-04-22" change="Coercion rules have changed in 4.0"/>
+      <environment ref="ListUnionTypes"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test>
+         declare namespace lu = 'http://www.w3.org/XQueryTest/ListUnionTypes' ;
+         import schema "http://www.w3.org/XQueryTest/ListUnionTypes";
+         function($in as lu:unionType) as xs:boolean {$in instance of xs:float}(12.3)</test>
+      <result>
+         <assert-true/>
       </result>
    </test-case>
    
@@ -1256,22 +1288,23 @@
    <test-case name="FunctionCall-421" covers-40="keywords">
       <description>Coercion of reduced-arity function that has a higher arity variant</description>
       <created by="Michael Kay" on="2023-12-01"/>
+      <modified by="Michael Kay" on="2024-04-22" change="New coercion rules made this a type error"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
          declare function local:f($x as xs:string, $y as xs:string, $z as xs:string := '1900-01-01') as xs:string {
            concat($x, '-', $y, ' on ', $z)
          };
-         declare function local:g($x as xs:string, $z as function(xs:string, xs:string, xs:integer) as xs:string) {
-           $z($x, $x, 22)
+         declare function local:g($x as xs:string, $z as function(xs:string, xs:string, xs:string) as xs:string) {
+           $z($x, $x, '2020-01-01')
          };  
          local:g("ABC", local:f#2)
       ]]></test>
       <result>
-         <assert-eq>"ABC-ABC on 1900-01-01"</assert-eq>
+         <assert-eq>"ABC-ABC on 2020-01-01"</assert-eq>
       </result>
    </test-case>
    
-   <test-case name="FunctionCall-422" covers-40="issue894">
+   <test-case name="FunctionCall-422" covers-40="PR897">
       <description>Partial application with a wrong-type argument. See issue 894</description>
       <created by="Michael Kay" on="2024-01-07"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
@@ -1281,7 +1314,7 @@
       </result>
    </test-case>
    
-   <test-case name="FunctionCall-423" covers-40="issue894">
+   <test-case name="FunctionCall-423" covers-40="PR897">
       <description>Partial application with a semantically invalid argument. See issue 894</description>
       <created by="Michael Kay" on="2024-01-07"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
@@ -1307,7 +1340,7 @@
       </result>
    </test-case>
    
-   <test-case name="FunctionCall-425" covers-40="issue894">
+   <test-case name="FunctionCall-425" covers-40="PR897">
       <description>Partial application of user function with argument defaulting to context item</description>
       <created by="Michael Kay" on="2024-01-07"/>
       <dependency type="spec" value="XQ40+"/>
@@ -1321,7 +1354,7 @@
       </result>
    </test-case>
    
-   <test-case name="FunctionCall-426" covers-40="issue894">
+   <test-case name="FunctionCall-426" covers-40="PR897">
       <description>Partial application with absent focus. See issue 894</description>
       <created by="Michael Kay" on="2024-01-07"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
@@ -1331,7 +1364,7 @@
       </result>
    </test-case>
    
-   <test-case name="FunctionCall-427" covers-40="issue894">
+   <test-case name="FunctionCall-427" covers-40="PR897">
       <description>Partial application of user function with argument defaulting to context item</description>
       <created by="Michael Kay" on="2024-01-07"/>
       <dependency type="spec" value="XQ40+"/>
@@ -1344,7 +1377,7 @@
       </result>
    </test-case>
    
-   <test-case name="FunctionCall-428" covers-40="issue894">
+   <test-case name="FunctionCall-428" covers-40="PR897">
       <description>Partial application of user function with argument defaulting to context item</description>
       <created by="Michael Kay" on="2024-01-07"/>
       <dependency type="spec" value="XQ40+"/>
