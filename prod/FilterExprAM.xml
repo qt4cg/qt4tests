@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="FilterExprAM"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" covers="PR1163">
+    <description>Tests for the FilterExprAM function introduced in XPath 4.0</description>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    
+    <test-case name="filter-array-001">
+        <description>Apply filter to array</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a := ["A", "B", 1, 2] return $a?[. instance of xs:integer]</test>
+        <result>
+            <all-of>
+                <assert-type>array(*)</assert-type>
+                <assert>array:size($result) eq 2</assert>
+                <assert-deep-eq>[1, 2]</assert-deep-eq>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-002">
+        <description>Apply filter to array</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a := ["the cat", "sat", "on the mat"] return $a?[count(tokenize(., " ")) gt 1]</test>
+        <result>
+            <all-of>
+                <assert-type>array(*)</assert-type>
+                <assert>array:size($result) eq 2</assert>
+                <assert-deep-eq>["the cat", "on the mat"]</assert-deep-eq>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-003">
+        <description>Apply filter to array</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a := ["A", "B", "", 0, 1] return $a?[boolean(.)]</test>
+        <result>
+            <all-of>
+                <assert-type>array(*)</assert-type>
+                <assert>array:size($result) eq 3</assert>
+                <assert-deep-eq>["A", "B", 1]</assert-deep-eq>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-004">
+        <description>Apply filter to array with array members</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a := [[2,3],[],[4,5,6,7],[6,7],[3]] return $a?[array:size(.) gt 1]</test>
+        <result>
+            <all-of>
+                <assert-type>array(*)</assert-type>
+                <assert>array:size($result) eq 3</assert>
+                <assert-deep-eq>[[2,3],[4,5,6,7],[6,7]]</assert-deep-eq>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-005">
+        <description>Apply filter to empty array</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a := [] return $a?[count(.)=1]</test>
+        <result>
+            <all-of>
+                <assert-type>array(*)</assert-type>
+                <assert>array:size($result) eq 0</assert>
+                <assert-deep-eq>[]</assert-deep-eq>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-006">
+        <description>Apply filter using partially-applied function</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a := ['apple', 'banana', 'cherry'] return $a?[contains(., 'e')]</test>
+        <result>
+            <all-of>
+                <assert-type>array(*)</assert-type>
+                <assert>array:size($result) eq 2</assert>
+                <assert-deep-eq>['apple', 'cherry']</assert-deep-eq>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-007">
+        <description>Apply filter, error, non-boolean result</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a := ['apple', 'banana', 'cherry'] return $a?[ substring-after(., "e") ]</test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-008">
+        <description>Apply filter, error, function has wrong number of arguments</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a := ['apple', 'banana', 'cherry'] return $a?[ substring-after(.) ]</test>
+        <result>
+            <error code="XPST0017"/>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-009">
+        <description>Apply filter, error, function expects wrong kind of argument</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a := ['apple', 'banana', 'cherry', 17] return $a?[ substring-after(., "e") = '']</test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-010">
+        <description>Apply filter, dynamic error evaluating function</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a := [10, 20, 30, 0] return $a?[ 20 idiv . eq 5]</test>
+        <result>
+            <error code="FOAR0001"/>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-011">
+        <description>Filter using a map as the predicate</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>
+            let $a := ["Monday", "Friday", "Tuesday"] 
+            return $a?[{"Monday":true(), "Tuesday":false(), "Wednesday":true(), "Thursday":4, "Friday":true()}(.)]</test>
+        <result>
+            <assert-deep-eq>["Monday", "Friday"]</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-012">
+        <description>Filter using an array as the predicate</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a := array{5 to 9} return $a?[[1, 2, 3, 4, true(), false(), true(), false(), true()](.)]</test>
+        <result>
+            <assert-deep-eq>[5, 7, 9]</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-014">
+        <description>Arity-2 callback</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a :=array{1 to 10} return $a?[. mod 2 = 0 and position() mod 3 = 0]</test>
+        <result>
+            <assert-deep-eq>[6]</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-015">
+        <description>Arity-0 callback</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a :=array{1 to 10} return $a?[ false() ]</test>
+        <result>
+            <assert-deep-eq>[]</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-016">
+        <description>Arity-0 callback</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $a :=array{1 to 10} return $a?[ true() ]</test>
+        <result>
+            <assert-deep-eq>array{1 to 10}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-017">
+        <description>Arrays with non-singleton members</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>[(), (1), (1,2), (1,2,3), (1,2,3,4)]?[count(.) ge 3]</test>
+        <result>
+            <assert-deep-eq>[(1,2,3), (1,2,3,4)]</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-018">
+        <description>Arrays with non-singleton members, using position()</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>[(), (1), (1,2), (1,2,3), (1,2,3,4)]?[count(.) ge 3 or position() le 2]</test>
+        <result>
+            <assert-deep-eq>[(), (1), (1,2,3), (1,2,3,4)]</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-019">
+        <description>Apply to empty sequence</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>[1,2,3][current-date() lt xs:date('1900-01-01')]?[position()=2]</test>
+        <result>
+            <assert-empty/>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-020">
+        <description>Predicate returning empty sequence</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>[{'a':true()},{'a':false()},{}]?[?a]</test>
+        <result>
+            <assert-deep-eq>[{'a':true()}]</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-021">
+        <description>Axis step applied to a multi-item context value</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test><![CDATA[
+            let $in := parse-xml('<doc><a id="1"/><a id="2"/><a id="3"/></doc>')//a
+            return [($in[1]), ($in[1], $in[2]), ($in[1], $in[2], $in[3])]?[count(@id) ge 2]
+        ]]></test>
+        <result>
+            <all-of>
+                <assert>array:size($result) = 2</assert>
+                <assert>$result?1[1]/@id = "1"</assert>
+                <assert>$result?1[2]/@id = "2"</assert>
+                <assert>$result?2[1]/@id = "1"</assert>
+                <assert>$result?2[2]/@id = "2"</assert>
+                <assert>$result?2[3]/@id = "3"</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-array-022">
+        <description>Axis step applied to a multi-item context value: document order</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test><![CDATA[
+            let $in := parse-xml('<doc><a id="1"/><a id="2"/><a id="3"/></doc>')//a
+            return [($in[1]), ($in[2], $in[1]), ($in[3], $in[2], $in[1])]?[string-join(@id) => contains("23")]
+        ]]></test>
+        <result>
+            <all-of>
+                <assert>array:size($result) = 1</assert>
+                <assert>$result?1[1]/@id = "3"</assert>
+                <assert>$result?2[2]/@id = "2"</assert>
+                <assert>$result?3[3]/@id = "1"</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-001">
+        <description>Empty map with predicate accepting all results</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $m := map { } return $m?[true()]</test>
+        <result>
+            <assert-deep-eq>map{}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-002">
+        <description>Empty map with predicate accepting no results</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $m := map { } return $m?[false()]</test>
+        <result>
+            <assert-deep-eq>map{}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-003">
+        <description>Singleton map with predicate accepting all results</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $m := map { 1: 2 } return $m?[true()]</test>
+        <result>
+            <assert-deep-eq>map{1:2}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-004">
+        <description>Singleton map with predicate accepting no results</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $m := map { 1: 2 }  return $m?[false()]</test>
+        <result>
+            <assert-deep-eq>map{}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-005">
+        <description>Singleton map with predicate checking key</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $m := map { 1: 2 } return $m?[?key = 1]</test>
+        <result>
+            <assert-deep-eq>map{1:2}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-006">
+        <description>Singleton map with predicate checking key</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $m := map { 1: 2 } return $m?[?key = 2]</test>
+        <result>
+            <assert-deep-eq>map{}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-007">
+        <description>Singleton map with predicate checking value</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $m := map { 1: 2 } return $m?[?value = 1]</test>
+        <result>
+            <assert-deep-eq>map{}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-008">
+        <description>Singleton map with predicate checking value</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>let $m := map { 1: 2 } return $m?[?value = 2]</test>
+        <result>
+            <assert-deep-eq>map{1:2}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-009">
+        <description>Map with predicate checking key</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>
+            let $m := map:merge((1 to 10) ! map:entry(., string()))
+            return $m?[?key lt 2] => map:keys()</test>
+        <result>
+            <assert-eq>1</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-010">
+        <description>Map with predicate checking value</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>
+            let $m := map:merge((1 to 10) ! map:entry(., string()))
+            return $m?[?value lt '2']?* => sort()</test>
+        <result>
+            <assert-deep-eq>'1', '10'</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-011">
+        <description>Map with built-in predicate function</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>
+            let $m := { 'abc': 'a', 'def': 'g' }
+            return $m?[contains(?key, ?value)]</test>
+        <result>
+            <assert-deep-eq>{'abc':'a'}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-012">
+        <description>Chained filters</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>
+            let $m := { 'aba': 'a', 'abc': 'a', 'cba': 'a' }
+            return $m?[contains(?key, 'a')]?[?value='a']?[starts-with(?key, ?value)] => map:keys()</test>
+        <result>
+            <assert-deep-eq>'aba', 'abc'</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-013">
+        <description>Zero-arity predicate function</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>
+            let $m := map { 'abc': 'a', 'def': 'g' }
+            return $m?[true()]</test>
+        <result>
+            <assert-deep-eq>map { 'abc': 'a', 'def': 'g' }</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-014">
+        <description>Invalid predicate function</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>
+            let $m := map { 'abc': 'a', 'def': 'g' }
+            return $m?[substring(., 2)='xyz']</test>
+        <result>
+            <error code="XPTY0004"/>
+        </result>
+    </test-case>
+    
+    <test-case name="filter-map-015">
+        <description>Predicate returns empty sequence</description>
+        <created by="Michael Kay" on="2024-04-20"/>
+        <test>
+            let $m := map { 'abc': 'a', 'def': 'g' }
+            let $k := ("key", "value", "banana")
+            return $m?[exists(?($k[3]))]</test>
+        <result>
+            <assert-deep-eq>{}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    
+    
+    
+ 
+</test-set>
