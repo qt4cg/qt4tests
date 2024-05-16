@@ -6,6 +6,13 @@
 
          
    <dependency type="spec" value="XP40+ XQ40+"/>
+   
+   <environment name="user-defined-types">
+      <schema uri="http://www.w3.org/XQueryTest/userDefinedTypes" file="../docs/userdefined.xsd">
+         <description>A schema user defined types and constructor tests</description>
+         <created by="Anonymous" on="2006-04-03"/>
+      </schema>   
+   </environment>
       
    <test-case name="union-type-001">
       <description>instance of test</description>
@@ -309,6 +316,28 @@
       </result>
    </test-case>
    
+   <test-case name="choice-type-108">
+      <description>cast, target is not generalized atomic</description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <test><![CDATA[
+      	current-dateTime() cast as (xs:dateTime | map(*))
+      ]]></test>
+      <result>
+         <error code="XPST0080"/>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-109">
+      <description>castable, target is not generalized atomic</description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <test><![CDATA[
+      	current-dateTime() castable as (xs:dateTime | map(*))
+      ]]></test>
+      <result>
+         <error code="XPST0080"/>
+      </result>
+   </test-case>
+   
    <test-case name="choice-type-150">
       <description>coercion rules</description>
       <created by="Michael Kay" on="2024-04-10"/>
@@ -402,6 +431,303 @@
             <assert-deep-eq>{'x':-1, 'y':+1}</assert-deep-eq>
             <assert>$result?x instance of xs:negativeInteger</assert>
             <assert>$result?y instance of xs:positiveInteger</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-157" covers-40="PR1148">
+      <description>coercion rules</description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <test><![CDATA[
+      	let $x as (xs:positiveInteger | xs:short)* := (12, -2, 100000) return $x
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>$result[1] instance of xs:positiveInteger</assert>
+            <assert>$result[2] instance of xs:short</assert>
+            <assert>$result[3] instance of xs:positiveInteger</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-158" covers-40="PR1148">
+      <description>coercion rules</description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <test><![CDATA[
+      	let $x as (xs:short | xs:positiveInteger)* := (12, -2, 100000) return $x
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>$result[1] instance of xs:short</assert>
+            <assert>$result[2] instance of xs:short</assert>
+            <assert>$result[3] instance of xs:positiveInteger</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-159" covers-40="PR1148">
+      <description>coercion rules</description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <test><![CDATA[
+      	let $x as (xs:short | xs:integer)* := (12, -2, 100000) return $x
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>$result[1] instance of xs:integer</assert>
+            <assert>not($result[1] instance of xs:short)</assert>
+            <assert>$result[2] instance of xs:integer</assert>
+            <assert>not($result[2] instance of xs:short)</assert>
+            <assert>$result[3] instance of xs:integer</assert>
+            <assert>not($result[3] instance of xs:short)</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-160" covers-40="PR1148">
+      <description>coercion rules: untyped atomization</description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <test><![CDATA[
+         let $xml := parse-xml('<doc><a>12</a><a>-2</a><a>100000</a></doc>')
+      	let $x as (xs:short | xs:integer)* := $xml//a return $x
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>$result[1] instance of xs:short</assert>
+            <assert>$result[2] instance of xs:short</assert>
+            <assert>$result[3] instance of xs:integer</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-161" covers-40="PR1148">
+      <description>coercion rules: untyped atomization</description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <test><![CDATA[
+         let $xml := parse-xml('<doc><a>12</a><a>-2</a><a>100000</a></doc>')
+      	let $x as (xs:short | xs:integer | element(a))* := $xml//a return $x
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>$result[1] instance of element(a)</assert>
+            <assert>$result[2] instance of element(a)</assert>
+            <assert>$result[3] instance of element(a)</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-162" covers-40="PR1148">
+      <description>coercion rules: untyped atomization</description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <test><![CDATA[
+         let $xml := parse-xml('<doc><a>12</a><a>-2</a><a>100000</a></doc>')
+      	let $x as (xs:short | xs:integer | map(*))* := $xml//a return $x
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>$result[1] instance of xs:short</assert>
+            <assert>$result[2] instance of xs:short</assert>
+            <assert>$result[3] instance of xs:integer</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-163" covers-40="PR1148">
+      <description>coercion rules: function types</description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <test><![CDATA[
+         let $x as (function(xs:integer) as xs:boolean | function(xs:string) as xs:boolean)* 
+                := fn($x){$x gt 3} return $x(12)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-164" covers-40="PR1148">
+      <description>coercion rules: function types</description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <test><![CDATA[
+         let $x as (function(xs:string) as xs:boolean | function(xs:integer) as xs:boolean)* 
+                := fn($x){$x gt 3} 
+         return $x(12)
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-165" covers-40="PR1148">
+      <description>coercion rules: function types</description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <test><![CDATA[
+         let $x as (function(xs:string) as xs:boolean | function(xs:integer) as xs:boolean)* 
+                := fn($x as xs:integer) as xs:boolean {$x gt 3} 
+         return $x(12)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-166" covers-40="PR1148">
+      <description>coercion rules: function types</description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <test><![CDATA[
+         let $x as (function(xs:string) as xs:boolean | function(xs:integer) as xs:boolean)* 
+                := fn($x as xs:decimal) as xs:boolean {$x gt 3} 
+         return $x(12)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-167" covers-40="PR1148">
+      <description>coercion rules: function types</description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <test><![CDATA[
+         let $x as (function(xs:string) as xs:boolean | function(xs:integer) as xs:boolean)* 
+                := fn($x as xs:double) as xs:boolean {$x gt 3} 
+         return $x(12)
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-200" covers-40="PR1148">
+      <description> Declare function accepting a union of user-defined types </description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <environment ref="user-defined-types"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test>
+         import schema namespace my="http://www.w3.org/XQueryTest/userDefinedTypes";
+         declare function local:sizeType($a as (my:hatsize | my:shoesize)) {$a};
+         local:sizeType(9)</test>
+      <result>
+         <all-of>
+            <assert-eq>9</assert-eq>
+            <assert-type>Q{http://www.w3.org/XQueryTest/userDefinedTypes}hatsize</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-201" covers-40="PR1148">
+      <description> Declare function accepting a union of user-defined types </description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <environment ref="user-defined-types"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test>
+         import schema namespace my="http://www.w3.org/XQueryTest/userDefinedTypes";
+         declare function local:size($a as (my:hatsize | my:sizeType)) {$a};
+         local:size(12)</test>
+      <result>
+         <all-of>
+            <assert-eq>12</assert-eq>
+            <assert-type>Q{http://www.w3.org/XQueryTest/userDefinedTypes}sizeType</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-202" covers-40="PR1148">
+      <description> Cast to a union of user-defined types </description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <environment ref="user-defined-types"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test>
+         import schema namespace my="http://www.w3.org/XQueryTest/userDefinedTypes";
+         9 cast as (my:hatsize | my:shoesize)
+      </test>
+      <result>
+         <all-of>
+            <assert-eq>9</assert-eq>
+            <assert-type>Q{http://www.w3.org/XQueryTest/userDefinedTypes}hatsize</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-203" covers-40="PR1148">
+      <description> Cast to a union of user-defined types </description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <environment ref="user-defined-types"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test>
+         import schema namespace my="http://www.w3.org/XQueryTest/userDefinedTypes";
+         12 cast as (my:hatsize | my:shoesize)
+      </test>
+      <result>
+         <all-of>
+            <assert-eq>12</assert-eq>
+            <assert-type>Q{http://www.w3.org/XQueryTest/userDefinedTypes}shoesize</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-204" covers-40="PR1148">
+      <description> Atomize element with user-defined type </description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <environment ref="user-defined-types"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test><![CDATA[
+         import schema namespace my="http://www.w3.org/XQueryTest/userDefinedTypes";
+         let $in := (validate strict {<my:hatsizeE>8</my:hatsizeE>}, validate strict {<my:shoesizeE>8</my:shoesizeE>})
+         let $var as (my:hatsize | my:shoesize)* := $in
+         return $var
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>$result[1] eq 8</assert>
+            <assert>$result[1] instance of Q{http://www.w3.org/XQueryTest/userDefinedTypes}hatsize</assert>
+            <assert>$result[2] eq 8</assert>
+            <assert>$result[2] instance of Q{http://www.w3.org/XQueryTest/userDefinedTypes}shoesize</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-205" covers-40="PR1148">
+      <description> Atomize element with user-defined type </description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <environment ref="user-defined-types"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test><![CDATA[
+         import schema namespace my="http://www.w3.org/XQueryTest/userDefinedTypes";
+         let $in := (validate strict {<my:hatsizeE>8</my:hatsizeE>}, validate strict {<my:shoesizeE>8</my:shoesizeE>})
+         let $var as (xs:float | xs:integer)* := $in
+         return $var
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>$result[1] eq 8</assert>
+            <assert>$result[1] instance of Q{http://www.w3.org/XQueryTest/userDefinedTypes}hatsize</assert>
+            <assert>$result[2] eq 8</assert>
+            <assert>$result[2] instance of Q{http://www.w3.org/XQueryTest/userDefinedTypes}shoesize</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="choice-type-206" covers-40="PR1148">
+      <description> Choice of user-defined types with downcasting coercion </description>
+      <created by="Michael Kay" on="2024-05-07"/>
+      <environment ref="user-defined-types"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test><![CDATA[
+         import schema namespace my="http://www.w3.org/XQueryTest/userDefinedTypes";
+         let $var as (my:hatsize | my:shoesize)* := (xs:integer(8), xs:float(7))
+         return $var
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>$result[1] eq 8</assert>
+            <assert>$result[1] instance of Q{http://www.w3.org/XQueryTest/userDefinedTypes}hatsize</assert>
+            <assert>$result[2] eq 7</assert>
+            <assert>$result[2] instance of Q{http://www.w3.org/XQueryTest/userDefinedTypes}shoesize</assert>
          </all-of>
       </result>
    </test-case>

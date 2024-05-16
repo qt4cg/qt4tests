@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-distinct-ordered-nodes"
+   covers-40="PR1198">
+   <description>Tests for the distinct-ordered-nodes function</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-filter"/>
+
+
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="d-o-n-001">
+      <description>Empty input</description>
+      <created by="Michael Kay" on="2024-05-09"/>
+      <test>distinct-ordered-nodes(())</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="d-o-n-002">
+      <description>Empty input</description>
+      <created by="Michael Kay" on="2024-05-09"/>
+      <test>distinct-ordered-nodes()</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="d-o-n-003">
+      <description>Single node</description>
+      <created by="Michael Kay" on="2024-05-09"/>
+      <test><![CDATA[
+         let $x := parse-xml('<x/>')
+         return $x is distinct-ordered-nodes($x)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="d-o-n-004">
+      <description>Sibling elements</description>
+      <created by="Michael Kay" on="2024-05-09"/>
+      <test><![CDATA[
+         let $x := parse-xml('<x><a/><b/><c/><d/></x>')
+         let $d := $x//d
+         let $c := $x//c
+         let $b := $x//b
+         let $a := $x//a
+         return distinct-ordered-nodes(($c, $b, $d, $a)) ! local-name()
+      ]]></test>
+      <result>
+         <assert-deep-eq>"a", "b", "c", "d"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="d-o-n-005">
+      <description>Sibling elements with duplicates</description>
+      <created by="Michael Kay" on="2024-05-09"/>
+      <test><![CDATA[
+         let $x := parse-xml('<x><a/><b/><c/><d/></x>')
+         let $d := $x//d
+         let $c := $x//c
+         let $b := $x//b
+         let $a := $x//a
+         return distinct-ordered-nodes(($c, $b, $d, $a, $b, $c, $d)) ! local-name()
+      ]]></test>
+      <result>
+         <assert-deep-eq>"a", "b", "c", "d"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="d-o-n-006">
+      <description>Sibling elements and parent with duplicates</description>
+      <created by="Michael Kay" on="2024-05-09"/>
+      <test><![CDATA[
+         let $x := parse-xml('<p><a/><b/><c/><d/></p>')
+         let $d := $x//d
+         let $c := $x//c
+         let $b := $x//b
+         let $a := $x//a
+         let $p := ($a | $b | $d)/parent::*
+         return distinct-ordered-nodes(($c, $b, $d, $p, $a, $b, $c, $d)) ! local-name()
+      ]]></test>
+      <result>
+         <assert-deep-eq>"p", "a", "b", "c", "d"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="d-o-n-007">
+      <description>Sibling elements and attributes</description>
+      <created by="Michael Kay" on="2024-05-09"/>
+      <test><![CDATA[
+         let $x := parse-xml("<p><a q='1'/><b r='2'/><c s='3'/><d t='4'/></p>")
+         let $y := random-number-generator()?permute($x//* | $x//@*)
+         let $z := distinct-ordered-nodes(($y, $x//d))
+         return $z ! local-name()
+      ]]></test>
+      <result>
+         <assert-deep-eq>"p", "a", "q", "b", "r", "c", "s", "d", "t"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="d-o-n-008">
+      <description>Multiple documents</description>
+      <created by="Michael Kay" on="2024-05-09"/>
+      <test><![CDATA[
+         let $x1 := parse-xml("<p><a q='1'/><b r='2'/><c s='3'/><d t='4'/></p>")
+         let $x2 := parse-xml("<p><a q='11'/><b r='12'/><c s='13'/><d t='14'/></p>")
+         let $y := random-number-generator()?permute($x1//* | $x2//@* | $x2//* | $x1//@*)
+         let $z := distinct-ordered-nodes($y)
+         return $z ! local-name()
+      ]]></test>
+      <result>
+         <assert-deep-eq>"p", "a", "q", "b", "r", "c", "s", "d", "t", "p", "a", "q", "b", "r", "c", "s", "d", "t"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="d-o-n-901">
+      <description>Type error</description>
+      <created by="Michael Kay" on="2024-05-09"/>
+      <test>distinct-ordered-nodes(42)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+
+
+</test-set>

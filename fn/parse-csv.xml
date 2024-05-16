@@ -584,6 +584,29 @@
     </result>
   </test-case>
   
+  <test-case name="parse-csv-049">
+    <description>Header only, no rows</description>
+    <created by="Michael Kay" on="2024-03-07"/>
+    <test>fn:parse-csv("left,right", 
+      map{'row-delimiter':'|', 'header':true()})</test>
+    <result>
+      <all-of>
+        <assert>deep-equal($result => map:remove("get"), 
+          map{"columns":("left","right"), 
+          "column-index": map{"left":1, "right":2}, 
+          "rows":()})</assert>
+        <assert>?get(1,"left") = ""</assert>
+        <assert>?get(1,"right") = ""</assert>
+        <assert>?get(2,"left") = ""</assert>
+        <assert>?get(2,"right") = ""</assert>
+        <assert>?get(1,1) = ""</assert>
+        <assert>?get(1,2) = ""</assert>
+        <assert>?get(2,1) = ""</assert>
+        <assert>?get(2,2) = ""</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
   <test-case name="parse-csv-060">
     <description>number-of-columns option</description>
     <created by="Michael Kay" on="2024-03-07"/>
@@ -975,6 +998,29 @@
        <error code="XPTY0004"/>
      </result>
    </test-case>
+  
+  <test-case name="parse-csv-918">
+    <description>get(): no such field</description>
+    <created by="Michael Kay" on="2024-05-11"/>
+    <test>fn:parse-csv("left,right|one,two|three,four", 
+      map{'row-delimiter':'|', 'header':true()})?get(1, "middle")</test>
+    <result>
+      <error code="FOCV0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-919">
+    <description>Negative row number passed to get() function</description>
+    <created by="Michael Kay" on="2024-05-11"/>
+    <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
+      map{'row-delimiter':'|',
+      'select-columns':(4,3,1)})?get(-1, 3)</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+ 
   
   
 
