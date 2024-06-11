@@ -265,9 +265,28 @@
       </description>
       <created by="Michael Kay" on="2016-02-08"/>
       <environment ref="map"/>
+      <dependency type="spec" value="XP30 XP31 XQ30 XQ31"/>
       <test>let $m := map{'a':1} return map:size(map{$m?a:true()})</test>
       <result>
          <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="MapConstructor-025a" covers-40="PR519">
+      <description>
+         The tokenization rules have changed in 4.0; the longest-token rule is no longer
+         qualified by the phrase "longest possible match that is consistent with the EBNF".
+         That makes this case clearly an error in 4.0. (Specifically, "a:true" is treated
+         as a single token, causing a syntax error because `?` cannot be followed by a QName).
+         See https://github.com/w3c/qt3tests/issues/63
+      </description>
+      <created by="Michael Kay" on="2016-02-08"/>
+      <modified by="Michael Kay" on="2024-05-25" change="see qt3tests bug 63"/>
+      <environment ref="map"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>let $m := map{'a':1} return map:size(map{$m?a:true()})</test>
+      <result>
+         <error code="XPST0003"/>
       </result>
    </test-case>
    
