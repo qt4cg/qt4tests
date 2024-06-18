@@ -232,10 +232,10 @@
         <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
-        <test><![CDATA[parse-xml("<!DOCTYPE SYSTEM '../id/iddtd.xml'><ID><elementwithid-1 anID='xyz'/></ID>", 
+        <test><![CDATA[parse-xml("<!DOCTYPE IDS SYSTEM 'id/iddtd2.dtd'><IDS><E a='x'/><E a='y'/></IDS>", 
             {'dtd-validation': true()})]]></test>
         <result>
-            <assert>exists($result/id('xyz'))</assert>
+            <assert>exists($result//E[@a='x'])</assert>
         </result>
     </test-case>
     
@@ -244,7 +244,19 @@
         <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
-        <test><![CDATA[parse-xml("<!DOCTYPE SYSTEM '../id/iddtd.xml'><ID><elementwithid-1/></ID>", 
+        <test><![CDATA[parse-xml("<!DOCTYPE IDS SYSTEM 'id/iddtd.dtd'><IDS><E a='x'/><E/></IDS>", 
+            {'dtd-validation': true()})]]></test>
+        <result>
+            <error code="FODC0006"/>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-414" covers-40="PR1257">
+        <description>parse-xml test - with DTD validation failure (duplicate IDs)</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml("<!DOCTYPE IDS SYSTEM 'id/iddtd.dtd'><IDS><E a='x'/><E a='x'/></IDS>", 
             {'dtd-validation': true()})]]></test>
         <result>
             <error code="FODC0006"/>
@@ -298,7 +310,7 @@
                        {'xsd-validation': 'strict'})
          ]]></test>
         <result>
-            <assert>data($result/duration) instance of xs:duration</assert>
+            <assert>data($result/*:duration) instance of xs:duration</assert>
         </result>
     </test-case>
     
@@ -315,7 +327,7 @@
                       {'xsd-validation': 'lax'})
         ]]></test>
         <result>
-            <assert>data($result/duration) instance of xs:duration</assert>
+            <assert>data($result/*:duration) instance of xs:duration</assert>
         </result>
     </test-case>
     
@@ -332,7 +344,7 @@
                       {'xsd-validation': 'skip'})
         ]]></test>
         <result>
-            <assert>data($result/duration) instance of xs:untypedAtomic</assert>
+            <assert>data($result/*:duration) instance of xs:untypedAtomic</assert>
         </result>
     </test-case>
     
@@ -349,7 +361,7 @@
                       {'xsd-validation': 'type Q{http://www.w3.org/2001/XMLSchema}dayTimeDuration'})
          ]]></test>
         <result>
-            <assert>data($result/duration) instance of xs:dayTimeDuration</assert>
+            <assert>data($result/*:duration) instance of xs:dayTimeDuration</assert>
         </result>
     </test-case>
     
@@ -366,7 +378,7 @@
                       {'xsd-validation': 'strict'})
         ]]></test>
         <result>
-            <error code="XXXX9999"/>
+            <error code="FODC0006"/>
         </result>
     </test-case>
     
@@ -383,7 +395,7 @@
                       {'xsd-validation': 'lax'})
         ]]></test>
         <result>
-            <assert>data($result/duration) instance of xs:untypedAtomic</assert>
+            <assert>data($result/*:duration) instance of xs:untypedAtomic</assert>
         </result>
     </test-case>
     
@@ -400,7 +412,7 @@
                       {'xsd-validation': 'strict', 'strip-space': true()})
         ]]></test>
         <result>
-            <assert>data($result/duration) eq "    "</assert>
+            <assert>data($result/*:string) eq "    "</assert>
         </result>
     </test-case>
     
