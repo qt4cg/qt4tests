@@ -13,26 +13,37 @@
             <assert-type>document-node(element(*,xs:untyped))</assert-type>
         </result>
     </test-case>
+    
     <test-case name="parse-xml-002">
         <description>parse-xml test - with invalid absolute URI</description>
         <created by="ONeil Delpratt" on="2010-10-05"/> 
-        <modified by="Michael Kay" on="2012-07-24" change="Two-arg form of function no longer exists"/>        
-        <environment name="empty"/>
+        <modified by="Michael Kay" on="2012-07-24" change="Two-arg form of function no longer exists"/> 
+        <modified by="Michael Kay" on="2024-06-21" change="Different error code in 4.0"/> 
+        <environment ref="empty"/>
         <test><![CDATA[parse-xml(unparsed-text("../docs/atomic.xml"),'###/atomic.xml')]]></test>
         <result>
-            <error code="XPST0017" />
+            <any-of>
+                <error code="XPST0017" />
+                <error code="XPTY0004" />
+            </any-of>
         </result>
     </test-case>
+    
     <test-case name="parse-xml-003">
         <description>parse-xml test - with valid absolute URI</description>
         <created by="ONeil Delpratt" on="2010-10-05"/>
-        <modified by="Michael Kay" on="2012-07-24" change="Two-arg form of function no longer exists"/>                
-        <environment name="empty"/>
+        <modified by="Michael Kay" on="2012-07-24" change="Two-arg form of function no longer exists"/>
+        <modified by="Michael Kay" on="2024-06-21" change="Different error code in 4.0"/> 
+        <environment ref="empty"/>
         <test><![CDATA[parse-xml(unparsed-text("../docs/atomic.xml"),'file:/test/fots/../docs/atomic.xml')]]></test>
         <result>
-            <error code="XPST0017" />
+            <any-of>
+                <error code="XPST0017" />
+                <error code="XPTY0004" />
+            </any-of>
         </result>
     </test-case>
+    
     <test-case name="parse-xml-004">
         <description>parse-xml test - invalid XML document</description>
         <created by="ONeil Delpratt" on="2010-10-05"/>        
@@ -170,4 +181,292 @@
             <assert-empty/>
         </result>
     </test-case>
+    
+    <test-case name="parse-xml-401" covers-40="PR1257">
+        <description>parse-xml test - base-uri option</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml('<a/>', {'base-uri': 'http://saxonica.com/'})]]></test>
+        <result>
+            <assert>base-uri($result) = 'http://saxonica.com/'</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-402" covers-40="PR1257">
+        <description>parse-xml test - base-uri option</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml("<a xml:base='welcome.xml'/>", 
+                                {'base-uri': 'http://saxonica.com/'})]]></test>
+        <result>
+            <assert>base-uri($result/a) = 'http://saxonica.com/welcome.xml'</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-410" covers-40="PR1257">
+        <description>parse-xml test - with local DTD - invalid against DTD</description>
+        <created by="Michael Kay" on="2013-01-07"/>        
+        <environment ref="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml("<!DOCTYPE a [<!ELEMENT a (#PCDATA)>]><a><b/></a>",
+                {'dtd-validation':true()})]]></test>
+        <result>
+            <error code="FODC0007"/>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-411" covers-40="PR1257">
+        <description>parse-xml test - with local DTD - valid against DTD</description>
+        <created by="Michael Kay" on="2013-01-07"/>        
+        <environment ref="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml("<!DOCTYPE a [<!ELEMENT a (#PCDATA)>]><a>bb</a>",
+                {'dtd-validation':true()})]]></test>
+        <result>
+            <assert-xml><![CDATA[<a>bb</a>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-412" covers-40="PR1257">
+        <description>parse-xml test - with DTD validation</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml("<!DOCTYPE IDS SYSTEM 'id/iddtd2.dtd'><IDS><E a='x'/><E a='y'/></IDS>", 
+            {'dtd-validation': true()})]]></test>
+        <result>
+            <assert>exists($result//E[@a='x'])</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-413" covers-40="PR1257">
+        <description>parse-xml test - with DTD validation failure (required attribute missing)</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml("<!DOCTYPE IDS SYSTEM 'id/iddtd.dtd'><IDS><E a='x'/><E/></IDS>", 
+            {'dtd-validation': true()})]]></test>
+        <result>
+            <error code="FODC0007"/>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-414" covers-40="PR1257">
+        <description>parse-xml test - with DTD validation failure (duplicate IDs)</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml("<!DOCTYPE IDS SYSTEM 'id/iddtd.dtd'><IDS><E a='x'/><E a='x'/></IDS>", 
+            {'dtd-validation': true()})]]></test>
+        <result>
+            <error code="FODC0007"/>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-420" covers-40="PR1257">
+        <description>parse-xml test - whitespace stripping on</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml('<a> <b/> </a>', {'strip-space': true()})]]></test>
+        <result>
+            <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-421" covers-40="PR1257">
+        <description>parse-xml test - whitespace stripping off</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml('<a> <b/> </a>', {'strip-space': false()})]]></test>
+        <result>
+            <assert-xml><![CDATA[<a> <b/> </a>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-422" covers-40="PR1257">
+        <description>parse-xml test - whitespace stripping on with xml:space</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml('<a><b> </b><b xml:space="preserve"> </b></a>', 
+                                 {'strip-space': true()})]]></test>
+        <result>
+            <assert-xml><![CDATA[<a><b/><b xml:space="preserve"> </b></a>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-430" covers-40="PR1257">
+        <description>parse-xml test - schema validation</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="simplexsd"/>
+        <dependency type="spec" value="XQ40+"/>
+        <dependency type="feature" value="schemaImport"/>
+        <dependency type="feature" value="schemaValidation"/>
+        <test><![CDATA[
+            import schema namespace simple="http://www.w3.org/XQueryTest/simple";
+            parse-xml('<duration xmlns="http://www.w3.org/XQueryTest/simple">P23D</duration>', 
+                       {'xsd-validation': 'strict'})
+         ]]></test>
+        <result>
+            <assert>data($result/*:duration) instance of xs:duration</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-431" covers-40="PR1257">
+        <description>parse-xml test - schema validation</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="simplexsd"/>
+        <dependency type="spec" value="XQ40+"/>
+        <dependency type="feature" value="schemaImport"/>
+        <dependency type="feature" value="schemaValidation"/>
+        <test><![CDATA[
+            import schema namespace simple="http://www.w3.org/XQueryTest/simple";
+            parse-xml('<duration xmlns="http://www.w3.org/XQueryTest/simple">P23D</duration>', 
+                      {'xsd-validation': 'lax'})
+        ]]></test>
+        <result>
+            <assert>data($result/*:duration) instance of xs:duration</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-432" covers-40="PR1257">
+        <description>parse-xml test - schema validation</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="simplexsd"/>
+        <dependency type="spec" value="XQ40+"/>
+        <dependency type="feature" value="schemaImport"/>
+        <dependency type="feature" value="schemaValidation"/>
+        <test><![CDATA[
+            import schema namespace simple="http://www.w3.org/XQueryTest/simple";
+            parse-xml('<duration xmlns="http://www.w3.org/XQueryTest/simple">P23D</duration>', 
+                      {'xsd-validation': 'skip'})
+        ]]></test>
+        <result>
+            <assert>data($result/*:duration) instance of xs:untypedAtomic</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-433" covers-40="PR1257">
+        <description>parse-xml test - schema validation</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="simplexsd"/>
+        <dependency type="spec" value="XQ40+"/>
+        <dependency type="feature" value="schemaImport"/>
+        <dependency type="feature" value="schemaValidation"/>
+        <test><![CDATA[
+            import schema namespace simple="http://www.w3.org/XQueryTest/simple";
+            parse-xml('<duration xmlns="http://www.w3.org/XQueryTest/simple">P23D</duration>', 
+                      {'xsd-validation': 'type Q{http://www.w3.org/2001/XMLSchema}dayTimeDuration'})
+         ]]></test>
+        <result>
+            <assert>data($result/*:duration) instance of xs:dayTimeDuration</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-434" covers-40="PR1257">
+        <description>parse-xml test - schema validation failure</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="simplexsd"/>
+        <dependency type="spec" value="XQ40+"/>
+        <dependency type="feature" value="schemaImport"/>
+        <dependency type="feature" value="schemaValidation"/>
+        <test><![CDATA[
+            import schema namespace simple="http://www.w3.org/XQueryTest/simple";
+            parse-xml('<duration xmlns="http://www.w3.org/XQueryTest/simple">A long time</duration>', 
+                      {'xsd-validation': 'strict'})
+        ]]></test>
+        <result>
+            <error code="FODC0007"/>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-435" covers-40="PR1257">
+        <description>parse-xml test - schema validation lax, unvalidated</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="simplexsd"/>
+        <dependency type="spec" value="XQ40+"/>
+        <dependency type="feature" value="schemaImport"/>
+        <dependency type="feature" value="schemaValidation"/>
+        <test><![CDATA[
+            import schema namespace simple="http://www.w3.org/XQueryTest/simple";
+            parse-xml('<duration>A long time</duration>', 
+                      {'xsd-validation': 'lax'})
+        ]]></test>
+        <result>
+            <assert>data($result/*:duration) instance of xs:untypedAtomic</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-436" covers-40="PR1257">
+        <description>parse-xml test - schema validation effect on whitespace stripping</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="simplexsd"/>
+        <dependency type="spec" value="XQ40+"/>
+        <dependency type="feature" value="schemaImport"/>
+        <dependency type="feature" value="schemaValidation"/>
+        <test><![CDATA[
+            import schema namespace simple="http://www.w3.org/XQueryTest/simple";
+            parse-xml('<string xmlns="http://www.w3.org/XQueryTest/simple">    </string>', 
+                      {'xsd-validation': 'strict', 'strip-space': true()})
+        ]]></test>
+        <result>
+            <assert>data($result/*:string) eq "    "</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-437" covers-40="PR1257">
+        <description>parse-xml test - invalid schema validation mode</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="simplexsd"/>
+        <dependency type="spec" value="XQ40+"/>
+        <dependency type="feature" value="schemaImport"/>
+        <dependency type="feature" value="schemaValidation"/>
+        <test><![CDATA[
+            import schema namespace simple="http://www.w3.org/XQueryTest/simple";
+            parse-xml('<duration>A long time</duration>', 
+                      {'xsd-validation': 'sporadic'})
+        ]]></test>
+        <result>
+            <error code="FODC0008"/>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-438" covers-40="PR1257">
+        <description>parse-xml test - invalid schema validation type</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="simplexsd"/>
+        <dependency type="spec" value="XQ40+"/>
+        <dependency type="feature" value="schemaImport"/>
+        <dependency type="feature" value="schemaValidation"/>
+        <test><![CDATA[
+            import schema namespace simple="http://www.w3.org/XQueryTest/simple";
+            parse-xml('<duration>A long time</duration>', 
+                      {'xsd-validation': 'type ?????'})
+        ]]></test>
+        <result>
+            <error code="FODC0008"/>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-439" covers-40="PR1257">
+        <description>parse-xml test - invalid schema validation type</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="simplexsd"/>
+        <dependency type="spec" value="XQ40+"/>
+        <dependency type="feature" value="schemaImport"/>
+        <dependency type="feature" value="schemaValidation"/>
+        <test><![CDATA[
+            import schema namespace simple="http://www.w3.org/XQueryTest/simple";
+            parse-xml('<duration>PT1D</duration>', 
+                      {'xsd-validation': 'type xs:superString'})
+        ]]></test>
+        <result>
+            <error code="FODC0008"/>
+        </result>
+    </test-case>
+
 </test-set>

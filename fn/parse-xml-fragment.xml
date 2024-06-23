@@ -16,24 +16,35 @@
             <assert-type>element(*,xs:untyped)</assert-type>
         </result>
     </test-case>
+    
     <test-case name="parse-xml-fragment-002">
         <description>parse-xml-fragment test - two args not allowed</description>
-        <created by="ONeil Delpratt, Saxonica" on="2010-10-05"/>        
+        <created by="ONeil Delpratt, Saxonica" on="2010-10-05"/>
+        <modified by="Michael Kay" on="2024-06-21" change="Different error code in 4.0"/> 
         <environment name="empty"/>
         <test><![CDATA[parse-xml-fragment(unparsed-text("../docs/atomic.xml"),'###/atomic.xml')]]></test>
         <result>
-            <error code="XPST0017" />
+            <any-of>
+                <error code="XPST0017" />
+                <error code="XPTY0004" />
+            </any-of>
         </result>
     </test-case>
+    
     <test-case name="parse-xml-fragment-003">
         <description>parse-xml-fragment test - two args not allowed</description>
         <created by="ONeil Delpratt, Saxonica" on="2010-10-05"/>        
+        <modified by="Michael Kay" on="2024-06-21" change="Different error code in 4.0"/> 
         <environment name="empty"/>
         <test><![CDATA[parse-xml-fragment(unparsed-text("../docs/atomic.xml"),'file:/test/fots/../docs/atomic.xml')]]></test>
         <result>
-            <error code="XPST0017" />
+            <any-of>
+                <error code="XPST0017" />
+                <error code="XPTY0004" />
+            </any-of>
         </result>
     </test-case>
+    
     <test-case name="parse-xml-fragment-004">
         <description>parse-xml-fragment test - invalid XML document</description>
         <created by="ONeil Delpratt, Saxonica" on="2010-10-05"/>        
@@ -272,4 +283,62 @@
             <assert-empty/>
         </result>
     </test-case>
+    
+    <test-case name="parse-xml-fragment-401" covers-40="PR1257">
+        <description>parse-xml-fragment test - base-uri option</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml-fragment('<a/><b/>', {'base-uri': 'http://saxonica.com/'})]]></test>
+        <result>
+            <assert>base-uri($result) = 'http://saxonica.com/'</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-fragment-402" covers-40="PR1257">
+        <description>parse-xml-fragment test - base-uri option</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml-fragment("<a xml:base='welcome.xml'/><b/>", 
+                                {'base-uri': 'http://saxonica.com/'})]]></test>
+        <result>
+            <assert>base-uri($result/a) = 'http://saxonica.com/welcome.xml'</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-fragment-420" covers-40="PR1257">
+        <description>parse-xml-fragment test - whitespace stripping on</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml-fragment('<a> <b/> </a> <c/>', {'strip-space': true()})]]></test>
+        <result>
+            <assert-xml><![CDATA[<a><b/></a><c/>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-fragment-421" covers-40="PR1257">
+        <description>parse-xml-fragment test - whitespace stripping off</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml-fragment('<a> <b/> </a> <c/>', {'strip-space': false()})]]></test>
+        <result>
+            <assert-xml><![CDATA[<a> <b/> </a> <c/>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-fragment-422" covers-40="PR1257">
+        <description>parse-xml-fragment test - whitespace stripping on with xml:space</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml-fragment('<a><b> </b><b xml:space="preserve"> </b></a> <c/> ', 
+                                 {'strip-space': true()})]]></test>
+        <result>
+            <assert-xml><![CDATA[<a><b/><b xml:space="preserve"> </b></a><c/>]]></assert-xml>
+        </result>
+    </test-case>
+    
 </test-set>
