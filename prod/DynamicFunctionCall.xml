@@ -901,13 +901,17 @@
    <test-case name="DynamicFunctionCall-R-081">
       <description>Failed Relabeling. Within record test.</description>
       <created by="Michael Kay" on="2024-02-09"/>
+      <modified by="Gunther Rademacher" on="2024-06-07" change="fix spelling of 'record' keyword; allow FORG0001"/>
       <test>
-         let $f := function($in as recod(x as xs:positiveInteger)) as xs:negativeInteger {
+         let $f := function($in as record(x as xs:positiveInteger)) as xs:negativeInteger {
          -$in?x
          }
          return $f(map{'x':-5})</test>
       <result>
-         <error code="XPTY0004"/>
+         <any-of>
+            <error code="FORG0001"/>
+            <error code="XPTY0004"/>
+         </any-of>
       </result>
    </test-case>
    
@@ -1188,13 +1192,14 @@
       <description>Promotion for enumeration types. Within record test.</description>
       <created by="Michael Kay" on="2024-02-09"/>
       <modified by="Michael Kay" on="2024-04-18" change="new rules say promotion happens here"/>
+      <modified by="Gunther Rademacher" on="2024-07-22" change="no coercion from xs:anyURI to enum"/>
       <test>
          let $f := function($in as record(x as enum("a", "b", "c"))) as xs:string {
             string($in?x)
          }
          return $f(map{'x':xs:anyURI('a')})</test>
       <result>
-         <assert-string-value>a</assert-string-value>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
    
