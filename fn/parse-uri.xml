@@ -187,17 +187,15 @@ map {
   <test-case name="fn-parse-uri-011a">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
-    <test>fn:parse-uri("file:////uncname/path/to/file")</test>
+    <test>fn:parse-uri("file:////uncname/path/to/file", map { "unc-path": false() })</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file:////uncname/path/to/file",
   "scheme": "file",
   "hierarchical": true(),
-  "authority": "uncname",
-  "host": "uncname",
-  "path": "/path/to/file",
-  "filepath": "/path/to/file",
-  "path-segments": ("", "path", "to", "file")
+  "path": "/uncname/path/to/file",
+  "filepath": "/uncname/path/to/file",
+  "path-segments": ("", "uncname", "path", "to", "file")
 }</assert-deep-eq>
     </result>
   </test-case>
@@ -211,11 +209,9 @@ map {
   "uri": "file:////uncname/path/to/file",
   "scheme": "file",
   "hierarchical": true(),
-  "authority": "uncname",
-  "host": "uncname",
-  "path": "/path/to/file",
-  "filepath": "/path/to/file",
-  "path-segments": ("", "path", "to", "file")
+  "path": "//uncname/path/to/file",
+  "filepath": "//uncname/path/to/file",
+  "path-segments": ("", "", "uncname", "path", "to", "file")
 }</assert-deep-eq>
     </result>
   </test-case>
@@ -862,6 +858,325 @@ map {
     <test>parse-uri("", ())?path</test>
     <result>
       <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-044">
+    <description>Parses a simple URI</description>
+    <created by="Norm Tovey-Walsh" on="2024-03-19"/>
+    <test>fn:parse-uri("https://example.com/path%2Fto/a=b")</test>
+    <result>
+      <assert-deep-eq>map {
+        "authority": "example.com",
+        "host": "example.com",
+        "path": "/path%2Fto/a=b",
+        "path-segments": ("", "path/to", "a=b"),
+        "scheme": "https",
+        "hierarchical": true(),
+        "uri": "https://example.com/path%2Fto/a=b"
+      }</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-045">
+    <description>Parses a simple URI</description>
+    <created by="Norm Tovey-Walsh" on="2024-03-19"/>
+    <test>fn:parse-uri("https://example.com/path%2Fto/a%3Db")</test>
+    <result>
+      <assert-deep-eq>map {
+        "authority": "example.com",
+        "host": "example.com",
+        "path": "/path%2Fto/a%3Db",
+        "path-segments": ("", "path/to", "a=b"),
+        "scheme": "https",
+        "hierarchical": true(),
+        "uri": "https://example.com/path%2Fto/a%3Db"
+      }</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-046a">
+    <description>UNC path test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("\\uncname\path\to\file", map { "unc-path": true() })</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "\\uncname\path\to\file",
+  "scheme": "file",
+  "hierarchical": true(),
+  "path": "//uncname/path/to/file",
+  "filepath": "//uncname/path/to/file",
+  "path-segments": ("", "", "uncname", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-046b">
+    <description>UNC path test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("\\\\\uncname\path\to\file", map { "unc-path": true() })</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "\\\\\uncname\path\to\file",
+  "scheme": "file",
+  "hierarchical": true(),
+  "path": "//uncname/path/to/file",
+  "filepath": "//uncname/path/to/file",
+  "path-segments": ("", "", "uncname", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-046c">
+    <description>UNC path test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("file://uncname/path/to/file", map { "unc-path": true() })</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "file://uncname/path/to/file",
+  "scheme": "file",
+  "hierarchical": true(),
+  "path": "//uncname/path/to/file",
+  "filepath": "//uncname/path/to/file",
+  "path-segments": ("", "", "uncname", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-046d">
+    <description>UNC path test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("file://///uncname/path/to/file", map { "unc-path": true() })</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "file://///uncname/path/to/file",
+  "scheme": "file",
+  "hierarchical": true(),
+  "path": "//uncname/path/to/file",
+  "filepath": "//uncname/path/to/file",
+  "path-segments": ("", "", "uncname", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-046e">
+    <description>UNC path test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("\\uncname\path\to\file", map { "unc-path": false() })</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "\\uncname\path\to\file",
+  "hierarchical": true(),
+  "authority": "uncname",
+  "host": "uncname",
+  "path": "/path/to/file",
+  "filepath": "/path/to/file",
+  "path-segments": ("", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-046f">
+    <description>UNC path test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("\\\\\uncname\path\to\file", map { "unc-path": false() })</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "\\\\\uncname\path\to\file",
+  "hierarchical": true(),
+  "path": "///uncname/path/to/file",
+  "filepath": "///uncname/path/to/file",
+  "path-segments": ("", "", "", "uncname", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-046g">
+    <description>UNC path test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("file://uncname/path/to/file", map { "unc-path": false() })</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "file://uncname/path/to/file",
+  "scheme": "file",
+  "hierarchical": true(),
+  "path": "/uncname/path/to/file",
+  "filepath": "/uncname/path/to/file",
+  "path-segments": ("", "uncname", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-046h">
+    <description>UNC path test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("file://///uncname/path/to/file", map { "unc-path": false() })</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "file://///uncname/path/to/file",
+  "hierarchical": true(),
+  "scheme": "file",
+  "path": "/uncname/path/to/file",
+  "filepath": "/uncname/path/to/file",
+  "path-segments": ("", "uncname", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-047a">
+    <description>Drive letter test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("/a|/path/to/file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "/a|/path/to/file",
+  "hierarchical": true(),
+  "scheme": "file",
+  "path": "/a:/path/to/file",
+  "filepath": "a:/path/to/file",
+  "path-segments": ("", "a:", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-047b">
+    <description>Drive letter test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("//a|/path/to/file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "//a|/path/to/file",
+  "hierarchical": true(),
+  "scheme": "file",
+  "path": "/a:/path/to/file",
+  "filepath": "a:/path/to/file",
+  "path-segments": ("", "a:", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-047c">
+    <description>Drive letter test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("////a|/path/to/file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "////a|/path/to/file",
+  "hierarchical": true(),
+  "scheme": "file",
+  "path": "/a:/path/to/file",
+  "filepath": "a:/path/to/file",
+  "path-segments": ("", "a:", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-047d">
+    <description>Drive letter test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("file:/a|/path/to/file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "file:/a|/path/to/file",
+  "hierarchical": true(),
+  "scheme": "file",
+  "path": "/a:/path/to/file",
+  "filepath": "a:/path/to/file",
+  "path-segments": ("", "a:", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-047e">
+    <description>Drive letter test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("file://a|/path/to/file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "file://a|/path/to/file",
+  "hierarchical": true(),
+  "scheme": "file",
+  "path": "/a:/path/to/file",
+  "filepath": "a:/path/to/file",
+  "path-segments": ("", "a:", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-047f">
+    <description>Drive letter test</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("file:////a|/path/to/file")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "file:////a|/path/to/file",
+  "hierarchical": true(),
+  "scheme": "file",
+  "path": "/a:/path/to/file",
+  "filepath": "a:/path/to/file",
+  "path-segments": ("", "a:", "path", "to", "file")
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-048a">
+    <description>Just authority</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("//somehost")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "//somehost",
+  "authority": "somehost",
+  "host": "somehost",
+  "hierarchical": true()
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-048b">
+    <description>More slashes, but no scheme</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("////somehost")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "////somehost",
+  "path": "//somehost",
+  "filepath": "//somehost",
+  "path-segments": ("", "", "somehost"),
+  "hierarchical": true()
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-049a">
+    <description>Authority and path</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("//somehost/path")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "//somehost/path",
+  "authority": "somehost",
+  "host": "somehost",
+  "path": "/path",
+  "filepath": "/path",
+  "path-segments": ("", "path"),
+  "hierarchical": true()
+}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-049b">
+    <description>Just authority</description>
+    <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <test>fn:parse-uri("////somehost/path")</test>
+    <result>
+      <assert-deep-eq>map {
+  "uri": "////somehost/path",
+  "path": "//somehost/path",
+  "filepath": "//somehost/path",
+  "path-segments": ("", "", "somehost", "path"),
+  "hierarchical": true()
+}</assert-deep-eq>
     </result>
   </test-case>
 </test-set>
