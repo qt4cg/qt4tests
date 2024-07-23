@@ -1921,7 +1921,7 @@ return string($a)
    <test-case name="xqhof21" covers="map-constructor map-general">
       <description>Function coercion applied to a map, failing</description>
       <created by="John Snelson" on="2015-07-16"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
           let $m := map {
                 "Tuesday" : true(),
@@ -1935,6 +1935,26 @@ return string($a)
       ]]></test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="xqhof21a" covers="map-constructor map-general">
+      <description>Same as xqhof21, but with XQ40+ expecting a result, rather than a type error as with XQ31</description>
+      <created by="Gunther Rademacher" on="2024-07-23"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+          let $m := map {
+                "Tuesday" : true(),
+                "Wednesday" : true(),
+                "Friday" : true(),
+                "Monday" : true(),
+                "Sunday" : false(),
+                "Saturday" : false() }
+          let $days := ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")     
+          return fn:filter($days,$m)        
+      ]]></test>
+      <result>
+         <assert-deep-eq>"Monday", "Tuesday", "Wednesday", "Friday"</assert-deep-eq>
       </result>
    </test-case>
 
