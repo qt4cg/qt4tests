@@ -1919,9 +1919,9 @@ return string($a)
    </test-case>
    
    <test-case name="xqhof21" covers="map-constructor map-general">
-      <description>Function coercion applied to a map, failing</description>
+      <description>Function coercion applied to a map, failing because $m("Thursday") returns ()</description>
       <created by="John Snelson" on="2015-07-16"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
           let $m := map {
                 "Tuesday" : true(),
@@ -1935,6 +1935,27 @@ return string($a)
       ]]></test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="xqhof21" covers="map-constructor map-general">
+      <description>Function coercion applied to a map, not failing because 4.0 allows the predicate to return ()</description>
+      <created by="John Snelson" on="2015-07-16"/>
+      <modified by="Michael Kay" on="2024-07-22" change="4.0 allows predicate to return ()"/>
+      <dependency type="spec" value="XP40 XQ40"/>
+      <test><![CDATA[
+          let $m := map {
+                "Tuesday" : true(),
+                "Wednesday" : true(),
+                "Friday" : true(),
+                "Monday" : true(),
+                "Sunday" : false(),
+                "Saturday" : false() }
+          let $days := ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")     
+          return fn:filter($days,$m)        
+      ]]></test>
+      <result>
+         <assert-deep-eq>"Monday", "Tuesday", "Wednesday", "Friday"</assert-deep-eq>
       </result>
    </test-case>
 
@@ -2003,18 +2024,23 @@ return string($a)
    <test-case name="xqhof43">
       <description>Function reference with missing context. 4.0 mandates an error; 3.1 doesn't say.</description>
       <created by="Michael Kay" on="2023-12-12"/>
+      <modified by="Michael Kay" on="2024-07-22" change="No, I don't think that's correct. 
+         The spec mandates an error if the expression `name#0` is actually evaluated, but it's possible to
+         determine the arity of a function without evaluating its body. There is no attempt to evaluate
+         the function here, so I think there is no error."/>
       <dependency type="spec" value="XQ30+"/>
       <test>
          let $f := fn($x){name#0} return function-arity($f)
       </test>
       <result>
-         <error code="XPDY0002"/>
+         <assert-eq>1</assert-eq>
       </result>
    </test-case>
    
    <test-case name="xqhof44">
       <description>Function reference with incorrect context. 4.0 mandates an error; 3.1 doesn't say.</description>
       <created by="Michael Kay" on="2023-12-12"/>
+      <modified by="Michael Kay" on="2024-07-22" change="See xqhof43"/>
       <dependency type="spec" value="XQ30+"/>
       <test>
          let $f := fn($x){42!name#0} return function-arity($f)
