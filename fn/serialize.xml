@@ -1353,7 +1353,7 @@
             in the standard namespace (no error, by option parameter conventions it is ignored)</description>
         <created by="Debbie Lockett, Saxonica" on="2015-05-19"/>
         <environment ref="atomic-xq"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP31 XQ31"/>
         <test>let $params := map {
             "method" : "xml",
             "indent" : true(),
@@ -1366,12 +1366,31 @@
         </result>
     </test-case>
     
+    <test-case name="serialize-xml-107-40" covers="fn-serialize">
+        <description>serialize test - params supplied as map: list of properties, but one is an unrecognized name 
+            in the standard namespace (no error, by option parameter conventions in 40 it is rejected)</description>
+        <created by="Debbie Lockett, Saxonica" on="2015-05-19"/>
+        <modified by="Michael Kay, Saxonica" on="2024-07-30" change="Invalid options rejected in 4.0"/>
+        <environment ref="atomic-xq"/>
+        <dependency type="spec" value="XP40 XQ40"/>
+        <test>let $params := map {
+            "method" : "xml",
+            "indent" : true(),
+            "xindent" : true() 
+            }
+            return serialize(., $params)
+        </test>
+        <result>
+            <error code="FORG0013"/>
+        </result>
+    </test-case>
+    
     <test-case name="serialize-xml-107a" covers="fn-serialize">
         <description>serialize test - params supplied as map: list of properties, but one is an unrecognized name 
             in a vendor namespace (no error, by option parameter conventions it is ignored)</description>
         <created by="Debbie Lockett, Saxonica" on="2015-05-19"/>
         <environment ref="atomic-xq"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP31 XQ31"/>
         <test>let $params := map {
             "method" : "xml",
             "indent" : true(),
@@ -1479,7 +1498,7 @@
         <created by="Debbie Lockett, Saxonica" on="2015-05-19"/>
         <modified by="Josh Spiegel" on="2016-05-19" change="bug 29373"/>
         <modified by="Michael Kay" on="2016-06-15" change="test requires XQuery"/>
-        <dependency type="spec" value="XQ31+"/>
+        <dependency type="spec" value="XQ31"/>
         <test><![CDATA[let $params := map { QName("","indent") : true() }
             return contains(serialize(<e><f/></e>, $params), " ")
         ]]>
@@ -1488,6 +1507,26 @@
             <assert-false/>
         </result>
     </test-case>
+    
+    <test-case name="serialize-xml-120-40">
+        <description>serialize test - params supplied as map: error - disallowed no-namespace entry</description>
+        <!-- The key of the entry is an xs:string value in the cases of parameter names defined in 
+            these specifications, or an xs:QName (with non-absent namespace) in the case of 
+            implementation-defined serialization parameters. -->
+        <created by="Debbie Lockett, Saxonica" on="2015-05-19"/>
+        <modified by="Josh Spiegel" on="2016-05-19" change="bug 29373"/>
+        <modified by="Michael Kay" on="2016-06-15" change="test requires XQuery"/>
+        <modified by="Michael Kay" on="2024-07-30" change="invalid option is an error in 4.0"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[let $params := map { QName("","indent") : true() }
+            return contains(serialize(<e><f/></e>, $params), " ")
+        ]]>
+        </test>
+        <result>
+            <error code="FORG0013"/>
+        </result>
+    </test-case>
+    
     <test-case name="serialize-xml-120b" covers="fn-serialize">
         <description>serialize test - params supplied as map: error - disallowed no-namespace entry</description>
         <!-- The key of the entry is an xs:string value in the cases of parameter names defined in 
@@ -1502,10 +1541,32 @@
                 <created by="Debbie Lockett, Saxonica" on="2019-11-19"/>
             </source>
         </environment>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP31 XQ31"/>
         <test>serialize(., map { QName("","indent") : true(), "omit-xml-declaration" : true() })</test>
         <result>
             <assert>not(contains($result,' '))</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-xml-120b-40" covers="fn-serialize">
+        <description>serialize test - params supplied as map: error - disallowed no-namespace entry</description>
+        <!-- The key of the entry is an xs:string value in the cases of parameter names defined in 
+            these specifications, or an xs:QName (with non-absent namespace) in the case of 
+            implementation-defined serialization parameters. -->
+        <created by="Debbie Lockett" on="2019-11-19"/>
+        <modified by="Debbie Lockett" on="2020-07-09" change="Source should be XML 1.0"/>
+        <modified by="Benito van der Zander" on="2020-09-24" change="test depends on 3.1 spec"/>
+        <modified by="Michael Kay" on="2024-07-30" change="invalid option is an error in 4.0"/>
+        <environment>        
+            <source role="." file="serialize/serialize-xml-120-src.xml">
+                <description>File to be serialized</description>
+                <created by="Debbie Lockett, Saxonica" on="2019-11-19"/>
+            </source>
+        </environment>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(., map { QName("","indent") : true(), "omit-xml-declaration" : true() })</test>
+        <result>
+            <error code="FORG0013"/>
         </result>
     </test-case>
     
