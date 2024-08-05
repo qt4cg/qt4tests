@@ -1113,6 +1113,7 @@
     <description>Loads a module, ignoring unrecognised option in second argument.</description>
     <created by="Debbie Lockett" on="2015-06-04"/>
     <modified by="Debbie Lockett" on="2015-09-04" change="Use XPath syntax in test"/>
+    <dependency type="spec" value="XP31 XQ31"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/valid/module" file="load-xquery-module/valid-module.xqm"/>    
     <test>
       let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/valid/module",
@@ -1124,6 +1125,24 @@
     </test>
     <result>
       <assert-deep-eq>("var1", "var2", "func1", "func2")</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="fn-load-xquery-module-070a">
+    <description>Unrecognised option becomes an error in 4.0.</description>
+    <created by="Michael Kay" on="2015-06-04"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/valid/module" file="load-xquery-module/valid-module.xqm"/>    
+    <test>
+      let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/valid/module",
+       $module-unrec := "http://www.w3.example/unrecognised/namespace/nobody/uses",
+       $module := fn:load-xquery-module($module-ns, map{"nonexistant-option" : "ignored"})
+      return
+      ($module("variables")(QName($module-ns, "var1")), $module("variables")(QName($module-ns, "var2")), 
+      $module("functions")(QName($module-ns, "func1"))(0)(), $module("functions")(QName($module-ns, "func2"))(0)())
+    </test>
+    <result>
+      <error code="FORG0013"/>
     </result>
   </test-case>
   
@@ -1227,6 +1246,83 @@
          and vice versa :)
       return $module("functions")(QName($module-ns, "saxon-functions-available"))(1)
                  (exists(function-lookup(fn:QName('http://saxon.sf.net/', 'type'), 1)))
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="fn-load-xquery-module-401" covers-40="PR1333">
+    <description>Loads a module using the 'content' option.</description>
+    <created by="Michael Kay" on="2024-07-23"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/valid/module" file="load-xquery-module/valid-module.xqm"/>
+    <test>
+      let $module-text := ``[
+          xquery version "4.0";
+          
+          module namespace vm = "http://www.w3.org/fots/fn/load-xquery-module/valid/module";
+          
+          declare variable $vm:var1 := "var1";
+          declare variable $vm:var2 := "var2";
+          declare %private variable $vm:var3 := "var3";
+          
+          declare function vm:func1() {
+              "func1"
+          };
+          
+          declare function vm:func2() {
+              "func2"
+          };
+          
+          declare %private function vm:func3() {
+              "func3"
+          };
+      ]``
+      
+      let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/valid/module",
+          $module := fn:load-xquery-module($module-ns, {'content': $module-text})
+      return
+        let $vars := $module("variables"),
+            $fns := $module("functions")
+        return
+          let $var-values := ($vars(QName($module-ns, "var1")), $vars(QName($module-ns, "var2"))),
+              $fns-values := ($fns(QName($module-ns, "func1"))(0)(), $fns(QName($module-ns, "func2"))(0)())
+          return
+            ($var-values, $fns-values)
+    </test>
+    <result>
+      <assert-deep-eq>("var1", "var2", "func1", "func2")</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="fn-load-xquery-module-402" covers-40="PR1333">
+    <description>Static base URI using the 'content' option.</description>
+    <created by="Michael Kay" on="2024-07-23"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/valid/module" file="load-xquery-module/valid-module.xqm"/>
+    <test>
+      let $module-text := ``[
+          xquery version "4.0";
+          
+          module namespace vm = "http://www.w3.org/fots/fn/load-xquery-module/valid/module";
+         
+          declare function vm:base-uri() {
+              static-base-uri()
+          };
+          
+      ]``
+      
+      let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/valid/module",
+          $module := fn:load-xquery-module($module-ns, {'content': $module-text})
+      return
+        let $vars := $module("variables"),
+            $fns := $module("functions")
+        return
+          let $f := $fns(QName($module-ns, "base-uri"))(0)
+          return $f() eq static-base-uri()
     </test>
     <result>
       <assert-true/>

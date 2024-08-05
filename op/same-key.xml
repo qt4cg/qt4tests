@@ -634,11 +634,12 @@
    <test-case name="same-key-025">
        <description>op:same-key over numeric values.</description>
        <created by="Josh Spiegel" on="2016-05-18"/>
+       <modified by="Michael Kay" on="2024-07-30" change="reduce cost of test by testing fewer numbers"/>
        <environment ref="map" />
        <dependency type="spec" value="XQ31+"/>    
        <dependency type="feature" value="arbitraryPrecisionDecimal"/>
        <test>
-         let $keys := (1 to 10000) ! xs:float(1 div .)
+         let $keys := (1 to 10000)[. mod 13 = 0] ! xs:float(1 div .)
          let $map := map:merge(
            $keys ! (
               map:entry(.,.), 
@@ -646,7 +647,7 @@
            )
          )
          return 
-            map:size($map) eq 20000 and
+            map:size($map) eq (20000 idiv 13) and
             (
              every $key in $keys 
              satisfies $map($key) eq $key and
