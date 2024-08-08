@@ -2537,6 +2537,117 @@
       </result>
    </test-case>
    
+   <test-case name="function-decl-40-050" covers-40="PR1137">
+      <description>XQ40: static call on variadic function</description>
+      <created by="Michael Kay" on="2024-08-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare %variadic function local:f($x as xs:integer*) { sum($x) };
+         local:f(1,2,3)
+      </test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-051" covers-40="PR1137">
+      <description>XQ40: dynamic call on variadic function</description>
+      <created by="Michael Kay" on="2024-08-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare %variadic function local:f($x as xs:integer*) { sum($x) };
+         let $f := local:f#3
+         return $f(1,2,3)
+      </test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-052" covers-40="PR1137">
+      <description>XQ40: function name and arity of variadic function</description>
+      <created by="Michael Kay" on="2024-08-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare %variadic function local:f($x as xs:integer*) { sum($x) };
+         let $f := local:f#3
+         return (local-name-from-QName(function-name($f)), function-arity($f))
+      </test>
+      <result>
+         <assert-deep-eq>"f", 3</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-053" covers-40="PR1137">
+      <description>XQ40: partial application of variadic function</description>
+      <created by="Michael Kay" on="2024-08-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare %variadic function local:f($x as xs:integer*) { sum($x) };
+         let $f := local:f(1, ?, 17)
+         return $f(12)
+      </test>
+      <result>
+         <assert-eq>30</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-054" covers-40="PR1137">
+      <description>XQ40: recursive variadic function</description>
+      <created by="Michael Kay" on="2024-08-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare %variadic function local:product($x as xs:integer*) { 
+            if (empty($x)) then 1 else head($x) * local:product(tail($x)) 
+         };
+         (local:product(1,2,3,4), local:product((1,2,3,4)), local:product((1,2), (3,4)))
+      </test>
+      <result>
+         <assert-deep-eq>24, 24, 24</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-055" covers-40="PR1137">
+      <description>XQ40: forwards reference call on variadic function</description>
+      <created by="Michael Kay" on="2024-08-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:e() as xs:integer { local:f(1,2,3) };
+         declare %variadic function local:f($x as xs:integer*) { sum($x) };
+         local:e()
+      </test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-056" covers-40="PR1137">
+      <description>XQ40: forwards function reference to a variadic function</description>
+      <created by="Michael Kay" on="2024-08-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:e() as function(*) { local:f#3 };
+         declare %variadic function local:f($x as xs:integer*) { sum($x) };
+         local:e()(1,2,3)
+      </test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-057" covers-40="PR1137">
+      <description>XQ40: forwards partial function reference to a variadic function</description>
+      <created by="Michael Kay" on="2024-08-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:e() as function(*) { local:f(2, ?, ?, 5) };
+         declare %variadic function local:f($x as xs:integer*) { sum($x) };
+         local:e()(10, 11)
+      </test>
+      <result>
+         <assert-eq>28</assert-eq>
+      </result>
+   </test-case>
    
    <test-case name="function-decl-40-901" covers-40="defaulted-params">
       <description>XQ40: function with optional parameters, overlapping argument ranges</description>
