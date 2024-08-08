@@ -1549,6 +1549,7 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
         <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/>
         <modified by="Debbie Lockett" on="2022-08-26" change="Remove XQ31+ dependency; use default XQ31+ XP31+"/>
         <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
+        <dependency type="spec" value="XP31 XQ31"/>
         <test><![CDATA[
             let $xsl  :="<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='2.0'>
                 <xsl:template name='main'>
@@ -1572,6 +1573,34 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
             </all-of>
         </result>
     </test-case>
+    
+    <test-case name="fn-transform-48a">
+        <description>Transform with additional unrecognised option which is rejected in 4.0</description>
+        <created by="Debbie Lockett" on="2015-04-15"/>
+        <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/>
+        <modified by="Debbie Lockett" on="2022-08-26" change="Remove XQ31+ dependency; use default XQ31+ XP31+"/>
+        <modified by="Michael Kay" on="2024-08-05" change="unknown options are rejected in 4.0"/>
+        <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+            let $xsl  :="<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='2.0'>
+                <xsl:template name='main'>
+                    <out>
+                        <xsl:value-of select='.' />
+                    </out>
+                </xsl:template>
+            </xsl:stylesheet>"
+            return
+            transform(map{"stylesheet-text":$xsl, "source-node":parse-xml("<doc>this</doc>"),
+            "initial-template": fn:QName('','main'),
+            "another-option" : "dummy"})
+        ]]>
+        </test>
+        <result>
+            <error code="FORG0013"/>
+        </result>
+    </test-case>
+
 
 
     <test-case name="fn-transform-50">
