@@ -11486,12 +11486,10 @@ return function-arity($initial)
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-09-10"/>
       <environment ref="global"/>
       <test>
-        
-declare %private function local:inc($c) { $c + 1 };
-function-annotations(local:inc#1)
+        function-annotations(true#0)
       </test>
       <result>
-         <assert-deep-eq>{ Q{http://www.w3.org/2012/xquery}private: () }</assert-deep-eq>
+         <assert-deep-eq>()</assert-deep-eq>
       </result>
    </test-case>
 
@@ -11501,13 +11499,14 @@ function-annotations(local:inc#1)
       <environment ref="global"/>
       <test>
         
-let $old := %local:deprecated('0.1', '0.2') fn() {}
-let $ann := function-annotations($old)
-return map:keys($ann) || ': ' || string-join(map:values($ann), ', ')
-
+declare %private function local:inc($c) { $c + 1 };
+function-annotations(local:inc#1)
       </test>
       <result>
-         <assert-deep-eq>local:deprecated: 0.1, 0.2</assert-deep-eq>
+         <assert-deep-eq>
+{ "key": xs:QName("http://www.w3.org/2012/xquery", "private"),
+  "value": () 
+}</assert-deep-eq>
       </result>
    </test-case>
 
@@ -11516,10 +11515,39 @@ return map:keys($ann) || ': ' || string-join(map:values($ann), ', ')
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-09-10"/>
       <environment ref="global"/>
       <test>
-        function-annotations(true#0)
+        
+declare %private %variadic 
+        function local:sum($c as xs:integer*) { sum($c) };
+function-annotations(local:sum#3)
       </test>
       <result>
-         <assert-deep-eq>{}</assert-deep-eq>
+         <assert-deep-eq>
+{ "key": xs:QName("http://www.w3.org/2012/xquery", "private"),
+  "value": () 
+},
+{ "key": xs:QName("http://www.w3.org/2012/xquery", "variadic"),
+  "value": () 
+}</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-function-annotations-004">
+      <description>Test case for fn:function-annotations</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2024-09-10"/>
+      <environment ref="global"/>
+      <test>
+        
+let $old := %local:deprecated('0.1', '0.2') fn() {}
+let $ann := function-annotations($old)
+return map:of-pairs($ann)
+
+      </test>
+      <result>
+         <assert-deep-eq>
+{ xs:QName("http://www.w3.org/2005/xquery-local-functions", "deprecated"):
+    ("0.1", "0.2") 
+}
+</assert-deep-eq>
       </result>
    </test-case>
 
