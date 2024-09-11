@@ -1172,15 +1172,24 @@
       <description>Example from JSONPath spec: all things in store, which are some
          books and a red bicycle</description>
       <created by="Michael Kay" on="2023-11-26"/>
+      <modified by="Michael Kay" on="2024-09-06" change="allow different order of results"/>
       <environment ref="jsonpath"/>
       <test>$m?store?*</test>
       <result>
-         <all-of>
-            <assert>count($result) = 2</assert>
-            <assert>$result[1] instance of record(color, price)</assert>
-            <assert>$result[2] instance of array(record(author, price, category, *)*)</assert>
-            <assert>array:size($result[2]) = 4</assert>
-         </all-of>
+         <any-of>
+            <all-of>
+               <assert>count($result) = 2</assert>
+               <assert>$result[1] instance of record(color, price)</assert>
+               <assert>$result[2] instance of array(record(author, price, category, *)*)</assert>
+               <assert>array:size($result[2]) = 4</assert>
+            </all-of>
+            <all-of>
+               <assert>count($result) = 2</assert>
+               <assert>$result[2] instance of record(color, price)</assert>
+               <assert>$result[1] instance of array(record(author, price, category, *)*)</assert>
+               <assert>array:size($result[1]) = 4</assert>
+            </all-of>
+          </any-of>
       </result>
    </test-case>
    

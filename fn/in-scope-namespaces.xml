@@ -101,6 +101,50 @@
          <assert-deep-eq>"p.ns", "Q.ns", "R.ns"</assert-deep-eq>
       </result>
    </test-case>
+   
+   <test-case name="in-scope-namespaces-11">
+      <description>Default namespace test with XPath</description>
+      <created by="Michael Kay" on="2024-08-27"/>
+      <test><![CDATA[
+      let $seq := in-scope-namespaces(parse-xml("<a xmlns='p.ns'/>")/*)
+      return $seq("")]]></test>
+      <result>
+         <assert-eq>"p.ns"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="in-scope-namespaces-12">
+      <description>Returned key for default namespace must be an instance of enum('')</description>
+      <created by="Michael Kay" on="2024-08-27"/>
+      <test><![CDATA[
+      let $seq := in-scope-namespaces(parse-xml("<a xmlns='p.ns'/>")/*)
+      return some $k in map:keys($seq) satisfies $k instance of enum('')]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="in-scope-namespaces-13">
+      <description>Apply to empty sequence</description>
+      <created by="Michael Kay" on="2024-08-27"/>
+      <test><![CDATA[
+      let $seq := in-scope-namespaces(parse-xml("<a xmlns='p.ns'/>")//b)
+      return $seq("")]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="in-scope-namespaces-14">
+      <description>Apply to document node</description>
+      <created by="Michael Kay" on="2024-08-27"/>
+      <test><![CDATA[
+      let $seq := in-scope-namespaces(parse-xml("<a xmlns='p.ns'/>"))
+      return $seq("")]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
 
 
 </test-set>
