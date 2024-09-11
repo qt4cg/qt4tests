@@ -682,6 +682,48 @@
          <error code="XQDY0054"/>
       </result>
    </test-case>
+   
+   <test-case name="vardeclerr-2">
+      <description> A variable is not in scope within its own initializer</description>
+      <created by="Michael Kay" on="2024-08-16"/>
+      <dependency type="spec" value="XQ30+" />
+      <test>
+         declare variable $var1 := $var1;
+         $var1
+      </test>
+      <result>
+         <error code="XPST0008"/>
+      </result>
+   </test-case>
+   
+   <test-case name="vardeclerr-3">
+      <description> A variable is not in scope within its own initializer (even when it might make sense)</description>
+      <created by="Michael Kay" on="2024-08-16"/>
+      <dependency type="spec" value="XQ30+" />
+      <test>
+         declare variable $var1 as function(xs:numeric) as xs:numeric :=               
+           function($x as xs:numeric) as xs:numeric { if (($x) lt 0) then $var1($x) else abs($x) };
+         $var1(2)
+      </test>
+      <result>
+         <error code="XPST0008"/>
+      </result>
+   </test-case>
+   
+   <test-case name="vardeclerr-4">
+      <description> A variable is not in scope within its own initializer.</description>
+      <created by="Michael Kay" on="2024-08-16"/>
+      <dependency type="spec" value="XQ30+" />
+      <test>
+         declare variable $var1 := $var2;
+         declare variable $var2 := $var3;
+         declare variable $var3 := $var3;
+         $var3
+      </test>
+      <result>
+         <error code="XPST0008"/>
+      </result>
+   </test-case>
  
    <test-case name="internalvar-2">
       <description> Evaluates an external variable named "$local:var" declared with no type and multiple embedded comments. </description>
