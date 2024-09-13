@@ -10,6 +10,7 @@
   <test-case name="fn-parse-uri-001">
     <description>Parses a simple URI</description>
     <created by="Norm Tovey-Walsh" on="2023-03-09"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("https://example.com\path\to\file")</test>
     <result>
       <assert-deep-eq>map {
@@ -19,6 +20,7 @@
         "path-segments": ("", "path", "to", "file"),
         "scheme": "https",
         "hierarchical": true(),
+        "absolute": true(),
         "uri": "https://example.com\path\to\file"
       }</assert-deep-eq>
     </result>
@@ -27,11 +29,13 @@
   <test-case name="fn-parse-uri-002">
     <description>Parses a URI with a complicated authority</description>
     <created by="Norm Tovey-Walsh" on="2023-03-09"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("https://user:password@example.com:443/path")</test>
     <result>
       <assert-deep-eq>map {'uri': 'https://user:password@example.com:443/path',
                            'scheme': 'https',
                            "hierarchical": true(),
+                           "absolute": true(),
                            'authority': 'user:password@example.com:443',
                            'host': 'example.com',
                            'port': '443',
@@ -43,10 +47,12 @@
   <test-case name="fn-parse-uri-003">
     <description>Parses a URI with a escaped path components</description>
     <created by="Norm Tovey-Walsh" on="2023-03-09"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("http://foo")</test>
     <result>
       <assert-deep-eq>map {'scheme': 'http',
                            "hierarchical": true(),
+                           "absolute": true(),
                            'authority': 'foo',
                            'host': 'foo',
                            'uri': 'http://foo'
@@ -57,10 +63,12 @@
   <test-case name="fn-parse-uri-004">
     <description>Parses a URI with a escaped path components</description>
     <created by="Norm Tovey-Walsh" on="2023-03-09"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("https://user:password@example.com:443/path/a%2fb/a+b")</test>
     <result>
       <assert-deep-eq>map {'scheme': 'https',
                            "hierarchical": true(),
+                           "absolute": true(),
                            'uri': 'https://user:password@example.com:443/path/a%2fb/a+b',
                            'authority': 'user:password@example.com:443',
                            'port': '443',
@@ -91,12 +99,14 @@
   <test-case name="fn-parse-uri-006">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("http://www.ietf.org/rfc/rfc2396.txt")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "http://www.ietf.org/rfc/rfc2396.txt",
   "scheme": "http",
   "hierarchical": true(),
+  "absolute": true(),
   "authority": "www.ietf.org",
   "host": "www.ietf.org",
   "path": "/rfc/rfc2396.txt",
@@ -108,12 +118,14 @@
   <test-case name="fn-parse-uri-007">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("https://example.com/path/to/file")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "https://example.com/path/to/file",
   "scheme": "https",
   "hierarchical": true(),
+  "absolute": true(),
   "authority": "example.com",
   "host": "example.com",
   "path": "/path/to/file",
@@ -126,6 +138,7 @@
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
     <modified by="Michael Kay" on="2023-03-16" change="run both on XPath and XQuery"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>
       let $amp := codepoints-to-string(38) return
       fn:parse-uri("https://example.com:8080/path?s=%22hello world%22" || $amp || "sort=relevance")</test>
@@ -135,6 +148,7 @@ map {
   "uri": `https://example.com:8080/path?s=%22hello world%22&sort=relevance`,
   "scheme": "https",
   "hierarchical": true(),
+  "absolute": true(),
   "authority": "example.com:8080",
   "host": "example.com",
   "port": "8080",
@@ -152,12 +166,14 @@ map {
   <test-case name="fn-parse-uri-009">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("https://user@example.com/path/to/file")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "https://user@example.com/path/to/file",
   "scheme": "https",
   "hierarchical": true(),
+  "absolute": true(),
   "authority": "user@example.com",
   "userinfo": "user",
   "host": "example.com",
@@ -170,12 +186,14 @@ map {
   <test-case name="fn-parse-uri-010">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("ftp://ftp.is.co.za/rfc/rfc1808.txt")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "ftp://ftp.is.co.za/rfc/rfc1808.txt",
   "scheme": "ftp",
   "hierarchical": true(),
+  "absolute": true(),
   "authority": "ftp.is.co.za",
   "host": "ftp.is.co.za",
   "path": "/rfc/rfc1808.txt",
@@ -187,12 +205,14 @@ map {
   <test-case name="fn-parse-uri-011a">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file:////uncname/path/to/file", map { "unc-path": false() })</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file:////uncname/path/to/file",
   "scheme": "file",
   "hierarchical": true(),
+  "absolute": true(),
   "path": "/uncname/path/to/file",
   "filepath": "/uncname/path/to/file",
   "path-segments": ("", "uncname", "path", "to", "file")
@@ -203,12 +223,14 @@ map {
   <test-case name="fn-parse-uri-011b">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file:////uncname/path/to/file", map { "unc-path": true() })</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file:////uncname/path/to/file",
   "scheme": "file",
   "hierarchical": true(),
+  "absolute": true(),
   "path": "//uncname/path/to/file",
   "filepath": "//uncname/path/to/file",
   "path-segments": ("", "", "uncname", "path", "to", "file")
@@ -235,12 +257,14 @@ map {
   <test-case name="fn-parse-uri-012">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file:///c:/path/to/file")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file:///c:/path/to/file",
   "scheme": "file",
   "hierarchical": true(),
+  "absolute": true(),
   "path": "/c:/path/to/file",
   "filepath": "c:/path/to/file",
   "path-segments": ("", "c:", "path", "to", "file")
@@ -251,12 +275,14 @@ map {
   <test-case name="fn-parse-uri-013">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file:/C:/Program%20Files/test.jar")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file:/C:/Program%20Files/test.jar",
   "scheme": "file",
   "hierarchical": true(),
+  "absolute": true(),
   "path": "/C:/Program%20Files/test.jar",
   "filepath": "C:/Program Files/test.jar",
   "path-segments": ("", "C:", "Program Files", "test.jar")
@@ -267,12 +293,14 @@ map {
   <test-case name="fn-parse-uri-014">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file:\\c:\path\to\file")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file:\\c:\path\to\file",
   "scheme": "file",
   "hierarchical": true(),
+  "absolute": true(),
   "path": "/c:/path/to/file",
   "filepath": "c:/path/to/file",
   "path-segments": ("", "c:", "path", "to", "file")
@@ -283,12 +311,14 @@ map {
   <test-case name="fn-parse-uri-015">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file:\c:\path\to\file")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file:\c:\path\to\file",
   "scheme": "file",
   "hierarchical": true(),
+  "absolute": true(),
   "path": "/c:/path/to/file",
   "filepath": "c:/path/to/file",
   "path-segments": ("", "c:", "path", "to", "file")
@@ -357,12 +387,14 @@ map {
   <test-case name="fn-parse-uri-020">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("ldap://[2001:db8::7]/c=GB?objectClass?one")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "ldap://[2001:db8::7]/c=GB?objectClass?one",
   "scheme": "ldap",
   "hierarchical": true(),
+  "absolute": true(),
   "authority": "[2001:db8::7]",
   "host": "[2001:db8::7]",
   "path": "/c=GB",
@@ -433,12 +465,14 @@ map {
   <test-case name="fn-parse-uri-024">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("telnet://192.0.2.16:80/")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "telnet://192.0.2.16:80/",
   "scheme": "telnet",
   "hierarchical": true(),
+  "absolute": true(),
   "authority": "192.0.2.16:80",
   "host": "192.0.2.16",
   "port": "80",
@@ -511,12 +545,14 @@ map {
   <test-case name="fn-parse-uri-029">
     <description>Parses an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("http://www.example.org/Dürst")</test>
     <result>
       <assert-deep-eq>map {
     "uri": "http://www.example.org/Dürst",
     "scheme": "http",
     "hierarchical": true(),
+    "absolute": true(),
     "authority": "www.example.org",
     "host": "www.example.org",
     "path": "/Dürst",
@@ -528,12 +564,14 @@ map {
   <test-case name="fn-parse-uri-031">
     <description>Parses a URI preserving deprecated features</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("https://user:password@example.com:443/path",
                        map { "allow-deprecated-features": true() })</test>
     <result>
       <assert-deep-eq>map {'uri': 'https://user:password@example.com:443/path',
                            'scheme': 'https',
                            "hierarchical": true(),
+                           "absolute": true(),
                            'authority': 'user:password@example.com:443',
                            'userinfo': 'user:password',
                            'host': 'example.com',
@@ -546,12 +584,14 @@ map {
   <test-case name="fn-parse-uri-032">
     <description>Parses a URI omitting known ports</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("https://user:password@example.com:443/path",
                        map { "omit-default-ports": true() })</test>
     <result>
       <assert-deep-eq>map {'uri': 'https://user:password@example.com:443/path',
                            'scheme': 'https',
                            "hierarchical": true(),
+                           "absolute": true(),
                            'authority': 'user:password@example.com:443',
                            'host': 'example.com',
                            'path-segments': ('', 'path'),
@@ -563,6 +603,7 @@ map {
     <description>Parses a URI preserving deprecated features and
     omitting known ports</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("https://user:password@example.com:443/path",
                        map { "allow-deprecated-features": true(),
                              "omit-default-ports": true() })</test>
@@ -570,6 +611,7 @@ map {
       <assert-deep-eq>map {'uri': 'https://user:password@example.com:443/path',
                            'scheme': 'https',
                            "hierarchical": true(),
+                           "absolute": true(),
                            'authority': 'user:password@example.com:443',
                            'userinfo': 'user:password',
                            'host': 'example.com',
@@ -615,12 +657,14 @@ map {
     <description>Parses a complex example; from Saxonica bug #6031.</description>
     <created by="Norm Tovey-Walsh" on="2023-05-11"/>
     <modified by="Michael Kay" on="2023-06-28" change="backticks achieve XP/XQ compatibility"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri(`https://example.com:8080/path?s=%22hello world%22&amp;sort=relevance`)</test>
     <result>
       <assert-deep-eq><![CDATA[
 map {
   "host": "example.com",
   "hierarchical": true(),
+  "absolute": true(),
   "port": "8080",
   "authority": "example.com:8080",
   "path": "/path",
@@ -655,12 +699,14 @@ map {
   <test-case name="fn-parse-uri-038">
     <description>Parses an example with file:// and |</description>
     <created by="Norm Tovey-Walsh" on="2023-05-11"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file://c|/path/to/file")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file://c|/path/to/file",
   "scheme": "file",
   "hierarchical": true(),
+  "absolute": true(),
   "path": "/c:/path/to/file",
   "filepath": "c:/path/to/file",
   "path-segments": ("", "c:", "path", "to", "file")
@@ -671,12 +717,14 @@ map {
   <test-case name="fn-parse-uri-040">
     <description>Parses a single character followed by a port</description>
     <created by="Norm Tovey-Walsh" on="2023-07-07"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("http://x:80")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "http://x:80",
   "scheme": "http",
   "hierarchical": true(),
+  "absolute": true(),
   "authority": "x:80",
   "host": "x",
   "port": "80"
@@ -702,11 +750,13 @@ map {
   <test-case name="fn-parse-uri-042">
     <description>Tests that repeated query parameters are represented as a sequence.</description>
     <created by="Norm Tovey-Walsh" on="2023-10-24"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri(`http://example.com/path?a=1&amp;b=2%264&amp;a=3`)</test>
     <result>
       <assert-deep-eq><![CDATA[map {
   `scheme`: `http`,
   `hierarchical`: true(),
+  "absolute": true(),
   `uri`: `http://example.com/path?a=1&b=2%264&a=3`,
   `authority`: `example.com`,
   `host`: `example.com`,
@@ -841,6 +891,7 @@ map {
   <test-case name="fn-parse-uri-044">
     <description>Parses a simple URI</description>
     <created by="Norm Tovey-Walsh" on="2024-03-19"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("https://example.com/path%2Fto/a=b")</test>
     <result>
       <assert-deep-eq>map {
@@ -850,6 +901,7 @@ map {
         "path-segments": ("", "path/to", "a=b"),
         "scheme": "https",
         "hierarchical": true(),
+        "absolute": true(),
         "uri": "https://example.com/path%2Fto/a=b"
       }</assert-deep-eq>
     </result>
@@ -858,6 +910,7 @@ map {
   <test-case name="fn-parse-uri-045">
     <description>Parses a simple URI</description>
     <created by="Norm Tovey-Walsh" on="2024-03-19"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("https://example.com/path%2Fto/a%3Db")</test>
     <result>
       <assert-deep-eq>map {
@@ -867,6 +920,7 @@ map {
         "path-segments": ("", "path/to", "a=b"),
         "scheme": "https",
         "hierarchical": true(),
+        "absolute": true(),
         "uri": "https://example.com/path%2Fto/a%3Db"
       }</assert-deep-eq>
     </result>
@@ -907,12 +961,14 @@ map {
   <test-case name="fn-parse-uri-046c">
     <description>UNC path test</description>
     <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file://uncname/path/to/file", map { "unc-path": true() })</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file://uncname/path/to/file",
   "scheme": "file",
   "hierarchical": true(),
+  "absolute": true(),
   "path": "//uncname/path/to/file",
   "filepath": "//uncname/path/to/file",
   "path-segments": ("", "", "uncname", "path", "to", "file")
@@ -923,12 +979,14 @@ map {
   <test-case name="fn-parse-uri-046d">
     <description>UNC path test</description>
     <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file://///uncname/path/to/file", map { "unc-path": true() })</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file://///uncname/path/to/file",
   "scheme": "file",
   "hierarchical": true(),
+  "absolute": true(),
   "path": "//uncname/path/to/file",
   "filepath": "//uncname/path/to/file",
   "path-segments": ("", "", "uncname", "path", "to", "file")
@@ -971,12 +1029,14 @@ map {
   <test-case name="fn-parse-uri-046g">
     <description>UNC path test</description>
     <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file://uncname/path/to/file", map { "unc-path": false() })</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file://uncname/path/to/file",
   "scheme": "file",
   "hierarchical": true(),
+  "absolute": true(),
   "path": "/uncname/path/to/file",
   "filepath": "/uncname/path/to/file",
   "path-segments": ("", "uncname", "path", "to", "file")
@@ -987,11 +1047,13 @@ map {
   <test-case name="fn-parse-uri-046h">
     <description>UNC path test</description>
     <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file://///uncname/path/to/file", map { "unc-path": false() })</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file://///uncname/path/to/file",
   "hierarchical": true(),
+  "absolute": true(),
   "scheme": "file",
   "path": "/uncname/path/to/file",
   "filepath": "/uncname/path/to/file",
@@ -1051,11 +1113,13 @@ map {
   <test-case name="fn-parse-uri-047d">
     <description>Drive letter test</description>
     <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file:/a|/path/to/file")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file:/a|/path/to/file",
   "hierarchical": true(),
+  "absolute": true(),
   "scheme": "file",
   "path": "/a:/path/to/file",
   "filepath": "a:/path/to/file",
@@ -1067,11 +1131,13 @@ map {
   <test-case name="fn-parse-uri-047e">
     <description>Drive letter test</description>
     <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file://a|/path/to/file")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file://a|/path/to/file",
   "hierarchical": true(),
+  "absolute": true(),
   "scheme": "file",
   "path": "/a:/path/to/file",
   "filepath": "a:/path/to/file",
@@ -1083,11 +1149,13 @@ map {
   <test-case name="fn-parse-uri-047f">
     <description>Drive letter test</description>
     <created by="Norm Tovey-Walsh" on="2024-05-28"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("file:////a|/path/to/file")</test>
     <result>
       <assert-deep-eq>map {
   "uri": "file:////a|/path/to/file",
   "hierarchical": true(),
+  "absolute": true(),
   "scheme": "file",
   "path": "/a:/path/to/file",
   "filepath": "a:/path/to/file",
@@ -1160,6 +1228,7 @@ map {
   <test-case name="fn-parse-uri-50">
     <description>Discard an empty query string</description>
     <create by="Norm Tovey-Walsh" on="2024-08-13"/>
+    <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <test>fn:parse-uri("https://example.com/?")</test>
     <result>
       <assert-deep-eq>map {
@@ -1169,6 +1238,7 @@ map {
         "path-segments": ("", ""),
         "scheme": "https",
         "hierarchical": true(),
+        "absolute": true(),
         "uri": "https://example.com/?"
         }</assert-deep-eq>
     </result>
