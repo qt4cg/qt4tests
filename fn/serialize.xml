@@ -2064,6 +2064,7 @@
             <assert><![CDATA[contains($result,">  <")]]></assert>
         </result>
     </test-case>
+    
     <test-case name="serialize-xml-142b" covers="fn-serialize">
         <description>Multiple untypedAtomic conversions in one map</description>
         <created by="Debbie Lockett" on="2019-11-19"/>
@@ -2079,6 +2080,99 @@
         <test>serialize(./x/*, map {'method' : 'xml', 'indent' : xs:untypedAtomic('false'), 'item-separator' : xs:untypedAtomic('  ') })</test>
         <result>
             <assert><![CDATA[contains($result,">  <")]]></assert>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-xml-143" covers="fn-serialize">
+        <description>omit-xml-declaration inconsistent with standalone</description>
+        <created by="Michael Kay" on="2024-09-27"/>
+        <dependency type="spec" value="XP31+ XQ31+"/>
+        <test><![CDATA[
+            serialize(
+                parse-xml('<a/>'), 
+                      {'method' : 'xml', 
+                       'omit-xml-declaration' : true(),
+                       'standalone': true()})
+            ]]></test>
+        <result>
+            <error code="SEPM0009"/>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-xml-144" covers="fn-serialize">
+        <description>omit-xml-declaration inconsistent with standalone</description>
+        <created by="Michael Kay" on="2024-09-27"/>
+        <dependency type="spec" value="XP31+ XQ31+"/>
+        <test><![CDATA[
+            serialize(
+                parse-xml('<a/>'), 
+                      {'method' : 'xml', 
+                       'omit-xml-declaration' : true(),
+                       'standalone': false()})
+            ]]></test>
+        <result>
+            <error code="SEPM0009"/>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-xml-145" covers="fn-serialize">
+        <description>omit-xml-declaration (which defaults to true) is inconsistent with standalone</description>
+        <created by="Michael Kay" on="2024-09-27"/>
+        <dependency type="spec" value="XP31+ XQ31+"/>
+        <test><![CDATA[
+            serialize(
+                parse-xml('<a/>'), 
+                      {'method' : 'xml', 
+                       'standalone': false()})
+            ]]></test>
+        <result>
+            <error code="SEPM0009"/>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-xml-146" covers="fn-serialize">
+        <description>omit-xml-declaration inconsistent with version/doctype-system</description>
+        <created by="Michael Kay" on="2024-09-27"/>
+        <dependency type="spec" value="XP31+ XQ31+"/>
+        <test><![CDATA[
+            serialize(
+                parse-xml('<a/>'), 
+                      {'method' : 'xml', 
+                       'version' : '1.1',
+                       'omit-xml-declaration' : true(),
+                       'doctype-system': 'http://www.w3.org/serialization-error'})
+            ]]></test>
+        <result>
+            <error code="SEPM0009"/>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-xml-147" covers="fn-serialize">
+        <description>omit-xml-declaration (defaulting to true) inconsistent with version/doctype-system</description>
+        <created by="Michael Kay" on="2024-09-27"/>
+        <dependency type="spec" value="XP31+ XQ31+"/>
+        <test><![CDATA[
+            serialize(
+                parse-xml('<a/>'), 
+                      {'method' : 'xml', 
+                       'version' : '1.1',
+                       'doctype-system': 'http://www.w3.org/serialization-error'})
+            ]]></test>
+        <result>
+            <error code="SEPM0009"/>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-xml-148" covers="fn-serialize">
+        <description>omit-xml-declaration defaults to true</description>
+        <created by="Michael Kay" on="2024-09-27"/>
+        <dependency type="spec" value="XP31+ XQ31+"/>
+        <test><![CDATA[
+            serialize(
+                parse-xml('<a/>'), map {'method' : 'xml'})
+            ]]></test>
+        <result>
+            <assert-eq><![CDATA['<a/>']]></assert-eq>
         </result>
     </test-case>
     
