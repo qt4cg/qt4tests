@@ -514,12 +514,57 @@
                  validation="strict"/>
          <schema uri="http://ns.example.com/books" file="TestSources/books.xsd"/>
       </environment>
-      <test update="true"><![CDATA[declare construction strip; declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(schema-element(BOOKLIST)) external; insert node attribute ids {count($books/id('jff001'))} into $books/BOOKLIST, for $a in $books//@xml:id return rename node $a as "ex-id"]]></test>
-      <test><![CDATA[declare revalidation skip; import schema default element namespace "http://ns.example.com/books"; declare variable $books as document-node(element(BOOKLIST)) external; <out> <jff>{$books/id('jff001')}</jff> </out>]]></test>
+      <test update="true"><![CDATA[
+         declare construction strip; 
+         declare revalidation skip; 
+         import schema default element namespace "http://ns.example.com/books"; 
+         declare variable $books as document-node(schema-element(BOOKLIST)) external; 
+         insert node attribute ids {count($books/id('jff001'))} into $books/BOOKLIST, 
+         for $a in $books//@xml:id 
+         return rename node $a as "ex-id"
+      ]]></test>
+      <test><![CDATA[
+         declare revalidation skip; 
+         import schema default element namespace "http://ns.example.com/books"; 
+         declare variable $books as document-node(element(BOOKLIST)) external; 
+         <out> <jff>{$books/id('jff001')}</jff> </out>
+      ]]></test>
       <result>
          <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><jff/></out>]]></assert-xml>
       </result>
    </test-case>
+   
+   <test-case name="removeType-valskip-ren-003a">
+      <description>Description: Renaming an xml:id attribute affects result of
+                  id(). Variant of ren-003 without schema validation (Saxon bug 6546)</description>
+      <created by="Michael Kay" on="2024-09-23"/>
+      <environment>
+         <source role="$books"
+                 file="TestSources/books.xml"
+                 mutable="true"
+                 declared="true"
+                 validation="skip"/>
+      </environment>
+      <test update="true"><![CDATA[
+         declare construction strip; 
+         declare revalidation skip;
+         declare default element namespace "http://ns.example.com/books";
+         declare variable $books as document-node(element(BOOKLIST)) external; 
+         insert node attribute ids {count($books/id('jff001'))} into $books/BOOKLIST, 
+         for $a in $books//@xml:id 
+         return rename node $a as "ex-id"
+      ]]></test>
+      <test><![CDATA[
+         declare revalidation skip; 
+         declare default element namespace "http://ns.example.com/books"; 
+         declare variable $books as document-node(element(BOOKLIST)) external; 
+         <out> <jff>{$books/id('jff001')}</jff> </out>
+      ]]></test>
+      <result>
+         <assert-xml><![CDATA[<out xmlns="http://ns.example.com/books"><jff/></out>]]></assert-xml>
+      </result>
+   </test-case>
+
 
    <test-case name="removeType-valskip-ren-004">
       <description>Description: Renaming a text node is an error</description>
