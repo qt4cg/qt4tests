@@ -447,13 +447,14 @@
    <test-case name="nscons-031">
       <description>nscons-031 - dynamic namespace constructor - copy namespaces mode</description>
       <created by="Till Westmann" on="2011-11-28"/>
+      <modified by="Michael Kay" on="2024-10-18" change="avoid use of reserved name"/>
       <test><![CDATA[
         declare copy-namespaces preserve, inherit;
         let $nested := 
             element outer { 
               namespace out { "http://out.zorba-xquery.com/" },
               element inner {
-                namespace in { "http://in.zorba-xquery.com/" }
+                namespace {"in"} { "http://in.zorba-xquery.com/" }
               } 
             },
             $elem := element e { namespace new { "http://new.zorba-xquery.com/" }, $nested }
@@ -468,12 +469,13 @@
    <test-case name="nscons-032">
       <description>nscons-032 - dynamic namespace constructor - copy namespaces mode</description>
       <created by="Till Westmann" on="2011-11-28"/>
+      <modified by="Michael Kay" on="2024-10-18" change="avoid use of reserved name"/>
       <test><![CDATA[
         declare copy-namespaces preserve, no-inherit;
         let $nested := 
             element outer { 
               namespace out { "http://out.zorba-xquery.com/" },
-              element inner { namespace in { "http://in.zorba-xquery.com/" } } 
+              element inner { namespace {"in"} { "http://in.zorba-xquery.com/" } } 
             },
             $elem := element e { namespace new { "http://new.zorba-xquery.com/" }, $nested }
         return
@@ -487,12 +489,13 @@
    <test-case name="nscons-033">
       <description>nscons-033 - dynamic namespace constructor - copy namespaces mode</description>
       <created by="Till Westmann" on="2011-11-28"/>
+      <modified by="Michael Kay" on="2024-10-18" change="avoid use of reserved name"/>
       <test><![CDATA[
         declare copy-namespaces no-preserve, inherit;
         let $nested := 
             element outer { 
               namespace out { "http://out.zorba-xquery.com/" },
-              element inner { namespace in { "http://in.zorba-xquery.com/" } } 
+              element inner { namespace {"in"} { "http://in.zorba-xquery.com/" } } 
             },
             $elem := element e { namespace new { "http://new.zorba-xquery.com/" }, $nested }
         return
@@ -506,12 +509,13 @@
    <test-case name="nscons-034">
       <description>nscons-034 - dynamic namespace constructor - copy namespaces mode</description>
       <created by="Till Westmann" on="2011-11-28"/>
+      <modified by="Michael Kay" on="2024-10-18" change="avoid use of reserved name"/>
       <test><![CDATA[
         declare copy-namespaces no-preserve, no-inherit;
         let $nested := 
             element outer { 
               namespace out { "http://out.zorba-xquery.com/" },
-              element inner { namespace in { "http://in.zorba-xquery.com/" } } 
+              element inner { namespace {"in"} { "http://in.zorba-xquery.com/" } } 
             },
             $elem := element e { namespace new { "http://new.zorba-xquery.com/" }, $nested }
         return
@@ -690,6 +694,76 @@
       ]]></test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+  
+  <test-case name="nscons-045" covers-40="PR1513">
+      <description> Allow name to be a string literal </description>
+      <created by="Michael Kay" on="2024-06-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<foo>{namespace "div" {'foo.ns'}}</foo>]]></test>
+      <result>
+         <assert-xml><![CDATA[<foo xmlns:div="foo.ns"/>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="nscons-046" covers-40="PR1513">
+      <description> Allow name to be a string literal </description>
+      <created by="Michael Kay" on="2024-06-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<foo>{namespace " div " {'foo.ns'}}</foo>]]></test>
+      <result>
+         <assert-xml><![CDATA[<foo xmlns:div="foo.ns"/>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="nscons-047" covers-40="PR1513">
+      <description> Disallow reserved names </description>
+      <created by="Michael Kay" on="2024-06-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<foo>{namespace at {"123"}}</foo>]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="nscons-048" covers-40="PR1513">
+      <description> Disallow all reserved names </description>
+      <created by="Michael Kay" on="2024-06-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for $kw in tokenize("allowing ancestor ancestor-or-self and array as at attribute 
+         base-uri boundary-space by case cast castable catch child collation comment 
+         construction context copy-namespaces count decimal-format decimal-separator 
+         declare default descendant descendant-or-self digit div document document-node 
+         element else empty empty-sequence encoding end enum eq every except 
+         exponent-separator false fixed fn following following-sibling for 
+         function ge group grouping-separator gt idiv if import in infinity 
+         inherit instance intersect is item items key keys lax le let lt 
+         map member minus-sign mod module namespace namespace-node NaN ne 
+         next no-inherit no-preserve node of only option or order ordered 
+         ordering otherwise pairs parent pattern-separator per-mille percent 
+         preceding preceding-sibling preserve previous processing-instruction 
+         record return satisfies schema schema-attribute schema-element 
+         self sliding some stable start strict strip switch text then 
+         to treat true try tumbling type typeswitch union unordered 
+         validate value values variable version when where while window 
+         xquery zero-digit ascending 
+         descending  external greatest least")
+         
+         let $q := `xquery version "4.0";
+                    module namespace m = "http://m.ns/"; 
+                    declare variable $m:v := namespace {$kw} {{"content"}};`
+         let $var := try {
+                       load-xquery-module('http://m.ns/', {'content':$q})?variables?*
+                     } catch err:FOQM0003 {
+                       ()
+                     }  
+         return $var
+         
+      </test>
+      <result>
+         <assert-empty/>
       </result>
    </test-case>
 

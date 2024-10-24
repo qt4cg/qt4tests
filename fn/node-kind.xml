@@ -1,0 +1,100 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-node-kind" covers-40="PR1523">
+  <description>Tests for the fn:node-kind function</description>
+
+  <dependency type="spec" value="XP40+ XQ40+"/>
+  
+  <test-case name="node-kind-000">
+    <description>empty sequence</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test>node-kind(())</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="node-kind-001">
+    <description>document node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test><![CDATA[node-kind(parse-xml('<a/>'))]]></test>
+    <result>
+      <assert-eq>"document"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="node-kind-002">
+    <description>element node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test><![CDATA[node-kind(parse-xml('<a/>')/*)]]></test>
+    <result>
+      <assert-eq>"element"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="node-kind-003">
+    <description>attribute node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test><![CDATA[node-kind(parse-xml('<a b="3"/>')/*/@b)]]></test>
+    <result>
+      <assert-eq>"attribute"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="node-kind-004">
+    <description>text node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test><![CDATA[node-kind(parse-xml('<a b="3">xxx<!--comment-->yyy</a>')//node()[.='xxx'])]]></test>
+    <result>
+      <assert-eq>"text"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="node-kind-005">
+    <description>comment node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test><![CDATA[node-kind(parse-xml('<a b="3">xxx<!--comment-->yyy</a>')//node()[.='xxx']/following-sibling::node()[1])]]></test>
+    <result>
+      <assert-eq>"comment"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="node-kind-006">
+    <description>PI node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test><![CDATA[node-kind(parse-xml('<a b="3">xxx<?pi pi>yyy?></a>')//node()[.='xxx']/following-sibling::node()[1])]]></test>
+    <result>
+      <assert-eq>"processing-instruction"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="node-kind-007">
+    <description>Namespace node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <dependency type="spec" value="XP40+"/>
+    <test><![CDATA[node-kind(parse-xml('<a xmlns:b="http://b/">xxx<?pi pi>yyy</a>')/*/namespace::b)]]></test>
+    <result>
+      <assert-eq>"namespace"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="node-kind-008">
+    <description>Namespace node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[node-kind(namespace "p" {"http://p.com/"})]]></test>
+    <result>
+      <assert-eq>"namespace"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="node-kind-009">
+    <description>Zero-arity function</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[parse-xml('<a/>') ! node-kind()]]></test>
+    <result>
+      <assert-eq>"document"</assert-eq>
+    </result>
+  </test-case>
+  
+
+</test-set>

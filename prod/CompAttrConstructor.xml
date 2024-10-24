@@ -399,6 +399,7 @@
    <test-case name="K2-ComputeConAttr-1">
       <description> The name can't be specified as a string literal. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"></dependency>
       <test>attribute "name" {"content"}</test>
       <result>
          <error code="XPST0003"/>
@@ -1028,10 +1029,80 @@
    <test-case name="K2-ComputeConAttr-62" covers-40="PR1259">
       <description> Resolve grammar ambiguity </description>
       <created by="Michael Kay" on="2024-06-11"/>
-      <dependency type="spec" value="XQ40+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[let $x := attribute div {} return <foo> { $x } </foo>]]></test>
       <result>
          <assert-xml><![CDATA[<foo div=""/>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConAttr-63" covers-40="PR1259">
+      <description> Allow name to be a string literal </description>
+      <created by="Michael Kay" on="2024-06-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<foo>{attribute "div" {}}</foo>]]></test>
+      <result>
+         <assert-xml><![CDATA[<foo div=""/>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConAttr-64" covers-40="PR1259">
+      <description> Allow name to be a string literal </description>
+      <created by="Michael Kay" on="2024-06-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<foo>{attribute " div " {}}</foo>]]></test>
+      <result>
+         <assert-xml><![CDATA[<foo div=""/>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConAttr-65" covers-40="PR1480">
+      <description> Disallow reserved names </description>
+      <created by="Michael Kay" on="2024-06-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<foo>{attribute at {"123"}}</foo>]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConAttr-66" covers-40="PR1480">
+      <description> Disallow all reserved names </description>
+      <created by="Michael Kay" on="2024-06-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         for $kw in tokenize("allowing ancestor ancestor-or-self and array as at attribute 
+         base-uri boundary-space by case cast castable catch child collation comment 
+         construction context copy-namespaces count decimal-format decimal-separator 
+         declare default descendant descendant-or-self digit div document document-node 
+         element else empty empty-sequence encoding end enum eq every except 
+         exponent-separator false fixed fn following following-sibling for 
+         function ge group grouping-separator gt idiv if import in infinity 
+         inherit instance intersect is item items key keys lax le let lt 
+         map member minus-sign mod module namespace namespace-node NaN ne 
+         next no-inherit no-preserve node of only option or order ordered 
+         ordering otherwise pairs parent pattern-separator per-mille percent 
+         preceding preceding-sibling preserve previous processing-instruction 
+         record return satisfies schema schema-attribute schema-element 
+         self sliding some stable start strict strip switch text then 
+         to treat true try tumbling type typeswitch union unordered 
+         validate value values variable version when where while window 
+         xquery zero-digit ascending 
+         descending  external greatest least")
+         
+         let $q := `xquery version "4.0";
+                    module namespace m = "http://m.ns/"; 
+                    declare variable $m:v := attribute {$kw} {{"content"}};`
+         let $var := try {
+                       load-xquery-module('http://m.ns/', {'content':$q})?variables?*
+                     } catch err:FOQM0003 {
+                       ()
+                     }  
+         return $var
+         
+      </test>
+      <result>
+         <assert-empty/>
       </result>
    </test-case>
 
