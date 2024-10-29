@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="prod-AxisStep.following-sibling-or-self" covers-40="PR1532">
+   <description>Tests for the following-sibling-or-self axis</description>
+
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="following-sibling-or-self-1">
+      <description> Evaluation of the following-sibling-or-self axis for which the context node is not a node. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <test>(200)/following-sibling-or-self::*</test>
+      <result>
+         <error code="XPTY0019"/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-2">
+      <description> Evaluation of the following-sibling-or-self axis for which the given node does not exists. Uses fn:count to avoid empty file. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>fn:count(/works/employee[1]/following-sibling-or-self::noSuchNode)</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-3">
+      <description> Evaluation of the following-sibling-or-self axis that is part of an "is" expression (return true). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>head(/works/employee[12]/following-sibling-or-self::employee) is exactly-one(/works/employee[12])</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-4">
+      <description> Evaluation of the following-sibling-or-self axis that is part of an "is" expression (return false). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>head(/works[1]/employee[12]/following-sibling-or-self::employee) is head(/works[1]/employee[12])</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-5">
+      <description> Evaluation of the following-sibling-or-self axis that is part of an "node before" expression (return true). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test><![CDATA[
+         head(/works[1]/employee[12]/overtime/day[1]/following-sibling-or-self::day) 
+         << head(/works[1]/employee[13])]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-6">
+      <description> Evaluation of the following-sibling-or-self axis that is part of an "node before" expression and both operands are the same (return false). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test><![CDATA[head(/works[1]/employee[12]/following-sibling-or-self::employee) 
+         << head(/works[1]/employee[12]/following-sibling-or-self::employee)]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-7">
+      <description> Evaluation of the following-sibling-or-self axis that is part of an "node before" expression both operands are different. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test><![CDATA[head(/works[1]/employee[12]/following-sibling-or-self::employee) << head(/works[1]/employee[12]/overtime[1])]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-8">
+      <description> Evaluation of the following-sibling-or-self axis that is part of an "node after" expression (returns true). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>head(/works[1]/employee[13]) >> head(/works[1]/employee[12]/overtime[1]/day[1]/following-sibling-or-self::day)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-9">
+      <description> Evaluation of the following-sibling-or-self axis that is part of an "node after" expression with both operands the same (returns false). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>head(/works[1]/employee[12]/following-sibling-or-self::employee) >> head(/works[1]/employee[12]/following-sibling-or-self::employee)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-10">
+      <description> Evaluation of the following-sibling-or-self axis that is part of an "node after" expression with different operands (returns false). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>head(/works[1]/employee[12]) >> head(/works[1]/employee[12]/following-sibling-or-self::employee)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-11">
+      <description> Evaluation of the following-sibling-or-self axis that is part of an "union " operation. Both operands are the same. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>string-join((/works/employee[12]/*/day[1]/following-sibling-or-self::day) | (/works/employee[12]/*/day[1]/following-sibling-or-self::day))</test>
+      <result>
+         <assert-eq>"MondayTuesday"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-12">
+      <description> Evaluation of the following-sibling-or-self axis that is part of an "union" operation. Both operands are different </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works/employee[12]/*/day[1]/following-sibling-or-self::day) | (/works/employee[12]/*/day[1])</test>
+      <result>
+         <assert-xml><![CDATA[<day>Monday</day><day>Tuesday</day>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-13">
+      <description> Evaluation of the following-sibling-or-self axis that is part of an "intersect" operation. Both operands are the same. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>string-join((/works[1]/employee[12]/overtime[1]/day[1]/following-sibling-or-self::day) intersect (/works[1]/employee[12]/overtime[1]/day[1]/following-sibling-or-self::day))</test>
+      <result>
+         <assert-eq>"MondayTuesday"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-14">
+      <description> Evaluation of the following-sibling-or-self axis that is part of an "except" operation. Both operands are the same. Uses fn:count to avoid empty file </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>fn:count((/works[1]/employee[12]/following-sibling-or-self::employee) except (/works[1]/employee[12]/following-sibling-or-self::employee))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-15">
+      <description> Evaluation of the following-sibling-or-self axis that is part of an "except" operation. Both operands are different. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works[1]/employee[12]/overtime/day) except (/works[1]/employee[12]/overtime/day[1]/following-sibling-or-self::day)</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-16">
+      <description> Evaluation of the following-sibling-or-self axis that is part of a boolean expression ("and" and fn:true(). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works[1]/employee[12]/following-sibling-or-self::employee) and fn:true()</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-17">
+      <description> Evaluation of the following-sibling-or-self axis that is part of a boolean expression ("and" and fn:false()). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works[1]/employee[12]/following-sibling-or-self::employee) and fn:false()</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-18">
+      <description> Evaluation of the following-sibling-or-self axis that is part of a boolean expression ("or" and fn:true()). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works[1]/employee[12]/following-sibling-or-self::employee) or fn:true()</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-19">
+      <description> Evaluation of the following-sibling-or-self axis that is part of a boolean expression ("or" and fn:false()). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works[1]/employee[12]/following-sibling-or-self::employee) or fn:false()</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-20">
+      <description> Evaluation of the following-sibling-or-self axis that used as part of the deep-equal-function. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>fn:deep-equal(/works[1]/employee[12]/following-sibling-or-self::employee,/works[1]/employee[12]/following-sibling-or-self::employee)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-21">
+      <description> Evaluation of the following axis used together with a newly constructed element. Uses fn:count to avoid empty file. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[let $var := <anElement>Some Content</anElement> return fn:count($var/following::*)]]></test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-22">
+      <description> Evaluate "following-sibling-or-self::employee[fn:position() = 1]". Selects the next employee sibling of the context node. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>for $h in (/works/employee[3]) return $h/following-sibling-or-self::employee[fn:position() = 1]</test>
+      <result>
+         <assert-xml><![CDATA[<employee name="Jane Doe 3" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P3</pnum>
+   <hours>80</hours>
+  </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-23">
+      <description> Apply following-sibling-or-self to a child whose siblings are the last in a document. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<root> <child/> <child/> <child/> </root>/child[1]/following-sibling-or-self::node()/local-name()]]></test>
+      <result>
+         <assert-deep-eq>"child", "child", "child"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-24">
+      <description> Apply following-sibling-or-self to a child whose last nodes in document order are attributes. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<root> <child/> <child/> <child attr="foo" attr2="foo"/> </root>/child[2]/following-sibling-or-self::node()]]></test>
+      <result>
+         <assert-xml><![CDATA[<child/><child attr="foo" attr2="foo"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-25">
+      <description> Apply fn:count() to the result of axis following-sibling-or-self. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[count(<root> <child/> <child/> <child attr="foo" attr2="foo"/> </root>/child[1]/following-sibling-or-self::node())]]></test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-26">
+      <description> Evaluate fn:count() on a range of nodes, navigated with axis following. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare variable $i := <root> <child/> <child/> <child> <child2> <child3> <leaf/> </child3> </child2> </child> </root>; 
+        root($i)//count(following-sibling-or-self::node())
+      ]]></test>
+      <result>
+         <assert-string-value>1 3 2 1 1 1 1</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-27">
+      <description> Evaluate on a small tree. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare variable $i := <root> <child1/> <child2/> <child3> <gchild2> <ggchild3> <leaf/> </ggchild3> </gchild2> </child3> </root>; 
+        count($i//child1/following-sibling-or-self::node())
+      ]]></test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-28">
+      <description> A type error with the following-sibling-or-self axis. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare variable $i := <root> <child/> <child/> <child> <child2> <child3> <leaf/> </child3> </child2> </child> </root>; 
+        root($i)//(following-sibling-or-self::node(), "BOO")
+      ]]></test>
+      <result>
+         <error code="XPTY0018"/>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-29">
+      <description> Apply count to axis following-sibling-or-self. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[count(<root> <child/> </root>/following-sibling-or-self::node())]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-30">
+      <description> Axis following-sibling-or-self, combined with the comma operator. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[1, string(<root><child>x</child></root>/following-sibling-or-self::node()), 1]]></test>
+      <result>
+         <assert-deep-eq>1, "x", 1</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-31">
+      <description> Axis following-sibling-or-self to a single node, combined with the comma operator. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[1, string(<root>x</root>/following-sibling-or-self::node()), 1]]></test>
+      <result>
+         <assert-deep-eq>1, "x", 1</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-32">
+      <description> Use a positional predicate beyond the output. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<result> { <a><b/></a>/*/following::*[2] } </result>]]></test>
+      <result>
+         <assert-xml><![CDATA[<result/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="following-sibling-or-self-33">
+      <description> Apply the following-sibling-or-self axis to an attribute node. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<foo a='1' b='2' c='3'> <bar>4</bar> <bar>5</bar> <bar>6</bar> </foo>/@a/following-sibling-or-self::node()]]></test>
+      <result>
+         <assert-string-value>1</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="following-sibling-or-self-34">
+      <description> Apply the following-sibling-or-self axis to elements where the context node isn't selected. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<foo><!--comment-->text<b/></foo>//comment()/following-sibling-or-self::b => count()]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="following-sibling-or-self-35">
+      <description> Evaluation of the following-sibling-or-self axis for a document node. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>fn:count(root(/works)/following-sibling-or-self::node())</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="following-sibling-or-self-36">
+      <description> Axis not allowed in 3.1. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <dependency type="spec" value="XP30 XP31 XQ30 XQ31"/>
+      <test>fn:count(root(/works)/following-sibling-or-self::node())</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="following-sibling-or-self-37">
+      <description> Evaluation of the following-sibling-or-self axis for an only-child text node. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>fn:count(root(/works)/following-sibling-or-self::node())</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="following-sibling-or-self-40">
+      <description> Evaluation of the following-sibling-or-self axis for an only-child text node. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>fn:count((//empnum/text())[1]/following-sibling-or-self::node())</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+</test-set>

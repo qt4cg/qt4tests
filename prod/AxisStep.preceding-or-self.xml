@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-AxisStep.preceding-or-self"  covers-40="PR1532">
+   <description>Tests for the preceding-or-self axis (new in 4.0)</description>
+
+   <test-case name="preceding-or-self-1">
+      <description> Evaluation of the preceding-or-self axis for which the context node is not a node. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <test>(200)/preceding-or-self::*</test>
+      <result>
+         <error code="XPTY0019"/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-2">
+      <description> Evaluation of the preceding-or-self axis for which the given node does not exists. Uses fn:count to avoid empty file. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>fn:count(/works/employee[1]/preceding-or-self::noSuchNode)</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-3">
+      <description> Evaluation of the preceding-or-self axis that is part of an "is" expression (return true). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>head(/works/employee[2]/preceding-or-self::employee) is head(/works/employee[1])</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-4">
+      <description> Evaluation of the preceding-or-self axis that is part of an "is" expression (return false). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>head(/works[1]/employee[2]/preceding-or-self::employee) is head(/works[1]/employee[2])</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-5">
+      <description> Evaluation of the preceding-or-self axis that is part of an "node before" expression (return true). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[head(/works[1]/employee[2]/preceding-or-self::employee) << head(/works[1]/employee[2])]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-6">
+      <description> Evaluation of the preceding-or-self axis that is part of an "node before" expression and both operands are the same (return false). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[head(/works[1]/employee[2]/preceding-or-self::employee) << head(/works[1]/employee[2]/preceding-or-self::employee)]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-7">
+      <description> Evaluation of the preceding-or-self axis that is part of an "node before" expression both operands are differents (return false). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[head(/works[1]/employee[2]/preceding-or-self::employee) << head(/works[1])]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-8">
+      <description> Evaluation of the preceding-or-self axis that is part of a "node after" expression (returns true). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>head(/works[1]/employee[13]) >> head(/works[1]/employee[12]/overtime[1]/day[2]/preceding-or-self::day)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-9">
+      <description> Evaluation of the preceding-or-self axis that is part of an "node after" expression with both operands the same (returns false). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>head(/works[1]/employee[2]/preceding-or-self::employee) >> head(/works[1]/employee[2]/preceding-or-self::employee)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-10">
+      <description> Evaluation of the preceding-or-self axis that is part of an "node after" expression with different operands (returns false). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>head(/works[1]/employee[13]) >> head(/works[1]/employee[2]/preceding-or-self::employee)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-11">
+      <description> Evaluation of the preceding-or-self axis that is part of an "union " operation. Both operands are the same. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works/employee[12]/*/day[2]/preceding-or-self::day | /works/employee[12]/*/day[2]/preceding-or-self::day) !string()</test>
+      <result>
+         <assert-deep-eq>"Monday", "Tuesday"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-12">
+      <description> Evaluation of the preceding-or-self axis that is part of an "union" operation. Both operands are different </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works/employee[12]/*/day[2]/preceding-or-self::day) | (/works/employee[12]/*/day[2])</test>
+      <result>
+         <assert-xml><![CDATA[<day>Monday</day><day>Tuesday</day>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-13">
+      <description> Evaluation of the preceding-or-self axis that is part of an "intersect" operation. Both operands are the same. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works[1]/employee[12]/overtime[1]/day[2]/preceding-or-self::day intersect /works[1]/employee[12]/overtime[1]/day[2]/preceding-or-self::day) ! string()</test>
+      <result>
+         <assert-deep-eq>"Monday", "Tuesday"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-14">
+      <description> Evaluation of the preceding-or-self axis that is part of an "except" operation. Both operands are the same. Uses fn:count to avoid empty file </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>fn:count((/works[1]/employee[12]/preceding-or-self::employee) except (/works[1]/employee[12]/preceding-or-self::employee))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-15">
+      <description> Evaluation of the preceding-or-self axis that is part of an "except" operation. Both operands are different. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works[1]/employee[12]/overtime/day) except (/works[1]/employee[12]/overtime/day[2]/preceding-or-self::day)</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-16">
+      <description> Evaluation of the preceding-or-self axis that is part of a boolean expression ("and" and fn:true(). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works[1]/employee[12]/preceding-or-self::employee) and fn:true()</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-17">
+      <description> Evaluation of the preceding-or-self axis that is part of a boolean expression ("and" and fn:false()). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works[1]/employee[12]/preceding-or-self::employee) and fn:false()</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-18">
+      <description> Evaluation of the preceding-or-self axis that is part of a boolean expression ("or" and fn:true()). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works[1]/employee[12]/preceding-or-self::employee) or fn:true()</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-19">
+      <description> Evaluation of the preceding-or-self axis that is part of a boolean expression ("or" and fn:false()). </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>(/works[1]/employee[12]/preceding-or-self::employee) or fn:false()</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-20">
+      <description> Evaluation of the preceding-or-self axis that used as part of the deep-equal-function. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment ref="works-mod"/>
+      <test>fn:deep-equal(/works[1]/employee[12]/preceding-or-self::employee,/works[1]/employee[12]/preceding-or-self::employee)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-21">
+      <description> Evaluation of the preceding-or-self axis used together with a newly constructed element. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         let $var := <anElement>Some Content</anElement> 
+         return fn:count($var/preceding-or-self::*)]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-22">
+      <description> Evaluation of the preceding-or-self axis from the last node in the document. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment>
+         <source role="." file="AxisStep.preceding/SmallTree.xml">
+           <description/>
+           <created by="Frans Englich" on="2008-04-03"/>
+         </source>
+      </environment>
+      <dependency type="spec" value="XQ40+"/>
+      <test>(//node())[last()]/preceding-or-self::node()/name()</test>
+      <result>
+         <assert-deep-eq>"","section1","","target1","","target2",
+                           "","target3","","",
+                           "section2","","","","section3","","","","","",
+                           "noChildren","",
+                           "oneTextChild","",""
+         </assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-23">
+      <description> Evaluation of the preceding-or-self axis from the last node in the document, containing only attributes and elements. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <environment>
+         <source role="." file="AxisStep.preceding/AttributesAndElements.xml">
+            <description/>
+            <created by="Frans Englich" on="2008-04-03"/>
+         </source>
+      </environment>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<result> { (//node())[last()]/preceding-or-self::node(), empty((//node())[last()]/preceding-or-self::node()) } </result>]]></test>
+      <result>
+         <all-of>
+            <assert>self::result[child::e3]</assert>
+            <assert>self::result/e3[@attr3='value3']</assert>
+            <assert>self::result/e3[@attr4='value4']</assert>
+            <assert>self::result/e3/following-sibling::node()[1] = 'false'</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <result>
+   <e3 attr3="value3" attr4="value4"/>false</result>
+   
+   <test-case name="preceding-or-self-24">
+      <description> Evaluation of the preceding-or-self axis from an attribute of the root element. Saxon bug 4822</description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[(<a z=""/>/@*/preceding-or-self::node()) ! name()]]></test>
+      <result>
+         <assert-eq>"z"</assert-eq>
+      </result>
+   </test-case>
+   
+
+   <test-case name="preceding-or-self-31">
+      <description> Evaluate the child node from the last node in a tree. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare variable $i := <root> <child/> <child/> <child> <child2> <child3> <leaf/> </child3> </child2> </child> </root>; 
+         count(root($i)/preceding-or-self::node())]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-32">
+      <description> Evaluate from a node that has no preceding nodes. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare variable $i := <root> <child> <child2> <child3> <leaf>x</leaf> </child3> <following/> </child2> <following/> </child> <following/> </root>; 
+         (root($i)//leaf/text()/preceding-or-self::*)]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-33">
+      <description> Apply a numeric predicate to axis preceding-or-self. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[declare variable $i := <root> <child> <preceding-or-self2/> <child2> <preceding-or-self1/> <child3> <leaf/> </child3> <following/> </child2> <following/> </child> <following/> </root>; root($i)//leaf/preceding-or-self::node()[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<leaf/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-34">
+      <description> Apply a numeric predicate to axis preceding-or-self, combined with a numeric predicate. The paranteses ensures the step is parsed as a primary expression, and hence is in document order, not reversed. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[declare variable $i := <root> <child> <preceding-or-self2/> <child2> <preceding-or-self1/> <child3> <leaf/> </child3> <following/> </child2> <following/> </child> <following/> </root>; root($i)//leaf/(preceding-or-self::node())[1]]]></test>
+      <result>
+         <assert-xml><![CDATA[<preceding-or-self2/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-35">
+      <description> Apply a numeric predicate to axis preceding-or-self, combined with fn:last(). 
+         The parentheses ensures the step is parsed as a primary expression, and hence is 
+         in document order, not reversed. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare variable $i := <root> <child> <preceding-or-self2/> <child2> <preceding-or-self1/> <child3> <leaf/> </child3> <following/> </child2> <following/> </child> <following/> </root>; 
+         root($i)//leaf/(preceding-or-self::node())[last()]]]></test>
+      <result>
+         <assert-xml><![CDATA[<leaf/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-36">
+      <description> Apply fn:last() to axis preceding-or-self. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[declare variable $i := <root> <child> <preceding-or-self2/> <child2> <preceding-or-self1/> <child3> <leaf/> </child3> <following/> </child2> <following/> </child> <following/> </root>; 
+         root($i)//leaf/preceding-or-self::node()[last()]
+      ]]></test>
+      <result>
+         <assert-xml><![CDATA[<preceding-or-self2/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-37">
+      <description> Apply fn:count() to axis preceding-or-self. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare variable $i := <root> <child> <preceding-or-self2/> <child2> <preceding-or-self1/> <child3> <leaf/> </child3> <following/> </child2> <following/> </child> <following/> </root>; 
+         count(root($i)//leaf/preceding-or-self::node())
+      ]]></test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="preceding-or-self-38">
+      <description> Apply fn:count() to axis preceding-or-self. </description>
+      <created by="Michael Kay" on="2024-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[declare variable $i := <root> <child> <preceding-or-self2/> <child2> <preceding-or-self1/> <child3> <leaf/> </child3> <following/> </child2> <following/> </child> <following/> </root>; root($i)//count(preceding-or-self::*)]]></test>
+      <result>
+         <assert-string-value>1 1 1 2 2 3 3 5 7 9</assert-string-value>
+      </result>
+   </test-case>
+</test-set>
