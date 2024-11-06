@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-siblings" covers-40="PR1547">
+   <description>Tests for the siblings() function</description>
+
+         
+   <environment name="compass">
+      <source role="." file="../prod/AxisStep/TreeCompass.xml">
+        <description>Data for fn:sibling tests.</description>
+        <created by="Michael Kay" on="2024-11-06"/>
+      </source>
+   </environment>      
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="fn-siblings-001">
+      <description>Simple test - document node</description>
+      <created by="Michael Kay" on="2024-11-06"/>
+      <environment ref="compass"/>
+      <test>count(fn:siblings(/))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-siblings-002">
+      <description>Simple test - outermost element</description>
+      <created by="Michael Kay" on="2024-11-06"/>
+      <environment ref="compass"/>
+      <test>count(fn:siblings(/*))</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-siblings-003">
+      <description>Simple test</description>
+      <created by="Michael Kay" on="2024-11-06"/>
+      <environment ref="compass"/>
+      <test>count(fn:siblings(//north))</test>
+      <result>
+         <assert-eq>7</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-siblings-004">
+      <description>Attribute node</description>
+      <created by="Michael Kay" on="2024-11-06"/>
+      <environment ref="compass"/>
+      <test>count(fn:siblings(//north/@mark))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-siblings-005">
+      <description>Empty argument</description>
+      <created by="Michael Kay" on="2024-11-06"/>
+      <environment ref="compass"/>
+      <test>count(fn:siblings(//north/passage))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-siblings-006">
+      <description>Results in document order</description>
+      <created by="Michael Kay" on="2024-11-06"/>
+      <environment ref="compass"/>
+      <test>deep-equal(fn:siblings(//north), //far-north/child::node())</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-siblings-007">
+      <description>Context item as default</description>
+      <created by="Michael Kay" on="2024-11-06"/>
+      <environment ref="compass"/>
+      <test>//north/count(fn:siblings())</test>
+      <result>
+         <assert-eq>7</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-siblings-008">
+      <description>No context value</description>
+      <created by="Michael Kay" on="2024-11-06"/>
+      <environment ref="compass"/>
+      <test>fn(){siblings()}()</test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-siblings-009">
+      <description>Context value is not a node</description>
+      <created by="Michael Kay" on="2024-11-06"/>
+      <environment ref="compass"/>
+      <test>23 ! siblings()</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-siblings-010">
+      <description>Context value is multiple nodes</description>
+      <created by="Michael Kay" on="2024-11-06"/>
+      <environment ref="compass"/>
+      <test>[(//north, //far-north)] ?[ exists(siblings()) ]</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+ 
+</test-set>
