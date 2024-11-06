@@ -1,0 +1,93 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-civil-timezone" covers-40="PR1545">
+  <description>Tests for the fn:civil-timezone function</description>
+
+  <dependency type="spec" value="XP40+ XQ40+"/>
+  
+  <test-case name="civil-timezone-001">
+    <description>Civil timezone here and now</description>
+    <created by="Michael Kay" on="2024-11-05"/>
+    <test>civil-timezone(current-dateTime())</test>
+    <result>
+      <assert-type>xs:dayTimeDuration</assert-type>
+    </result>
+  </test-case>
+  
+  <test-case name="civil-timezone-002">
+    <description>Difference between civil time now and in six months</description>
+    <created by="Michael Kay" on="2024-11-05"/>
+    <test>civil-timezone(current-dateTime()) - civil-timezone(current-dateTime() + xs:dayTimeDuration("P180D"))</test>
+    <result>
+      <any-of>
+        <!-- this is probably OK for most parts of the world, but there could be exceptions -->
+        <assert-eq>xs:dayTimeDuration("PT1H")</assert-eq>
+        <assert-eq>xs:dayTimeDuration("-PT1H")</assert-eq>
+        <assert-eq>xs:dayTimeDuration("PT0H")</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+  
+  <test-case name="civil-timezone-003">
+    <description>Paris time in November</description>
+    <created by="Michael Kay" on="2024-11-05"/>
+    <test>civil-timezone(xs:dateTime("2024-11-05T12:00:00Z"), "Europe/Paris")</test>
+    <result>
+       <assert-eq>xs:dayTimeDuration("PT1H")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="civil-timezone-004">
+    <description>Paris time in May</description>
+    <created by="Michael Kay" on="2024-11-05"/>
+    <test>civil-timezone(xs:dateTime("2024-05-05T12:00:00Z"), "Europe/Paris")</test>
+    <result>
+       <assert-eq>xs:dayTimeDuration("PT2H")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="civil-timezone-005">
+    <description>India time, all year round</description>
+    <created by="Michael Kay" on="2024-11-05"/>
+    <test>civil-timezone(current-dateTime(), "Asia/Kolkata")</test>
+    <result>
+       <assert-eq>xs:dayTimeDuration("PT5H30M")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="civil-timezone-006">
+    <description>Peru time, all year round</description>
+    <created by="Michael Kay" on="2024-11-05"/>
+    <test>civil-timezone(current-dateTime(), "America/Lima")</test>
+    <result>
+       <assert-eq>xs:dayTimeDuration("-PT5H")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="civil-timezone-007">
+    <description>Unknown timezone</description>
+    <created by="Michael Kay" on="2024-11-05"/>
+    <test>civil-timezone(current-dateTime(), "North/Pole")</test>
+    <result>
+       <error code="FODT0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="civil-timezone-008">
+    <description>Empty second arg</description>
+    <created by="Michael Kay" on="2024-11-05"/>
+    <test>civil-timezone(current-dateTime(), ())</test>
+    <result>
+      <assert-type>xs:dayTimeDuration</assert-type>
+    </result>
+  </test-case>
+  
+  <test-case name="civil-timezone-009">
+    <description>Supplied date/time has no timezone</description>
+    <created by="Michael Kay" on="2024-11-05"/>
+    <test>civil-timezone(xs:dateTime("2024-01-01T12:00:00"), "Asia/Kolkata")</test>
+    <result>
+       <assert-eq>xs:dayTimeDuration("PT5H30M")</assert-eq>
+    </result>
+  </test-case>
+  
+ 
+</test-set>
