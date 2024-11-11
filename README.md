@@ -1,6 +1,6 @@
 # qt4tests
 
-This repository contains around 30,000 tests for XPath and XQuery, developed originally by the 
+This repository contains around 40,000 tests for XPath and XQuery, developed originally by the 
 W3C XQuery and XSLT Working Groups, and subsequently expanded by members of the QT4CG W3C 
 Community Group, and by individual contributors.
 
