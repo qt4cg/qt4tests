@@ -1935,7 +1935,7 @@
       </result>
    </test-case>
 
-   <test-case name="xml-to-json-401" covers-40="fn-xml-to-json">
+   <test-case name="xml-to-json-401" covers-40="PR1455">
       <description>Retaining number format</description>
       <created by="Michael Kay" on="2020-12-23"/>
       <modified by="Michael Kay" on="2024-10-01" change="PR1455, number-formatter dropped"/>
@@ -1946,7 +1946,7 @@
       </result>
    </test-case>
    
-   <test-case name="xml-to-json-402" covers-40="fn-xml-to-json">
+   <test-case name="xml-to-json-402" covers-40="PR1455">
       <description>Retaining number format</description>
       <created by="Michael Kay" on="2020-12-23"/>
       <modified by="Michael Kay" on="2024-10-01" change="PR1455, number-formatter dropped"/>
@@ -1957,7 +1957,7 @@
       </result>
    </test-case>
    
-   <test-case name="xml-to-json-403" covers-40="fn-xml-to-json">
+   <test-case name="xml-to-json-403" covers-40="PR1455">
       <description>Retaining number format</description>
       <created by="Michael Kay" on="2020-12-23"/>
       <modified by="Michael Kay" on="2024-10-01" change="PR1455, number-formatter dropped"/>
@@ -1968,34 +1968,104 @@
       </result>
    </test-case>
    
-   <test-case name="xml-to-json-404" covers-40="fn-xml-to-json">
+   <test-case name="xml-to-json-404" covers-40="PR1455">
       <description>Retaining number format</description>
       <created by="Michael Kay" on="2020-12-23"/>
       <modified by="Michael Kay" on="2024-10-01" change="PR1455, number-formatter dropped"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test><![CDATA[parse-xml("<fn:number xmlns:fn='http://www.w3.org/2005/xpath-functions'>10000000</fn:number>") => xml-to-json()]]></test>
+      <test><![CDATA[parse-xml("<fn:number xmlns:fn='http://www.w3.org/2005/xpath-functions'> 10000000 </fn:number>") => xml-to-json()]]></test>
       <result>
          <assert-eq>'10000000'</assert-eq>
       </result>
    </test-case>
    
-   <test-case name="xml-to-json-405" covers-40="fn-xml-to-json">
+   <test-case name="xml-to-json-405" covers-40="PR1455">
       <description>Retaining number format - leading zeroes dropped</description>
       <created by="Michael Kay" on="2024-10-01"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test><![CDATA[parse-xml("<fn:number xmlns:fn='http://www.w3.org/2005/xpath-functions'>0010000000</fn:number>") => xml-to-json()]]></test>
+      <test><![CDATA[parse-xml("<fn:number xmlns:fn='http://www.w3.org/2005/xpath-functions'>000000000</fn:number>") => xml-to-json()]]></test>
       <result>
-         <assert-eq>'10000000'</assert-eq>
+         <assert-eq>'0'</assert-eq>
       </result>
    </test-case>
    
-   <test-case name="xml-to-json-406" covers-40="fn-xml-to-json">
+   <test-case name="xml-to-json-406" covers-40="PR1455">
       <description>Retaining number format - leading zeroes dropped</description>
       <created by="Michael Kay" on="2024-10-01"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[parse-xml("<fn:number xmlns:fn='http://www.w3.org/2005/xpath-functions'>-001.15e01</fn:number>") => xml-to-json()]]></test>
       <result>
          <assert-eq>'-1.15e01'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="xml-to-json-407" covers-40="PR1455">
+      <description>Retaining number format - leading zeroes dropped</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[parse-xml("<fn:number xmlns:fn='http://www.w3.org/2005/xpath-functions'>-000</fn:number>") => xml-to-json()]]></test>
+      <result>
+         <assert-eq>'-0'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="xml-to-json-408" covers-40="PR1455">
+      <description>Retaining number format - leading zeroes dropped</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[parse-xml("<fn:number xmlns:fn='http://www.w3.org/2005/xpath-functions'>00.01E02</fn:number>") => xml-to-json()]]></test>
+      <result>
+         <assert-eq>'0.01E02'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="xml-to-json-409" covers-40="PR1455">
+      <description>Retaining number format - no digit before decimal point</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[parse-xml("<fn:number xmlns:fn='http://www.w3.org/2005/xpath-functions'>.01E02</fn:number>") => xml-to-json()]]></test>
+      <result>
+         <assert-eq>'0.01E02'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="xml-to-json-410" covers-40="PR1455">
+      <description>Retaining number format - no digit after decimal point; leading plus sign</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[parse-xml("<fn:number xmlns:fn='http://www.w3.org/2005/xpath-functions'>+1.e+02</fn:number>") => xml-to-json()]]></test>
+      <result>
+         <assert-eq>'1.0e+02'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="xml-to-json-411" covers-40="PR1455">
+      <description>Retaining number format - no digit after decimal point; leading plus sign</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[parse-xml("<fn:number xmlns:fn='http://www.w3.org/2005/xpath-functions'>+1.E+02</fn:number>") => xml-to-json()]]></test>
+      <result>
+         <assert-eq>'1.0E+02'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="xml-to-json-412" covers-40="PR1455">
+      <description>Retaining number format - no digit after decimal point</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[parse-xml("<fn:number xmlns:fn='http://www.w3.org/2005/xpath-functions'>10.</fn:number>") => xml-to-json()]]></test>
+      <result>
+         <assert-eq>'10.0'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="xml-to-json-413" covers-40="PR1455">
+      <description>Retaining number format - leading plus sign and zeroes</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[parse-xml("<fn:number xmlns:fn='http://www.w3.org/2005/xpath-functions'>+001</fn:number>") => xml-to-json()]]></test>
+      <result>
+         <assert-eq>'1'</assert-eq>
       </result>
    </test-case>
    
