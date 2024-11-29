@@ -417,6 +417,7 @@
    <test-case name="K2-NodeTest-7">
       <description> '*' is not allowed inside document-node(). </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XP30 XQ30 XP31 XQ31"/>
       <test>document-node(*)</test>
       <result>
          <error code="XPST0003"/>
@@ -480,6 +481,7 @@
    <test-case name="K2-NodeTest-14">
       <description> 'name' is not allowed inside document-node(). </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XP30 XQ30 XP31 XQ31"/>
       <test>document-node(name)</test>
       <result>
          <error code="XPST0003"/>
@@ -489,6 +491,7 @@
    <test-case name="K2-NodeTest-15">
       <description> 'name' is not allowed inside document-node(). </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XP30 XQ30 XP31 XQ31"/>
       <test>document-node(local:name)</test>
       <result>
          <error code="XPST0003"/>
@@ -805,6 +808,146 @@
       <test>declare namespace ex = "http://www.example.com/"; schema-element(ex:*)</test>
       <result>
          <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K4-NodeTest-01" covers-40="PR1604">
+      <description> document-node(*) in 4.0 </description>
+      <created by="Michael Kay" on="2024-11-29"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[parse-xml('<a/>') instance of document-node(*)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="K4-NodeTest-02" covers-40="PR1604">
+      <description> document-node(N) in 4.0 </description>
+      <created by="Michael Kay" on="2024-11-29"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[parse-xml('<a/>') instance of document-node(a)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="K4-NodeTest-03" covers-40="PR1604">
+      <description> document-node(N) in 4.0 </description>
+      <created by="Michael Kay" on="2024-11-29"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[parse-xml('<a/>') instance of document-node(b)]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="K4-NodeTest-04" covers-40="PR1604">
+      <description> document-node(P:*) in 4.0 </description>
+      <created by="Michael Kay" on="2024-11-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace p="http://p.com/";
+         parse-xml('<p:a xmlns:p="http://p.com/"/>') instance of document-node(p:*)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="K4-NodeTest-05" covers-40="PR1604">
+      <description> document-node(P:*) in 4.0 </description>
+      <created by="Michael Kay" on="2024-11-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace p="http://p.com/";
+         parse-xml('<p:a xmlns:p="http:/q.com/"/>') instance of document-node(p:*)
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="K4-NodeTest-06" covers-40="PR1604">
+      <description> document-node(*:N) in 4.0 </description>
+      <created by="Michael Kay" on="2024-11-29"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         parse-xml('<p:a xmlns:p="http:/p.com/"/>') instance of document-node(*:a)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="K4-NodeTest-07" covers-40="PR1604">
+      <description> document-node(*:N) in 4.0 </description>
+      <created by="Michael Kay" on="2024-11-29"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         parse-xml('<p:a xmlns:p="http:/p.com/"/>') instance of document-node(*:b)
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="K4-NodeTest-08" covers-40="PR1604">
+      <description> document-node(N) in 4.0 with comments and PIs</description>
+      <created by="Michael Kay" on="2024-11-29"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         parse-xml('<!--c--><p:a xmlns:p="http:/p.com/"/><?pi?>') instance of document-node(*:a)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="K4-NodeTest-09" covers-40="PR1604">
+      <description> document-node(N) in 4.0 with text nodes</description>
+      <created by="Michael Kay" on="2024-11-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         document{ "abc", <a/>, "xyz" } instance of document-node(a)
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="K4-NodeTest-10" covers-40="PR1604">
+      <description> document-node(N) with EQName </description>
+      <created by="Michael Kay" on="2024-11-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         document{ <a xmlns="http://x.com/"/> } instance of document-node(Q{http://x.com/}a)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="K4-NodeTest-11" covers-40="PR1604">
+      <description> document-node(N) with two element children </description>
+      <created by="Michael Kay" on="2024-11-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         document{ <a/>, <b/> } instance of document-node(a)
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="K4-NodeTest-12" covers-40="PR1604">
+      <description> document-node(N) with choice of element children </description>
+      <created by="Michael Kay" on="2024-11-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         document{ <a/> } instance of document-node(a|b)
+      ]]></test>
+      <result>
+         <assert-true/>
       </result>
    </test-case>
    
