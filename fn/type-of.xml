@@ -1,0 +1,302 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-type-of" covers-40="PR1523 PR1570">
+  <description>Tests for the fn:type-of function</description>
+
+  <dependency type="spec" value="XP40+ XQ40+"/>
+  
+  <test-case name="type-of-000">
+    <description>empty sequence</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test>type-of(())</test>
+    <result>
+      <assert-eq>"empty-sequence()"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-001">
+    <description>document node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test><![CDATA[type-of(parse-xml('<a/>'))]]></test>
+    <result>
+      <assert-eq>"document-node()"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-002">
+    <description>element node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test><![CDATA[type-of(parse-xml('<a/>')/*)]]></test>
+    <result>
+      <assert-eq>"element()"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-003">
+    <description>attribute node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test><![CDATA[type-of(parse-xml('<a b="3"/>')/*/@b)]]></test>
+    <result>
+      <assert-eq>"attribute()"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-004">
+    <description>text node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test><![CDATA[type-of(parse-xml('<a b="3">xxx<!--comment-->yyy</a>')//node()[.='xxx'])]]></test>
+    <result>
+      <assert-eq>"text()"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-005">
+    <description>comment node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test><![CDATA[type-of(parse-xml('<a b="3">xxx<!--comment-->yyy</a>')//node()[.='xxx']/following-sibling::node()[1])]]></test>
+    <result>
+      <assert-eq>"comment()"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-006">
+    <description>PI node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test><![CDATA[type-of(parse-xml('<a b="3">xxx<?pi pi>yyy?></a>')//node()[.='xxx']/following-sibling::node()[1])]]></test>
+    <result>
+      <assert-eq>"processing-instruction()"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-007">
+    <description>Namespace node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <dependency type="spec" value="XP40+"/>
+    <test><![CDATA[type-of(parse-xml('<a xmlns:b="http://b/">xxx<?pi pi>yyy</a>')/*/namespace::b)]]></test>
+    <result>
+      <assert-eq>"namespace-node()"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-008">
+    <description>Namespace node</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[type-of(namespace "p" {"http://p.com/"})]]></test>
+    <result>
+      <assert-eq>"namespace-node()"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-009">
+    <description>Zero-arity function</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test><![CDATA[parse-xml('<a/>') ! type-of()]]></test>
+    <result>
+      <assert-eq>"document-node()"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-100">
+    <description>built-in atomic type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>type-of(1)</test>
+    <result>
+      <assert-eq>"xs:integer"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-101">
+    <description>built-in atomic type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>type-of(1.1)</test>
+    <result>
+      <assert-eq>"xs:decimal"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-102">
+    <description>built-in atomic type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>type-of(1.1e0)</test>
+    <result>
+      <assert-eq>"xs:double"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-103">
+    <description>built-in atomic type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>type-of(xs:float(1.1e0))</test>
+    <result>
+      <assert-eq>"xs:float"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-104">
+    <description>built-in atomic type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>type-of("abc")</test>
+    <result>
+      <assert-eq>"xs:string"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-105">
+    <description>untyped atomic type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[type-of(parse-xml('<a>thing</a>')/a => data())]]></test>
+    <result>
+      <assert-eq>"xs:untypedAtomic"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-106">
+    <description>untyped atomic type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[type-of(parse-xml('<a>thing</a>')/a => node-name())]]></test>
+    <result>
+      <assert-eq>"xs:QName"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-107">
+    <description>built-in atomic type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[type-of(parse-xml('<a xmlns="http:/example.ns/">thing</a>')/a => namespace-uri())]]></test>
+    <result>
+      <assert-eq>"xs:anyURI"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-108">
+    <description>built-in derived atomic type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>type-of(xs:long(1234))</test>
+    <result>
+      <assert-eq>"xs:long"</assert-eq>
+    </result>
+  </test-case>
+  
+  
+  <test-case name="type-of-200">
+    <description>map type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>type-of({1:2})</test>
+    <result>
+      <assert-eq>"map(*)"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-201">
+    <description>map type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>type-of({})</test>
+    <result>
+      <assert-eq>"map(*)"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-202">
+    <description>array type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>type-of([1,2,3])</test>
+    <result>
+      <assert-eq>"array(*)"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-203">
+    <description>array type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>type-of([])</test>
+    <result>
+      <assert-eq>"array(*)"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-204">
+    <description>function type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>type-of(fn:contains#2)</test>
+    <result>
+      <assert-eq>"function(*)"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-205">
+    <description>function type</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>type-of(fn{@x})</test>
+    <result>
+      <assert-eq>"function(*)"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-300">
+    <description>Multi-item sequence, homogenous</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <test><![CDATA[type-of(parse-xml('<a><b/></a>')//*)]]></test>
+    <result>
+      <assert-eq>"element()+"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-301">
+    <description>Multi-item sequence, homogenous</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <test><![CDATA[type-of(1 to 10)]]></test>
+    <result>
+      <assert-eq>"xs:integer+"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-302">
+    <description>Multi-item sequence, homogenous</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <test><![CDATA[type-of(({}, {}, {}))]]></test>
+    <result>
+      <assert-eq>"map(*)+"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-320">
+    <description>Multi-item sequence, heterogenous</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <test><![CDATA[type-of(parse-xml('<a><b>stuff</b></a>')//node())]]></test>
+    <result>
+      <any-of>
+        <assert-eq>"(element()|text())+"</assert-eq>
+        <assert-eq>"(text()|element())+"</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+  
+  <test-case name="type-of-321">
+    <description>Multi-item sequence, heterogenous</description>
+    <created by="Michael Kay" on="2024-11-30"/>
+    <test><![CDATA[type-of((1, 5, 12e0, 8))]]></test>
+    <result>
+      <any-of>
+        <assert-eq>"(xs:integer|xs:double)+"</assert-eq>
+        <assert-eq>"(xs:double|xs:integer)+"</assert-eq>
+      </any-of>
+    </result>
+  </test-case>
+  
+  
+
+</test-set>
