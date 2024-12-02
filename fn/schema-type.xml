@@ -1,5 +1,16 @@
 <test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-schema-type" covers-40="PR1523">
   <description>Tests for the fn:schema-type function</description>
+  
+  <environment name="simple">
+    <schema uri="http://www.w3.org/XQueryTest" file="type-of/simple.xsd">
+        <description>A Schema for simple.xml</description>
+        <created by="Michael Kay" on="2024-12-01"/>
+    </schema>        
+    <source role="." file="type-of/simple.xml" validation="strict" uri="http://www.w3.org/type-of/simple.xml">
+        <description>A Schema validated xml file, that contains values for data types. Can be used by any test.</description>
+        <created by="Michael Kay" on="2024-12-01"/>
+    </source>
+   </environment>
 
   <dependency type="spec" value="XP40+ XQ40+"/>
   
@@ -10,6 +21,182 @@
     <result>
       <all-of>
         <assert>$result ? name = xs:QName('xs:boolean')</assert>
+        <assert>$result ? is-simple</assert>
+        <assert>$result ? base-type() ? name = xs:QName('xs:anyAtomicType')</assert>
+        <assert>$result ? primitive-type() ? name = xs:QName('xs:boolean')</assert>
+        <assert>$result ? variety = "atomic"</assert>
+        <assert>$result ? matches(false())</assert>
+        <assert>not($result ? matches(0))</assert>
+        <assert>$result ? constructor(1) = true()</assert>
+        <assert>$result ? constructor("false") = false()</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="schema-type-002">
+    <description>built-in derived type</description>
+    <created by="Michael Kay" on="2024-12-02"/>
+    <test>schema-type(xs:QName('xs:yearMonthDuration'))</test>
+    <result>
+      <all-of>
+        <assert>$result ? name = xs:QName('xs:yearMonthDuration')</assert>
+        <assert>$result ? is-simple</assert>
+        <assert>$result ? base-type() ? name = xs:QName('xs:duration')</assert>
+        <assert>$result ? base-type() ? base-type() ? name = xs:QName('xs:anyAtomicType')</assert>
+        <assert>$result ? base-type() ? base-type() ? base-type() ? name = xs:QName('xs:anySimpleType')</assert>
+        <assert>$result ? base-type() ? base-type() ? base-type() ? base-type() ? name = xs:QName('xs:anyType')</assert>
+        <assert>$result ? primitive-type() ? name = xs:QName('xs:duration')</assert>
+        <assert>$result ? variety = "atomic"</assert>
+        <assert>$result ? matches(xs:yearMonthDuration('P1Y'))</assert>
+        <assert>not($result ? matches(0))</assert>
+        <assert>$result ? constructor("P1Y") = xs:yearMonthDuration('P1Y')</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="schema-type-003">
+    <description>built-in type xs:QName</description>
+    <created by="Michael Kay" on="2024-12-02"/>
+    <test>schema-type(xs:QName('xs:QName'))</test>
+    <result>
+      <all-of>
+        <assert>$result ? name = xs:QName('xs:QName')</assert>
+        <assert>$result ? is-simple</assert>
+        <assert>$result ? variety = "atomic"</assert>
+        <assert><![CDATA[$result ? matches(parse-xml('<a/>')/*/node-name())]]></assert>
+        <assert>not($result ? matches(0))</assert>
+        <assert>empty($result ? constructor)</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="schema-type-004">
+    <description>built-in union type xs:numeric</description>
+    <created by="Michael Kay" on="2024-12-02"/>
+    <test>schema-type(xs:QName('xs:numeric'))</test>
+    <result>
+      <all-of>
+        <assert>$result ? name = xs:QName('xs:numeric')</assert>
+        <assert>$result ? is-simple</assert>
+        <assert>$result ? variety = "union"</assert>
+        <assert>$result ? base-type() ? name = xs:QName('xs:anySimpleType')</assert>
+        <!--<assert>$result ? matches(22)</assert>
+        <assert>$result ? matches(93.7)</assert>
+        <assert>$result ? matches(1e-6)</assert>
+        <assert>$result ? matches(xs:float(1e18))</assert>-->
+        <assert>$result ? constructor("10") instance of xs:double</assert>
+        <assert>$result ? constructor("-INF") instance of xs:double</assert>
+        <assert>some $m in $result ? members() satisfies $m ? name = xs:QName('xs:double')</assert>
+        <assert>some $m in $result ? members() satisfies $m ? name = xs:QName('xs:float')</assert>
+        <assert>some $m in $result ? members() satisfies $m ? name = xs:QName('xs:decimal')</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="schema-type-005">
+    <description>built-in list type xs:ENTITIES</description>
+    <created by="Michael Kay" on="2024-12-02"/>
+    <test>schema-type(xs:QName('xs:ENTITIES'))</test>
+    <result>
+      <all-of>
+        <assert>$result ? name = xs:QName('xs:ENTITIES')</assert>
+        <assert>$result ? is-simple</assert>
+        <assert>$result ? variety = "list"</assert>
+        <assert>$result ? base-type() ? name = xs:QName('xs:anySimpleType')</assert>
+        <assert>$result ? members() ? name = xs:QName('xs:ENTITY')</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="schema-type-100">
+    <description>complex type with element-only content</description>
+    <created by="Michael Kay" on="2024-12-02"/>
+    <dependency type="feature" value="schemaImport"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      import schema namespace fn = "http://www.w3.org/2005/xpath-functions";
+      schema-type(xs:QName('fn:mapType'))</test>
+    <result>
+      <all-of>
+        <assert>$result ? name = xs:QName('fn:mapType')</assert>
+        <assert>not($result ? is-simple)</assert>
+        <assert>$result ? variety = "element-only"</assert>
+        <assert>$result ? base-type() ? name = xs:QName('xs:anyType')</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="schema-type-101">
+    <description>complex type with empty content</description>
+    <created by="Michael Kay" on="2024-12-02"/>
+    <dependency type="feature" value="schemaImport"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      import schema namespace fn = "http://www.w3.org/2005/xpath-functions";
+      schema-type(xs:QName('fn:nullType'))</test>
+    <result>
+      <all-of>
+        <assert>$result ? name = xs:QName('fn:nullType')</assert>
+        <assert>not($result ? is-simple)</assert>
+        <assert>$result ? variety = "empty"</assert>
+        <assert>$result ? base-type() ? name = xs:QName('xs:anyType')</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="schema-type-102">
+    <description>complex type with simple content</description>
+    <created by="Michael Kay" on="2024-12-02"/>
+    <dependency type="feature" value="schemaImport"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      import schema namespace fn = "http://www.w3.org/2005/xpath-functions";
+      schema-type(xs:QName('fn:stringType'))</test>
+    <result>
+      <all-of>
+        <assert>$result ? name = xs:QName('fn:stringType')</assert>
+        <assert>not($result ? is-simple)</assert>
+        <assert>$result ? variety = "simple"</assert>
+        <assert>$result ? base-type() ? name = xs:QName('xs:string')</assert>
+        <assert>$result ? simple-content-type() ? name = xs:QName('xs:string')</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="schema-type-103">
+    <description>complex type with mixed content</description>
+    <created by="Michael Kay" on="2024-12-02"/>
+    <dependency type="feature" value="schemaImport"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      import schema namespace fn = "http://www.w3.org/2005/xpath-functions";
+      schema-type(xs:QName('fn:match-type'))</test>
+    <result>
+      <all-of>
+        <assert>$result ? name = xs:QName('fn:match-type')</assert>
+        <assert>not($result ? is-simple)</assert>
+        <assert>$result ? variety = "mixed"</assert>
+        <assert>$result ? base-type() ? name = xs:QName('xs:anyType')</assert>
+        <assert>empty($result ? simple-content-type)</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="schema-type-104">
+    <description>derived complex type</description>
+    <created by="Michael Kay" on="2024-12-02"/>
+    <dependency type="feature" value="schemaImport"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      import schema namespace fn = "http://www.w3.org/2005/xpath-functions";
+      schema-type(xs:QName('fn:stringWithinMapType'))</test>
+    <result>
+      <all-of>
+        <assert>$result ? name = xs:QName('fn:stringWithinMapType')</assert>
+        <assert>not($result ? is-simple)</assert>
+        <assert>$result ? variety = "simple"</assert>
+        <assert>$result ? base-type() ? name = xs:QName('fn:stringType')</assert>
+        <assert>$result ? simple-content-type() ? name = xs:QName('xs:string')</assert>
       </all-of>
     </result>
   </test-case>
