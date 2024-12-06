@@ -1063,7 +1063,7 @@
       ]]></test>
       <result>
          <assert-deep-eq>{ "Q{http://www.w3.org/XQueryTest/specimen}ListPlus": 
-            {"@num": 3,
+            {"@num": 3e0,
              "@test": false(),
              "DatePlus":[]
             }}</assert-deep-eq>
@@ -1115,54 +1115,6 @@
          <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":
             { "@test": true(), "Boolean": true(), "Number": 2, "Date": xs:date("1966-07-03") }
           }</assert-deep-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="elements-to-maps-332">
-      <description> element node - schema-based - record layout, attributes, repeated element, whitespace </description>
-      <created by="Michael Kay" on="2024-11-16"/>
-      <environment ref="specimen"/>
-      <dependency type="spec" value="XQ40+"/>
-      <dependency type="xsd-version" value="1.1"/>
-      <test><![CDATA[
-         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
-         declare boundary-space preserve;
-         let $in := validate strict {<c:RecordPlus test="1">
-                                       <c:Boolean>1</c:Boolean>
-                                       <c:Number>2</c:Number>
-                                       <c:Date>1966-07-03</c:Date>
-                                       <c:Date>1966-07-04</c:Date>
-                                     </c:RecordPlus>}
-         return elements-to-maps($in)
-      ]]></test>
-      <result>
-         <assert-deep-eq>{ "Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":
-            {"@test":true(), "Boolean":true(), "Number":2, "Date": [xs:date("1966-07-03"), xs:date("1966-07-04")] }
-         }</assert-deep-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="elements-to-maps-333">
-      <description> element node - schema-based - record layout, repeated element, whitespace </description>
-      <created by="Michael Kay" on="2024-11-16"/>
-      <environment ref="specimen"/>
-      <dependency type="spec" value="XQ40+"/>
-      <dependency type="xsd-version" value="1.1"/>
-      <test><![CDATA[
-         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
-         declare boundary-space preserve;
-         let $in := validate strict {<c:RecordPlus>
-                                       <c:Date>1966-07-03</c:Date>
-                                       <c:Boolean>1</c:Boolean>
-                                       <c:Date>1966-07-04</c:Date>
-                                     </c:RecordPlus>}
-         return elements-to-maps($in)
-      ]]></test>
-      <result>
-         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":{
-            "Date": [xs:date("1966-07-03"), xs:date("1966-07-04")], 
-            "Boolean":true()
-         }}</assert-deep-eq>
       </result>
    </test-case>
    
@@ -1657,6 +1609,152 @@
       </result>
    </test-case>
    
+   <test-case name="elements-to-maps-601" covers-40="PR1596">
+      <description> Empty element with empty layout disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         elements-to-maps(parse-xml('<a xmlns="http://a.com/"/>')/*,
+                          {'disable-layouts': 'empty'})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a": {}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="elements-to-maps-602" covers-40="PR1596">
+      <description> Empty element with empty and empty-plus layout disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         elements-to-maps(parse-xml('<a xmlns="http://a.com/"/>')/*,
+                          {'disable-layouts': ('empty', 'empty-plus')})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a": ""}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="elements-to-maps-603" covers-40="PR1596">
+      <description> Empty element with empty, empty-plus, and simple layout disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         elements-to-maps(parse-xml('<a xmlns="http://a.com/"/>')/*,
+                          {'disable-layouts': ('empty', 'empty-plus', 'simple')})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a": {"#content": ""}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="elements-to-maps-604" covers-40="PR1596">
+      <description> List content with list layout disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         elements-to-maps(parse-xml('<a><b>one</b><b>two</b><b>three</b></a>')/*,
+                          {'disable-layouts': ('list')})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a": {"b": ["one", "two", "three"] }}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="elements-to-maps-605" covers-40="PR1596">
+      <description> List content with list and list-plus layout disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         elements-to-maps(parse-xml('<a><b>one</b><b>two</b><b>three</b></a>')/*,
+                          {'disable-layouts': ('list', 'list-plus')})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a": [ {"b": "one"}, {"b": "two"}, {"b": "three"} ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="elements-to-maps-606" covers-40="PR1596">
+      <description> Record content with record layout disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         elements-to-maps(parse-xml('<a><b>one</b><c>two</c><d>three</d></a>')/*,
+                          {'disable-layouts': ('record')})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a": [ {"b": "one"}, {"c": "two"}, {"d": "three"} ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="elements-to-maps-607" covers-40="PR1596">
+      <description> element node - uniform across list and list-plus elements, but list-plus is disabled</description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         elements-to-maps(parse-xml('<a><b><i>X</i><i>Y</i><i>Z</i></b><b class="Q"><i>A</i><i>B</i><i>C</i></b><c/></a>')/a, 
+            map{ 'uniform':true(), 'disable-layouts':'list-plus'})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"b":[{"i":"X"},{"i":"Y"},{"i":"Z"}]},{"b":[{"@class":"Q"},{"i":"A"},{"i":"B"},{"i":"C"}]},{"c":""}]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="elements-to-maps-651" covers-40="PR1596">
+      <description> element node - schema-based - empty - but empty is disabled</description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:Empty/>}
+         return elements-to-maps($in, {'disable-layouts':'empty'})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}Empty":{}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="elements-to-maps-652" covers-40="PR1596">
+      <description> element node - schema-based - 
+         empty content, schema allows attributes, but there are none
+         -- but empty-plus and simple are disabled
+      </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus/>}
+         return elements-to-maps($in, {'disable-layouts':('empty-plus', 'simple')})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="elements-to-maps-653" covers-40="PR1596">
+      <description> element node - schema-based - would be record layout, but disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:RecordPlus test="1">
+                                       <c:Boolean>1</c:Boolean>
+                                       <c:Number>2</c:Number>
+                                       <c:Date>1966-07-03</c:Date>
+                                     </c:RecordPlus>}
+         return elements-to-maps($in, {"disable-layouts": "record", "name-format": "local"})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"RecordPlus":
+            [ { "@test": true() },
+              { "Boolean": true() },
+              { "Number": 2 },
+              { "Date": xs:date("1966-07-03") }
+            ]  
+          }</assert-deep-eq>
+      </result>
+   </test-case>
+   
    <test-case name="elements-to-maps-900">
       <description> invalid layout </description>
       <created by="Michael Kay" on="2024-11-16"/>
@@ -1701,6 +1799,17 @@
       <created by="Michael Kay" on="2024-11-16"/>
       <test><![CDATA[
          elements-to-maps(parse-xml('<a>x</a>'), {'name-format':'palindromic'})
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="elements-to-maps-904">
+      <description> cannot disable mixed layout </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         elements-to-maps(parse-xml('<a>x</a>'), {'disable-layouts':'mixed'})
       ]]></test>
       <result>
          <error code="XPTY0004"/>
