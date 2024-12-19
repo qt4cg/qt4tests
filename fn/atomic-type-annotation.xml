@@ -3,6 +3,17 @@
 
   <dependency type="spec" value="XP40+ XQ40+"/>
   
+  <environment name="simple">
+    <schema uri="http://www.w3.org/XQueryTest" file="type-of/simple.xsd">
+        <description>A Schema for simple.xml</description>
+        <created by="Michael Kay" on="2024-12-01"/>
+    </schema>        
+    <source role="." file="type-of/simple.xml" validation="strict" uri="http://www.w3.org/type-of/simple.xml">
+        <description>A Schema validated xml file, that contains values for data types. Can be used by any test.</description>
+        <created by="Michael Kay" on="2024-12-01"/>
+    </source>
+   </environment>
+  
   <test-case name="atomic-type-annotation-001">
     <description>built-in primitive type</description>
     <created by="Michael Kay" on="2024-10-22"/>
@@ -10,6 +21,141 @@
     <result>
       <all-of>
         <assert>$result ? name = xs:QName('xs:boolean')</assert>
+        <assert>$result ? is-simple</assert>
+        <assert>$result ? base-type() ? name = xs:QName('xs:anyAtomicType')</assert>
+        <assert>$result ? primitive-type() ? name = xs:QName('xs:boolean')</assert>
+        <assert>$result ? variety = "atomic"</assert>
+        <assert>$result ? matches(false())</assert>
+        <assert>not($result ? matches(0))</assert>
+        <assert>$result ? constructor(1) = true()</assert>
+        <assert>$result ? constructor("false") = false()</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="atomic-type-annotation-002">
+    <description>built-in derived type</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <test>atomic-type-annotation(xs:dayTimeDuration('PT1H'))</test>
+    <result>
+      <all-of>
+        <assert>$result ? name = xs:QName('xs:dayTimeDuration')</assert>
+        <assert>$result ? is-simple</assert>
+        <assert>$result ? base-type() ? name = xs:QName('xs:duration')</assert>
+        <assert>$result ? base-type() ? base-type() ? name = xs:QName('xs:anyAtomicType')</assert>
+        <assert>$result ? primitive-type() ? name = xs:QName('xs:duration')</assert>
+        <assert>$result ? variety = "atomic"</assert>
+        <assert>not($result ? matches(xs:duration('PT0S')))</assert>
+        <assert>$result ? constructor("PT0S") => seconds-from-duration() = 0</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <!--<test-case name="atomic-type-annotation-051">
+    <description>built-in primitive type: validation</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <dependency type="feature" value="schemaValidation"/>
+    <test><![CDATA[atomic-type-annotation(23)?validate(parse-xml("<a>19</a>"))]]></test>
+    <result>
+      <all-of>
+        <assert>data($result) instance of xs:integer</assert>
+        <assert>$result eq 19</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="atomic-type-annotation-052">
+    <description>built-in primitive type: validation</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <dependency type="feature" value="schemaValidation"/>
+    <test><![CDATA[atomic-type-annotation(23)?valid(parse-xml("<a>19</a>"))]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="atomic-type-annotation-053">
+    <description>built-in primitive type: validation</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <dependency type="feature" value="schemaValidation"/>
+    <test><![CDATA[atomic-type-annotation(23)?valid(parse-xml("<a>abc</a>"))]]></test>
+    <result>
+      <assert-false/>
+    </result>
+  </test-case>-->
+  
+  <test-case name="atomic-type-annotation-100">
+    <description>node validated against type xs:integer</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <environment ref="simple"/>
+    <test>atomic-type-annotation(//*:a)</test>
+    <result>
+      <all-of>
+        <assert>$result ? name = xs:QName('xs:integer')</assert>
+        <assert>$result ? is-simple</assert>
+        <assert>$result ? base-type() ? name = xs:QName('xs:decimal')</assert>
+        <assert>$result ? primitive-type() ? name = xs:QName('xs:decimal')</assert>
+        <assert>$result ? variety = "atomic"</assert>
+        <assert>$result ? matches(42)</assert>
+        <assert>$result ? constructor("-1") = -1</assert>
+        <assert>$result ? constructor(12e0) = 12</assert>
+        <assert>$result ? constructor(93.7) = 93</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="atomic-type-annotation-101">
+    <description>node validated against type derived from xs:integer</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <environment ref="simple"/>
+    <test>atomic-type-annotation(//*:b)</test>
+    <result>
+      <all-of>
+        <assert>$result ? name = QName("http://www.w3.org/XQueryTest/typeOf/simple", "namedInteger")</assert>
+        <assert>$result ? is-simple</assert>
+        <assert>$result ? base-type() ? name = xs:QName('xs:integer')</assert>
+        <assert>$result ? primitive-type() ? name = xs:QName('xs:decimal')</assert>
+        <assert>$result ? variety = "atomic"</assert>
+        <assert>not($result ? matches(42))</assert>
+        <assert>$result ? constructor("-1") = -1</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="atomic-type-annotation-102">
+    <description>node validated against anonymous type derived from xs:integer</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <environment ref="simple"/>
+    <test>atomic-type-annotation(//*:c)</test>
+    <result>
+      <all-of>
+        <assert>empty($result ? name)</assert>
+        <assert>$result ? is-simple</assert>
+        <assert>$result ? base-type() ? name = xs:QName('xs:integer')</assert>
+        <assert>$result ? primitive-type() ? name = xs:QName('xs:decimal')</assert>
+        <assert>$result ? variety = "atomic"</assert>
+        <assert>not($result ? matches(42))</assert>
+        <assert>$result ? constructor("-1") = -1</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="atomic-type-annotation-103">
+    <description>node validated against anonymous type derived from a restriction of xs:integer</description>
+    <created by="Michael Kay" on="2024-10-22"/>
+    <environment ref="simple"/>
+    <test>atomic-type-annotation(//*:d)</test>
+    <result>
+      <all-of>
+        <assert>empty($result ? name)</assert>
+        <assert>$result ? is-simple</assert>
+        <assert>$result ? base-type() ? name = QName("http://www.w3.org/XQueryTest/typeOf/simple", "namedInteger")</assert>
+        <assert>$result ? base-type() ? base-type() ? name = xs:QName('xs:integer')</assert>
+        <assert>$result ? base-type() ? base-type() ? base-type() ? name = xs:QName('xs:decimal')</assert>
+        <assert>$result ? primitive-type() ? name = xs:QName('xs:decimal')</assert>
+        <assert>$result ? variety = "atomic"</assert>
+        <assert>not($result ? matches(42))</assert>
+        <assert>$result ? constructor("-1") = -1</assert>
       </all-of>
     </result>
   </test-case>

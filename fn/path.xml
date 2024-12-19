@@ -291,4 +291,228 @@
          </all-of>
       </result>
    </test-case>
+   
+   <test-case name="path040" covers-40="PR1620">
+      <description>path with indexes=false</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <environment ref="pathdata"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:path((//*:all-of)[1], {"indexes":false()})</test>
+      <result>
+         <all-of>
+            <assert-string-value>/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-set/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-case/Q{http://www.w3.org/2010/09/qt-fots-catalog}result/Q{http://www.w3.org/2010/09/qt-fots-catalog}all-of</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path041" covers-40="PR1620">
+      <description>path() with namespaces option (using default namespace)</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <environment ref="pathdata"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:path(//*[@name="fn-absintg1args-1"], {"namespaces": in-scope-namespaces(/*)})</test>
+      <result>
+         <all-of>
+            <assert-string-value>/test-set[1]/test-case[4]</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path042" covers-40="PR1620">
+      <description>path() with namespaces option (using default namespace) and no indexes</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <environment ref="pathdata"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         fn:path(//*[@name="fn-absintg1args-1"], 
+         {"namespaces": in-scope-namespaces(/*), "indexes": false()})</test>
+      <result>
+         <all-of>
+            <assert-string-value>/test-set/test-case</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path043" covers-40="PR1620">
+      <description>path() with namespaces option (using non-default namespace)</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <environment ref="pathdata"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         fn:path(//*[@name="fn-absintg1args-1"], 
+           {"namespaces": {"ppp": "http://www.w3.org/2010/09/qt-fots-catalog"}})</test>
+      <result>
+         <all-of>
+            <assert-string-value>/ppp:test-set[1]/ppp:test-case[4]</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path044" covers-40="PR1620">
+      <description>path() with namespaces option (duplicate prefixes)</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <environment ref="pathdata"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         fn:path(//*[@name="fn-absintg1args-1"], 
+           {"namespaces": {"ppp": "http://www.w3.org/2010/09/qt-fots-catalog",
+                           "qqq": "http://www.w3.org/2010/09/qt-fots-catalog"}})</test>
+      <result>
+         <all-of>
+            <any-of>
+               <assert-string-value>/ppp:test-set[1]/ppp:test-case[4]</assert-string-value>
+               <assert-string-value>/qqq:test-set[1]/qqq:test-case[4]</assert-string-value>
+            </any-of>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path045" covers-40="PR1620">
+      <description>path() applied to a parentless attribute node, with namespace for fn:root()</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test>fn:path(attribute name {"fred"},
+                {"namespaces": {"fn": "http://www.w3.org/2005/xpath-functions"}})</test>
+      <result>
+         <all-of>
+            <assert-string-value>fn:root()</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path046" covers-40="PR1620">
+      <description>path() applied to no-namespace element, with namespace map</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <environment ref="pathdata"/>
+      <test>fn:path(//p, {"namespaces": {
+                             "" : "",
+                             "z": "http://www.w3.org/2010/09/qt-fots-catalog" 
+                          }})</test>
+      <result>
+         <all-of>
+            <assert-string-value>/z:test-set[1]/p[1]</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path047" covers-40="PR1620">
+      <description>First argument is (), options supplied</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <environment ref="pathdata"/>
+      <test>fn:path(//nonexistent, {"namespaces": {
+                             "" : "",
+                             "z": "http://www.w3.org/2010/09/qt-fots-catalog" 
+                          }})</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="path048" covers-40="PR1620">
+      <description>First argument is context item, options supplied</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <environment ref="pathdata"/>
+      <test>//p ! fn:path(., {"namespaces": {
+                             "" : "",
+                             "z": "http://www.w3.org/2010/09/qt-fots-catalog" 
+                          }})</test>
+      <result>
+         <all-of>
+            <assert-string-value>/z:test-set[1]/p[1]</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path049" covers-40="PR1620">
+      <description>First argument is omitted, options supplied</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <environment ref="pathdata"/>
+      <test>//p ! fn:path(options := {"namespaces": {
+                             "" : "",
+                             "z": "http://www.w3.org/2010/09/qt-fots-catalog" 
+                          }, 
+                          "indexes" :false() })</test>
+      <result>
+         <all-of>
+            <assert-string-value>/z:test-set/p</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path050" covers-40="PR1620">
+      <description>First argument is implicit, options supplied</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <environment ref="pathdata"/>
+      <test>//p => fn:path({"namespaces": {
+                             "" : "",
+                             "z": "http://www.w3.org/2010/09/qt-fots-catalog" 
+                          }, 
+                          "indexes" :false() })</test>
+      <result>
+         <all-of>
+            <assert-string-value>/z:test-set/p</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path051" covers-40="PR1620">
+      <description>First argument is implicit, options supplied with keyword</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <environment ref="pathdata"/>
+      <test>//p => fn:path({"namespaces": {
+                             "" : "",
+                             "z": "http://www.w3.org/2010/09/qt-fots-catalog" 
+                          }, 
+                          "indexes" :false() })</test>
+      <result>
+         <all-of>
+            <assert-string-value>/z:test-set/p</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path052" covers-40="PR1620">
+      <description>Partial function application binding first argument</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <environment ref="pathdata"/>
+      <test>
+         let $path := fn:path(//p, ?)
+         let $nsOption := {"namespaces": {
+                             "" : "",
+                             "z": "http://www.w3.org/2010/09/qt-fots-catalog" 
+                          }}
+         return [$path($nsOption), $path($nsOption => map:put("indexes", false()))]                 
+      </test>
+      <result>
+         <assert-deep-eq>["/z:test-set[1]/p[1]", "/z:test-set/p"]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="path053" covers-40="PR1620">
+      <description>Partial function application binding second argument</description>
+      <created by="Michael Kay" on="2024-12-04"/>
+      <environment ref="pathdata"/>
+      <test>
+         let $nsOption := {"namespaces": {
+                             "" : "",
+                             "z": "http://www.w3.org/2010/09/qt-fots-catalog" 
+                          }}
+         let $path := fn:path(?, $nsOption)                         
+         return [$path(()), $path(//p), $path(/*), $path(/*/@name)]                 
+      </test>
+      <result>
+         <assert-deep-eq>[(), "/z:test-set[1]/p[1]", "/z:test-set[1]", "/z:test-set[1]/@name"]</assert-deep-eq>
+      </result>
+   </test-case>
 </test-set>
