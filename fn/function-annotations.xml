@@ -148,9 +148,10 @@
    <test-case name="fn-function-annotations-014">
       <description>Test return type</description>
       <created by="Christian Gruen" on="2023-09-17"/>
+      <modified by="Michael Kay" on="2024-12-19"/>
       <test>fn:function-annotations( fn:substring#2 )</test>
       <result>
-         <assert-type>record(key as xs:QName, value as xs:anyAtomicType*)*</assert-type>
+         <assert-type>map{xs:QName, xs:anyAtomicType*)*</assert-type>
       </result>
    </test-case>
 
@@ -176,10 +177,11 @@
       <description>Function item</description>
       <created by="Christian Gruen" on="2023-09-17"/>
       <modified by="Michael Kay" on="2024-08-19" change="spec change, PR1393"/>
+      <modified by="Michael Kay" on="2024-08-19" change="spec change, PR1666"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
 declare %private function local:inc($c) { $c + 1 };
-function-annotations(local:inc#1) => map:of-pairs()
+function-annotations(local:inc#1)
        ]]></test>
       <result>
          <assert-deep-eq>map { QName('http://www.w3.org/2012/xquery', 'private'): () }</assert-deep-eq>
@@ -190,10 +192,11 @@ function-annotations(local:inc#1) => map:of-pairs()
       <description>Partial function application</description>
       <created by="Christian Gruen" on="2023-09-17"/>
       <modified by="Michael Kay" on="2024-08-19" change="spec change, PR1393"/>
+      <modified by="Michael Kay" on="2024-08-19" change="spec change, PR1666"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
 let $f := %Q{uri}name('a', 'b') function($a, $b) {}
-return function-annotations($f(?, 5)) => map:of-pairs()
+return function-annotations($f(?, 5))
       ]]></test>
       <result>
          <assert-deep-eq>map { QName('uri', 'name'): ('a', 'b') }</assert-deep-eq>
@@ -203,10 +206,11 @@ return function-annotations($f(?, 5)) => map:of-pairs()
    <test-case name="fn-function-annotations-019">
       <description>Multiple annotations</description>
       <created by="Michael Kay" on="2024-08-19"/>
+      <modified by="Michael Kay" on="2024-08-19" change="spec change, PR1666"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
 declare %private %local:optimized(true()) function local:inc($c) { $c + 1 };
-function-annotations(local:inc#1) => map:of-pairs()
+function-annotations(local:inc#1) => map:merge()
        ]]></test>
       <result>
          <assert-deep-eq>map { QName('http://www.w3.org/2012/xquery', 'private'): (),
@@ -218,15 +222,16 @@ function-annotations(local:inc#1) => map:of-pairs()
    <test-case name="fn-function-annotations-020">
       <description>Multiple annotations, duplicate names</description>
       <created by="Michael Kay" on="2024-08-19"/>
+      <modified by="Michael Kay" on="2024-08-19" change="spec change, PR1666"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
 declare %private %local:optimized(true()) %local:optimized(false()) function local:inc($c) { $c + 1 };
 function-annotations(local:inc#1)
        ]]></test>
       <result>
-         <assert-deep-eq>map { 'key': QName('http://www.w3.org/2012/xquery', 'private'), 'value': () },
-                         map { 'key': QName('http://www.w3.org/2005/xquery-local-functions', 'optimized'), 'value': true() },
-                         map { 'key': QName('http://www.w3.org/2005/xquery-local-functions', 'optimized'), 'value': false() }
+         <assert-deep-eq>map { QName('http://www.w3.org/2012/xquery', 'private'): () },
+                         map { QName('http://www.w3.org/2005/xquery-local-functions', 'optimized'): true() },
+                         map { QName('http://www.w3.org/2005/xquery-local-functions', 'optimized'): false() }
          </assert-deep-eq>
       </result>
    </test-case>
