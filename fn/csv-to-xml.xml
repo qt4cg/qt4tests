@@ -689,7 +689,44 @@
           ></rows></csv>]]></assert-xml>
     </result>
   </test-case>-->
-  
+
+  <test-case name="csv-to-xml-088">
+    <description>Extracted headers are always trimmed</description>
+    <created by="Gunther Rademacher" on="2025-01-03"/>
+    <test>fn:csv-to-xml("  one,two  |three,four", 
+      map{'row-delimiter':'|', 'header':true()})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"><columns><column
+	      >one</column><column>two</column></columns><rows><row><field column="one">three</field
+		  ><field column="two">four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-xml-089">
+    <description>Extracted headers are trimmed even when trim-whitespace is false</description>
+    <created by="Gunther Rademacher" on="2025-01-03"/>
+    <test>fn:csv-to-xml("  one,two  |three,four", 
+      map{'row-delimiter':'|', 'header':true(), 'trim-whitespace':false()})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"><columns><column
+	      >one</column><column>two</column></columns><rows><row><field column="one">three</field
+		  ><field column="two">four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-xml-090">
+    <description>Explicit headers are not trimmed even when trim-whitespace is true</description>
+    <created by="Gunther Rademacher" on="2025-01-03"/>
+    <test>fn:csv-to-xml("  one,two  |three,four", 
+      map{'row-delimiter':'|', 'header':('   first', 'second   '), 'trim-whitespace':true()})</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"><columns><column
+	      >   first</column><column>second   </column></columns><rows><row><field column="   first"
+		  >one</field><field column="second   ">two</field></row><row><field column="   first"
+		  >three</field><field column="second   ">four</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+
   <test-case name="csv-to-xml-201">
     <description>Returned element is parentless</description>
     <created by="Michael Kay" on="2024-02-28"/>

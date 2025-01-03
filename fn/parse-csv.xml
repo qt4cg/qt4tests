@@ -830,8 +830,47 @@
        <assert-deep-eq>["d","c","b","s","r","q"]</assert-deep-eq>
      </result>
    </test-case> 
-  
-  
+
+  <test-case name="parse-csv-103">
+    <description>Extracted headers are always trimmed</description>
+    <created by="Gunther Rademacher" on="2025-01-03"/>
+    <test>fn:parse-csv("  one,two  |three,four", 
+      map{'row-delimiter':'|', 'header':true()})</test>
+    <result>
+      <assert>deep-equal($result => map:remove("get"), 
+        map{"columns":("one","two"), 
+        "column-index": map{"one":1, "two":2}, 
+        "rows":["three","four"]})</assert>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-104">
+    <description>Extracted headers are trimmed even when trim-whitespace is false</description>
+    <created by="Gunther Rademacher" on="2025-01-03"/>
+    <test>fn:parse-csv("  one,two  |three,four", 
+      map{'row-delimiter':'|', 'header':true(), 'trim-whitespace':false()})</test>
+    <result>
+      <assert>deep-equal($result => map:remove("get"), 
+        map{"columns":("one","two"), 
+        "column-index": map{"one":1, "two":2}, 
+        "rows":["three","four"]})</assert>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-105">
+    <description>Explicit headers are not trimmed even when trim-whitespace is true</description>
+    <created by="Gunther Rademacher" on="2025-01-03"/>
+    <test>fn:parse-csv("  one,two  |three,four", 
+      map{'row-delimiter':'|', 'header':('   first', 'second   '), 'trim-whitespace':true()})</test>
+    <result>
+      <assert>deep-equal($result => map:remove("get"), 
+        map{"columns":("   first","second   "), 
+        "column-index": map{"   first":1, "second   ":2}, 
+        "rows":(["one","two"],["three","four"])})</assert>
+    </result>
+  </test-case>
+
+
   <test-case name="parse-csv-901">
     <description>Unclosed quotes</description>
     <created by="Michael Kay" on="2024-03-07"/>
