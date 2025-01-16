@@ -869,6 +869,58 @@
         "rows":(["one","two","three","four"], ["1", "2", "3", "4"])})</assert>
     </result>
   </test-case>
+  
+  <test-case name="parse-csv-106">
+    <description>CRLF as row delimiter</description>
+    <created by="Michael Kay" on="2025-01-15"/>
+    <test>fn:parse-csv('one,two,three,four'||char(13)||char(10)||'1,2,3,4', 
+      map{'header':('first', 'second', 'third', 'fourth')})</test>
+    <result>
+      <assert>deep-equal($result => map:remove("get"), 
+        map{"columns":("first","second","third","fourth"), 
+        "column-index": map{"first":1, "second":2, "third":3, "fourth":4}, 
+        "rows":(["one","two","three","four"], ["1", "2", "3", "4"])})</assert>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-107">
+    <description>CR as row delimiter</description>
+    <created by="Michael Kay" on="2025-01-15"/>
+    <test>fn:parse-csv('one,two,three,four'||char(13)||'1,2,3,4', 
+      map{'header':('first', 'second', 'third', 'fourth')})</test>
+    <result>
+      <assert>deep-equal($result => map:remove("get"), 
+        map{"columns":("first","second","third","fourth"), 
+        "column-index": map{"first":1, "second":2, "third":3, "fourth":4}, 
+        "rows":(["one","two","three","four"], ["1", "2", "3", "4"])})</assert>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-108">
+    <description>CRLF within quoted field</description>
+    <created by="Michael Kay" on="2025-01-15"/>
+    <test>fn:parse-csv('one,two,three,four'||char(13)||char(10)||'11,"2'||char(13)||char(10)||'2",33,44', 
+      map{'header':('first', 'second', 'third', 'fourth')})</test>
+    <result>
+      <assert>deep-equal($result => map:remove("get"), 
+        map{"columns":("first","second","third","fourth"), 
+        "column-index": map{"first":1, "second":2, "third":3, "fourth":4}, 
+        "rows":(["one","two","three","four"], ["11", "2"||char(10)||"2", "33", "44"])})</assert>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-109">
+    <description>CR within quoted field</description>
+    <created by="Michael Kay" on="2025-01-15"/>
+    <test>fn:parse-csv('one,two,three,four'||char(13)||'11,"2'||char(13)||'2",33,44', 
+      map{'header':('first', 'second', 'third', 'fourth')})</test>
+    <result>
+      <assert>deep-equal($result => map:remove("get"), 
+        map{"columns":("first","second","third","fourth"), 
+        "column-index": map{"first":1, "second":2, "third":3, "fourth":4}, 
+        "rows":(["one","two","three","four"], ["11", "2"||char(10)||"2", "33", "44"])})</assert>
+    </result>
+  </test-case>
 
 
   <test-case name="parse-csv-901">
