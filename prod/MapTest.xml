@@ -674,15 +674,167 @@
       </result>
    </test-case>
    
-   
-   
-   
-   
-   
-   
-   
-   
-   
+   <test-case name="MapTest-080" covers-40="PR1501">
+      <description>Map coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as map(xs:integer, xs:byte*) := { 1: (1, 2) }
+return $m instance of map(xs:integer, xs:byte*)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="MapTest-081" covers-40="PR1501">
+      <description>Map coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as map(xs:integer, xs:byte*) := { 1: (1.2, 2) }
+return $m
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="MapTest-082" covers-40="PR1501">
+      <description>Map coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as map(xs:integer, xs:byte?) := { 1: (1, 2) }
+return $m
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="MapTest-083" covers-40="PR1501">
+      <description>Map coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as map(xs:integer, xs:string) := { 1: xs:anyURI('URI') }
+return $m?* instance of xs:string
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="MapTest-084" covers-40="PR1501">
+      <description>Map coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as map(xs:integer, empty-sequence()) := { 1: () }
+return $m
+      </test>
+      <result>
+         <assert-deep-eq>{ 1: () }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="MapTest-085" covers-40="PR1501">
+      <description>Map coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as map(xs:integer, empty-sequence()) := { 1: 1 }
+return $m
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="MapTest-086" covers-40="PR1501">
+      <description>Map coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $f as map(xs:byte, empty-sequence()) := { 1: () }
+return map:keys($f) instance of xs:byte
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="MapTest-087" covers-40="PR1501">
+      <description>Map coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $f as map(xs:integer, element()) := { 1: element a {} }
+return local-name($f?*)
+      </test>
+      <result>
+         <assert-string-value>a</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="MapTest-088" covers-40="PR1501">
+      <description>Map coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $f as map(xs:byte, xs:byte)* := ({ 1: 2 }, { 3: 4 })
+return sum($f?*)
+      </test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="MapTest-089" covers-40="PR1501">
+      <description>Map coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $f as map(xs:byte, xs:byte)* := ({ 1: 2 }, { 3: 456 })
+return sum($f?*)
+      </test>
+      <result>
+         <any-of>
+            <error code="XPTY0004"/>
+            <error code="FORG0001"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="MapTest-090" covers-40="PR1501">
+      <description>Map coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as map(xs:integer, xs:short*) := { 1: 0 to 0x7FFF }
+return sum($m?*)
+      </test>
+      <result>
+         <assert-eq>536854528</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="MapTest-091" covers-40="PR1501">
+      <description>Map coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as map(xs:integer, xs:short*) := { 1: 0 to 0x8000 }
+return $m
+      </test>
+      <result>
+         <any-of>
+            <error code="XPTY0004"/>
+            <error code="FORG0001"/>
+         </any-of>
+      </result>
+   </test-case>
 
 
 </test-set>
