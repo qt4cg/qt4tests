@@ -671,5 +671,154 @@
       </result>
    </test-case>
    
+
+   <test-case name="ArrayTest-090" covers-40="PR1501">
+      <description>Array coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as array(xs:byte*) := [ 1, 2 ]
+return $m instance of array(xs:byte*)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="ArrayTest-091" covers-40="PR1501">
+      <description>Array coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as array(xs:byte*) := [ 1.2, 2 ]
+return $m
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="ArrayTest-092" covers-40="PR1501">
+      <description>Array coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as array(xs:byte?) := [ (1, 2) ]
+return $m
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="ArrayTest-093" covers-40="PR1501">
+      <description>Array coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as array(xs:string) := [ xs:anyURI('URI') ]
+return $m?* instance of xs:string
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="ArrayTest-094" covers-40="PR1501">
+      <description>Array coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as array(empty-sequence()) := [ () ]
+return $m
+      </test>
+      <result>
+         <assert-deep-eq>[ () ]</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="ArrayTest-095" covers-40="PR1501">
+      <description>Array coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as array(empty-sequence()) := [ 1 ]
+return $m
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="ArrayTest-097" covers-40="PR1501">
+      <description>Array coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $f as array(element()) := [ element a {} ]
+return local-name($f?*)
+      </test>
+      <result>
+         <assert-string-value>a</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="ArrayTest-098" covers-40="PR1501">
+      <description>Array coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $f as array(xs:byte)* := ([ 2 ], [ 4 ])
+return sum($f?*)
+      </test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="ArrayTest-099" covers-40="PR1501">
+      <description>Array coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $f as array(xs:byte)* := ([ 2 ], [ 456 ])
+return sum($f?*)
+      </test>
+      <result>
+         <any-of>
+            <error code="XPTY0004"/>
+            <error code="FORG0001"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="ArrayTest-100" covers-40="PR1501">
+      <description>Array coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as array(xs:short*) := array { 0 to 0x7FFF }
+return sum($m?*)
+      </test>
+      <result>
+         <assert-eq>536854528</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="ArrayTest-101" covers-40="PR1501">
+      <description>Array coercion</description>
+      <created by="Christian Gruen" on="2025-01-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as array(xs:byte?) := array { 0 to 0x8000 }
+return $m
+      </test>
+      <result>
+         <any-of>
+            <error code="XPTY0004"/>
+            <error code="FORG0001"/>
+         </any-of>
+      </result>
+   </test-case>
    
 </test-set>
