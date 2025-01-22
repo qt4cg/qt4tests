@@ -486,7 +486,7 @@
         <created by="Michael Kay, Saxonica" on="2024-12-11"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <environment ref="map"/>
-        <test>map:merge((), {'retain-order': true()}) =>
+        <test>map:merge(()) =>
            map:put(17,0) => map:put(29,0) => map:put('a',0) => map:put(-234,0) => map:put(86,0) =>
            map:put(445,0) => map:put(101,0) => map:put('e',0) => map:keys()</test>
         <result>
@@ -500,37 +500,23 @@
         <dependency type="spec" value="XP40+ XQ40+"/>
         <environment ref="map"/>
         <test>
-            let $m1 := map:merge(({17:0}, {29:0}), {'retain-order': true()})
-            let $m2 := map:merge(({'e':0}, {'x':0}, {'b':0} ), {'retain-order': true()})
-            let $m3 := map:merge(($m1, $m2), {'retain-order': true()})
+            let $m1 := map:merge(({17:0}, {29:0}))
+            let $m2 := map:merge(({'e':0}, {'x':0}, {'b':0} ))
+            let $m3 := map:merge(($m1, $m2))
             return map:keys($m3)</test>
         <result>
             <assert-deep-eq>17, 29, 'e', 'x', 'b'</assert-deep-eq>
         </result>
     </test-case>
     
-    <test-case name="map-merge-404" covers-40="PR1609">
-        <description>retain-order=true - merge unordered maps</description>
-        <created by="Michael Kay, Saxonica" on="2024-12-11"/>
-        <dependency type="spec" value="XP40+ XQ40+"/>
-        <environment ref="map"/>
-        <test>
-            let $m1 := map:merge(({17:0}, {29:0}), {'retain-order': false()})
-            let $m2 := map:merge(({'e':0}, {'x':0}, {'b':0} ), {'retain-order': false()})
-            let $m3 := map:merge(($m1, $m2), {'retain-order': true()})
-            return deep-equal(map:keys($m3), (map:keys($m1), map:keys($m2)))</test>
-        <result>
-            <assert-true/>
-        </result>
-    </test-case>
     
     <test-case name="map-merge-405" covers-40="PR1609">
         <description>retain-order=true, using map:entries</description>
         <created by="Michael Kay, Saxonica" on="2024-12-11"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <environment ref="map"/>
-        <test>map:merge(({17:0}, {29:0}, {'a':0}, {-234:0}, {86:0}, {445:0}, {101:0}, {'e':0}),
-                       {'retain-order': true()}) => map:entries()</test>
+        <test>map:merge(({17:0}, {29:0}, {'a':0}, {-234:0}, {86:0}, {445:0}, {101:0}, {'e':0})) 
+            => map:entries()</test>
         <result>
             <assert-deep-eq>{17:0}, {29:0}, {'a':0}, {-234:0}, {86:0}, {445:0}, {101:0}, {'e':0}</assert-deep-eq>
         </result>
@@ -541,8 +527,8 @@
         <created by="Michael Kay, Saxonica" on="2024-12-11"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <environment ref="map"/>
-        <test>map:merge(({17:0}, {29:0}, {'a':0}, {-234:0}, {86:0}, {445:0}, {101:0}, {'e':0}),
-                       {'retain-order': true()}) => map:for-each(fn($k, $v){$k || '=' || $v})</test>
+        <test>map:merge(({17:0}, {29:0}, {'a':0}, {-234:0}, {86:0}, {445:0}, {101:0}, {'e':0})) 
+            => map:for-each(fn($k, $v){$k || '=' || $v})</test>
         <result>
             <assert-deep-eq>'17=0', '29=0', 'a=0', '-234=0', '86=0', '445=0', '101=0', 'e=0'</assert-deep-eq>
         </result>
@@ -554,7 +540,7 @@
         <dependency type="spec" value="XP40+ XQ40+"/>
         <environment ref="map"/>
         <test>map:merge(({17:0}, {29:0}, {'a':0}, {-234:0}, {86:0}, {29:1}, {101:0}, {'e':0}),
-                       {'retain-order': true(), 'duplicates': 'combine'}) 
+                       {'duplicates': 'combine'}) 
                        => map:for-each(fn($k, $v){string-join(($k, $v), ':')})</test>
         <result>
             <assert-deep-eq>'17:0', '29:0:1', 'a:0', '-234:0', '86:0', '101:0', 'e:0'</assert-deep-eq>
