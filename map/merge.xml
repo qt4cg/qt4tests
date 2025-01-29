@@ -162,12 +162,14 @@
     <test-case name="map-merge-006e">
         <description>Evaluate the function map:merge() with duplicates in the input maps</description>
         <created by="Michael Kay, Saxonica" on="2016-07-26"/>
+        <modified by="Michael Kay, Saxonica" on="2025-01-29" 
+            change="deleted alternative result, clearly incorrect"/>
         <environment ref="map"/>
         <test>map:merge((map:entry("foo", 3), map:entry("foo", 4)))</test>
         <result>
             <any-of>
                 <assert>deep-equal(map:get($result, "foo"), 3)</assert>
-                <assert>deep-equal(map:get($result, "foo"), 4)</assert>
+                <!--<assert>deep-equal(map:get($result, "foo"), 4)</assert>-->
             </any-of>
         </result>
     </test-case>
@@ -431,7 +433,10 @@
         <modified by="Christian Gruen" on="2024-01-16"/>
         <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"/>
         <environment ref="map"/>
-        <test>map:merge((1 to 100)!map:entry('z', .), if (current-date() lt xs:date('1900-01-01')) then map{'duplicates':'combine'} else ())?z</test>
+        <test>map:merge((1 to 100)!map:entry('z', .), 
+                        if (current-date() lt xs:date('1900-01-01')) 
+                          then map{'duplicates':'combine'} 
+                          else ())?z</test>
         <result>
             <error code="XPTY0004"/>
         </result>
@@ -442,7 +447,10 @@
         <created by="Christian Gruen" on="2024-01-16"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <environment ref="map"/>
-        <test>map:merge((1 to 100)!map:entry('z', .), if (current-date() lt xs:date('1900-01-01')) then map{'duplicates':'combine'} else ())?z</test>
+        <test>map:merge((1 to 100)!map:entry('z', .), 
+                        if (current-date() lt xs:date('1900-01-01')) 
+                          then map{'duplicates':'combine'} 
+                          else ())?z</test>
         <result>
             <assert-eq>1</assert-eq>
         </result>
@@ -474,8 +482,7 @@
         <created by="Michael Kay, Saxonica" on="2024-12-11"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <environment ref="map"/>
-        <test>map:merge(({17:0}, {29:0}, {'a':0}, {-234:0}, {86:0}, {445:0}, {101:0}, {'e':0}),
-                       {'retain-order': true()}) => map:keys()</test>
+        <test>map:merge(({17:0}, {29:0}, {'a':0}, {-234:0}, {86:0}, {445:0}, {101:0}, {'e':0})) => map:keys()</test>
         <result>
             <assert-deep-eq>17, 29, 'a', -234, 86, 445, 101, 'e'</assert-deep-eq>
         </result>

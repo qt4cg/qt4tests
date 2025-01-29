@@ -57,6 +57,7 @@
         <created by="Michael Kay, Saxonica" on="2022-10-12"/>
         <modified by="Michael Kay, Saxonica" on="2022-11-23" change="change test to deliver expected result"/>
         <modified by="Michael Kay, Saxonica" on="2024-03-25" change="argument keyword changed from 'key' to 'keys'"/>
+        <modified by="Michael Kay, Saxonica" on="2025-01-29" change="combine is now part of options"/>
         <environment ref="map"/>
         <test>
             let $days := ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"),
@@ -64,11 +65,159 @@
             return map:build(1 to count($fortnight), 
                              keys := function($n){$fortnight[$n]},
                              value := identity#1, 
-                             combine := op('*'))
+                             options := {'combine' : op('*')})
                    ?Tuesday
         </test>
         <result>
             <assert-eq>36</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-006">
+        <description>duplicates option</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <test>
+            map:build((1, 2, 3, 1.0e0), options:={'duplicates':'use-first'})
+        </test>
+        <result>
+            <all-of>
+                <assert-deep-eq>{1:1, 2:2, 3:3}</assert-deep-eq>
+                <assert>deep-equal(map:keys($result), (1, 2, 3))</assert>
+                <assert>map:keys($result)[1] instance of xs:double</assert>
+                <assert>map:values($result)[1] instance of xs:integer</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-007">
+        <description>duplicates option</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <test>
+            map:build((1, 2, 3, 1.0e0), options:={'duplicates':'use-last'})
+        </test>
+        <result>
+            <all-of>
+                <assert-deep-eq>{1:1, 2:2, 3:3}</assert-deep-eq>
+                <assert>deep-equal(map:keys($result), (1, 2, 3))</assert>
+                <assert>deep-equal(map:values($result), (1, 2, 3))</assert>
+                <assert>map:keys($result)[1] instance of xs:double</assert>
+                <assert>map:values($result)[1] instance of xs:double</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-008">
+        <description>duplicates option</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <test>
+            map:build((1, 2, 3, 1.0e0), options:={'duplicates':'use-any'})
+        </test>
+        <result>
+            <all-of>
+                <assert-deep-eq>{1:1, 2:2, 3:3}</assert-deep-eq>
+                <assert>deep-equal(map:keys($result), (1, 2, 3))</assert>
+                <assert>deep-equal(map:values($result), (1, 2, 3))</assert>
+                <assert>map:keys($result)[1] instance of xs:double</assert>
+                <assert>map:values($result)[1] instance of xs:numeric</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-009">
+        <description>duplicates option</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <test>
+            map:build((1, 2, 3, 1.0e0), options:={'duplicates':'combine'})
+        </test>
+        <result>
+            <all-of>
+                <assert-deep-eq>{1:(1, 1e0), 2:2, 3:3}</assert-deep-eq>
+                <assert>deep-equal(map:keys($result), (1, 2, 3))</assert>
+                <assert>deep-equal(map:values($result), (1, 1.0e0, 2, 3))</assert>
+                <assert>map:keys($result)[1] instance of xs:double</assert>
+                <assert>map:values($result)[1] instance of xs:numeric</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-010">
+        <description>duplicates option</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <test>
+            map:build((1, 2, 3, 1.0e0), options:={'duplicates':'reject'})
+        </test>
+        <result>
+            <error code="FOJS0003"/>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-011">
+        <description>duplicates option, invalid</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <test>
+            map:build((1, 2, 3, 1.0e0), options:={'duplicates':'invalid'})
+        </test>
+        <result>
+            <error code="FOJS0005"/>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-012">
+        <description>duplicates option and combine option both present</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <test>
+            map:build((1, 2, 3, 1.0e0), options:={'duplicates':'use-first', 'combine':concat#2})
+        </test>
+        <result>
+            <error code="FORG0013"/>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-013">
+        <description>duplicates option with keys and values</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <test>
+            map:build(1 to 10, 
+                      keys := fn{. mod 5}, 
+                      value := fn{. + 1}, 
+                      options:={'duplicates':'use-first'})
+        </test>
+        <result>
+            <all-of>
+                <assert-deep-eq>{1:2, 2:3, 3:4, 4:5, 0:6}</assert-deep-eq>
+                <assert>deep-equal(map:keys($result), (1,2,3,4,0))</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-014">
+        <description>duplicates option with keys and values</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <test>
+            map:build(1 to 10, 
+                      keys := fn{. mod 5}, 
+                      value := fn{. + 1}, 
+                      options:={'duplicates':'use-last'})
+        </test>
+        <result>
+            <all-of>
+                <assert-deep-eq>{1:7, 2:8, 3:9, 4:10, 0:11}</assert-deep-eq>
+                <assert>deep-equal(map:keys($result), (1,2,3,4,0))</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-015">
+        <description>duplicates option with keys and values</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <test>
+            map:build(1 to 10, 
+                      keys := fn{. mod 5}, 
+                      value := fn{. + 1}, 
+                      options:={'duplicates':'combine'})
+        </test>
+        <result>
+            <assert-deep-eq>{1:(2,7), 2:(3,8), 3:(4,9), 4:(5,10), 0:(6,11)}</assert-deep-eq>
         </result>
     </test-case>
     
@@ -250,7 +399,9 @@
     <test-case name="map-build-119" covers-40="PR1041">
         <description>Test equivalence of implementation given in spec</description>
         <created by="Michael Kay" on="2024-03-13"/>
-        <test>let $m := map:build(tokenize("The cat sat on the mat"), characters#1, upper-case#1, concat#2)
+        <modified by="Michael Kay, Saxonica" on="2025-01-29" change="combine is now part of options"/>
+        <test>let $m := map:build(tokenize("The cat sat on the mat"), 
+                                  characters#1, upper-case#1, {'combine': concat#2})
               let $n := fold-left(tokenize("The cat sat on the mat"), map { }, fn($map, $item) {
                            let $v := upper-case($item)
                            return fold-left(characters($item), $map, fn($m, $k) {
@@ -293,6 +444,37 @@
             <assert-deep-eq>reverse(("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"))</assert-deep-eq>
         </result>
     </test-case>
+    
+    <test-case name="map-build-121" covers-40="PR1703">
+        <description>Order is retained</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-22"/>
+        <environment ref="map"/>
+        <test>
+            let $days := ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
+            return map:build(reverse(1 to 7), function($i){$days[$i]}, function($x){$x}) => map:keys()
+        </test>
+        <result>
+            <assert-deep-eq>reverse(("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"))</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-build-122" covers-40="PR1041">
+        <description>Test equivalence of another implementation given in spec</description>
+        <created by="Michael Kay" on="2025-01-29"/>
+        <test>let $m := map:build(tokenize("The cat sat on the mat"), characters#1, upper-case#1, 
+                           options := {'combine':concat#2})
+              let $n := ((for $item in tokenize("The cat sat on the mat")
+                          let $val := upper-case($item)
+                          for $key in characters($item)
+                          return map:pair($key, $val) )    =>  map:of-pairs({'combine':concat#2}))
+             return deep-equal(trace(serialize($m, {'method':'adaptive'}), '$m'), 
+                               trace(serialize($n, {'method':'adaptive'}), '$n'))
+        </test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
     
     
     <!-- Following tests copied (mutatis mutandis) from map-group-by (MHK, 2023-06-28) -->
@@ -447,7 +629,9 @@
     <test-case name="map-build-222" covers-40="PR1174">
         <description>Value depends on position, with duplicates</description>
         <created by="Michael Kay" on="2024-06-26"/>
-        <test>map:build(("A", "B", "C", "A"), value := fn($it, $pos){$pos}, combine := op('+'))</test>
+        <test>map:build(("A", "B", "C", "A"), 
+                        value := fn($it, $pos){$pos}, 
+                        options := {'combine' : op('+')})</test>
         <result>
             <assert-deep-eq>map{"A":5, "B":2, "C":3}</assert-deep-eq>
         </result>
