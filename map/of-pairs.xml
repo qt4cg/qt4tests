@@ -92,7 +92,10 @@
         <description>Custom handling of duplicates</description>
         <created by="Michael Kay, Saxonica" on="2023-05-07"/>
         <environment ref="map"/>
-        <test>map:of-pairs(((1 to 20) ! map{'key':., 'value':.+1}, map{'key':13, 'value':82}, map{'key':13, 'value':11}), op('+'))</test>
+        <test>map:of-pairs(((1 to 20) ! map{'key':., 'value':.+1}, 
+                            map{'key':13, 'value':82}, 
+                            map{'key':13, 'value':11}), 
+                            {'combine': op('+')})</test>
         <result>
             <all-of>
                 <assert-count>1</assert-count>
@@ -107,8 +110,10 @@
         <description>Custom handling of duplicates</description>
         <created by="Michael Kay, Saxonica" on="2023-05-07"/>
         <environment ref="map"/>
-        <test>map:of-pairs(((1 to 20) ! map{'key':., 'value':.+1}, map{'key':13, 'value':82}, map{'key':13, 'value':11}), 
-            function($a,$b){$b})</test>
+        <test>map:of-pairs(((1 to 20) ! map{'key':., 'value':.+1}, 
+                             map{'key':13, 'value':82}, 
+                             map{'key':13, 'value':11}), 
+                      {'combine':function($a,$b){$b}})</test>
         <result>
             <all-of>
                 <assert-count>1</assert-count>
@@ -124,7 +129,7 @@
         <created by="Michael Kay, Saxonica" on="2023-05-07"/>
         <environment ref="map"/>
         <test>map:of-pairs(((1 to 20) ! map{'key':., 'value':.+1}, map{'key':13, 'value':82}, map{'key':13, 'value':11}), 
-            function($a,$b){error(xs:QName('map:duplicates'))})</test>
+            {'combine':function($a,$b){error(xs:QName('map:duplicates'))}})</test>
         <result>
             <error code="Q{http://www.w3.org/2005/xpath-functions/map}duplicates"/>
         </result>
@@ -134,7 +139,8 @@
         <description>Duplicate NaNs</description>
         <created by="Michael Kay, Saxonica" on="2023-05-07"/>
         <environment ref="map"/>
-        <test>map:of-pairs(((1 to 20) ! map{'key':., 'value':.+1}, map{'key':xs:float('NaN'), 'value':82}, map{'key':xs:double('NaN'), 'value':11}), op('+'))</test>
+        <test>map:of-pairs(((1 to 20) ! map{'key':., 'value':.+1}, map{'key':xs:float('NaN'), 'value':82}, map{'key':xs:double('NaN'), 'value':11}), 
+            {'combine':op('+')})</test>
         <result>
             <all-of>
                 <assert-count>1</assert-count>
@@ -183,6 +189,109 @@
                             map{'key':14, 'value':(11 to 20)})) => map:keys()</test>
         <result>
             <assert-deep-eq>12, 10, 8, 14</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-of-pairs-014" covers-40="PR1740">
+        <description>duplicates first</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <environment ref="map"/>
+        <test>map:of-pairs(({'key':12, 'value':10}, 
+                            {'key':12, 'value':83}),
+                            {'duplicates':'use-first'})</test>
+        <result>
+            <assert-deep-eq>{12:10}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-of-pairs-015" covers-40="PR1740">
+        <description>duplicates last</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <environment ref="map"/>
+        <test>map:of-pairs(({'key':12, 'value':10}, 
+                            {'key':12, 'value':83}),
+                            {'duplicates':'use-last'})</test>
+        <result>
+            <assert-deep-eq>{12:83}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-of-pairs-016" covers-40="PR1740">
+        <description>duplicates any</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <environment ref="map"/>
+        <test>map:of-pairs(({'key':12, 'value':10}, 
+                            {'key':12, 'value':83}),
+                            {'duplicates':'use-last'})</test>
+        <result>
+            <any-of>
+                <assert-deep-eq>{12:10}</assert-deep-eq>
+                <assert-deep-eq>{12:83}</assert-deep-eq>
+            </any-of>           
+        </result>
+    </test-case>
+    
+    <test-case name="map-of-pairs-017" covers-40="PR1740">
+        <description>duplicates combine</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <environment ref="map"/>
+        <test>map:of-pairs(({'key':12, 'value':10}, 
+                            {'key':12, 'value':83}),
+                            {'duplicates':'combine'})</test>
+        <result>
+                <assert-deep-eq>{12:(10,83)}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-of-pairs-018" covers-40="PR1740">
+        <description>duplicates reject</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-22"/>
+        <environment ref="map"/>
+        <test>map:of-pairs(({'key':12, 'value':10}, 
+                            {'key':12, 'value':83}),
+                            {'duplicates':'reject'})</test>
+        <result>
+             <error code="FOJS0003"/>
+        </result>
+    </test-case>
+    
+    <test-case name="map-of-pairs-019" covers-40="PR1740">
+        <description>order of duplicates</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <environment ref="map"/>
+        <test>map:of-pairs(({'key':12, 'value':10}, 
+                            {'key':14, 'value':11},
+                            {'key':33, 'value':33},
+                            {'key':12, 'value':83},
+                            {'key':14, 'value':84},
+                            {'key':10, 'value':77},
+                            {'key':10, 'value':71}),
+                            {'duplicates':'use-first'})</test>
+        <result>
+            <all-of>
+                <assert-deep-eq>{12:10, 33:33, 14:11, 10:77}</assert-deep-eq>
+                <assert>deep-equal(map:keys($result), (12, 14, 33, 10))</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="map-of-pairs-020" covers-40="PR1740">
+        <description>order of duplicates</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <environment ref="map"/>
+        <test>map:of-pairs(({'key':12, 'value':10}, 
+                            {'key':14, 'value':11},
+                            {'key':33, 'value':33},
+                            {'key':12, 'value':83},
+                            {'key':14, 'value':84},
+                            {'key':10, 'value':77},
+                            {'key':10, 'value':71}),
+                            {'duplicates':'use-last'})</test>
+        <result>
+            <all-of>
+                <assert-deep-eq>{12:83, 33:33, 14:84, 10:71}</assert-deep-eq>
+                <assert>deep-equal(map:keys($result), (12, 14, 33, 10))</assert>
+            </all-of>
         </result>
     </test-case>
     
@@ -248,6 +357,17 @@
         <test><![CDATA[map:of-pairs(map{'key':parse-xml('<a>26</a>'), 'value':42})]]></test>
         <result>
             <assert-deep-eq>map{'26':42}</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="map-of-pairs-907">
+        <description>Can't have both combine and duplicates</description>
+        <created by="Michael Kay, Saxonica" on="205-01-29"/>
+        <environment ref="map"/>
+        <test><![CDATA[map:of-pairs(map:pairs({'a':1}),
+            {'duplicates':'use-last', 'combine':concat#2})]]></test>
+        <result>
+            <error code="FORG0013"/>
         </result>
     </test-case>
 
