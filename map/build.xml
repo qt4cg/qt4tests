@@ -76,6 +76,7 @@
     <test-case name="map-build-006">
         <description>duplicates option</description>
         <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <modified by="Christian Gruen" on="2025-01-30" change="Implementation-dependent key handling"/>
         <test>
             map:build((1, 2, 3, 1.0e0), options:={'duplicates':'use-first'})
         </test>
@@ -83,8 +84,8 @@
             <all-of>
                 <assert-deep-eq>{1:1, 2:2, 3:3}</assert-deep-eq>
                 <assert>deep-equal(map:keys($result), (1, 2, 3))</assert>
-                <assert>map:keys($result)[1] instance of xs:double</assert>
-                <assert>map:values($result)[1] instance of xs:integer</assert>
+                <assert>map:keys($result)[1] instance of xs:numeric</assert>
+                <assert>map:items($result)[1] instance of xs:integer</assert>
             </all-of>
         </result>
     </test-case>
@@ -99,9 +100,9 @@
             <all-of>
                 <assert-deep-eq>{1:1, 2:2, 3:3}</assert-deep-eq>
                 <assert>deep-equal(map:keys($result), (1, 2, 3))</assert>
-                <assert>deep-equal(map:values($result), (1, 2, 3))</assert>
+                <assert>deep-equal(map:items($result), (1, 2, 3))</assert>
                 <assert>map:keys($result)[1] instance of xs:double</assert>
-                <assert>map:values($result)[1] instance of xs:double</assert>
+                <assert>map:items($result)[1] instance of xs:double</assert>
             </all-of>
         </result>
     </test-case>
@@ -116,9 +117,9 @@
             <all-of>
                 <assert-deep-eq>{1:1, 2:2, 3:3}</assert-deep-eq>
                 <assert>deep-equal(map:keys($result), (1, 2, 3))</assert>
-                <assert>deep-equal(map:values($result), (1, 2, 3))</assert>
+                <assert>deep-equal(map:items($result), (1, 2, 3))</assert>
                 <assert>map:keys($result)[1] instance of xs:double</assert>
-                <assert>map:values($result)[1] instance of xs:numeric</assert>
+                <assert>map:items($result)[1] instance of xs:numeric</assert>
             </all-of>
         </result>
     </test-case>
@@ -133,9 +134,9 @@
             <all-of>
                 <assert-deep-eq>{1:(1, 1e0), 2:2, 3:3}</assert-deep-eq>
                 <assert>deep-equal(map:keys($result), (1, 2, 3))</assert>
-                <assert>deep-equal(map:values($result), (1, 1.0e0, 2, 3))</assert>
+                <assert>deep-equal(map:items($result), (1, 1.0e0, 2, 3))</assert>
                 <assert>map:keys($result)[1] instance of xs:double</assert>
-                <assert>map:values($result)[1] instance of xs:numeric</assert>
+                <assert>map:items($result)[1] instance of xs:numeric</assert>
             </all-of>
         </result>
     </test-case>
@@ -154,11 +155,15 @@
     <test-case name="map-build-011">
         <description>duplicates option, invalid</description>
         <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <modified by="Christian Gruen" on="2025-01-30" change="Error code added to allow enum check"/>
         <test>
             map:build((1, 2, 3, 1.0e0), options:={'duplicates':'invalid'})
         </test>
         <result>
-            <error code="FOJS0005"/>
+            <any-of>
+               <error code="XPTY0004"/>
+               <error code="FOJS0005"/>
+            </any-of>
         </result>
     </test-case>
     
@@ -445,7 +450,7 @@
         </result>
     </test-case>
     
-    <test-case name="map-build-121" covers-40="PR1703">
+    <test-case name="map-build-121a" covers-40="PR1703">
         <description>Order is retained</description>
         <created by="Michael Kay, Saxonica" on="2025-01-22"/>
         <environment ref="map"/>
