@@ -65,7 +65,7 @@
             return map:build(1 to count($fortnight), 
                              keys := function($n){$fortnight[$n]},
                              value := identity#1, 
-                             options := {'combine' : op('*')})
+                             options := {'duplicates' : op('*')})
                    ?Tuesday
         </test>
         <result>
@@ -164,17 +164,6 @@
                <error code="XPTY0004"/>
                <error code="FOJS0005"/>
             </any-of>
-        </result>
-    </test-case>
-    
-    <test-case name="map-build-012">
-        <description>duplicates option and combine option both present</description>
-        <created by="Michael Kay, Saxonica" on="2025-01-29"/>
-        <test>
-            map:build((1, 2, 3, 1.0e0), options:={'duplicates':'use-first', 'combine':concat#2})
-        </test>
-        <result>
-            <error code="FORG0013"/>
         </result>
     </test-case>
     
@@ -406,7 +395,7 @@
         <created by="Michael Kay" on="2024-03-13"/>
         <modified by="Michael Kay, Saxonica" on="2025-01-29" change="combine is now part of options"/>
         <test>let $m := map:build(tokenize("The cat sat on the mat"), 
-                                  characters#1, upper-case#1, {'combine': concat#2})
+                                  characters#1, upper-case#1, {'duplicates': concat#2})
               let $n := fold-left(tokenize("The cat sat on the mat"), map { }, fn($map, $item) {
                            let $v := upper-case($item)
                            return fold-left(characters($item), $map, fn($m, $k) {
@@ -467,11 +456,11 @@
         <description>Test equivalence of another implementation given in spec</description>
         <created by="Michael Kay" on="2025-01-29"/>
         <test>let $m := map:build(tokenize("The cat sat on the mat"), characters#1, upper-case#1, 
-                           options := {'combine':concat#2})
+                           options := {'duplicates':concat#2})
               let $n := ((for $item in tokenize("The cat sat on the mat")
                           let $val := upper-case($item)
                           for $key in characters($item)
-                          return map:pair($key, $val) )    =>  map:of-pairs({'combine':concat#2}))
+                          return map:pair($key, $val) )    =>  map:of-pairs({'duplicates':concat#2}))
              return deep-equal(trace(serialize($m, {'method':'adaptive'}), '$m'), 
                                trace(serialize($n, {'method':'adaptive'}), '$n'))
         </test>
@@ -636,7 +625,7 @@
         <created by="Michael Kay" on="2024-06-26"/>
         <test>map:build(("A", "B", "C", "A"), 
                         value := fn($it, $pos){$pos}, 
-                        options := {'combine' : op('+')})</test>
+                        options := {'duplicates' : op('+')})</test>
         <result>
             <assert-deep-eq>map{"A":5, "B":2, "C":3}</assert-deep-eq>
         </result>
