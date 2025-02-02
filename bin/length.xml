@@ -1,0 +1,71 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-length">
+  <description>Tests for the bin:length function</description>
+  
+  <environment name="EXPath-binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <param name="empty.bin" select="xs:base64Binary('')"/>
+    <!-- 'Man' in base64 - 3 octets, 4 characters -->
+    <param name="man.base" select="xs:base64Binary('TWFu')"/>
+    <param name="man.octets" select="77,97,110"/>
+  </environment>
+  
+  <dependency type="feature" value="binary"/>
+  
+  <test-case name="EXPath-binary-length-001">
+    <description>Use length on an empty value</description>
+    <created by="Michael Kay" on="2013-07-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:length(xs:base64Binary("")) </test>
+    <result>
+      <assert-eq>0</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-length-002">
+    <description>Use length on an quadruple octet value</description>
+    <created by="John Lumley" on="2013-07-16"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:length(xs:base64Binary(xs:hexBinary("face1234"))) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:integer</assert-type>
+        <assert-eq>4</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-length1">
+    <description>Test for the length function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:length(xs:base64Binary(xs:hexBinary("")))</test>
+    <result>
+      <assert-eq>0</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-length2">
+    <description>Test for the length function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:length(xs:base64Binary(xs:hexBinary("FF")))</test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-length3">
+    <description>Test for the length function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:length(xs:base64Binary(xs:hexBinary("12345678")))</test>
+    <result>
+      <assert-eq>4</assert-eq>
+    </result>
+  </test-case>
+  
+ 
+  
+</test-set>

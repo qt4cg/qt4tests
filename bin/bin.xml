@@ -1,0 +1,200 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-bin">
+  <description>Tests for the bin:bin unction</description>
+  
+  <environment name="EXPath-binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <param name="empty.bin" select="xs:base64Binary('')"/>
+    <!-- 'Man' in base64 - 3 octets, 4 characters -->
+    <param name="man.base" select="xs:base64Binary('TWFu')"/>
+    <param name="man.octets" select="77,97,110"/>
+  </environment>
+  
+  <dependency type="feature" value="binary"/>
+  
+  <test-case name="EXPath-binary-bin-001">
+    <description>Generate a zero-length binary from an empty binary string</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:bin("") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-bin-002">
+    <description>Generate an empty sequence from an empty sequence</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:bin(()) </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-bin-003">
+    <description>Generate a binary from an eight-multiple binary string</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:bin("010011010110000101101110") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("TWFu")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-bin-004">
+    <description>Generate a binary from a non-eight-multiple binary string</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:bin("011010110000101101110") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("DWFu")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-bin-005">
+    <description>Parsing error in binary string</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:bin("0100a1010110000101101110") </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}non-numeric-character"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-bin1">
+    <description>Test for the bin function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:bin(()))</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-bin2">
+    <description>Test for the bin function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:bin(""))</test>
+    <result>
+      <assert-eq>xs:hexBinary("")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-bin3">
+    <description>Test for the bin function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:bin("0"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("00")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-bin4">
+    <description>Test for the bin function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:bin("00"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("00")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-bin5">
+    <description>Test for the bin function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:bin("000000000"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("0000")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-bin6">
+    <description>Test for the bin function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:bin("1"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("01")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-bin7">
+    <description>Test for the bin function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:bin("10"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("02")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-bin8">
+    <description>Test for the bin function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:bin("11111111"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("FF")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-bin9">
+    <description>Test for the bin function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:bin("111111111"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("01FF")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-bin10">
+    <description>Test for the bin function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:bin("1101000111010101")</test>
+    <result>
+      <assert-eq>xs:base64Binary("0dU=")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-bin11">
+    <description>Test for the bin function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:bin("1000111010101")</test>
+    <result>
+      <assert-eq>xs:base64Binary("EdU=")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-bin12">
+    <description>Test for the bin function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:bin("X")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}non-numeric-character"/>
+    </result>
+  </test-case>
+  
+ 
+  
+</test-set>

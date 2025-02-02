@@ -1,0 +1,320 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-decode-string">
+  <description>Tests for the bin:decode-string function</description>
+  
+  <environment name="EXPath-binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <param name="empty.bin" select="xs:base64Binary('')"/>
+    <!-- 'Man' in base64 - 3 octets, 4 characters -->
+    <param name="man.base" select="xs:base64Binary('TWFu')"/>
+    <param name="man.octets" select="77,97,110"/>
+  </environment>
+  
+  
+  <dependency type="feature" value="binary"/>
+  
+  
+  <test-case name="EXPath-binary-decode-string-001">
+    <description>decode-string on an empty sequence</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string((),"utf-8") </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-002">
+    <description>decode-string on empty binary data</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string($empty.bin,"utf-8") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert-eq>""</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-003">
+    <description>decode-string with unknown encoding</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string($empty.bin,"NOTutf-8") </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}unknown-encoding"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-004">
+    <description>decode-string on non-empty binary data</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-12" change="Replace non-ASCII by encodings"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(bin:encode-string("Simple &#xa3; text","utf-8"),"utf-8") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert-eq>"Simple &#xa3; text"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-005">
+    <description>decode-string on non-empty binary data</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-12" change="Replace non-ASCII by encodings"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary("QcOqw7HDvEM="),"utf-8") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert-eq>"A&#xea;&#xf1;&#xfc;C"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-006">
+    <description>decode-string on non-empty binary data, converted from octets</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-12" change="Replace non-ASCII by encodings"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(bin:from-octets((65,195,170,195,177,195,188,67)),"utf-8") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert-eq>"A&#xea;&#xf1;&#xfc;C"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-007">
+    <description>decode-string with offset</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-12" change="Replace non-ASCII by encodings"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary("QcOqw7HDvEM="),"utf-8",3) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert-eq>"&#xf1;&#xfc;C"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-008">
+    <description>decode-string with offset and size</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-12" change="Replace non-ASCII by encodings"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary("QcOqw7HDvEM="),"utf-8",3,4) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert-eq>"&#xf1;&#xfc;"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-009">
+    <description>decode-string with negative offset</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary("QcOqw7HDvEM="),"utf-8",-3,4) </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-010">
+    <description>decode-string with negative size</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary("QcOqw7HDvEM="),"utf-8",3,-4) </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}negative-size"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-011">
+    <description>decode-string with offset+size beyond data</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary("QcOqw7HDvEM="),"utf-8",3,6) </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-012">
+    <description>decode-string with code phasing mismatch in UTF-8</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary("QcOqw7HDvEM="),"utf-8",2) </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}conversion-error"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-013">
+    <description>decode-string on non-empty binary data in UTF-16</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary(
+                xs:hexBinary("feff00540068006900730020006900730020005500540046002d00310036")),
+                "utf-16") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert-eq>"This is UTF-16"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-014">
+    <description>decode-string on non-empty binary data in UTF-16 with big-endian
+                BOM</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-12" change="Replace non-ASCII by encodings"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary(xs:hexBinary("feff011e")),"utf-16") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert-eq>"&#x11e;"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-015">
+    <description>decode-string on non-empty binary data in UTF-16 with little endian
+                BOM</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-12" change="Replace non-ASCII by encodings"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary(xs:hexBinary("fffe1e01")),"utf-16") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+
+        <assert-eq>"&#x11e;"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-016">
+    <description>decode-string on non-empty binary data with default encoding</description>
+    <created by="John Lumley" on="2013-11-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary("QcOqw7HDvEM=")) =
+                bin:decode-string(xs:base64Binary("QcOqw7HDvEM="),"utf-8") </test>
+    <result>
+      <all-of>
+        <assert-true/>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-decode-string1">
+    <description>Test for the decode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <modified by="John Lumley" on="2014-08-13" change="changed assertion type to string from integer"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:decode-string(xs:base64Binary(xs:hexBinary("3132")), "US-ASCII")</test>
+    <result>
+      <assert-eq>'12'</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-decode-string2">
+    <description>Test for the decode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:decode-string(xs:base64Binary(xs:hexBinary("3132")), "UTF-8")</test>
+    <result>
+      <assert-eq>'12'</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-decode-string3">
+    <description>Test for the decode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:decode-string(xs:base64Binary(xs:hexBinary("313233")), "UTF-8", 1, 1)</test>
+    <result>
+      <assert-eq>'2'</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-decode-string4">
+    <description>Test for the decode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:decode-string(xs:base64Binary(xs:hexBinary("")), "UTF-8", -1)</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-decode-string5">
+    <description>Test for the decode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:decode-string(xs:base64Binary(xs:hexBinary("")), "UTF-8", 0, -1)</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}negative-size"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-decode-string6">
+    <description>Test for the decode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:decode-string(xs:base64Binary(xs:hexBinary("")), "UTF-8", 1, 0)</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-decode-string7">
+    <description>Test for the decode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:decode-string(xs:base64Binary(xs:hexBinary("")), "UTF-8", 0, 1)</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-decode-string8">
+    <description>Test for the decode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:decode-string(xs:base64Binary(xs:hexBinary("")), "X")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}unknown-encoding"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-decode-string9">
+    <description>Test for the decode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:decode-string(xs:base64Binary(xs:hexBinary("FF")), "UTF-8")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}conversion-error"/>
+    </result>
+  </test-case>
+  
+ 
+  
+</test-set>

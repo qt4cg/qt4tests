@@ -1,0 +1,163 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-find">
+  <description>Tests for the bin:find function</description>
+  
+  <environment name="EXPath-binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <param name="empty.bin" select="xs:base64Binary('')"/>
+    <!-- 'Man' in base64 - 3 octets, 4 characters -->
+    <param name="man.base" select="xs:base64Binary('TWFu')"/>
+    <param name="man.octets" select="77,97,110"/>
+  </environment>
+  
+  <dependency type="feature" value="binary"/>
+  
+  <test-case name="EXPath-binary-find-001">
+    <description>find on an empty sequence</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:find((),0,xs:base64Binary("TWFuAAAA")) </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-find-002">
+    <description>find with an empty search sequence</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2013-11-25" change="Empty search supported"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:find(xs:base64Binary("TWFuAAAA"),1,xs:base64Binary("")) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:integer</assert-type>
+        <assert-eq>1</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-find-003">
+    <description>find with negative offset</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:find(xs:base64Binary("AE1hbg=="),-1,xs:base64Binary("TWFu")) </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-find-004">
+    <description>find with offset beyond input</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:find(xs:base64Binary("AE1hbg=="),5,xs:base64Binary("TWFu")) </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-find-005">
+    <description>find with search sequence absent from target</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:find(xs:base64Binary("AE1hbg=="),2,xs:base64Binary("TWFu")) </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-find-006">
+    <description>find under normal operation</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:find(xs:base64Binary("AE1hbg=="),0,xs:base64Binary("TWFu")) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:integer</assert-type>
+        <assert-eq>1</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-find-007">
+    <description>find under normal operation</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:find(xs:base64Binary("TWFuAA=="),0,xs:base64Binary("TWFu")) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:integer</assert-type>
+        <assert-eq>0</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-find1">
+    <description>Test for the find function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:find(xs:base64Binary(xs:hexBinary("1122")), 0, xs:base64Binary(xs:hexBinary("11")))</test>
+    <result>
+      <assert-eq>0</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-find2">
+    <description>Test for the find function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:find(xs:base64Binary(xs:hexBinary("1122")), 1, xs:base64Binary(xs:hexBinary("11")))</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-find3">
+    <description>Test for the find function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:find(xs:base64Binary(xs:hexBinary("112233")), 0, xs:base64Binary(xs:hexBinary("22")))</test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-find4">
+    <description>Test for the find function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:find(xs:base64Binary(xs:hexBinary("")), -1, xs:base64Binary(xs:hexBinary("11")))</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-find5">
+    <description>Test for the find function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:find(xs:base64Binary(xs:hexBinary("")), 1, xs:base64Binary(xs:hexBinary("11")))</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-find6">
+    <description>Test for the find function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:find(xs:base64Binary(xs:hexBinary("")), 0, xs:base64Binary(xs:hexBinary("")))</test>
+    <result>
+      <assert-eq>0</assert-eq>
+      <!--<error code="Q{http://expath.org/ns/binary}empty-search-item"/>-->
+    </result>
+  </test-case>
+  
+ 
+  
+</test-set>

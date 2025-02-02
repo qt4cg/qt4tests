@@ -1,0 +1,116 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-from-octets">
+  <description>Tests for the bin:from-octets unction</description>
+  
+  <environment name="EXPath-binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <param name="empty.bin" select="xs:base64Binary('')"/>
+    <!-- 'Man' in base64 - 3 octets, 4 characters -->
+    <param name="man.base" select="xs:base64Binary('TWFu')"/>
+    <param name="man.octets" select="77,97,110"/>
+  </environment>
+  
+  <dependency type="feature" value="binary"/>
+  
+  <test-case name="EXPath-binary-from-octets-001">
+    <description>Generate a zero-length binary from an empty set of octets</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:from-octets(()) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-from-octets-002">
+    <description>Generate a 4-length binary from a triple of octets</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:from-octets($man.octets) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("TWFu")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-from-octets-003">
+    <description>Negative integer outside octet range in binary construction</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:from-octets((-77,97,110)) </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}octet-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-from-octets-004">
+    <description>Positive integer outside octet range in binary construction</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:from-octets((277,97,110)) </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}octet-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-from-octets1">
+    <description>Test for the from-octets function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:from-octets(0))</test>
+    <result>
+      <assert-eq>xs:hexBinary("00")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-from-octets2">
+    <description>Test for the from-octets function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:from-octets((1,127)))</test>
+    <result>
+      <assert-eq>xs:hexBinary("017F")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-from-octets3">
+    <description>Test for the from-octets function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:from-octets((128,255)))</test>
+    <result>
+      <assert-eq>xs:hexBinary("80FF")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-from-octets4">
+    <description>Test for the from-octets function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:from-octets(-1)</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}octet-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-from-octets5">
+    <description>Test for the from-octets function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:from-octets(256)</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}octet-out-of-range"/>
+    </result>
+  </test-case>
+  
+ 
+  
+</test-set>
