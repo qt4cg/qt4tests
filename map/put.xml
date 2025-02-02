@@ -151,13 +151,14 @@
         <description>map:put() with assorted keys that compare equal</description>
         <created by="Michael Kay, Saxonica" on="2014-05-13"/>
         <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/>
+        <modified by="Christian Gruen" on="2025-01-30" change="Implementation-dependent key handling"/>
         <environment ref="map"/>
         <test>map:put(map{3 : "three"},  xs:float('3.0'), "threeF")</test>
         <result>
             <all-of>
                 <assert-count>1</assert-count>
                 <assert-type>map(*)</assert-type>
-                <assert-type>map(xs:float, xs:string)</assert-type>
+                <assert-type>map(xs:numeric, xs:string)</assert-type>
                 <assert>map:size($result) eq 1</assert>
                 <assert>$result?(3.0) eq "threeF"</assert>
             </all-of>
@@ -290,8 +291,9 @@
     </test-case>
     
     <test-case name="map-put-026">
-        <description>The new entry has the type annotation of the new key</description>
+        <description>The new entry may change the type annotation of the new key</description>
         <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <modified by="Christian Gruen" on="2025-01-30" change="Implementation-dependent key handling"/>
         <environment ref="map"/>
         <test>
             {"x":5, "y":6} 
@@ -299,19 +301,28 @@
             => map:put(xs:NCName("y"), 60)
             => map:keys()</test>
         <result>
-            <assert-type>xs:NCName+</assert-type>
+            <any-of>
+                <assert-type>xs:string+</assert-type>
+                <assert-type>xs:NCName+</assert-type>
+            </any-of>
         </result>
     </test-case>
     
     <test-case name="map-put-027">
-        <description>The new entry has the type annotation of the new key</description>
+        <description>The new entry may change the type annotation of the new key</description>
         <created by="Michael Kay, Saxonica" on="2025-01-29"/>
+        <modified by="Christian Gruen" on="2025-01-30" change="Implementation-dependent key handling"/>
         <environment ref="map"/>
         <test>
-            ( {"x":5, "y":6} 
-               => map:put(xs:NCName("x"), true()) 
-               => map:put(xs:NCName("y"), (false(), false()))
-            ) instance of map(xs:NCName, xs:boolean+)
+        let $map := (
+          {"x":5, "y":6} 
+          => map:put(xs:NCName("x"), true()) 
+          => map:put(xs:NCName("y"), (false(), false()))
+        )
+        return (
+          $map instance of map(xs:NCName, xs:boolean+) or
+          $map instance of map(xs:string, xs:boolean+)
+        )
         </test>
         <result>
             <assert-true/>
