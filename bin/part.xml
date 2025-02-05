@@ -1,0 +1,170 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-part">
+  <description>Tests for the bin:part function</description>
+  
+  <environment name="EXPath-binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <param name="empty.bin" select="xs:base64Binary('')"/>
+    <!-- 'Man' in base64 - 3 octets, 4 characters -->
+    <param name="man.base" select="xs:base64Binary('TWFu')"/>
+    <param name="man.octets" select="77,97,110"/>
+  </environment>
+  
+  <dependency type="feature" value="binary"/>
+  
+ <test-case name="EXPath-binary-part-001">
+    <description>Part of an empty sequence</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:part((),0) </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-part-002">
+    <description>Part with negative offset</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:part($man.base,-1) </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-part-003">
+    <description>Part with negative size</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:part($man.base,0,-1) </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}negative-size"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-part-004">
+    <description>Part: offset just at end of input</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:part($man.base,3) </test>
+    <result>
+      <assert-eq>xs:base64Binary("")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-part-005">
+    <description>Part: offset beyond end of input</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:part($man.base,4) </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-part-006">
+    <description>Part: end beyond end of input</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:part($man.base,2,2) </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-part1">
+    <description>Test for the part function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:part((), 0))</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-part2">
+    <description>Test for the part function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:part(xs:base64Binary(xs:hexBinary("FF")), 0))</test>
+    <result>
+      <assert-eq>xs:hexBinary("FF")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-part3">
+    <description>Test for the part function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:part(xs:base64Binary(xs:hexBinary("FF")), 0, 1))</test>
+    <result>
+      <assert-eq>xs:hexBinary("FF")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-part4">
+    <description>Test for the part function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:part(xs:base64Binary(xs:hexBinary("FF")), 1))</test>
+    <result>
+      <assert-eq>xs:hexBinary("")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-part5">
+    <description>Test for the part function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:part(xs:base64Binary(xs:hexBinary("FF")), 1, 0))</test>
+    <result>
+      <assert-eq>xs:hexBinary("")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-part6">
+    <description>Test for the part function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:part(xs:base64Binary(xs:hexBinary("FF")), -1)</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-part7">
+    <description>Test for the part function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:part(xs:base64Binary(xs:hexBinary("FF")), 0, -1)</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}negative-size"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-part8">
+    <description>Test for the part function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:part(xs:base64Binary(xs:hexBinary("FF")), 2)</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-part9">
+    <description>Test for the part function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:part(xs:base64Binary(xs:hexBinary("FF")), 0, 2)</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}index-out-of-range"/>
+    </result>
+  </test-case>
+  
+</test-set>

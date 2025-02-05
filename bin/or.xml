@@ -1,0 +1,146 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-or">
+  <description>Tests for the bin:or function</description>
+  
+  <environment name="EXPath-binary-bitwise">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <namespace prefix="binJAVA" uri="java:org.expath.ns.binary.EXPathBinary"/>
+    <namespace prefix="err" uri="http://expath.org/ns/binary"/>
+    <param name="empty.bin" select="xs:base64Binary('')"/>
+    <param name="a" select="xs:base64Binary(xs:hexBinary('F00F'))"/>
+    <param name="b" select="xs:base64Binary(xs:hexBinary('0FF0'))"/>
+    <param name="c" select="xs:base64Binary(xs:hexBinary('0FABCD'))"/>
+  </environment>
+  
+  <environment name="binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+  </environment>
+  
+  <dependency type="feature" value="binary"/>
+  
+  <test-case name="EXPath-binary-bitwise-or-001">
+    <description>bitwise-or with differing lengths</description>
+    <created by="John Lumley" on="2013-07-22"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:or($a,$c) </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}differing-length-arguments"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-bitwise-or-002">
+    <description>bitwise-or on empty sequences</description>
+    <created by="John Lumley" on="2013-07-22"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:or((),()) </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-bitwise-or-003">
+    <description>bitwise-or with data and empty sequence</description>
+    <created by="John Lumley" on="2013-07-22"/>
+    <modified by="John Lumley" on="2013-11-13" change="change to empty sequence result"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:or($a,()) </test>
+    <result>
+      <assert-empty/>
+      <!-- <error code="Q{http://expath.org/ns/binary}differing-length-arguments"/>-->
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-bitwise-or-004">
+    <description>bitwise-or with empty sequence and data</description>
+    <created by="John Lumley" on="2013-07-22"/>
+    <modified by="John Lumley" on="2013-11-13" change="change to empty sequence result"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:or((),$a) </test>
+    <result>
+      <assert-empty/>
+      <!--<error code="Q{http://expath.org/ns/binary}differing-length-arguments"/>-->
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-bitwise-or-005">
+    <description>bitwise-or on empty binaries</description>
+    <created by="John Lumley" on="2013-07-22"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:or($empty.bin,$empty.bin) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary('')</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-bitwise-or-006">
+    <description>bitwise-or with similar lengths</description>
+    <created by="John Lumley" on="2013-07-22"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:or($a,$b) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary(xs:hexBinary("FFFF"))</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-or1">
+    <description>Test for the or function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:or((), xs:base64Binary(xs:hexBinary("00"))))</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-or2">
+    <description>Test for the or function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:or(xs:base64Binary(xs:hexBinary("00")), ()))</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-or3">
+    <description>Test for the or function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:or(xs:base64Binary(xs:hexBinary("")), xs:base64Binary(xs:hexBinary(""))))</test>
+    <result>
+      <assert-eq>xs:hexBinary("")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-or4">
+    <description>Test for the or function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:or(xs:base64Binary(xs:hexBinary("8081")), xs:base64Binary(xs:hexBinary("7F7E"))))</test>
+    <result>
+      <assert-eq>xs:hexBinary("FFFF")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-or5">
+    <description>Test for the or function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>bin:or(xs:base64Binary(xs:hexBinary("00")), xs:base64Binary(xs:hexBinary("")))</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}differing-length-arguments"/>
+    </result>
+  </test-case>
+
+ 
+  
+</test-set>

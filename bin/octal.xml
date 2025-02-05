@@ -1,0 +1,190 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-octal">
+  <description>Tests for the bin:octal function</description>
+  
+  <environment name="EXPath-binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <param name="empty.bin" select="xs:base64Binary('')"/>
+    <!-- 'Man' in base64 - 3 octets, 4 characters -->
+    <param name="man.base" select="xs:base64Binary('TWFu')"/>
+    <param name="man.octets" select="77,97,110"/>
+  </environment>
+  
+  <dependency type="feature" value="binary"/>
+  
+  <test-case name="EXPath-binary-octal-001">
+    <description>Generate a zero-length binary from an empty octal string</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:octal("") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-octal-002">
+    <description>octal - Generate an empty sequence from an empty sequence</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:octal(()) </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-octal-003">
+    <description>Generate a binary from byte-aligned octal string</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:octal("23260556") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("TWFu")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-octal-004">
+    <description>Generate a binary from a non-byte-aligned string</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:octal("3260556") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("DWFu")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-octal-005">
+    <description>Parsing error in octal string</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:octal("8260556") </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}non-numeric-character"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-octal1">
+    <description>Test for the octal function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:octal(())</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-octal2">
+    <description>Test for the octal function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:octal(""))</test>
+    <result>
+      <assert-eq>xs:hexBinary("")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-octal3">
+    <description>Test for the octal function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:octal("0"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("00")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-octal4">
+    <description>Test for the octal function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:octal("00"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("00")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-octal5">
+    <description>Test for the octal function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:octal("000"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("0000")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-octal6">
+    <description>Test for the octal function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:octal("007"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("0007")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-octal7">
+    <description>Test for the octal function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:octal("1"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("01")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-octal8">
+    <description>Test for the octal function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:octal("10"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("08")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-octal9">
+    <description>Test for the octal function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:octal("77"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("3F")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-octal10">
+    <description>Test for the octal function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:octal("11223047")</test>
+    <result>
+      <assert-eq>xs:base64Binary("JSYn")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-octal11">
+    <description>Test for the octal function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:octal("X")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}non-numeric-character"/>
+    </result>
+  </test-case>
+  
+ 
+  
+</test-set>

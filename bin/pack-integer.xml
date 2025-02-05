@@ -1,0 +1,635 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-pack-integer">
+  <description>Tests for the bin:pack-integer function</description>
+  
+  <environment name="binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+  </environment>
+  
+  <environment name="EXPath-binary.numeric">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <namespace prefix="binJAVA" uri="java:org.expath.ns.binary.EXPathBinary"/>
+    <namespace prefix="err" uri="http://expath.org/ns/binary"/>
+    <param name="int.byte" select="5"/>
+    <param name="int.short" select="256 * 1 + 5"/>
+    <param name="int.3" select="65536 * 1 + 256 * 1 + 5"/>
+    <param name="int.int" select="16777216 * 1 + 65536 * 1 + 256 * 1 + 5"/>
+    <param name="int.long" select="4294967296 * 1 + 16777216 * 1 + 65536 * 1 + 256 * 1 + 5"/>
+    <param name="double.negative.0" select="xs:base64Binary(xs:hexBinary('8000000000000000'))"/>
+    <param name="double.1" select="xs:base64Binary(xs:hexBinary('3ff0000000000000'))"/>
+    <param name="double.1.octets" select="(63,240,0,0,0,0,0,0)"/>
+    <param name="float.negative.0" select="xs:base64Binary(xs:hexBinary('80000000'))"/>
+    <param name="float.1.octets" select="(63,128,0,0)"/>
+    <param name="int.byte.B" select="xs:base64Binary(xs:hexBinary('f0'))"/>
+    <param name="int.short.B" select="xs:base64Binary(xs:hexBinary('f040'))"/>
+    <param name="int.short.B-1" select="xs:base64Binary(xs:hexBinary('ffff'))"/>
+  </environment>
+  
+  
+  <dependency type="feature" value="binary"/>
+  
+  <test-case name="EXPath-binary-pack-integer-001">
+    <description>pack-integer with unknown octet-order</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:pack-integer(0,1,'MOST-sign-first') </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}unknown-significance-order"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-002">
+    <description>pack-integer octet-order comparison - most significant synonyms</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> for $b in bin:pack-integer(34567,3,'most-significant-first') return $b eq
+                bin:pack-integer(34567,3,'big-endian') and $b eq bin:pack-integer(34567,3,'BE') </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-003">
+    <description>pack-integer octet-order comparison - least significant synonyms</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> for $b in bin:pack-integer(34567,3,'least-significant-first') return $b eq
+                bin:pack-integer(34567,3,'little-endian') and $b eq bin:pack-integer(34567,3,'LE') </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-004">
+    <description>pack-integer octet-order comparison - least and most differ</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:pack-integer(34567,3,'most-significant-first') eq
+                bin:pack-integer(34567,3,'least-significant-first') </test>
+    <result>
+      <assert-false/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-005">
+    <description>pack-integer with negative length</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:pack-integer(34567,-3,'most-significant-first') </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}negative-size"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-006">
+    <description>pack-integer with zero length</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:pack-integer(34567,0,'most-significant-first') </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-007">
+    <description>pack-integer with zero as byte</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:pack-integer(0,1) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("AA==")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-008">
+    <description>pack-integer with non-zero as byte</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:pack-integer($int.short,1) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("BQ==")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-009">
+    <description>pack-integer with zero as short</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:pack-integer(0,2) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("AAA=")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-010">
+    <description>pack-integer with non-zero as short - default - big-endian</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:pack-integer($int.short,2) eq  bin:pack-integer($int.short,2,'BE')</test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-011">
+    <description>pack-integer with non-zero as short - little-endian</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:pack-integer($int.short,2,'least-significant-first') </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("BQE=")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-012">
+    <description>pack-integer with non-zero as short - big-endian</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:pack-integer($int.short,2,'most-significant-first') </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("AQU=")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-013">
+    <description>pack-integer with non-zero as short - big-endian</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer($int.short,2)) </test>
+    <result>
+      <assert-deep-eq>(1,5)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-014">
+    <description>pack-integer with non-zero as short - big-endian</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer($int.short,2,'most-significant-first')) </test>
+    <result>
+      <assert-deep-eq>(1,5)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-015">
+    <description>pack-integer with non-zero as 3-byte - little-endian</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer($int.3,3,'LE')) </test>
+    <result>
+      <assert-deep-eq>(5,1,1)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-016">
+    <description>pack-integer with non-zero as 3-byte - big-endian</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer($int.3,3,'most-significant-first')) </test>
+    <result>
+      <assert-deep-eq>(1,1,5)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-017">
+    <description>pack-integer with non-zero as int - little-endian</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer($int.int,4,'LE')) </test>
+    <result>
+      <assert-deep-eq>(5,1,1,1)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-018">
+    <description>pack-integer with non-zero as int - big-endian</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer($int.int,4,'most-significant-first')) </test>
+    <result>
+      <assert-deep-eq>(1,1,1,5)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-019">
+    <description>pack-integer with non-zero as long - little-endian</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer($int.long,8,'LE')) </test>
+    <result>
+      <assert-deep-eq>(5,1,1,1,1,0,0,0)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-020">
+    <description>pack-integer with non-zero as long - big-endian</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer($int.long,8,'most-significant-first')) </test>
+    <result>
+      <assert-deep-eq>(0,0,0,1,1,1,1,5)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-021">
+    <description>pack-integer with non-zero as BIG - big-endian</description>
+    <created by="John Lumley" on="2013-07-19"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(12345678901234,12,'most-significant-first')) </test>
+    <result>
+      <assert-deep-eq>(0, 0, 0, 0, 0, 0, 11, 58, 115, 206, 47, 242)</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-binary-pack-integer-022">
+    <description>pack-integer - negative - big-endian - single-byte</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-2, 1, 'BE')) </test>
+    <result>
+      <assert-deep-eq>(254)</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-binary-pack-integer-023">
+    <description>pack-integer - negative - big-endian - two-byte</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-2, 2, 'BE')) </test>
+    <result>
+      <assert-deep-eq>(255, 254)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-024">
+    <description>pack-integer - negative - big-endian - four-byte</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-2, 4, 'BE')) </test>
+    <result>
+      <assert-deep-eq>(255, 255, 255, 254)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-025">
+    <description>pack-integer - negative - big-endian - eight-byte</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-2, 8, 'BE')) </test>
+    <result>
+      <assert-deep-eq>(255, 255, 255, 255, 255, 255, 255, 254)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-026">
+    <description>pack-integer - negative - big-endian - 16-byte</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-2, 16, 'BE')) </test>
+    <result>
+      <assert-deep-eq>(255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 254)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-027">
+    <description>pack-integer - large negative - big-endian - 16-byte</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-1000000000000, 16, 'BE')) </test>
+    <result>
+      <assert-deep-eq>(255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 23, 43, 90, 240, 0)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-028">
+    <description>pack-integer - negative - big-endian - truncated</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-65536, 1, 'BE')) </test>
+    <result>
+      <assert-deep-eq>(0)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-029">
+    <description>pack-integer - negative - big-endian - truncated</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-65536*65536, 3, 'BE')) </test>
+    <result>
+      <assert-deep-eq>(0, 0, 0)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-030">
+    <description>pack-integer - negative - little-endian - single-byte</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-2, 1, 'LE')) </test>
+    <result>
+      <assert-deep-eq>(254)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-031">
+    <description>pack-integer - negative - little-endian - 2-byte</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-2, 2, 'LE')) </test>
+    <result>
+      <assert-deep-eq>(254, 255)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-032">
+    <description>pack-integer - negative - little-endian - 4-byte</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-2, 4, 'LE')) </test>
+    <result>
+      <assert-deep-eq>(254, 255, 255, 255)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-033">
+    <description>pack-integer - negative - little-endian - 8-byte</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-2, 8, 'LE')) </test>
+    <result>
+      <assert-deep-eq>(254, 255, 255, 255, 255, 255, 255, 255)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-034">
+    <description>pack-integer - negative - little-endian - 16-byte</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-2, 16, 'LE')) </test>
+    <result>
+      <assert-deep-eq>(254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-035">
+    <description>pack-integer - large negative - little-endian - 16-byte</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-1000000000000, 16, 'LE')) </test>
+    <result>
+      <assert-deep-eq>(0, 240, 90, 43, 23, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-036">
+    <description>pack-integer - negative - little-endian - truncated</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-65536*65536, 3, 'LE')) </test>
+    <result>
+      <assert-deep-eq>(0, 0, 0)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-040">
+    <description>pack-integer - positive - big-endian - truncated</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(65536*65536, 3, 'BE')) </test>
+    <result>
+      <assert-deep-eq>(0, 0, 0)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-041">
+    <description>pack-integer - positive - little-endian - truncated</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(65536*65536, 3, 'LE')) </test>
+    <result>
+      <assert-deep-eq>(0, 0, 0)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-042">
+    <description>pack-integer - extended zero - big-endian</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(0, 20, 'BE')) </test>
+    <result>
+      <assert-deep-eq>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-043">
+    <description>pack-integer - extended zero - little-endian</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(0, 20, 'LE')) </test>
+    <result>
+      <assert-deep-eq>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-044">
+    <description>pack-integer - extended -1 - big-endian</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-1, 20, 'BE')) </test>
+    <result>
+      <assert-deep-eq>(255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-pack-integer-045">
+    <description>pack-integer - extended zero - little-endian</description>
+    <created by="Michael Kay" on="2022-04-08"/>
+    <environment ref="EXPath-binary.numeric"/>
+    <test> bin:to-octets(bin:pack-integer(-1, 20, 'LE')) </test>
+    <result>
+      <assert-deep-eq>(255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer1">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:pack-integer(1, 0))</test>
+    <result>
+      <assert-eq>xs:hexBinary("")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer2">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:pack-integer(1, 1))</test>
+    <result>
+      <assert-eq>xs:hexBinary("01")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer3">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:pack-integer(1, 2))</test>
+    <result>
+      <assert-eq>xs:hexBinary("0001")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer4">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:pack-integer(9223372036854775807, 8))</test>
+    <result>
+      <assert-eq>xs:hexBinary("7FFFFFFFFFFFFFFF")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer5">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:pack-integer(-1, 8))</test>
+    <result>
+      <assert-eq>xs:hexBinary("FFFFFFFFFFFFFFFF")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer6">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:pack-integer(-1, 9))</test>
+    <result>
+      <assert-eq>xs:hexBinary("FFFFFFFFFFFFFFFFFF")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer7">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:pack-integer(1, 2, "most-significant-first"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("0001")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer8">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:pack-integer(1, 2, "big-endian"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("0001")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer9">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:pack-integer(1, 2, "BE"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("0001")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer10">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:pack-integer(1, 2, "least-significant-first"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("0100")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer11">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:pack-integer(1, 2, "little-endian"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("0100")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer12">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:pack-integer(1, 2, "LE"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("0100")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer13">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>bin:pack-integer(1, -1)</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}negative-size"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-pack-integer14">
+    <description>Test for the pack-integer function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="binary"/>
+    <test>bin:pack-integer(1, 1, "X")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}unknown-significance-order"/>
+    </result>
+  </test-case>
+
+  
+ 
+  
+</test-set>

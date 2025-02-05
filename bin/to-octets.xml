@@ -1,0 +1,81 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-to-octets">
+  <description>Tests for the bin:to-octets unction</description>
+  
+  <environment name="EXPath-binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <param name="empty.bin" select="xs:base64Binary('')"/>
+    <!-- 'Man' in base64 - 3 octets, 4 characters -->
+    <param name="man.base" select="xs:base64Binary('TWFu')"/>
+    <param name="man.octets" select="77,97,110"/>
+  </environment>
+  
+  <dependency type="feature" value="binary"/>
+  
+  <test-case name="EXPath-binary-to-octets-001">
+    <description>Octets from a zero-length binary</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:to-octets(xs:base64Binary("")) </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-to-octets-002">
+    <description>Generate octets from a 4-length</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:to-octets($man.base) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:integer*</assert-type>
+        <assert-deep-eq>(77,97,110)</assert-deep-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-to-octets1">
+    <description>Test for the to-octets function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:to-octets(xs:base64Binary(xs:hexBinary("")))</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-to-octets2">
+    <description>Test for the to-octets function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:to-octets(xs:base64Binary(xs:hexBinary("00")))</test>
+    <result>
+      <assert-eq>0</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-to-octets3">
+    <description>Test for the to-octets function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:to-octets(xs:base64Binary(xs:hexBinary("FF")))</test>
+    <result>
+      <assert-eq>255</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-to-octets4">
+    <description>Test for the to-octets function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:to-octets(xs:base64Binary(xs:hexBinary("1122")))</test>
+    <result>
+      <assert-deep-eq>17, 34</assert-deep-eq>
+    </result>
+  </test-case>
+  
+ 
+  
+</test-set>

@@ -1,0 +1,171 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-encode-string">
+  <description>Tests for the bin:encode-string function</description>
+  
+  <environment name="EXPath-binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <param name="empty.bin" select="xs:base64Binary('')"/>
+    <!-- 'Man' in base64 - 3 octets, 4 characters -->
+    <param name="man.base" select="xs:base64Binary('TWFu')"/>
+    <param name="man.octets" select="77,97,110"/>
+  </environment>
+  
+  
+  <dependency type="feature" value="binary"/>
+  
+  <test-case name="EXPath-binary-encode-string-001">
+    <description>encode-string on an empty string</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:encode-string("","utf-8") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-encode-string-002">
+    <description>encode-string with unknown encoding</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:encode-string("","NOTutf-8") </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}unknown-encoding"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-encode-string-003">
+    <description>encode-string on a non-empty string</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-12" change="Replace non-ASCII by encodings"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:encode-string("A&#xea;&#xf1;&#xfc;C","utf-8") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary("QcOqw7HDvEM=")</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-encode-string-004">
+    <description>encode-string on a non-empty string, converted to octets</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-12" change="Replace non-ASCII by encodings"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:to-octets(bin:encode-string("A&#xea;&#xf1;&#xfc;C","utf-8")) </test>
+    <result>
+      <assert-deep-eq>(65,195,170,195,177,195,188,67)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-encode-string-005">
+    <description>encode-string on a non-empty string - UTF-16 - no control over BOM
+        Note (MHK 2021-06-21): the expected results assume UTF-16BE with BOM. This
+        isn't mandated by the spec, but it seems a reasonable thing to aim for.
+      </description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> xs:hexBinary(bin:encode-string("This is UTF-16","utf-16")) </test>
+    <result>
+      <assert-eq>xs:hexBinary("feff00540068006900730020006900730020005500540046002d00310036")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-encode-string-006">
+    <description>
+        encode-string on a non-empty string - UTF-16 - no control over BOM.
+        Note (MHK 2021-06-21): the expected results assume UTF-16BE with BOM. This
+        isn't mandated by the spec, but it seems a reasonable thing to aim for.
+      </description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-12" change="Replace non-ASCII by encodings"/>
+    <environment ref="EXPath-binary"/>
+    <test> xs:hexBinary(bin:encode-string("&#x11e;","utf-16")) </test>
+    <result>
+      <assert-eq>xs:hexBinary("feff011e")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-encode-string-007">
+    <description>encode-string on a non-empty string using default encoding</description>
+    <created by="John Lumley" on="2013-11-19"/>
+    <modified by="John Lumley" on="2014-08-12" change="Replace non-ASCII by encodings"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:encode-string("A&#xea;&#xf1;&#xfc;C") =
+                bin:encode-string("A&#xea;&#xf1;&#xfc;C","utf-8") </test>
+    <result>
+      <all-of>
+        <assert-true/>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-encode-string-008">
+    <description>encode-string with unsupported character</description>
+    <created by="John Lumley" on="2013-07-18"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:encode-string("&#xa3;","US-ASCII") </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}conversion-error"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-encode-string1">
+    <description>Test for the encode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:encode-string("", "US-ASCII"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-encode-string2">
+    <description>Test for the encode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:encode-string("a", "US-ASCII"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("61")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-encode-string3">
+    <description>Test for the encode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>xs:hexBinary(bin:encode-string("&#196;", "UTF-8"))</test>
+    <result>
+      <assert-eq>xs:hexBinary("C384")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-encode-string4">
+    <description>Test for the encode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:encode-string("", "X")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}unknown-encoding"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-encode-string5">
+    <description>Test for the encode-string function.</description>
+    <created by="Christian Grün" on="2013-11-19+01:00"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:encode-string("&#196;", "US-ASCII")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}conversion-error"/>
+    </result>
+  </test-case>
+  
+ 
+  
+</test-set>
