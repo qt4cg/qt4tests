@@ -16,7 +16,7 @@ declare function mod1:nested() as element() {
   element outer { 
     namespace out { "http://out.zorba-xquery.com/" },
     element inner {
-      namespace "in" { "http://in.zorba-xquery.com/" }
+      namespace {"in"} { "http://in.zorba-xquery.com/" }
     } 
   }
 };
