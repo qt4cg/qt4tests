@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-ArrowPostfix" covers="arrow-operator">
-    <description>Tests for the arrow operator in XPath 3.1</description>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-ArrowExpr" covers="arrow-operator">
+    <description>Tests for the arrow operator</description>
              
 
     <test-case name="ArrowPostfix-001">
@@ -471,7 +471,7 @@
         </result>
     </test-case>
     
-    <test-case name="ArrowPostfix-401" covers-40="operator-symbols">
+    <test-case name="ArrowExpr-401" covers-40="operator-symbols">
         <description>Arrow operator used with ceiling function, full-width symbol</description>
         <created by="Michael Kay" on="2023-06-12"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
@@ -481,7 +481,7 @@
         </result>
     </test-case>
     
-    <test-case name="ArrowPostfix-402" covers-40="PR545">
+    <test-case name="ArrowExpr-402" covers-40="PR545">
         <description>Arrow operator used with inline function, no parens</description>
         <created by="Michael Kay" on="2023-06-12"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
@@ -491,7 +491,7 @@
         </result>
     </test-case>
     
-    <test-case name="ArrowPostfix-403" covers-40="PR545">
+    <test-case name="ArrowExpr-403" covers-40="PR545">
         <description>Arrow operator used with inline function, no parens</description>
         <created by="Michael Kay" on="2023-06-12"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
@@ -501,7 +501,7 @@
         </result>
     </test-case>
     
-    <test-case name="ArrowPostfix-404" covers-40="PR545">
+    <test-case name="ArrowExpr-404" covers-40="PR545">
         <description>Arrow operator used with inline function, no parens, 'fn' abbreviation</description>
         <created by="Michael Kay" on="2023-06-12"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
@@ -511,13 +511,143 @@
         </result>
     </test-case>
     
-    <test-case name="ArrowPostfix-405" covers-40="PR545">
+    <test-case name="ArrowExpr-405" covers-40="PR545">
         <description>Arrow operator used with inline function, no parens, 'fn' abbreviation</description>
         <created by="Michael Kay" on="2023-06-12"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test>4.54 => function{.+1}() => ceiling()</test>
         <result>
             <assert-deep-eq>6</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="ArrowExpr-406" covers-40="PR1763">
+        <description>A map may be used as a function</description>
+        <created by="Michael Kay" on="2025-02-18"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>"Tu" => map{"Mo": "Monday", "Tu": "Tuesday"}()</test>
+        <result>
+            <assert-eq>"Tuesday"</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="ArrowExpr-407" covers-40="PR1763">
+        <description>A map may be used as a function</description>
+        <created by="Michael Kay" on="2025-02-18"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>"Tu" => {"Mo": "Monday", "Tu": "Tuesday"}()</test>
+        <result>
+            <assert-eq>"Tuesday"</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="ArrowExpr-408" covers-40="PR1763 PR1830">
+        <description>Dynamic function selected from map</description>
+        <created by="Michael Kay" on="2025-02-18"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>3 => ({"Mo": "Monday", "Tu": fn{.+1}}("Tu"))()</test>
+        <result>
+            <assert-eq>4</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="ArrowExpr-409" covers-40="PR1763">
+        <description>Error case (reserved name)</description>
+        <created by="Michael Kay" on="2025-02-18"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>3 => if (true()) then abs() else round()</test>
+        <result>
+            <error code="XPST0003"/>
+        </result>
+    </test-case>
+    
+    <test-case name="ArrowExpr-410" covers-40="PR1763">
+        <description>Dynamic function call of a named function ref</description>
+        <created by="Michael Kay" on="2025-02-18"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>-3 => abs#1()</test>
+        <result>
+            <assert-eq>3</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="ArrowExpr-411" covers-40="PR1763">
+        <description>Dynamic function call of an array constructor</description>
+        <created by="Michael Kay" on="2025-02-18"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>3 => [4,5,6,7]()</test>
+        <result>
+            <assert-eq>6</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="ArrowExpr-412" covers-40="PR1763">
+        <description>Dynamic function call of an array constructor</description>
+        <created by="Michael Kay" on="2025-02-18"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>3 => array{(4,5,6,7)}()</test>
+        <result>
+            <assert-eq>6</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="ArrowExpr-413" covers-40="PR1763 PR1830">
+        <description>Dynamic function call of function returned by static function call</description>
+        <created by="Michael Kay" on="2025-02-18"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>-3 => function-lookup(xs:QName('fn:abs'), 1)()</test>
+        <result>
+            <error code="XPST0003"/>
+        </result>
+    </test-case>
+    
+    <test-case name="ArrowExpr-414" covers-40="PR1763 PR1830">
+        <description>Dynamic function call of function returned by static function call</description>
+        <created by="Michael Kay" on="2025-02-18"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>-3 => (function-lookup(xs:QName('fn:abs'), 1))()</test>
+        <result>
+            <assert-eq>3</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="ArrowExpr-415" covers-40="PR1763 PR1830">
+        <description>Dynamic function call of function returned by dynamic function call</description>
+        <created by="Michael Kay" on="2025-02-18"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>(3, 4, 5) => random-number-generator()?next()?permute()</test>
+        <result>
+            <error code="XPST0003"/>
+        </result>
+    </test-case>
+    
+    <test-case name="ArrowExpr-416" covers-40="PR1763 PR1830">
+        <description>Dynamic function call of function returned by dynamic function call</description>
+        <created by="Michael Kay" on="2025-02-18"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>(3, 4, 5) => (random-number-generator()?next()?permute)()</test>
+        <result>
+            <assert-permutation>(3,4,5)</assert-permutation>
+        </result>
+    </test-case>
+    
+    <test-case name="ArrowExpr-417" covers-40="PR1763">
+        <description>An array may be used as a function</description>
+        <created by="Michael Kay" on="2025-02-18"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>2 => ["a", "b", "c"]()</test>
+        <result>
+            <assert-eq>"b"</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="ArrowExpr-418" covers-40="PR1763">
+        <description>An array may be used as a function</description>
+        <created by="Michael Kay" on="2025-02-18"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>2 => array{("a", "b", "c")}()</test>
+        <result>
+            <assert-eq>"b"</assert-eq>
         </result>
     </test-case>
 
