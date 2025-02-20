@@ -224,6 +224,77 @@
     </result>
   </test-case>
   
+  <test-case name="EXPath-binary-decode-string-017" covers-40="PR-1765">
+    <description>decode-string on non-empty binary data in UTF-16, BE, no BOM</description>
+    <created by="Michael Kay" on="2025-02-18"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary(
+                xs:hexBinary("00540068006900730020006900730020005500540046002d00310036")),
+                "utf-16") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert-eq>"This is UTF-16"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-018" covers-40="PR-1765">
+    <description>decode-string on non-empty binary data in UTF-16BE, no BOM</description>
+    <created by="Michael Kay" on="2025-02-18"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary(
+                xs:hexBinary("00540068006900730020006900730020005500540046002d00310036")),
+                "utf-16be") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert-eq>"This is UTF-16"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-019" covers-40="PR-1765">
+    <description>decode-string on non-empty binary data in UTF-16 with little endian
+                encoding, no BOM</description>
+    <created by="Michael Kay" on="2025-02-18"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary(xs:hexBinary("1e01")),"utf-16le") </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+
+        <assert-eq>"&#x11e;"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-020" covers-40="PR-1765">
+    <description>BOM at offset 0 used when reading from later offset</description>
+    <created by="Michael Kay" on="2025-02-18"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary(xs:hexBinary("fffe690069006900")),"utf-16", 6) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert-eq>"i"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-binary-decode-string-021" covers-40="PR-1765">
+    <description>BOM at non-zero offset treated as regular character</description>
+    <created by="Michael Kay" on="2025-02-18"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:decode-string(xs:base64Binary(xs:hexBinary("69006900fffe")),"utf-16le", 2) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert-eq>"i" || char(0xfeff)</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
   <test-case name="bin-decode-string1">
     <description>Test for the decode-string function.</description>
     <created by="Christian Grün" on="2013-11-19+01:00"/>
