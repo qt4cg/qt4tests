@@ -184,6 +184,7 @@
       <created by="Michael Kay" on="2014-10-08"/>
       <environment ref="map"/>
       <dependency type="feature" value="higherOrderFunctions"/>
+      <dependency type="spec" value="XP31 XQ31"/>
       <test>
          let $f := function($m as map(xs:integer, xs:integer)) as xs:boolean {
              map:contains($m, 17)
@@ -192,6 +193,23 @@
       </test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="MapTest-021" covers-40="PR1501">
+      <description>conversion on function call occurs in 4.0</description>
+      <created by="Michael Kay" on="2025-02-21"/>
+      <environment ref="map"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $f := function($m as map(xs:integer, xs:integer)) as xs:boolean {
+             map:contains($m, 17)
+         }
+         return $f(map{17: xs:untypedAtomic('234')})
+      </test>
+      <result>
+         <assert-true/>
       </result>
    </test-case>
    
@@ -833,6 +851,19 @@ return $m
             <error code="XPTY0004"/>
             <error code="FORG0001"/>
          </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="MapTest-092" covers-40="PR1501">
+      <description>Map coercion resulting in duplicates</description>
+      <created by="Michael Kay" on="2025-02-21"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+let $m as map(xs:float, xs:string) := { 1.0000000000001: "one", 1.0000000000002: "two" }
+return $m
+      </test>
+      <result>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
