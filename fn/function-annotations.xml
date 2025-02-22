@@ -188,8 +188,8 @@ function-annotations(local:inc#1)
       </result>
    </test-case>
 
-   <test-case name="fn-function-annotations-018">
-      <description>Partial function application</description>
+   <test-case name="fn-function-annotations-018" covers-40="PR1828">
+      <description>Partial function application: annotations are retained</description>
       <created by="Christian Gruen" on="2023-09-17"/>
       <modified by="Michael Kay" on="2024-08-19" change="spec change, PR1393"/>
       <modified by="Michael Kay" on="2024-08-19" change="spec change, PR1666"/>
@@ -232,6 +232,51 @@ function-annotations(local:inc#1)
          <assert-deep-eq>map { QName('http://www.w3.org/2012/xquery', 'private'): () },
                          map { QName('http://www.w3.org/2005/xquery-local-functions', 'optimized'): true() },
                          map { QName('http://www.w3.org/2005/xquery-local-functions', 'optimized'): false() }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-function-annotations-021" covers-40="PR1828">
+      <description>Explicit annotations on inline function expression</description>
+      <created by="Michael Kay" on="2025-02-21"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+let $f := %Q{http://local/}incremental(true()) function ($c) { $c + 1 }
+return function-annotations($f)
+       ]]></test>
+      <result>
+         <assert-deep-eq>map { QName('http://local/', 'incremental'): true() }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-function-annotations-022" covers-40="PR1828">
+      <description>Explicit multiple annotations on inline function expression</description>
+      <created by="Michael Kay" on="2025-02-21"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+let $f := %Q{http://local/}color("red") %Q{http://local/}color("green") function ($c) { $c + 1 }
+return function-annotations($f)
+       ]]></test>
+      <result>
+         <assert-deep-eq>
+            { QName('http://local/', 'color'): "red" },
+            { QName('http://local/', 'color'): "green" }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-function-annotations-023" covers-40="PR1828">
+      <description>Annotations retained by partial application</description>
+      <created by="Michael Kay" on="2025-02-21"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+let $f := %Q{http://local/}color("red") %Q{http://local/}color("green") function ($c, $d) { $c + $d }
+return function-annotations($f(?, 1))
+       ]]></test>
+      <result>
+         <assert-deep-eq>
+            { QName('http://local/', 'color'): "red" },
+            { QName('http://local/', 'color'): "green" }
          </assert-deep-eq>
       </result>
    </test-case>
