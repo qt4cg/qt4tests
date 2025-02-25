@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-partial-apply" covers-40="PR1825">
+   <description>Tests the partial-apply() function</description>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-31/"
+         idref="func-partial-apply"/>
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+
+   <test-case name="fn-partial-apply-01">
+      <description> basic use of partial-apply </description>x
+      <created by="Michael Kay" on="2025-02-25"/>
+      
+      <test>partial-apply(round#2, {2: 1})(1.23456)</test>
+      <result>
+	    <assert-eq>1.2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-partial-apply-02">
+      <description>Call built-in function with 0 arguments</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <test>partial-apply(true#0, {})()</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+ 
+   <test-case name="fn-partial-apply-03">
+      <description>Invoke built-in function</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <test>partial-apply(string-join#2, {2: ", "})((12,13,14))</test>
+      <result>
+         <assert-eq>"12, 13, 14"</assert-eq>
+      </result>
+   </test-case>
+ 
+   <test-case name="fn-partial-apply-04">
+      <description>Invoke inline function</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>
+         let $func := function($a,$b,$c) { $a + $b + $c }
+           , $args := {2: 22}
+         return partial-apply($func, $args)(33, 44)
+      </test>
+      <result>
+         <assert-eq>9(</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-partial-apply-05">
+      <description>Invoke user-defined function</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:square($n as xs:integer) { $n * $n };
+         partial-apply(local:square#1, {1: 10})()
+      </test>
+      <result>
+         <assert-eq>100</assert-eq>
+      </result>
+   </test-case>
+ 
+   <test-case name="fn-partial-apply-06">
+      <description>Partial function application</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <test>
+         partial-apply(substring#3, {2: 3, 3: 2})('flower')
+      </test>
+      <result>
+         <assert-eq>"ow"</assert-eq>
+      </result>
+   </test-case>
+ 
+   <test-case name="fn-partial-apply-07">
+      <description>Invoke function retrieved via function-lookup</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <test>
+         let $f := function-lookup(xs:QName('fn:substring'), 3)
+         return partial-apply($f, {2: 3, 3: 2})('flower')
+      </test>
+      <result>
+         <assert-eq>"ow"</assert-eq>
+      </result>
+   </test-case>
+ 
+   <test-case name="fn-partial-apply-08">
+      <description>Invoke concat with different number of arguments</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <test>
+         for $f1 in (concat#2, concat#3, concat#4)
+         let $f2 := partial-apply($f1, {function-arity($f1) : "$"})
+         return apply($f2, array:slice(["a", "b", "c", "d", "e"], 1, function-arity($f2)))
+      </test>
+      <result>
+         <assert-deep-eq>"a$", "ab$", "abc$"</assert-deep-eq>
+      </result>
+   </test-case>
+ 
+   <test-case name="fn-partial-apply-09">
+      <description>Invoke functions with different number of arguments</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <test>
+         for $name in (true#0, count#1, empty#1, concat#2, contains#2) 
+         return partial-apply($name, {1: "x", 2: "y"})()
+      </test>
+      <result>
+         <assert-deep-eq>true(), 1, false(), "xy", false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-partial-apply-10">
+      <description>Invoke inlined functions</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <test>
+         for $f in (
+           function($a) { $a },
+           function($a, $b) { $a + $b },
+           function($a, $b, $c) { $a + $b + $c }
+         )
+         return partial-apply($f, {function-arity($f) : 1}) => apply([2, 3])
+      </test>
+      <result>
+         <assert-deep-eq>1, 3, 6</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-partial-apply-11">
+      <description>Partially apply an array</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <test>
+         fn:partial-apply(array{10 to 20}, {1 : 5})()
+      </test>
+      <result>
+         <assert-eq>14</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-partial-apply-12">
+      <description>Wrong kind of map supplied</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <test>partial-apply(concat#8, {'1': "---"})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-partial-apply-13">
+      <description>Supply sequence to a function that expects a string</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <test>partial-apply(string-length#1, {1 : ('a','b') })</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-partial-apply-14">
+      <description>Invoke atomization</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         fn:partial-apply(contains#2, {1:<a>ABC</a>})(<a>B</a>)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-partial-apply-15">
+      <description>Apply user-defined function, with atomization</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:l($x as xs:string){lower-case($x)};
+         declare function local:u($x as xs:string){upper-case($x)};
+         let $data := <a><b>Banana</b></a>
+         return partial-apply(if (current-date() lt xs:date('1900-01-01')) then local:l#1 else local:u#1, {1: $data})()
+      ]]></test>
+      <result>
+         <assert-eq>"BANANA"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-partial-apply-16">
+      <description>An XPath test to defeat rewriting as a static function call</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <test>partial-apply(if (current-date() lt xs:date('1900-01-01')) then abs#1 else round#1, {1: -2})()</test>
+      <result>
+	    <assert-eq>-2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-partial-apply-17">
+      <description>fn:partial-apply applied to empty sequence</description>
+      <created by="Michael Kay" on="2025-02-25"/>
+      <test>() => partial-apply({})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   
+   
+</test-set>
