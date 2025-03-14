@@ -106,6 +106,7 @@
       <description> For+While+Return - In the inner For+While+Return, uses outer variable in 'While' expr </description>
       <created by="Jinghao Liu" on="2003-02-10"/>
       <modified by="Michael Kay" on="2024-01-11" change="adapted 'where' test to create 'while' test"/>
+      <modified by="Gunther Rademacher" on="2025-03-04" change="Make test independent of boundary space in result"/>
       <environment ref="fsx"/>
       <test><![CDATA[
          for $folder in /MyComputer/Drive4//Folder 
@@ -115,22 +116,7 @@
             return <File>{ $file/@name }</File> }</Folder>
       ]]></test>
       <result>
-         <assert-xml><![CDATA[
-            <Folder name="Folder00000000047"/>
-            <Folder name="Folder00000000048">
-               <File name="File00000000077"/>
-               <File name="File00000000078"/>
-               <File name="File00000000079"/>
-               <File name="File00000000080"/>
-               <File name="File00000000081"/>
-            </Folder>
-            <Folder name="Folder00000000049"/>
-            <Folder name="Folder00000000050"/>
-            <Folder name="Folder00000000051"/>
-            <Folder name="Folder00000000052"/>
-            <Folder name="Folder00000000053"/>
-            <Folder name="Folder00000000054"/>
-         ]]></assert-xml>
+         <assert-xml><![CDATA[<Folder name="Folder00000000047"/><Folder name="Folder00000000048"><File name="File00000000077"/><File name="File00000000078"/><File name="File00000000079"/><File name="File00000000080"/><File name="File00000000081"/></Folder><Folder name="Folder00000000049"/><Folder name="Folder00000000050"/><Folder name="Folder00000000051"/><Folder name="Folder00000000052"/><Folder name="Folder00000000053"/><Folder name="Folder00000000054"/>]]></assert-xml>
       </result>
    </test-case>
 
@@ -138,16 +124,11 @@
       <description> For+While+Return - 2 iterations use 'While' to build relationship </description>
       <created by="Jinghao Liu" on="2003-02-10"/>
       <modified by="Michael Kay" on="2024-01-11" change="adapted 'where' test to create 'while' test"/>
+      <modified by="Gunther Rademacher" on="2025-03-04" change="Make test independent of boundary space in result"/>
       <environment ref="fsx"/>
       <test><![CDATA[<fragment-result>{ for $folder in /MyComputer/Drive3/Folder ,$file in /MyComputer/Drive3/Folder/File while $folder/@id = $file/@idref return <Folder> { $folder/@name, $folder/@id } <file>{ $file/@idref, $file/FileName/text() }</file> </Folder> }</fragment-result>]]></test>
       <result>
-         <assert-xml><![CDATA[
-            <fragment-result>
-               <Folder name="Folder00000000017" id="67">
-                  <file idref="67">File00000000047</file>
-               </Folder>
-            </fragment-result>
-         ]]></assert-xml>
+         <assert-xml><![CDATA[<fragment-result><Folder name="Folder00000000017" id="67"><file idref="67">File00000000047</file></Folder></fragment-result>]]></assert-xml>
       </result>
    </test-case>
 
@@ -1047,23 +1028,13 @@
       <description> A left outer join that requires tricky predicate hoisting to spot. </description>
       <created by="Oliver Hallam" on="2008-07-23"/>      
       <modified by="Michael Kay" on="2024-01-11" change="adapted 'where' test to create 'while' test"/>
+      <modified by="Gunther Rademacher" on="2025-03-04" change="Make test independent of boundary space in result"/>
       <test><![CDATA[
          <e> { for $x in 1 to 10 return <a>{
                   for $y in 1 to 10 while $x > 7 and $y = $x return $y
                }</a> } </e>]]></test>
       <result>
-         <assert-xml><![CDATA[<e>
-   <a/>
-   <a/>
-   <a/>
-   <a/>
-   <a/>
-   <a/>
-   <a/>
-   <a/>
-   <a/>
-   <a/>
-</e>]]></assert-xml>
+         <assert-xml><![CDATA[<e><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/></e>]]></assert-xml>
       </result>
    </test-case>
    
@@ -1085,6 +1056,7 @@
       <description/>
       <created by="Nick Jones" on="2010-03-24"/>      
       <modified by="Michael Kay" on="2024-01-11" change="adapted 'where' test to create 'while' test"/>
+      <modified by="Gunther Rademacher" on="2025-03-04" change="Make test independent of boundary space in result"/>
       <test><![CDATA[<tbody> { 
          let $rows := <tables> <table> <row> <entry>Acetazolamide</entry> <entry>Acetazolamide</entry> </row> <row> <entry>Acetazolamide sodium</entry> <entry>Acetazolamide sodium</entry> </row> </table> <table> <row> <entry>Acetylcholine chloride</entry> <entry>Acetylcholine chloride</entry> </row> </table> <table> <row> <entry>Acetylcysteine</entry> <entry>Acetylcysteine</entry> </row> <row> <entry>Acetylcysteine sodium</entry> <entry>Acetylcysteine sodium</entry> </row> </table> </tables>/table/row 
          return for $g in distinct-values($rows/entry[2][string(.)])  
@@ -1095,15 +1067,7 @@
                        return <entry> { $matches/( <link> { node() } </link>, text { if (position() lt last()) then '; ' else () } ) } </entry> 
          } </tbody>]]></test>
       <result>
-         <assert-xml><![CDATA[<tbody>
-   <entry>
-      <link>Acetazolamide</link>
-   </entry>
-   <entry/>
-   <entry/>
-   <entry/>
-   <entry/>
-</tbody>]]></assert-xml>
+         <assert-xml><![CDATA[<tbody><entry><link>Acetazolamide</link></entry><entry/><entry/><entry/><entry/></tbody>]]></assert-xml>
       </result>
    </test-case>
    
