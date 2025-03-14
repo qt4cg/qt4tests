@@ -565,7 +565,7 @@ defg
       <environment>
         <source role="." file="matches/perl-tests.xml"/>
       </environment>
-      <dependency type="spec" value="XQ30+"/>
+      <dependency type="spec" value="XQ30 XQ31"/>
       <dependency type="xsd-version" value="1.0"/> <!-- See bug 30029 - four of the subtests assume XSD 1.0 rules on hyphens -->
       
       <test><![CDATA[
@@ -583,6 +583,40 @@ defg
       	    } catch * {
       	        if ($t/@result = ('y', 'n'))
       	        then <fail error="{$err:code}">{$t}</fail>
+      	        else ()
+      	    }   
+      	}</results>
+      ]]></test>
+      <result>
+         <assert>empty($result//fail)</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-matches-50a" covers-40="PR1856">
+      <description>Composite test executing regular expressions from Perl-derived test file: variant for 4.0 </description>
+      <created by="Michael Kay" on="2025-03-04"/>
+      <environment>
+        <source role="." file="matches/perl-tests.xml"/>
+      </environment>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.0"/> <!-- See bug 30029 - four of the subtests assume XSD 1.0 rules on hyphens -->     
+      <test><![CDATA[
+        declare namespace err="http://www.w3.org/2005/xqt-errors";
+      	<results>{
+      		for $t in /tests/test
+      		let $expected := $t/(@result40 otherwise @result)
+      		return try {
+      		    let $matches := matches($t/@input, $t/@regex, string($t/@flags))
+      		    let $matches-debug := trace(matches($t/@input, $t/@regex, string($t/@flags)), $t/@id || '-' || $expected)
+      		    return
+      		       if ($matches (:trace($matches, $t/@id):) and $expected ne 'y')
+      		         then <fail actual="y">{$t}</fail>
+      		       else if (not($matches) and $expected ne 'n') 
+      		         then <fail actual="n">{$t}</fail>
+      		       else ()
+      	    } catch * {
+      	        if ($expected = ('y', 'n'))
+      	        then <fail error="{$err:code}" msg="{$err:description}">{$t}</fail>
       	        else ()
       	    }   
       	}</results>

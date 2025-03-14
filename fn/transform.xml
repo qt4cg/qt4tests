@@ -2895,6 +2895,55 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
             </all-of>
         </result>
     </test-case>
+    
+    <test-case name="fn-transform-91">
+        <description>Transform with enable-assertions off by default</description>
+        <created by="Michael Kay" on="2025-02-28"/>
+        <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
+        <test><![CDATA[
+            let $xsl  :="<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='2.0'>
+                <xsl:template match='/'>
+                    <out>
+                      <xsl:assert test='current-date() ne current-date()'/>
+                    </out>  
+                </xsl:template>
+            </xsl:stylesheet>"
+            return
+            transform(map{"stylesheet-text": $xsl, 
+                          "source-node": parse-xml("<doc>this</doc>"), 
+                          "delivery-format": "raw"})
+        ]]></test>
+        <result>
+            <all-of>
+                <assert-type>map(*)</assert-type>
+                <assert>map:contains($result, "output")</assert>
+                <assert>$result?output instance of element(out)</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="fn-transform-92">
+        <description>Transform with enable-assertions on</description>
+        <created by="Michael Kay" on="2025-02-28"/>
+        <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
+        <test><![CDATA[
+            let $xsl  :="<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='2.0'>
+                <xsl:template match='/'>
+                    <out>
+                      <xsl:assert test='current-date() ne current-date()'/>
+                    </out>  
+                </xsl:template>
+            </xsl:stylesheet>"
+            return
+            transform(map{"stylesheet-text": $xsl, 
+                          "source-node": parse-xml("<doc>this</doc>"),
+                          "enable-assertions": true(),
+                          "delivery-format": "raw"})
+        ]]></test>
+        <result>
+            <error code="XTMM9001"/>
+        </result>
+    </test-case>
    
     <test-case name="fn-transform-401" covers-40="fn-transform">
         <description>Invoke an XSLT 4.0 stylesheet</description>

@@ -139,11 +139,26 @@
    </test-case>
 
    <test-case name="fn-replace-6">
-      <description>Evaluation of replace function with pattern = ".*?" and replacement = "$1" as an example 6 for this function. Should raise an error </description>
+      <description>Evaluation of replace function with pattern = ".*?" 
+         and replacement = "$1" as an example 6 for this function. Should raise an error 
+      </description>
       <created by="Carmelo Montanez" on="2005-10-13"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ30 XQ31"/>
       <test>replace("abracadabra", ".*?", "$1")</test>
       <result>
          <error code="FORX0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-replace-6a" covers-40="PR1856">
+      <description>Evaluation of replace function with pattern = ".*?" 
+         and replacement = "$1" as an example 6 for this function. No error in 4.0 
+      </description>
+      <created by="Michael Kay" on="2025-03-09"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>replace("abracadabra", ".*?", "$1")</test>
+      <result>
+         <assert-string-value>abracadabra</assert-string-value>
       </result>
    </test-case>
 
@@ -818,26 +833,51 @@ abracadabra", "\n","with")</test>
    <test-case name="cbcl-fn-replace-002">
       <description> Tests a prepared expression which matches the empty sequence </description>
       <created by="Nick Jones" on="2008-06-16"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ30 XQ31"/>
       <test>replace("a","","b")</test>
       <result>
          <error code="FORX0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cbcl-fn-replace-002a" covers-40="PR1856">
+      <description> Tests a prepared expression which matches the empty sequence </description>
+      <created by="Nick Jones" on="2008-06-16"/>
+      <dependency type="spec" value="XP40 XQ40"/>
+      <test>replace("a","","b")</test>
+      <result>
+         <assert-string-value>bab</assert-string-value>
       </result>
    </test-case>
 
    <test-case name="cbcl-fn-replace-003">
       <description> Tests empty regex on prepared fn:replace </description>
       <created by="Nick Jones" on="2008-06-17"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ30 XQ31"/>
+      <test>
+        replace(string-join(for $x in (1 to 10)[. mod 2 = 0] return string($x),","), "", "c")
+      </test>
+      <result>
+         <error code="FORX0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cbcl-fn-replace-003a" covers-40="PR1856">
+      <description> Tests empty regex on prepared fn:replace </description>
+      <created by="Nick Jones" on="2008-06-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
         replace(string-join(for $x in (1 to 10)[. mod 2 = 0] return string($x),","),"","c")
       </test>
       <result>
-         <error code="FORX0003"/>
+         <assert-string-value>c2c,c4c,c6c,c8c,c1c0c</assert-string-value>
       </result>
    </test-case>
 
    <test-case name="cbcl-fn-replace-004">
       <description> Tests empty regex on prepared fn:replace </description>
       <created by="Nick Jones" on="2008-06-17"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ30 XQ31"/>
       <test>
         replace(string-join(for $x in (1 to 10)[. mod 2 = 0] return string($x),","),"","c","m")
       </test>
@@ -845,15 +885,40 @@ abracadabra", "\n","with")</test>
          <error code="FORX0003"/>
       </result>
    </test-case>
+   
+   <test-case name="cbcl-fn-replace-004a" covers-40="PR1856">
+      <description> Tests empty regex on prepared fn:replace </description>
+      <created by="Nick Jones" on="2008-06-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+        replace(string-join(for $x in (1 to 10)[. mod 2 = 0] return string($x),","),"","c","m")
+      </test>
+      <result>
+         <assert-string-value>c2c,c4c,c6c,c8c,c1c0c</assert-string-value>
+      </result>
+   </test-case>
 
    <test-case name="cbcl-fn-replace-005">
       <description> Tests empty regex on prepared fn:replace </description>
       <created by="Nick Jones" on="2008-06-17"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ30 XQ31"/>
       <test>
         replace(string-join(for $x in (1 to 10)[. mod 2 = 0] return string($x),","),"","c","m")
       </test>
       <result>
          <error code="FORX0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cbcl-fn-replace-005a" covers-40="PR1856">
+      <description> Tests empty regex on prepared fn:replace </description>
+      <created by="Nick Jones" on="2008-06-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+        replace(string-join(for $x in (1 to 10)[. mod 2 = 0] return string($x),","),"","c","m")
+      </test>
+      <result>
+         <assert-string-value>c2c,c4c,c6c,c8c,c1c0c</assert-string-value>
       </result>
    </test-case>
 
@@ -1018,13 +1083,14 @@ abracadabra", "\n","with")</test>
          <assert-deep-eq>'14', '4'</assert-deep-eq>
       </result>
    </test-case>
-   <test-case name="fn-replace-114">
+   <test-case name="fn-replace-114" covers-40="PR1856">
       <description>Error: empty replacement pattern</description>
       <created by="Christian Gruen" on="2022-08-17"/>
+      <modified by="Michael Kay" on="2025-03-09" change="now allowed"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test><![CDATA[fn:replace("W", ".*", (), (), function($k, $g) { })]]></test>
+      <test><![CDATA[fn:replace("W", ".*", (), (), function($k, $g) {"~"})]]></test>
       <result>
-         <error code="FORX0003"/>
+         <assert-string-value>~</assert-string-value>
       </result>
    </test-case>
    <test-case name="fn-replace-115">
@@ -1647,6 +1713,36 @@ abracadabra", "\n",action := fn{"with"})</test>
       <test>replace('ba#na\na', '[\#]', '')</test>
       <result>
          <assert-string-value>bana\na</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-replace-316" covers-40="PR1856">
+      <description>Can now replace zero-length string</description>
+      <created by="Michael Kay" on="2024-02-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>replace('a nice cup of tea', '\b', '|')</test>
+      <result>
+         <assert-string-value>|a| |nice| |cup| |of| |tea|</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-replace-317" covers-40="PR1856">
+      <description>Can now replace zero-length string</description>
+      <created by="Michael Kay" on="2024-02-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>replace('a nice cup of tea', '(?=\W)', '|')</test>
+      <result>
+         <assert-string-value>a| nice| cup| of| tea</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-replace-318" covers-40="PR1856">
+      <description>Use substring captured by lookahead</description>
+      <created by="Michael Kay" on="2024-03-11"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>replace('a nice cup of tea', '\s(?=...(.))', ' $1')</test>
+      <result>
+         <assert-string-value>a enice  cup tof tea</assert-string-value>
       </result>
    </test-case>
 
