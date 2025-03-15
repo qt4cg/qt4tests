@@ -394,6 +394,39 @@ it put its sooty foot.</fn:non-match></fn:analyze-string-result>]]></assert-xml>
       </result>
    </test-case>
    
+   <test-case name="analyzeString-031" covers-40="PR1856">
+      <description>Empty Pattern</description>
+      <created by="Michael Kay" on="2025-03-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>fn:analyze-string("abc", "")</test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions">
+   <match/>
+   <non-match>a</non-match>
+   <match/>
+   <non-match>b</non-match>
+   <match/>
+   <non-match>c</non-match>
+   <match/>
+</analyze-string-result>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="analyzeString-032" covers-40="PR1856">
+      <description>Captured group in lookahead</description>
+      <created by="Michael Kay" on="2023-01-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>fn:analyze-string("abcd", ".(?=(.))")</test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions">
+   <match>a<lookahead-group nr="1" position="2" value="b"/></match>
+   <match>b<lookahead-group nr="1" position="3" value="c"/></match>
+   <match>c<lookahead-group nr="1" position="4" value="d"/></match>
+   <non-match>d</non-match>
+</analyze-string-result>]]></assert-xml>
+      </result>
+   </test-case>
+   
    <test-case name="analyzeString-901">
       <description> analyze-string, error, bad regex pattern</description>
       <created by="Michael Kay" on="2009-10-18"/>
@@ -417,9 +450,22 @@ it put its sooty foot.</fn:non-match></fn:analyze-string-result>]]></assert-xml>
       <description> analyze-string, error, pattern matches a zero-length string </description>
       <created by="Michael Kay" on="2009-10-18"/>
       <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
+      <dependency type="spec" value="XP30 XP31 XP30 XQ31"/>
       <test>analyze-string("abc", "a|b|c?")</test>
       <result>
             <error code="FORX0003"/>
+      </result>
+   </test-case>
+   <test-case name="analyzeString-903a" covers-40="PR1856">
+      <description> analyze-string, no error in 4.0, pattern matches a zero-length string </description>
+      <created by="Michael Kay" on="2025-03-11"/>
+      <test>analyze-string("abc", "a|b|c?")</test>
+      <result>
+            <assert-xml ignore-prefixes="true"><![CDATA[<analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions">
+   <match>a</match>
+   <match>b</match>
+   <match>c</match>
+</analyze-string-result>]]></assert-xml>
       </result>
    </test-case>
 </test-set>

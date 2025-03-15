@@ -96,32 +96,21 @@
                 <assert-string-value>$f(1, $f(2, $f(3, $f(4, $f(5, $zero)))))</assert-string-value>
         </result>
     </test-case>
+    
     <test-case name="fold-right-008">
         <description>
             Higher Order Functions 
             fold-right function 
         </description>
         <created by="William Candillon" on="2011-11-27"/>
-        <dependency type="spec" value="XP30 XP31 XQ30 XQ31"/>
+        <dependency type="spec" value="XP30+ XQ30+"/>
         <environment ref="empty"/>
         <test>fold-right(1 to 5, 0, function($a, $b, $c){ $a + $b + $c })</test>
         <result>
             <error code="XPTY0004"/>
         </result>
     </test-case>
-    <test-case name="fold-right-008a" covers-40="PR828">
-        <description>
-            Higher Order Functions 
-            fold-right function: positional argument
-        </description>
-        <created by="Christian Gruen" on="2023-12-12"/>
-        <dependency type="spec" value="XP40+ XQ40+"/>
-        <environment ref="empty"/>
-        <test>fold-right(1 to 5, 0, function($a, $b, $c){ $a + $b + $c })</test>
-        <result>
-            <assert-eq>30</assert-eq>
-        </result>
-    </test-case>
+    
     <test-case name="fold-right-009">
         <description>
             Higher Order Functions 
@@ -369,6 +358,32 @@
           let $f := function($a, $b){($b, $a)} return local:fold-right(1 to 5, (), $f)</test>
         <result>
                 <assert-deep-eq>5,4,3,2,1</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="fold-right-403" covers-40="PR828">
+        <description>Arity-1 callback function</description>
+        <created by="Michael Kay, Saxonica" on="2023-12-01"/>
+        <modified by="Christian Gruen" on="2024-01-16" change="result fixed"/>
+        <environment ref="array"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>fold-right((1,2,3,4,5,6), 10, function($z){$z+1})</test>
+        <result>
+            <all-of>
+                <assert-type>xs:integer</assert-type>
+                <assert-deep-eq>2</assert-deep-eq>
+            </all-of>
+        </result>
+    </test-case>
+    
+    <test-case name="fold-right-404" covers-40="PR828">
+        <description>Arity-0 callback function</description>
+        <created by="Michael Kay, Saxonica" on="2023-12-01"/>
+        <environment ref="array"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>fold-right((1,2,3,4,5,6), 10, true#0)</test>
+        <result>
+            <assert-true/>
         </result>
     </test-case>
 
