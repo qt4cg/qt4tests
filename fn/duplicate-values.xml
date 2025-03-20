@@ -1328,16 +1328,46 @@ duplicate-values(
       </result>
    </test-case>
    
-   <test-case name="duplicate-values-404" covers-40="PR987">
+   <test-case name="duplicate-values-404" covers-40="PR987 PR1873">
       <description>Order of results is predictable (assumes ordering mode = ordered)</description>
       <created by="Michael Kay" on="2024-01-31"/>
+      <modified by="Michael Kay" on="2024-03-17" change="see PR1873"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>distinct-values((xs:float(10e0), 10, xs:float(20e0), 10e0, 20e0, 20))</test>
+      <test>duplicate-values((xs:float(10e0), 10, xs:float(20e0), 10e0, 20, 20e0))</test>
       <result>
          <all-of>
             <assert-deep-eq>10, 20</assert-deep-eq>
-            <assert-type>xs:float*</assert-type>
+            <assert-type>xs:integer*</assert-type>
          </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="duplicate-values-405" covers-40="PR1873">
+      <description>The value chosen is the second of the duplicates</description>
+      <created by="Michael Kay" on="2024-03-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>duplicate-values(
+         (xs:time('12:00:00Z'), xs:time('13:00:00+01:00'), xs:time('14:00:00+02:00'), xs:time('15:00:00+03:00'))) 
+         => string()</test>
+      <result>
+         <assert-eq>"13:00:00+01:00"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="duplicate-values-406" covers-40="PR1873">
+      <description>The order of results is the order of second appearance</description>
+      <created by="Michael Kay" on="2024-03-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>duplicate-values(
+         (xs:time('12:00:00Z'), 
+          xs:time('12:00:00+01:00'),
+          xs:time('13:00:00+02:00'),
+          xs:time('13:00:00+01:00'), 
+          xs:time('14:00:00+02:00'), 
+          xs:time('15:00:00+03:00'))) 
+         =!> string()</test>
+      <result>
+         <assert-deep-eq>"13:00:00+02:00", "13:00:00+01:00"</assert-deep-eq>
       </result>
    </test-case>
 
