@@ -515,4 +515,138 @@
          <assert-deep-eq>[(), "/z:test-set[1]/p[1]", "/z:test-set[1]", "/z:test-set[1]/@name"]</assert-deep-eq>
       </result>
    </test-case>
+   
+   <test-case name="path054" covers-40="PR1886">
+      <description>lexical option</description>
+      <created by="Michael Kay" on="2025-03-25"/>
+      <environment ref="pathdata"/>
+      <test>//p => fn:path({"lexical": true()})</test>
+      <result>
+         <all-of>
+            <assert-string-value>/test-set[1]/p[1]</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path055" covers-40="PR1886">
+      <description>lexical option: path to namespaced attribute</description>
+      <created by="Michael Kay" on="2025-03-25"/>
+      <environment ref="pathdata"/>
+      <test>(//@xml:id)[1] => fn:path({"lexical": true()})</test>
+      <result>
+         <all-of>
+            <assert-string-value>/test-set[1]/environment[3]/source[1]/@xml:id</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path056" covers-40="PR1886">
+      <description>lexical option: path to non-namespaced attribute</description>
+      <created by="Michael Kay" on="2025-03-25"/>
+      <environment ref="pathdata"/>
+      <test>(//*:test-case/@name)[1] => fn:path({"lexical": true()})</test>
+      <result>
+         <all-of>
+            <assert-string-value>/test-set[1]/test-case[1]/@name</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path057" covers-40="PR1886">
+      <description>relative path to an attribute of an element root</description>
+      <created by="Michael Kay" on="2025-03-25"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         let $doc := <z><z><z><a b="c"/></z></z></z>
+         return fn:path($doc//@b, {'origin':$doc, 'lexical':true()})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert-string-value>z[1]/z[1]/a[1]/@b</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path058" covers-40="PR1886">
+      <description>origin option: relative path to attribute</description>
+      <created by="Michael Kay" on="2025-03-25"/>
+      <environment ref="pathdata"/>
+      <test>(//*:test-case/@name)[1] => fn:path({"origin": /*})</test>
+      <result>
+         <all-of>
+            <assert-string-value>Q{http://www.w3.org/2010/09/qt-fots-catalog}test-case[1]/@name</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path059" covers-40="PR1886">
+      <description>origin option: relative path to element</description>
+      <created by="Michael Kay" on="2025-03-25"/>
+      <environment ref="pathdata"/>
+      <test>(//*:test-case/*:result/*:all-of/*:assert-eq)[1] => fn:path({"origin": /*, 'lexical':true()})</test>
+      <result>
+         <all-of>
+            <assert-string-value>test-case[1]/result[1]/all-of[1]/assert-eq[1]</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path060" covers-40="PR1886">
+      <description>lexical option</description>
+      <created by="Michael Kay" on="2025-03-25"/>
+      <environment ref="pathdata"/>
+      <test>//p => fn:path({"lexical": true(), 'indexes': false()})</test>
+      <result>
+         <all-of>
+            <assert-string-value>/test-set/p</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path061" covers-40="PR1886">
+      <description>origin must be an ancestor of target node</description>
+      <created by="Michael Kay" on="2025-03-25"/>
+      <environment ref="pathdata"/>
+      <test>(//*:assert-eq)[1] => fn:path({"lexical": true(), 'origin': //p})</test>
+      <result>
+         <error code="FOAP0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="path062" covers-40="PR1886">
+      <description>origin must be an ancestor of target node</description>
+      <created by="Michael Kay" on="2025-03-25"/>
+      <environment ref="pathdata"/>
+      <test>(//@xml:id)[1] => fn:path({"lexical": true(), 'origin': //p})</test>
+      <result>
+         <error code="FOAP0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="path063" covers-40="PR1886">
+      <description>origin must be an ancestor of target node</description>
+      <created by="Michael Kay" on="2025-03-25"/>
+      <environment ref="pathdata"/>
+      <test>(//@xml:id)[1] => fn:path({"lexical": true(), 'origin': parse-xml('<doc/>')})</test>
+      <result>
+         <error code="FOAP0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="path064" covers-40="PR1886">
+      <description>origin must be an ancestor of target node</description>
+      <created by="Michael Kay" on="2025-03-25"/>
+      <environment ref="pathdata"/>
+      <test>fn:path(/, {'origin': /})</test>
+      <result>
+         <error code="FOAP0001"/>
+      </result>
+   </test-case>
 </test-set>
