@@ -491,5 +491,142 @@
             <error code="FODC0008"/>
         </result>
     </test-case>
+    
+    <test-case name="parse-xml-450" covers-40="PR1879">
+        <description>parse-xml test - with local DTD, OK even with allow-external-entities=false</description>
+        <created by="Michael Kay" on="2025-03-26"/>        
+        <environment name="empty"/>
+        <test><![CDATA[parse-xml("<?xml version='1.0' encoding='iso-8859-1'?><!DOCTYPE a [<!ELEMENT a (#PCDATA)>]><a>foo</a>",
+            { 'allow-external-entities': false()} )]]></test>
+        <result>
+            <assert-xml><![CDATA[<a>foo</a>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-451" covers-40="PR1879">
+        <description>parse-xml test - with external DTD, not OK because disallowed</description>
+        <created by="Michael Kay" on="2025-03-26"/>        
+        <environment name="empty"/>
+        <test><![CDATA[parse-xml("<!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>",
+            { 'allow-external-entities': false() } )]]></test>
+        <result>
+            <error code="FODC0006"/>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-452" covers-40="PR1879">
+        <description>parse-xml test - internal DTD with external entities, not OK because disallowed</description>
+        <created by="Michael Kay" on="2025-03-26"/>        
+        <environment name="empty"/>
+        <test><![CDATA[parse-xml(`<!DOCTYPE foo [ <!ENTITY ext SYSTEM 'parse-xml/foo.entity'> ]><foo>&ext;</foo>`,
+            { 'allow-external-entities': false() } )]]></test>
+        <result>
+            <error code="FODC0006"/>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-453" covers-40="PR1879">
+        <description>parse-xml test - internal DTD with external entities, OK because allowed</description>
+        <created by="Michael Kay" on="2025-03-26"/>        
+        <environment name="empty"/>
+        <test><![CDATA[parse-xml(`<!DOCTYPE foo [ <!ENTITY ext SYSTEM 'parse-xml/foo.entity'> ]><foo>&ext;</foo>`,
+            { 'allow-external-entities': true() } )]]></test>
+        <result>
+            <assert-xml><![CDATA[<foo><bar>baz</bar></foo>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-454" covers-40="PR1879">
+        <description>parse-xml test - internal DTD with external entities, OK because allowed</description>
+        <created by="Michael Kay" on="2025-03-26"/>        
+        <environment name="empty"/>
+        <test><![CDATA[parse-xml(`<!DOCTYPE foo [ <!ENTITY ext SYSTEM 'parse-xml/foo.entity'> ]><foo>&ext;</foo>`)]]></test>
+        <result>
+            <assert-xml><![CDATA[<foo><bar>baz</bar></foo>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-460" covers-40="PR1879">
+        <description>parse-xml test - entity expansion limit exceeded</description>
+        <created by="Michael Kay" on="2025-03-26"/>        
+        <environment name="empty"/>
+        <test><![CDATA[parse-xml(`
+            
+            <!DOCTYPE lolz [
+ <!ENTITY lol "lol">
+ <!ELEMENT lolz (#PCDATA)>
+ <!ENTITY lol1 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">
+ <!ENTITY lol2 "&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;">
+ <!ENTITY lol3 "&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;">
+ <!ENTITY lol4 "&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;">
+ <!ENTITY lol5 "&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;">
+ <!ENTITY lol6 "&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;">
+ <!ENTITY lol7 "&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;">
+ <!ENTITY lol8 "&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;">
+ <!ENTITY lol9 "&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;">
+]><lolz>&lol9;</lolz>            
+            `,
+            { 'entity-expansion-limit': 10000 } )]]></test>
+        <result>
+            <error code="FODC0006"/>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-461" covers-40="PR1879">
+        <description>parse-xml test - entity expansion limit not exceeded</description>
+        <created by="Michael Kay" on="2025-03-26"/>        
+        <environment name="empty"/>
+        <test><![CDATA[parse-xml(`
+            
+            <!DOCTYPE lolz [
+ <!ENTITY lol "lol">
+ <!ELEMENT lolz (#PCDATA)>
+ <!ENTITY lol1 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">
+ <!ENTITY lol2 "&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;">
+ <!ENTITY lol3 "&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;">
+ <!ENTITY lol4 "&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;">
+ <!ENTITY lol5 "&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;">
+ <!ENTITY lol6 "&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;">
+ <!ENTITY lol7 "&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;">
+ <!ENTITY lol8 "&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;">
+ <!ENTITY lol9 "&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;">
+]><lolz>&lol1;</lolz>            
+            `,
+            { 'entity-expansion-limit': 10000 } )]]></test>
+        <result>
+            <assert-xml><![CDATA[<lolz>lollollollollollollollollollol</lolz>]]></assert-xml>
+        </result>
+    </test-case>
+    
+
+    
+    <test-case name="parse-xml-470" covers-40="PR1879">
+        <description>parse-xml test - xinclude processing on</description>
+        <created by="Michael Kay" on="2025-03-26"/>        
+        <environment name="empty"/>
+        <test><![CDATA[parse-xml(`<foo xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="parse-xml/foo.entity"/>
+</foo>`,
+            { 'xinclude': true() } )]]></test>
+        <result>
+            <any-of>
+                <error code="FODC0013"/>
+                <assert>/foo/bar = 'baz'</assert>
+            </any-of>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-471" covers-40="PR1879">
+        <description>parse-xml test - xinclude processing off</description>
+        <created by="Michael Kay" on="2025-03-26"/>        
+        <environment name="empty"/>
+        <test><![CDATA[parse-xml(
+            `<foo xmlns:xi="http://www.w3.org/2001/XInclude"><xi:include href="parse-xml/foo.entity"/></foo>`,
+            { 'xinclude': false() } )]]></test>
+        <result>
+            <assert-xml><![CDATA[<foo xmlns:xi="http://www.w3.org/2001/XInclude"><xi:include href="parse-xml/foo.entity"/></foo>]]></assert-xml>
+        </result>
+    </test-case>
+    
 
 </test-set>
