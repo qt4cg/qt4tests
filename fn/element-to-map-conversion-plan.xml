@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-element-to-map-conversion-plan" covers-40="PR1906">
+   <description>Tests for the element-to-map-conversion-plan-conversion-plan() function</description>
+
+ 
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="element-to-map-conversion-plan-001">
+      <description> Empty sequence </description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test>element-to-map-conversion-plan(())</test>
+      <result>
+         <assert-deep-eq> {} </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-002">
+      <description> Single element </description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a/>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'empty' } }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-003">
+      <description> Single element </description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a id="x"/>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'empty-plus' }}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-004">
+      <description> Single element with numeric attribute </description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a id="42"/>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'empty-plus' },
+                            '@id' : { 'type' : 'numeric'}
+                          }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-005">
+      <description> Single element, simple content </description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a>42</a>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'simple', 'type': 'numeric' } }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-006">
+      <description> Single element, simple content with string attribute </description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a id="x">true</a>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'simple-plus', 'type': 'boolean' } }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-007">
+      <description> Single element, simple content with boolean attribute </description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a id="true">42</a>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'simple-plus', 'type': 'numeric' },
+                            '@id' : { 'type': 'boolean' }
+                          }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-008">
+      <description> Single element, list content</description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a><b>12</b><b>13</b><b>14</b></a>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'list', 'child': 'b' },
+                            'b' : { 'layout': 'simple', 'type': 'numeric' }
+                          }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-009">
+      <description> Single element, list content, attribute on wrapper element</description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a id="x"><b>12</b><b>13</b><b>14</b></a>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'list-plus', 'child': 'b' },
+                            'b' : { 'layout': 'simple', 'type': 'numeric' }
+                          }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-010">
+      <description> Single element, list content, numeric attribute on wrapper element</description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a id="42"><b>12</b><b>13</b><b>14</b></a>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'list-plus', 'child': 'b' },
+                            'b' : { 'layout': 'simple', 'type': 'numeric' },
+                            '@id' : { 'type': 'numeric' }
+                          }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-011">
+      <description> Single element, record content</description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a><b>12</b><c>true</c><d>fred</d></a>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'record' },
+                            'b' : { 'layout': 'simple', 'type': 'numeric' },
+                            'c' : { 'layout': 'simple', 'type': 'boolean' },
+                            'd' : { 'layout': 'simple' }
+                          }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-012">
+      <description> Single element, record layout</description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a id="a"><b id="b">12</b><c id="c">true</c><d id="d">fred</d></a>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'record' },
+                            'b' : { 'layout': 'simple-plus', 'type': 'numeric' },
+                            'c' : { 'layout': 'simple-plus', 'type': 'boolean' },
+                            'd' : { 'layout': 'simple-plus' }
+                          }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-013">
+      <description> Single element, record layout with attributes</description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a id="a"><b id="b">12</b><c id="c">true</c><d id="d">fred</d></a>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'record' },
+                            'b' : { 'layout': 'simple-plus', 'type': 'numeric' },
+                            'c' : { 'layout': 'simple-plus', 'type': 'boolean' },
+                            'd' : { 'layout': 'simple-plus' }
+                          }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-014">
+      <description> Single element, sequence layout</description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a id="a"><b id="b">12</b><b id="b2">-12</b><c id="c">true</c><d id="d">fred</d></a>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'sequence' },
+                            'b' : { 'layout': 'simple-plus', 'type': 'numeric' },
+                            'c' : { 'layout': 'simple-plus', 'type': 'boolean' },
+                            'd' : { 'layout': 'simple-plus' }
+                          }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-015">
+      <description> Single element, mixed layout</description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a id="a"><b id="b">12.4</b>x<b id="b2">-12.1</b>y<c id="c">true</c>z<d id="d">fred</d></a>'))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'mixed' },
+                            'b' : { 'layout': 'simple-plus', 'type': 'numeric' },
+                            'c' : { 'layout': 'simple-plus', 'type': 'boolean' },
+                            'd' : { 'layout': 'simple-plus' }
+                          }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-016">
+      <description> Multiple consistent elements</description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a/>') => replicate(3))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'empty' } }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-017">
+      <description> Multiple consistent elements</description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan(parse-xml('<a>12</a>') => replicate(3))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'simple', 'type': 'numeric' } }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-018">
+      <description> Multiple consistent elements</description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan((parse-xml('<a><b/><b/></a>'), parse-xml('<a><b/></a>')))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'list', 'child': 'b' }, 
+                            'b' : { 'layout': 'empty' } }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-019">
+      <description> Multiple consistent elements: in namespace</description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan((parse-xml('<a xmlns="http://a.com/"><b/><b/></a>'), 
+                                                     parse-xml('<a xmlns="http://a.com/"><b/></a>')))]]></test>
+      <result>
+         <assert-deep-eq> { 'Q{http://a.com/}a' : { 'layout': 'list', 'child': 'Q{http://a.com/}b' }, 
+                            'Q{http://a.com/}b' : { 'layout': 'empty' } }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-conversion-plan-020">
+      <description> Multiple consistent elements; attribute in namespace</description>
+      <created by="Michael Kay" on="2025-03-30"/>
+      <test><![CDATA[element-to-map-conversion-plan((parse-xml('<a x:space="22" xmlns:x="http://x.com/"><b/><b/></a>'), parse-xml('<a><b/></a>')))]]></test>
+      <result>
+         <assert-deep-eq> { 'a' : { 'layout': 'list-plus', 'child': 'b' }, 
+                            'b' : { 'layout': 'empty' },
+                            '@Q{http://x.com/}space' : { 'type' : 'numeric' } }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+ 
+   
+   
+   
+</test-set>
+   
+
+ 
