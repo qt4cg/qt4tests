@@ -1,0 +1,1863 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-element-to-map" covers-40="PR1575 PR1906">
+   <description>Tests for the element-to-map() function</description>
+
+   
+   <environment name="specimen">
+      <schema uri="http://www.w3.org/XQueryTest/specimen" file="elements-to-maps/specimen.xsd" xsd-version="1.1">
+         <description>A Schema with some nillable elements</description>
+         <created by="Michael Kay" on="2023-05-31"/>
+      </schema>
+   </environment>
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="element-to-map-001">
+      <description> Empty sequence </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test>element-to-map(())</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-002">
+      <description> Multiple elements </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map((parse-xml('<a/>')/a, parse-xml('<b/>')/b))]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-003">
+      <description> Namespaced elements: default name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<a xmlns="http://a.com/"/>')/*)]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":""}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-004">
+      <description> Namespaced elements: default name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<z:a xmlns:z="http://a.com/"/>')/*)]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":""}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-005">
+      <description> Namespaced elements: EQName name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<a xmlns="http://a.com/"/>')/*, {'name-format': 'eqname'})]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":""}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-006">
+      <description> Namespaced elements: EQName name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<z:a xmlns:z="http://a.com/"/>')/*, {'name-format': 'eqname'})]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":""}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-007">
+      <description> Namespaced elements: lexical name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<a xmlns="http://a.com/"/>')/*, {'name-format': 'lexical'})]]></test>
+      <result>
+         <assert-deep-eq>{"a":""}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-008">
+      <description> Namespaced elements: lexical name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<z:a xmlns:z="http://a.com/"/>')/*, {'name-format': 'lexical'})]]></test>
+      <result>
+         <assert-deep-eq>{"z:a":""}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-009">
+      <description> Namespaced elements: local name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<a xmlns="http://a.com/"/>')/*, {'name-format': 'lexical'})]]></test>
+      <result>
+         <assert-deep-eq>{"a":""}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-010">
+      <description> Namespaced elements: local name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<z:a xmlns:z="http://a.com/"/>')/*, {'name-format': 'local'})]]></test>
+      <result>
+         <assert-deep-eq>{"a":""}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-011">
+      <description> Namespaced elements: default name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<a xmlns="http://a.com/"><b/></a>')/*)]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":{"b":""}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-012">
+      <description> Namespaced elements: default name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<z:a xmlns:z="http://a.com/"><z:b/></z:a>')/*)]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":{"b":""}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-013">
+      <description> Namespaced elements: default name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<z:a xmlns:z="http://a.com/"><b/></z:a>')/*)]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":{"Q{}b":""}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-014">
+      <description> Namespaced elements: default name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<a xmlns="http://a.com/"><b xmlns="http://b.com/"/></a>')/*)]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":{"Q{http://b.com/}b":""}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-015">
+      <description> Namespaced elements: default name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<a><b xmlns="http://b.com/"/></a>')/*)]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"Q{http://b.com/}b":""}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-016">
+      <description> Namespaced elements: default name-format with attributes</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<a xmlns="http://a.com/" b="BBB" z:c="CCC" xmlns:z="http://c.com/"/>')/*)]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":{"@b":"BBB", "@Q{http://c.com/}c":"CCC"}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-017">
+      <description> Namespaced elements: xsi:type is dropped</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<a xmlns="http://a.com/" 
+            xsi:type="xs:integer"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema">2</a>')/*)]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":{"#content":"2"}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-018">
+      <description> Namespaced elements: attribute-marker</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(
+         parse-xml('<a xmlns="http://a.com/" b="BBB" z:c="CCC" xmlns:z="http://c.com/"/>')/*,
+         {'attribute-marker':'%%'})]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":{"%%b":"BBB", "%%Q{http://c.com/}c":"CCC"}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-019">
+      <description> Namespaced elements: attribute-marker</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(
+         parse-xml('<a xmlns="http://a.com/" b="BBB" z:c="CCC" xmlns:z="http://c.com/"/>')/*,
+         {'attribute-marker':''})]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":{"b":"BBB", "Q{http://c.com/}c":"CCC"}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-100">
+      <description> Layout XML</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $data := parse-xml('<p>lorem</p>')
+         return element-to-map($data/*, {'plan': {'p': {'layout':'xml'}}})]]></test>
+      <result>
+         <assert-deep-eq><![CDATA[{'p': '<p>lorem</p>'}]]></assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-101">
+      <description> Layout XML</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $data := parse-xml('
+           <chap nr="1">
+             <section nr="2"/>
+             <section nr="3">
+               <para>Some <i>mixed</i> <!--really?--> content</para>
+             </section>
+           </chap>')
+         return element-to-map($data/*, {'plan': {'para': {'layout':'xml'}}})]]></test>
+      <result>
+         <all-of>
+            <assert><![CDATA[??para = '<para>Some <i>mixed</i> <!--really?--> content</para>']]></assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+  
+
+   
+   
+  
+   
+   <test-case name="element-to-map-200">
+      <description> element node - implicit - empty</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a/>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":""}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-201">
+      <description> element node - implicit - empty - whitespace significant</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a> </a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":" "}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-202">
+      <description> element node - implicit - empty - default namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xmlns="http://one.com/"/>')/*:a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://one.com/}a":""}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-203">
+      <description> element node - implicit - empty - non-default namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<p:a xmlns:p="http://one.com/"/>')/*:a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://one.com/}a":""}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-204">
+      <description> element node - implicit - nested</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b/></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"b":""}}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-205">
+      <description> element node - implicit - nested same namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xmlns="http://one.com/"><b/></a>')/*:a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://one.com/}a":{"b":""}}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-206">
+      <description> element node - implicit - nested same namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<p:a xmlns:p="http://one.com/"><p:b/></p:a>')/*:a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://one.com/}a":{"b":""}}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-207">
+      <description> element node - implicit - nested different namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xmlns="http://one.com/"><b xmlns=""/></a>')/*:a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://one.com/}a":{"Q{}b":""}}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-208">
+      <description> element node - implicit - nested different namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<p:a xmlns:p="http://one.com/"><b/></p:a>')/*:a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://one.com/}a":{"Q{}b":""}}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-209">
+      <description> element node - implicit - nested different namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><p:b xmlns:p="http://two.com/"/></a>')/*:a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"Q{http://two.com/}b":""}}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-210">
+      <description> element node - implicit - empty-plus</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a x="1" y="2"/>')/a)
+      ]]></test>
+      <result>
+         <any-of>
+            <assert-deep-eq>{"a":{"@x":"1","@y":"2"}}</assert-deep-eq> 
+            <assert-deep-eq>{"a":{"@y":"2","@x":"1"}}</assert-deep-eq>  
+         </any-of>           
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-211">
+      <description> element node - implicit - simple</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a>babel</a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":"babel"}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-212">
+      <description> element node - implicit - simple - whitespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a> </a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":" "}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-213">
+      <description> parentless element node </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         element-to-map(<a>x</a>)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":"x"}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-214">
+      <description> parentless element node in namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         element-to-map(<a xmlns="http://a.com/">x</a>)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":"x"}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   
+   <test-case name="element-to-map-220">
+      <description> element node - implicit - simple plus</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="zz">babel</a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@id":"zz","#content":"babel"}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-221">
+      <description> element node - implicit - simple plus</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="zz" x="22">babel</a>')/a)
+      ]]></test>
+      <result>
+         <any-of>
+            <assert-deep-eq>{"a":{"@id":"zz","@x":"22","#content":"babel"}}</assert-deep-eq> 
+            <assert-deep-eq>{"a":{"@x":"22","@id":"zz","#content":"babel"}}</assert-deep-eq> 
+         </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-222">
+      <description> element node - implicit - simple plus - whitespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="zz" x="22"> </a>')/a)
+      ]]></test>
+      <result>
+         <any-of>
+            <assert-deep-eq>{"a":{"@id":"zz","@x":"22","#content":" "}}</assert-deep-eq> 
+            <assert-deep-eq>{"a":{"@x":"22","@id":"zz","#content":" "}}</assert-deep-eq> 
+         </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-223">
+      <description> element node - implicit - simple plus - nested</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="aa"><b id="bb">bertie</b></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@id":"aa","b":{"@id":"bb","#content":"bertie"}}}</assert-deep-eq>  
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-224">
+      <description> element node - implicit - simple plus - nested, different namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="aa"><b id="bb" xmlns="http://bertie.com/">bertie</b></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@id":"aa","Q{http://bertie.com/}b":{"@id":"bb","#content":"bertie"}}}</assert-deep-eq>  
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-225">
+      <description> element node - implicit - simple plus - attribute in namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="zz" p:x="22" xmlns:p="http://p.com/">babel</a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@id":"zz","@Q{http://p.com/}x":"22","#content":"babel"}}</assert-deep-eq>  
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-230">
+      <description> element node - implicit - list-plus</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="zz"><b/><b/></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@id":"zz","b":["",""]}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-231">
+      <description> element node - implicit - list-plus</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xml:id="zz"><b>xxx</b><b>yyy</b><b>zzz</b></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@xml:id":"zz","b":["xxx","yyy","zzz"]}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-232">
+      <description> element node - implicit - list-plus</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xml:id="zz"><b><p/></b><b><q/></b><b><r/></b></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@xml:id":"zz","b":[{"p":""},{"q":""},{"r":""}]}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-233">
+      <description> element node - implicit - list-plus - whitespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xml:id="zz"><b> <p/> </b><b> <q/> </b><b> <r/> </b></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@xml:id":"zz","b":[{"p":""},{"q":""},{"r":""}]}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-234">
+      <description> element node - implicit - list-plus - same namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xmlns="http://one.com/" xml:id="zz"><b><p/></b><b><q/></b><b><r/></b></a>')/*:a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://one.com/}a":{"@xml:id":"zz","b":[{"p":""},{"q":""},{"r":""}]}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-235">
+      <description> element node - implicit - list-plus - different namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xml:id="zz"><b xmlns="http://one.com/"><p/></b><b xmlns="http://one.com/"><q/></b><b xmlns="http://one.com/"><r/></b></a>')/*:a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@xml:id":"zz","Q{http://one.com/}b":[{"p":""},{"q":""},{"r":""}]}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-236">
+      <description> element node - implicit - list-plus - different namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xmlns="http://zero.com/" xml:id="zz"><b xmlns="http://one.com/"><p/></b><b xmlns="http://one.com/"><q/></b><b xmlns="http://one.com/"><r/></b></a>')/*:a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://zero.com/}a":{"@xml:id":"zz","Q{http://one.com/}b":[{"p":""},{"q":""},{"r":""}]}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-240">
+      <description> element node - implicit - record</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xml:id="zz"><p/><q/><r/></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@xml:id":"zz","p":"","q":"","r":""}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-241">
+      <description> element node - implicit - record - whitespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xml:id="zz"> <p/> <q/> <r/> </a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@xml:id":"zz","p":"","q":"","r":""}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-242">
+      <description> element node - implicit - record - namespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xml:id="zz"> <p/> <z:q xmlns:z="http://z.com/" z:id="cow"/> <r/> </a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@xml:id":"zz","p":"","Q{http://z.com/}q":{"@Q{http://z.com/}id":"cow"},"r":""}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-250">
+      <description> element node - implicit - sequence</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><head/><p/><p/><p/></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"head":""},{"p":""},{"p":""},{"p":""}]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-251">
+      <description> element node - implicit - sequence - with attributes and content</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a diff="chg"><head/><p>Intro</p><p/><p/></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"@diff":"chg"},{"head":""},{"p":"Intro"},{"p":""},{"p":""}]}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-252">
+      <description> element node - implicit - sequence - with whitespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a diff="chg"> <head/> <p>Intro</p> <p/> <p/> </a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"@diff":"chg"},{"head":""},{"p":"Intro"},{"p":""},{"p":""}]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-260">
+      <description> element node - implicit - mixed</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><head/><p/><p/><p/>The end</a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"head":""},{"p":""},{"p":""},{"p":""},"The end"]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-261">
+      <description> element node - implicit - mixed - with attributes and content</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a diff="chg"><head/>The beginning<p>Intro</p><p/><p/></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"@diff":"chg"},{"head":""},"The beginning",{"p":"Intro"},{"p":""},{"p":""}]}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-262">
+      <description> element node - implicit - mixed - with whitespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a diff="chg"> <head/> <p>Intro</p> The middle <p/> <p/> </a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"@diff":"chg"}," ",{"head":""}," ",{"p":"Intro"}," The middle ",{"p":""}," ",{"p":""}," "]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-263">
+      <description> element node - implicit - mixed - with comment</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><head>Title</head><!--lets start--><p>Intro</p><p>Outtro</p><!--the end--></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"head":"Title"},{"#comment":"lets start"},{"p":"Intro"},{"p":"Outtro"},{"#comment":"the end"}]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-264">
+      <description> element node - implicit - mixed - with comments and whitespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a> <head>Title</head> Lets start <p>Intro</p> <p>Outtro</p> <!--the end--> </a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[" ",{"head":"Title"}," Lets start ",{"p":"Intro"}," ",{"p":"Outtro"}," ",{"#comment":"the end"}," "]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-270">
+      <description> element node - implicit - list</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b/><b/></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":["",""]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-271">
+      <description> element node - implicit - list</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b>xxx</b><b>yyy</b><b>zzz</b></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":["xxx","yyy","zzz"]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-272">
+      <description> element node - implicit - list</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b><p/></b><b><q/></b><b><r/></b></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"p":""},{"q":""},{"r":""}]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-273">
+      <description> element node - implicit - list - whitespace</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b> <p/> </b><b> <q/> </b><b> <r/> </b></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"p":""},{"q":""},{"r":""}]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-274">
+      <description> element node - implicit - list - complex children</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b nr="1"><p>One</p></b><b nr="2"><p>Two</p></b><b nr="3"><p>Three</p></b></a>')/a)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"@nr":"1","p":"One"},{"@nr":"2","p":"Two"},{"@nr":"3","p":"Three"}]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+ 
+   
+   <test-case name="element-to-map-300">
+      <description> element node - schema-based - empty</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:Empty/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}Empty":""}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-301">
+      <description> element node - schema-based - empty content, schema allows attributes, but there are none</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-302">
+      <description> element node - schema-based - empty content, with a boolean attribute</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus test="true"/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"@test":true()}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-303">
+      <description> element node - schema-based - empty content, with a numeric attribute</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus num="42"/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"@num":42}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-304">
+      <description> element node - schema-based - empty content, with a list-valued attribute</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus list="42 43 44"/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"@list":[42,43,44]}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-305">
+      <description> element node - schema-based - empty content, with a singleton list-valued attribute</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus list="1234"/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"@list":[1234]}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-306">
+      <description> element node - schema-based - empty content, with an empty list-valued attribute</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus list=""/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"@list":[]}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-307">
+      <description> element node - schema-based - empty content, nilled</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus list="" xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"@list":[], "#content": xs:QName("fn:null")}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-310">
+      <description> element node - schema-based - simple content, numeric</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:Number>5</c:Number>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}Number":5}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-311">
+      <description> element node - schema-based - simple content, boolean</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:Boolean>0</c:Boolean>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}Boolean":false()}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-312">
+      <description> element node - schema-based - simple content, date</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:Date>2023-05-31</c:Date>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}Date": xs:date("2023-05-31")}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-313">
+      <description> element node - schema-based - simple content, list of numbers</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:ListOfNumbers>33 32 31</c:ListOfNumbers>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}ListOfNumbers":[33,32,31]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-314">
+      <description> element node - schema-based - simple content, singleton list of numbers</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:ListOfNumbers>33</c:ListOfNumbers>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}ListOfNumbers":[33]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-315">
+      <description> element node - schema-based - simple content, empty list of numbers</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:ListOfNumbers></c:ListOfNumbers>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}ListOfNumbers":[]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-316">
+      <description> element node - schema-based - simple typed content, plus attributes </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:BooleanPlus num="3" test="0">1</c:BooleanPlus>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}BooleanPlus":{"@num":3,"@test":false(),"#content":true()}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-317">
+      <description> element node - schema-based - simple typed content, plus attributes, nilled </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:BooleanPlus num="3" test="0" xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Q{http://www.w3.org/XQueryTest/specimen}BooleanPlus": 
+            { "@num": 3,
+              "@test": false(),
+              "#content": xs:QName("fn:null")}
+            }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-318">
+      <description> element node - schema-based - simple typed content, plus attributes, @xsi:nil attribute is dropped </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:BooleanPlus num="3" test="0" xsi:nil="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1</c:BooleanPlus>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}BooleanPlus":{"@num":3,"@test":false(),"#content":true()}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-320">
+      <description> element node - schema-based - list layout - whitespace dropped</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:ListPlus num="5">
+                                        <c:DatePlus num="1">2000-01-01</c:DatePlus>
+                                        <c:DatePlus num="2">2000-01-02</c:DatePlus>
+                                        <c:DatePlus num="3">2000-01-03</c:DatePlus></c:ListPlus>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Q{http://www.w3.org/XQueryTest/specimen}ListPlus":
+            { "@num":5,
+              "DatePlus": [ {"@num": 1, "#content": xs:date("2000-01-01")},
+                            {"@num": 2, "#content": xs:date("2000-01-02")},
+                            {"@num": 3, "#content": xs:date("2000-01-03")}
+                          ]
+            }}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-321">
+      <description> element node - schema-based - list layout - singleton</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:ListPlus num="3">
+                                        <c:DatePlus num="1">2000-01-01</c:DatePlus>
+                                     </c:ListPlus>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Q{http://www.w3.org/XQueryTest/specimen}ListPlus":
+            {"@num": 3, 
+             "DatePlus": [ { "@num": 1, "#content": xs:date("2000-01-01")} ] }}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-322">
+      <description> element node - schema-based - list layout - empty</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:ListPlus num="3" test="0"/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Q{http://www.w3.org/XQueryTest/specimen}ListPlus": 
+            {"@num": 3e0,
+             "@test": false(),
+             "DatePlus":[]
+            }}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-330">
+      <description> element node - schema-based - record layout, no attributes, no repeats, whitespace </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:RecordPlus>
+                                       <c:Boolean>1</c:Boolean>
+                                       <c:Number>2</c:Number>
+                                       <c:Date>1966-07-03</c:Date>
+                                     </c:RecordPlus>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{
+            "Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":
+              {"Boolean":true(),
+               "Number":2,
+               "Date": xs:date("1966-07-03")}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-331">
+      <description> element node - schema-based - record layout, attributes, no repeats, whitespace </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:RecordPlus test="1">
+                                       <c:Boolean>1</c:Boolean>
+                                       <c:Number>2</c:Number>
+                                       <c:Date>1966-07-03</c:Date>
+                                     </c:RecordPlus>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":
+            { "@test": true(), "Boolean": true(), "Number": 2, "Date": xs:date("1966-07-03") }
+          }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-334">
+      <description> element node - schema-based - record layout, nilled, no attributes </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:RecordPlus xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":{"#content":()}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-335">
+      <description> element node - schema-based - record layout, nilled, with attributes </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:RecordPlus num="42" xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":{"@num":42,"#content":()}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-336">
+      <description> element node - schema-based - record layout, empty, not nilled, attributes </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:RecordPlus num="42" xsi:nil="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":{"@num":42}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-337">
+      <description> element node - schema-based - record layout, empty, not nilled, no attributes </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:RecordPlus xsi:nil="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}RecordPlus":{}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-340">
+      <description> element node - schema-based - sequence layout, no attributes, whitespace </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:Sequence>
+                                       <c:Boolean>1</c:Boolean>
+                                       <c:Number>2</c:Number>
+                                       <c:Date>1966-07-03</c:Date>
+                                     </c:Sequence>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}Sequence":[
+            {"Boolean": true()},
+            {"Number": 2},
+            {"Date": xs:date("1966-07-03")}]
+         }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-341">
+      <description> element node - schema-based - sequence layout, attributes, whitespace </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:SequencePlus num="42">
+                                       <c:BooleanPlus>1</c:BooleanPlus>
+                                       <c:NumberPlus>2</c:NumberPlus>
+                                       <c:DatePlus>1966-07-03</c:DatePlus>
+                                     </c:SequencePlus>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}SequencePlus":
+            [{"@num": 42},
+             {"BooleanPlus": {"#content": true()}},
+             {"NumberPlus": {"#content": 2}},
+             {"DatePlus": {"#content": xs:date("1966-07-03")}}
+            ]}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-342">
+      <description> element node - schema-based - sequence layout, nilled </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:SequencePlus num="42" xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}SequencePlus":
+            [ {"@num": 42}, 
+              {"#content": xs:QName("fn:null")} ]
+         }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-350">
+      <description> element node - schema-based - mixed layout, whitespace, no attributes </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:Mixed>A can of <c:Number>2</c:Number>  <c:Date>1966-07-03</c:Date> worms</c:Mixed>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{
+            "Q{http://www.w3.org/XQueryTest/specimen}Mixed":
+               [ "A can of ", {"Number": 2}, "  " , {"Date": xs:date("1966-07-03")}, " worms" ]}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-351">
+      <description> element node - schema-based - mixed layout, whitespace, attributes </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:MixedPlus test="0">A can of <c:Number>2</c:Number>  <c:Date>1966-07-03</c:Date> worms</c:MixedPlus>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{
+            "Q{http://www.w3.org/XQueryTest/specimen}MixedPlus":
+              [ {"@test": false()}, "A can of ", {"Number": 2}, "  ", {"Date": xs:date("1966-07-03")}, " worms"]}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-352">
+      <description> element node - schema-based - mixed layout, whitespace, attributes, nilled </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:MixedPlus test="0" xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{
+            "Q{http://www.w3.org/XQueryTest/specimen}MixedPlus":[
+              {"@test":false()}, 
+              {"#content": xs:QName("fn:null")}
+            ]}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-353">
+      <description> element node - schema-based - mixed layout, whitespace, attributes, not nilled </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:MixedPlus test="0" xsi:nil="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            >A can of <c:Number>2</c:Number>  <c:Date>1966-07-03</c:Date> worms</c:MixedPlus>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{
+            "Q{http://www.w3.org/XQueryTest/specimen}MixedPlus":
+              [ {"@test":false()},
+                "A can of ",
+                {"Number":2},
+                "  ",
+                {"Date": xs:date("1966-07-03")},
+                " worms" ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-354">
+      <description> element node - schema-based - mixed layout, whitespace, attributes, comments and PIs </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:MixedPlus test="0">A can of <!--many-->  <c:Date>1966-07-03</c:Date> <?pi worms?></c:MixedPlus>}
+         return element-to-map($in)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{
+            "Q{http://www.w3.org/XQueryTest/specimen}MixedPlus":
+            [ {"@test":false()},
+              "A can of ",
+              {"#comment":"many"},
+              "  ",
+              {"Date":xs:date("1966-07-03")},
+              " ",
+              {"#processing-instruction":{"#target":"pi","#data":"worms"}}
+            ]}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-400">
+      <description> element node - explicit - selects empty layout though not empty</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="3"/>')/a, {'plan': {'a': {'layout': 'empty'}}})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":""}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-401">
+      <description> element node - explicit - selects empty layout though not empty</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="3"><b/></a>')/a, {'plan':map{'a': {'layout': 'empty'}}})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":""}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-402">
+      <description> element node - explicit - selects empty-plus layout though there are no attributes</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a/>')/a, {'plan': {'a': {'layout': 'empty-plus'}}})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{}}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-403">
+      <description> element node - explicit - selects empty-plus layout though there are children</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b/></a>')/a, {'plan' : {'a': {'layout': 'empty-plus'}}})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{}}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-410">
+      <description> element node - explicit - selects simple layout though there is mixed content</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a>The <i>short</i> introduction</a>')/a, {'plan': {'a': {'layout':'simple'}}})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":"The short introduction"}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-411">
+      <description> element node - explicit - selects simple-plus layout though there are no attributes</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a>The <i>short</i> introduction</a>')/a, {'plan': {'a': {'layout':'simple-plus'}}})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"#content":"The short introduction"}}</assert-deep-eq>     
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-412">
+      <description> element node - schema-based - request simple layout, but content cannot be atomized.
+      Fall back to using the string value.</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:Sequence><c:Boolean>1</c:Boolean><c:Number>2</c:Number></c:Sequence>}
+         return element-to-map($in, 
+                                 map{'plan': { 'Q{http://www.w3.org/XQueryTest/specimen}Sequence': {'layout': 'simple'}},
+                                     'name-format': 'local'}
+                                )
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Sequence": "12" }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-420">
+      <description> element node - request list format though element names are inconsistent. Fall back to serialized XML.</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="zz"><b/><b/><c/></a>')/a, {'plan':{'a':{'layout':'list'}}})
+      ]]></test>
+      <result>
+         <assert-deep-eq><![CDATA[{"a":'<a id="zz"><b/><b/><c/></a>'}]]></assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-421">
+      <description> element node - request list format though there are text node children. Fall back to serialized XML. </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="zz"><b/>rhubarb<b/></a>')/a, {'plan': {'a': {'layout':'list'}}})
+      ]]></test>
+      <result>
+         <assert-deep-eq><![CDATA[{"a":'<a id="zz"><b/>rhubarb<b/></a>'}]]></assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-422">
+      <description> element node - request list format though there are attributes. Drop the attributes. </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="zz"><b>one</b><b>two</b></a>')/a, {'plan': {'a': {'layout':'list'}}})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":["one","two"]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-430">
+      <description> element node - select record format though element names repeat</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="zz"><b>x</b><b>y</b><c/></a>')/a, 
+                          {'plan': {'a': {'layout':'record'}}}
+                         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "a":{ "@id": "zz", "b": ["x", "y"], "c": "" } }</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-431">
+      <description> element node - select record layout though element names repeat, nested</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(
+            parse-xml('<a id="zz"><b><p/></b><b><p/><p/></b></a>')/a, 
+            map{'plan': { 'a': {'layout':'record'},
+                          'b': {'layout':'record'}}
+               })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@id":"zz",
+                          "b":[{"p":""}, 
+                               {"p":["",""]}] }}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-440">
+      <description> element node - select mixed/simple layout though there is no non-whitespace text</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b> </b> <b>_</b></a>')/a, {'plan':{'a':{'layout':'mixed'},
+                                                                          'b':{'layout':'simple'}}})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"b":" "}," ",{"b":"_"}]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-500">
+      <description> element node - uniform across empty and empty-plus elements</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b/><b id="x"/><b/><c/></a>')
+         return element-to-map($in/a, {'plan':element-to-map-conversion-plan($in)})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"b":{}},{"b":{"@id":"x"}},{"b":{}},{"c":""}]}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-501">
+      <description> element node - uniform across simple and empty-plus elements</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b>-</b><b id="x"/><b>+</b><c/></a>')
+         return element-to-map($in/a, {'plan':element-to-map-conversion-plan($in)})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"b":{"#content":"-"}},{"b":{"@id":"x","#content":""}},{"b":{"#content":"+"}},{"c":""}]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-502">
+      <description> element node - uniform across list and single-child and empty elements</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b></b><b><i/><i/><i/></b><b><i/></b></a>')
+         return element-to-map($in/a, 
+                               {'plan':element-to-map-conversion-plan($in)})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[[],["","",""],[""]]}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-503">
+      <description> element node - uniform across lists with different child elements</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b></b><b><j/><j/><j/></b><b><i/></b></a>')
+         return element-to-map($in/a, {'plan':element-to-map-conversion-plan($in)})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[ [], [{"j":""},{"j":""},{"j":""}], [{"i":""}] ]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-504">
+      <description> element node - uniform across list and list-plus elements</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b id="x"></b><b><i/><i/><i/></b><b><i/></b><c/></a>')
+         return element-to-map($in/a, {'plan':element-to-map-conversion-plan($in)})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"b":{"@id":"x","i":[]}},{"b":{"i":["","",""]}},{"b":{"i":[""]}},{"c":""}]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-505">
+      <description> element node - uniform across list and record elements</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><i/><j/><k/></b><b><i>A</i><i>B</i><i>C</i></b><c/></a>')
+         return element-to-map($in/a, {'plan':element-to-map-conversion-plan($in)})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"b": [{"i":""},{"j":""},{"k":""}]},
+                               {"b": [{"i":"A"}, {"i":"B"}, {"i":"C"}]},
+                               {"c":""}]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-506">
+      <description> element node - uniform across list and mixed elements</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><i/><j/>zzz<k/></b><b><i/><i/><i/></b><c/></a>')
+         return element-to-map(
+             $in/a, 
+             {'plan':element-to-map-conversion-plan($in)}
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>{
+            "a": [
+               {"b": [ {"i":""}, {"j":""}, "zzz", {"k":""} ] },
+               {"b": [ {"i":""}, {"i":""}, {"i":""} ] },
+               {"c": ""}
+            ]}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-507">
+      <description> element node - uniform across single-child and list elements</description>
+      <created by="Michael Kay" on="2025-02-09"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><i>1</i></b><b><i>2</i><i>3</i></b></a>')
+         return element-to-map($in/a, {'plan':element-to-map-conversion-plan($in)})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[["1"], ["2","3"]]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-508">
+      <description> element node - uniform across single-child and list elements</description>
+      <created by="Michael Kay" on="2025-02-09"/>
+      <test><![CDATA[
+         let $in1 := parse-xml('<a><b><i>1</i></b><b><i>2</i></b></a>')/a
+         let $in2 := parse-xml('<a><b><i>2</i><i>3</i></b></a>')/a
+         let $plan := element-to-map-conversion-plan(($in1, $in2))
+         return (element-to-map($in1, {'plan':$plan}),
+                 element-to-map($in2, {'plan':$plan}))
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[["1"],["2"]]}, {"a":[["2","3"]]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <!--<test-case name="element-to-map-601" covers-40="PR1596">
+      <description> Empty element with empty layout disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xmlns="http://a.com/"/>')/*,
+                          {'disable-layouts': 'empty'})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a": {}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-602" covers-40="PR1596">
+      <description> Empty element with empty and empty-plus layout disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xmlns="http://a.com/"/>')/*,
+                          {'disable-layouts': ('empty', 'empty-plus')})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a": ""}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-603" covers-40="PR1596">
+      <description> Empty element with empty, empty-plus, and simple layout disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xmlns="http://a.com/"/>')/*,
+                          {'disable-layouts': ('empty', 'empty-plus', 'simple')})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a": {"#content": ""}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-604" covers-40="PR1596">
+      <description> List content with list layout disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b>one</b><b>two</b><b>three</b></a>')/*,
+                          {'disable-layouts': ('list')})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a": {"b": ["one", "two", "three"] }}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-605" covers-40="PR1596">
+      <description> List content with list and list-plus layout disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b>one</b><b>two</b><b>three</b></a>')/*,
+                          {'disable-layouts': ('list', 'list-plus')})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a": [ {"b": "one"}, {"b": "two"}, {"b": "three"} ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-606" covers-40="PR1596">
+      <description> Record content with record layout disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b>one</b><c>two</c><d>three</d></a>')/*,
+                          {'disable-layouts': ('record')})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a": [ {"b": "one"}, {"c": "two"}, {"d": "three"} ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-607" covers-40="PR1596">
+      <description> element node - uniform across list and list-plus elements, but list-plus is disabled</description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b><i>X</i><i>Y</i><i>Z</i></b><b class="Q"><i>A</i><i>B</i><i>C</i></b><c/></a>')/a, 
+            map{ 'uniform':true(), 'disable-layouts':'list-plus'})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":[{"b":[{"i":"X"},{"i":"Y"},{"i":"Z"}]},{"b":[{"@class":"Q"},{"i":"A"},{"i":"B"},{"i":"C"}]},{"c":""}]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-651" covers-40="PR1596">
+      <description> element node - schema-based - empty - but empty is disabled</description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:Empty/>}
+         return element-to-map($in, {'disable-layouts':'empty'})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}Empty":{}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-652" covers-40="PR1596">
+      <description> element node - schema-based - 
+         empty content, schema allows attributes, but there are none
+         -\- but empty-plus and simple are disabled
+      </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus/>}
+         return element-to-map($in, {'disable-layouts':('empty-plus', 'simple')})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-653" covers-40="PR1596">
+      <description> element node - schema-based - would be record layout, but disabled </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         declare boundary-space preserve;
+         let $in := validate strict {<c:RecordPlus test="1">
+                                       <c:Boolean>1</c:Boolean>
+                                       <c:Number>2</c:Number>
+                                       <c:Date>1966-07-03</c:Date>
+                                     </c:RecordPlus>}
+         return element-to-map($in, {"disable-layouts": "record", "name-format": "local"})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"RecordPlus":
+            [ { "@test": true() },
+              { "Boolean": true() },
+              { "Number": 2 },
+              { "Date": xs:date("1966-07-03") }
+            ]  
+          }</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-900">
+      <description> invalid layout </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(
+             parse-xml('<a>x</a>')/a, 
+             map{'layouts': {xs:QName('a'): 'undeclared'}}
+         )
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-901">
+      <description> invalid key in layouts map </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(
+             parse-xml('<a>x</a>')/a, 
+             map{'layouts': {'a': 'simple'}}
+         )
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-902">
+      <description> input is a document node </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a>x</a>'))
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-903">
+      <description> unknown name format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a>x</a>'), {'name-format':'palindromic'})
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-904">
+      <description> cannot disable mixed layout </description>
+      <created by="Michael Kay" on="2024-12-06"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a>x</a>'), {'disable-layouts':'mixed'})
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   -->
+   
+   
+   
+</test-set>
+   
+
+ 
