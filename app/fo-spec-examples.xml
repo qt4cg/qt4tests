@@ -5605,10 +5605,10 @@ Tak, tak, tak! - da kommen sie.
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-04-08"/>
       <environment ref="global"/>
       <test>
-        replace("abracadabra", "bra", action := fn { "*" })
+        replace("abracadabra", "bra", upper-case#1)
       </test>
       <result>
-         <assert-deep-eq>"a*cada*"</assert-deep-eq>
+         <assert-deep-eq>"aBRAcadaBRA"</assert-deep-eq>
       </result>
    </test-case>
 
@@ -5617,14 +5617,10 @@ Tak, tak, tak! - da kommen sie.
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-04-08"/>
       <environment ref="global"/>
       <test>
-        replace(
-  "abracadabra",
-  "bra",
-  action := upper-case#1
-)
+        replace("Chapter 9", "[0-9]+", fn { . + 1 })
       </test>
       <result>
-         <assert-deep-eq>"aBRAcadaBRA"</assert-deep-eq>
+         <assert-deep-eq>"Chapter 10"</assert-deep-eq>
       </result>
    </test-case>
 
@@ -5633,10 +5629,14 @@ Tak, tak, tak! - da kommen sie.
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-04-08"/>
       <environment ref="global"/>
       <test>
-        replace("Chapter 9", "[0-9]+", action := fn { . + 1 })
+        replace(
+  "LHR to LAX",
+  "\b[A-Z]{3}\b",
+  { 'LAX': 'Los Angeles', 'LHR': 'London' }
+)
       </test>
       <result>
-         <assert-deep-eq>"Chapter 10"</assert-deep-eq>
+         <assert-deep-eq>"London to Los Angeles"</assert-deep-eq>
       </result>
    </test-case>
 
@@ -5646,25 +5646,9 @@ Tak, tak, tak! - da kommen sie.
       <environment ref="global"/>
       <test>
         replace(
-  "LHR to LAX",
-  "\b[A-Z]{3}\b",
-  action := { 'LAX': 'Los Angeles', 'LHR': 'London' }
-)
-      </test>
-      <result>
-         <assert-deep-eq>"London to Los Angeles"</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-replace-015">
-      <description>Test case for fn:replace</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-04-08"/>
-      <environment ref="global"/>
-      <test>
-        replace(
   "57°43′30″",
   "([0-9]+)°([0-9]+)′([0-9]+)″",
-  action := fn($s, $groups) {
+  fn($s, $groups) {
     string($groups[1] + $groups[2] ÷ 60 + $groups[3] ÷ 3600) || '°'
   }
 )
