@@ -225,6 +225,46 @@
       </result>
    </test-case>
    
+   <test-case name="itemTypeDecl-016" covers-40="PR1908">
+      <description>Forwards references are allowed</description>
+      <created by="Michael Kay" on="2025-03-31"/>
+      <test><![CDATA[
+         declare variable $cplx as local:complex-number := {'real': 0, 'imag': 1};
+         declare type local:complex-number as map(*);
+      	`{$cplx?real} + {$cplx?imag}i`
+      ]]></test>
+      <result>
+         <assert-eq>"0 + 1i"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-017" covers-40="PR1908">
+      <description>Self-references are allowed</description>
+      <created by="Michael Kay" on="2025-03-31"/>
+      <test><![CDATA[
+         declare variable $cplx as local:complex-number := {'real': 0, 'imag': 1};
+         declare type local:complex-number as map(xs:string, local:complex-number);
+      	`{$cplx?real} + {$cplx?imag}i`
+      ]]></test>
+      <result>
+         <error code="XQST0140"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-018" covers-40="PR1908">
+      <description>Mutual recursion is not allowed</description>
+      <created by="Michael Kay" on="2025-03-31"/>
+      <test><![CDATA[
+         declare type local:yin as map(xs:string, local:yan);
+         declare type local:yan as map(xs:string, local:yin);
+      	declare variable $x as local:yin external;
+      	$x
+      ]]></test>
+      <result>
+         <error code="XQST0140"/>
+      </result>
+   </test-case>
+   
  
  
    
