@@ -191,6 +191,46 @@
       </result>
    </test-case>
    
+   <test-case name="element-to-map-020">
+      <description> Namespaced elements: bad name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<z:a xmlns:z="http://a.com/"/>')/*, {'name-format': 'bad'})]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-021">
+      <description> Namespaced elements: attribute-marker contains quotes</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(
+         parse-xml('<a xmlns="http://a.com/" b="BBB" z:c="CCC" xmlns:z="http://c.com/"/>')/*,
+         {'attribute-marker':'"'})]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://a.com/}a":{"""b":"BBB", """Q{http://c.com/}c":"CCC"}}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-022">
+      <description> Namespaced elements: bad name-format </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(parse-xml('<z:a xmlns:z="http://a.com/"/>')/*, {'name-format': 93.7})]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-023">
+      <description> Namespaced elements: attribute-marker is numeric</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[element-to-map(
+         parse-xml('<a xmlns="http://a.com/" b="BBB" z:c="CCC" xmlns:z="http://c.com/"/>')/*,
+         {'attribute-marker':93.7})]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
    <test-case name="element-to-map-100">
       <description> Layout XML</description>
       <created by="Michael Kay" on="2024-11-16"/>
@@ -218,6 +258,61 @@
          <all-of>
             <assert><![CDATA[??para = '<para>Some <i>mixed</i> <!--really?--> content</para>']]></assert>
          </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-102">
+      <description> Bad Layout option</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $data := parse-xml('<p>lorem</p>')
+         return element-to-map($data/*, {'plan': {'p': {'layout':'dramatic'}}})]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-103">
+      <description> Bad Layout option</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $data := parse-xml('<p>lorem</p>')
+         return element-to-map($data/*, {'plan': {'p': {'layout':current-date()}}})]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-104">
+      <description> Bad plan</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $data := parse-xml('<p>lorem</p>')
+         return element-to-map($data/*, {'plan': {'p': current-date()}})]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-105">
+      <description> Extra entries are allowed in the plan </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $data := parse-xml('<p>lorem</p>')
+         return element-to-map($data/*, {'plan': {'p': {'layout':'xml'}, '$$$': {'layout': 'xml'}}})]]></test>
+      <result>
+         <assert-deep-eq><![CDATA[{'p': '<p>lorem</p>'}]]></assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-106">
+      <description> Extra entries are allowed in an entry of the plan </description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $data := parse-xml('<p>lorem</p>')
+         return element-to-map($data/*, {'plan': {'p': {'layout':'xml', 'colour': 'green'}}})]]></test>
+      <result>
+         <assert-deep-eq><![CDATA[{'p': '<p>lorem</p>'}]]></assert-deep-eq>
       </result>
    </test-case>
    
@@ -1375,13 +1470,16 @@
    </test-case>
    
    <test-case name="element-to-map-401">
-      <description> element node - explicit - selects empty layout though not empty</description>
+      <description> element node - explicit - selects empty layout though not empty; fallback uses record layout</description>
       <created by="Michael Kay" on="2024-11-16"/>
       <test><![CDATA[
-         element-to-map(parse-xml('<a id="3"><b/></a>')/a, {'plan':map{'a': {'layout': 'empty'}}})
+         element-to-map(parse-xml('<a id="3"><b/></a>')/a, {'plan': {'a': {'layout': 'empty'},
+                                                                     '*': {'layout': 'record'},
+                                                                     '@id': {'type': 'numeric'}
+                                                                     }})
       ]]></test>
       <result>
-         <assert-deep-eq>{"a":""}</assert-deep-eq>     
+         <assert-deep-eq>{"a":{"@id":3, "b":""}}</assert-deep-eq>     
       </result>
    </test-case>
    
@@ -1403,7 +1501,8 @@
          element-to-map(parse-xml('<a><b/></a>')/a, {'plan' : {'a': {'layout': 'empty-plus'}}})
       ]]></test>
       <result>
-         <assert-deep-eq>{"a":{}}</assert-deep-eq>     
+         <!--<assert-deep-eq>{"a":{}}</assert-deep-eq>  --> 
+         <error code="FOJS0008"/>
       </result>
    </test-case>
    
@@ -1414,7 +1513,8 @@
          element-to-map(parse-xml('<a>The <i>short</i> introduction</a>')/a, {'plan': {'a': {'layout':'simple'}}})
       ]]></test>
       <result>
-         <assert-deep-eq>{"a":"The short introduction"}</assert-deep-eq>     
+         <!--<assert-deep-eq>{"a":"The short introduction"}</assert-deep-eq>     -->
+         <error code="FOJS0008"/>
       </result>
    </test-case>
    
@@ -1422,7 +1522,7 @@
       <description> element node - explicit - selects simple-plus layout though there are no attributes</description>
       <created by="Michael Kay" on="2024-11-16"/>
       <test><![CDATA[
-         element-to-map(parse-xml('<a>The <i>short</i> introduction</a>')/a, {'plan': {'a': {'layout':'simple-plus'}}})
+         element-to-map(parse-xml('<a>The short introduction</a>')/a, {'plan': {'a': {'layout':'simple-plus'}}})
       ]]></test>
       <result>
          <assert-deep-eq>{"a":{"#content":"The short introduction"}}</assert-deep-eq>     
@@ -1440,34 +1540,38 @@
          import schema namespace c="http://www.w3.org/XQueryTest/specimen";
          let $in := validate strict {<c:Sequence><c:Boolean>1</c:Boolean><c:Number>2</c:Number></c:Sequence>}
          return element-to-map($in, 
-                                 map{'plan': { 'Q{http://www.w3.org/XQueryTest/specimen}Sequence': {'layout': 'simple'}},
+                                 map{'plan': { 'Q{http://www.w3.org/XQueryTest/specimen}Sequence': {'layout': 'simple'},
+                                               '*': {'layout': 'record'}
+                                             },
                                      'name-format': 'local'}
                                 )
       ]]></test>
       <result>
-         <assert-deep-eq>{ "Sequence": "12" }</assert-deep-eq>
+         <assert-deep-eq>{ "Sequence": {"Boolean": true(), "Number": 2 }}</assert-deep-eq>
       </result>
    </test-case>
    
    <test-case name="element-to-map-420">
-      <description> element node - request list format though element names are inconsistent. Fall back to serialized XML.</description>
+      <description> element node - request list format though element names are inconsistent. </description>
       <created by="Michael Kay" on="2024-11-16"/>
       <test><![CDATA[
          element-to-map(parse-xml('<a id="zz"><b/><b/><c/></a>')/a, {'plan':{'a':{'layout':'list'}}})
       ]]></test>
       <result>
-         <assert-deep-eq><![CDATA[{"a":'<a id="zz"><b/><b/><c/></a>'}]]></assert-deep-eq> 
+         <!--<assert-deep-eq><![CDATA[{"a":'<a id="zz"><b/><b/><c/></a>'}]]></assert-deep-eq> -->
+         <error code="FOJS0008"/>
       </result>
    </test-case>
    
    <test-case name="element-to-map-421">
-      <description> element node - request list format though there are text node children. Fall back to serialized XML. </description>
+      <description> element node - request list format though there are text node children. </description>
       <created by="Michael Kay" on="2024-11-16"/>
       <test><![CDATA[
          element-to-map(parse-xml('<a id="zz"><b/>rhubarb<b/></a>')/a, {'plan': {'a': {'layout':'list'}}})
       ]]></test>
       <result>
-         <assert-deep-eq><![CDATA[{"a":'<a id="zz"><b/>rhubarb<b/></a>'}]]></assert-deep-eq> 
+         <!--<assert-deep-eq><![CDATA[{"a":'<a id="zz"><b/>rhubarb<b/></a>'}]]></assert-deep-eq> -->
+         <error code="FOJS0008"/>
       </result>
    </test-case>
    
@@ -1529,7 +1633,7 @@
       <created by="Michael Kay" on="2024-11-16"/>
       <test><![CDATA[
          let $in := parse-xml('<a><b/><b id="x"/><b/><c/></a>')
-         return element-to-map($in/a, {'plan':element-to-map-conversion-plan($in)})
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
       ]]></test>
       <result>
          <assert-deep-eq>{"a":[{"b":{}},{"b":{"@id":"x"}},{"b":{}},{"c":""}]}</assert-deep-eq>
@@ -1541,7 +1645,7 @@
       <created by="Michael Kay" on="2024-11-16"/>
       <test><![CDATA[
          let $in := parse-xml('<a><b>-</b><b id="x"/><b>+</b><c/></a>')
-         return element-to-map($in/a, {'plan':element-to-map-conversion-plan($in)})
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
       ]]></test>
       <result>
          <assert-deep-eq>{"a":[{"b":{"#content":"-"}},{"b":{"@id":"x","#content":""}},{"b":{"#content":"+"}},{"c":""}]}</assert-deep-eq> 
@@ -1554,7 +1658,7 @@
       <test><![CDATA[
          let $in := parse-xml('<a><b></b><b><i/><i/><i/></b><b><i/></b></a>')
          return element-to-map($in/a, 
-                               {'plan':element-to-map-conversion-plan($in)})
+                               {'plan':element-to-map-plan($in)})
       ]]></test>
       <result>
          <assert-deep-eq>{"a":[[],["","",""],[""]]}</assert-deep-eq>
@@ -1566,7 +1670,7 @@
       <created by="Michael Kay" on="2024-11-16"/>
       <test><![CDATA[
          let $in := parse-xml('<a><b></b><b><j/><j/><j/></b><b><i/></b></a>')
-         return element-to-map($in/a, {'plan':element-to-map-conversion-plan($in)})
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
       ]]></test>
       <result>
          <assert-deep-eq>{"a":[ [], [{"j":""},{"j":""},{"j":""}], [{"i":""}] ]}</assert-deep-eq> 
@@ -1578,7 +1682,7 @@
       <created by="Michael Kay" on="2024-11-16"/>
       <test><![CDATA[
          let $in := parse-xml('<a><b id="x"></b><b><i/><i/><i/></b><b><i/></b><c/></a>')
-         return element-to-map($in/a, {'plan':element-to-map-conversion-plan($in)})
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
       ]]></test>
       <result>
          <assert-deep-eq>{"a":[{"b":{"@id":"x","i":[]}},{"b":{"i":["","",""]}},{"b":{"i":[""]}},{"c":""}]}</assert-deep-eq> 
@@ -1590,7 +1694,7 @@
       <created by="Michael Kay" on="2024-11-16"/>
       <test><![CDATA[
          let $in := parse-xml('<a><b><i/><j/><k/></b><b><i>A</i><i>B</i><i>C</i></b><c/></a>')
-         return element-to-map($in/a, {'plan':element-to-map-conversion-plan($in)})
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
       ]]></test>
       <result>
          <assert-deep-eq>{"a":[{"b": [{"i":""},{"j":""},{"k":""}]},
@@ -1606,7 +1710,7 @@
          let $in := parse-xml('<a><b><i/><j/>zzz<k/></b><b><i/><i/><i/></b><c/></a>')
          return element-to-map(
              $in/a, 
-             {'plan':element-to-map-conversion-plan($in)}
+             {'plan':element-to-map-plan($in)}
          )
       ]]></test>
       <result>
@@ -1624,10 +1728,15 @@
       <created by="Michael Kay" on="2025-02-09"/>
       <test><![CDATA[
          let $in := parse-xml('<a><b><i>1</i></b><b><i>2</i><i>3</i></b></a>')
-         return element-to-map($in/a, {'plan':element-to-map-conversion-plan($in)})
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
       ]]></test>
       <result>
-         <assert-deep-eq>{"a":[["1"], ["2","3"]]}</assert-deep-eq> 
+         <all-of>
+            <assert-deep-eq>{"a":[[1], [2,3]]}</assert-deep-eq>
+            <assert>?a?1?1 instance of xs:integer</assert>
+            <assert>?a?2?1 instance of xs:integer</assert>
+            <assert>?a?2?2 instance of xs:integer</assert>
+         </all-of>
       </result>
    </test-case>
    
@@ -1637,12 +1746,81 @@
       <test><![CDATA[
          let $in1 := parse-xml('<a><b><i>1</i></b><b><i>2</i></b></a>')/a
          let $in2 := parse-xml('<a><b><i>2</i><i>3</i></b></a>')/a
-         let $plan := element-to-map-conversion-plan(($in1, $in2))
+         let $plan := element-to-map-plan(($in1, $in2))
          return (element-to-map($in1, {'plan':$plan}),
                  element-to-map($in2, {'plan':$plan}))
       ]]></test>
       <result>
-         <assert-deep-eq>{"a":[["1"],["2"]]}, {"a":[["2","3"]]}</assert-deep-eq> 
+         <assert-deep-eq>{"a":[[1],[2]]}, {"a":[[2,3]]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-509">
+      <description> element node - explicit error</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b></b><b><j/><j/><j/></b><b><i/></b></a>')
+         return element-to-map($in/a, {'plan':{'i': {'layout':'error'}}})
+      ]]></test>
+      <result>
+         <error code="FOJS0008"/>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-510">
+      <description> element node - explicit deep-skip</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b/><c/><d/><e/></a>')
+         return element-to-map($in/a, {'plan':{
+                                          'a': {'layout': 'record'},
+                                          'd': {'layout': 'deep-skip'}
+                                          }})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a": {'b':"", 'c':"", 'e':""}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-511">
+      <description> element node - explicit - selects simple layout though there is mixed content - fallback mixed</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a>The <i>short</i> introduction</a>')/a, 
+                        {'plan': {'a': {'layout':'simple'},
+                                  '*': {'layout':'mixed'}
+                                  }})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":["The ", {"i": "short"}, " introduction"]}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-512">
+      <description> element node - explicit - selects simple layout though there is mixed content - fallback xml</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a>The <i>short</i> introduction</a>')/a, 
+                        {'plan': {'a': {'layout':'simple'},
+                                  '*': {'layout':'xml'}
+                                  }})
+      ]]></test>
+      <result>
+         <assert-deep-eq><![CDATA[{"a":"<a>The <i>short</i> introduction</a>"}]]></assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-513">
+      <description> element node - explicit - selects simple layout though there is mixed content - fallback deep-skip</description>
+      <created by="Michael Kay" on="2024-11-16"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a>The <i>short</i> introduction</a>')/a, 
+                        {'plan': {'a': {'layout':'simple'},
+                                  '*': {'layout':'deep-skip'}
+                                  }})
+      ]]></test>
+      <result>
+         <assert-empty/> 
       </result>
    </test-case>
    
