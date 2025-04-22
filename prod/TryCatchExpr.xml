@@ -2001,5 +2001,163 @@
       <assert-true/>
     </result>
   </test-case>
+  
+  <test-case name="try-finally-001" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Michael Kay" on="2025-04-20"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[try { 42 } finally {}]]></test>
+    <result>
+      <assert-eq>42</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="try-finally-002" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Michael Kay" on="2025-04-20"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[try { 42 } finally {()}]]></test>
+    <result>
+      <assert-eq>42</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="try-finally-003" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Michael Kay" on="2025-04-20"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[try { 42 } catch * {97} finally {()}]]></test>
+    <result>
+      <assert-eq>42</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="try-finally-004" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Michael Kay" on="2025-04-20"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[try { 42 } 
+                   catch err:FORG0001 {97} 
+                   catch err:FORG0002 {98} 
+                   finally {()}]]></test>
+    <result>
+      <assert-eq>42</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="try-finally-005" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Michael Kay" on="2025-04-20"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[try { 42 } catch err:FORG0001 {97} err:FORG0002 {98} finally {99}]]></test>
+    <result>
+      <error code="XQDY0153"/>
+    </result>
+  </test-case>
+  
+  <test-case name="try-finally-006" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Michael Kay" on="2025-04-20"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[try { 42 } finally {"ok"[current-date() gt xs:date('1900-01-01')}]]></test>
+    <result>
+      <error code="XQDY0153"/>
+    </result>
+  </test-case>
+  
+  <test-case name="try-finally-007" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Michael Kay" on="2025-04-20"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[try { 42 } 
+                   finally {"ok"[current-date() lt xs:date('1900-01-01')]}
+    ]]></test>
+    <result>
+      <assert-eq>42</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="try-finally-008" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Michael Kay" on="2025-04-20"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[try { for $i in -2 to +2 return 10 div $i } 
+                   catch err:FOAR0001 {99}
+                   finally {"ok"[current-date() lt xs:date('1900-01-01')]}
+    ]]></test>
+    <result>
+      <assert-eq>99</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="try-finally-009" covers-40="PR1914">
+    <description>
+      Tests that 'finally' clause is actually executed on success (by throwing an error if it is)
+    </description>
+    <created by="Michael Kay" on="2025-04-20"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+        try { 42 } 
+        finally {10 div (xs:integer(random-number-generator()?next())) }
+    ]]></test>
+    <result>
+      <error code="FOAR0001"/>
+    </result>
+  </test-case>
+  
+  <test-case name="try-finally-010" covers-40="PR1914">
+    <description>
+      Tests that 'finally' clause is actually executed on failure (by throwing an error if it is)
+    </description>
+    <created by="Michael Kay" on="2025-04-20"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      let $zero := count(current-date()[. lt xs:date('1900-01-01')])
+      return 
+        try {
+          try { string(current-date()) cast as xs:integer } 
+          finally {10 div $zero}
+        } 
+        catch err:FORG0001 {"wrong"}
+        catch err:FOAR0001 {"right"}
+    ]]></test>
+    <result>
+      <assert-eq>"right"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="try-finally-011" covers-40="PR1914">
+    <description>
+      Tests that an error in the 'finally' clause is not caught
+    </description>
+    <created by="Michael Kay" on="2025-04-20"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+        try { 42 }
+        catch err:FOAR0001 {"wrong"}
+        finally {10 div (xs:integer(random-number-generator()?next()) }
+    ]]></test>
+    <result>
+      <error code="FOAR0001"/>
+    </result>
+  </test-case>
+  
+  <test-case name="try-finally-012" covers-40="PR1914">
+    <description>
+      Tests that 'finally' is evaluated after a catch
+    </description>
+    <created by="Michael Kay" on="2025-04-20"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+        let $zero := count(current-date()[. lt xs:date('1900-01-01')])
+        return 
+          try { string(current-date()) cast as xs:integer}
+          catch err:FORG0001 {"wrong"}
+          finally {10 div $zero) }
+    ]]></test>
+    <result>
+      <error code="FOAR0001"/>
+    </result>
+  </test-case>
 
 </test-set>
