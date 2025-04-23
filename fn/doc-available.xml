@@ -4,12 +4,32 @@
    <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/"
          idref="func-doc-available"/>
 
+   <environment name="works-mod-uri">
+      <source role="." file="../docs/works-mod.xml" uri="http://www.w3.org/fots/docs/works-mod.xml">
+         <description>Data for various NIST tests (abbreviated, unabbreviated syntax)</description>
+         <created by="Carmelo Montanez" on="2005-03-04"/>
+      </source>
+      <param name="uri" as="xs:string" select="'http://www.w3.org/fots/docs/works-mod.xml'" declared="false"/>
+   </environment>
+
    <test-case name="fn-doc-available-1">
       <description> Evaluation of ana fn:doc-available function with wrong arity. </description>
       <created by="Carmelo Montanez" on="2006-07-11"/>
+      <modified by="Gunther Rademacher" on="2025-04-23" change="add dependency"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"/>
       <test>fn:doc-available("http://example.com","string 2")</test>
       <result>
          <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-doc-available-1a">
+      <description>Same as fn-doc-available-1, but second argument permitted in 4.0.</description>
+      <created by="Gunther Rademacher" on="2025-04-23"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:doc-available("http://example.com","string 2")</test>
+      <result>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
@@ -203,8 +223,9 @@
    <test-case name="fn-doc-available-40-017" covers-40="PR1910">
       <description>Options on fn:doc-available - dtd validation, document valid, internal DTD with external entities, allow-external-entities=true</description>
       <created by="Michael Kay" on="2025-04-08"/>
+      <modified by="Gunther Rademacher" on="2025-04-23" change="removed excess left parenthesis"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>(fn:doc-available("../docs/bib-with-internal-dtd-and-external-entities.xml", {'dtd-validation':true(), 'allow-external-entities': true()})</test>
+      <test>fn:doc-available("../docs/bib-with-internal-dtd-and-external-entities.xml", {'dtd-validation':true(), 'allow-external-entities': true()})</test>
       <result>
          <assert-true/>
       </result>
@@ -243,10 +264,11 @@
    <test-case name="fn-doc-available-40-021" covers-40="PR1910">
       <description>Options on fn:doc-available - dtd validation, document valid, internal DTD with internal entities, entity-expansion-limit=10000</description>
       <created by="Michael Kay" on="2025-04-08"/>
+      <modified by="Gunther Rademacher" on="2025-04-23" change="corrected expected response (test does not exceed entity expansion limit)"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>fn:doc-available("../docs/bib-with-internal-dtd-and-internal-entities.xml", {'dtd-validation':true(), 'entity-expansion-limit':10000})</test>
       <result>
-         <assert-false/>
+         <assert-true/>
       </result>
    </test-case>
    

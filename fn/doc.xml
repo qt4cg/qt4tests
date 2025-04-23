@@ -51,9 +51,21 @@
    <test-case name="fn-doc-2">
       <description> Evaluation of fn:doc function with wrong arity. </description>
       <created by="Carmelo Montanez" on="2005-11-30"/>
+      <modified by="Gunther Rademacher" on="2025-04-23" change="add dependency"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"/>
       <test>fn:doc("argument1","argument2")</test>
       <result>
          <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-doc-2a" covers="fn-doc" covers-40="PR1910">
+      <description>Same as fn-doc-2, but second argument permitted in 4.0.</description>
+      <created by="Gunther Rademacher" on="2025-04-23"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:doc("argument1","argument2")</test>
+      <result>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
@@ -658,20 +670,28 @@
    <test-case name="fn-doc-40-011" covers-40="PR1910">
       <description>Options on fn:doc - dtd validation requested, no DTD available</description>
       <created by="Michael Kay" on="2025-04-08"/>
+      <modified by="Gunther Rademacher" on="2025-04-23" change="XML parser reports a DTD validation error, so added response code FODC0007"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>exists(fn:doc("../docs/bib.xml", {'dtd-validation':true()})/*)</test>
       <result>
-         <error code="FODC0002"/>
+         <any-of>
+            <error code="FODC0002"/>
+            <error code="FODC0007"/>
+         </any-of>
       </result>
    </test-case>
    
    <test-case name="fn-doc-40-012" covers-40="PR1910">
       <description>Options on fn:doc - dtd validation requested, document is invalid</description>
       <created by="Michael Kay" on="2025-04-08"/>
+      <modified by="Gunther Rademacher" on="2025-04-23" change="XML parser reports a DTD validation error, so added response code FODC0007"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>exists(fn:doc("../docs/bib-invalid.xml", {'dtd-validation':true()})/*)</test>
       <result>
-         <error code="FODC0002"/>
+         <any-of>
+            <error code="FODC0002"/>
+            <error code="FODC0007"/>
+         </any-of>
       </result>
    </test-case>
    
@@ -698,10 +718,14 @@
    <test-case name="fn-doc-40-015" covers-40="PR1910">
       <description>Options on fn:doc - dtd validation, document valid, external DTD, allow-external-entities=false</description>
       <created by="Michael Kay" on="2025-04-08"/>
+      <modified by="Gunther Rademacher" on="2025-04-23" change="Entity resolver reports access to blocked external URI, so added response code FODC0002"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>exists(fn:doc("../docs/bib-with-external-dtd.xml", {'dtd-validation':true(), 'allow-external-entities': false()})/*)</test>
       <result>
-         <error code="FODC0006"/>
+         <any-of>
+            <error code="FODC0002"/>
+            <error code="FODC0006"/>
+         </any-of>
       </result>
    </test-case>
    
@@ -728,10 +752,14 @@
    <test-case name="fn-doc-40-018" covers-40="PR1910">
       <description>Options on fn:doc - dtd validation, document valid, internal DTD with external entities, allow-external-entities=false</description>
       <created by="Michael Kay" on="2025-04-08"/>
+      <modified by="Gunther Rademacher" on="2025-04-23" change="Entity resolver reports access to blocked external URI, so added response code FODC0002"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>exists(fn:doc("../docs/bib-with-internal-dtd-and-external-entities.xml", {'dtd-validation':true(), 'allow-external-entities': false()})//title[contains(., 'XSLT')])</test>
       <result>
-         <error code="FODC0006"/>
+         <any-of>
+            <error code="FODC0002"/>
+            <error code="FODC0006"/>
+         </any-of>
       </result>
    </test-case>
    
@@ -748,10 +776,14 @@
    <test-case name="fn-doc-40-020" covers-40="PR1910">
       <description>Options on fn:doc - dtd validation, document valid, internal DTD with external entities, entity-expansion-limit=0</description>
       <created by="Michael Kay" on="2025-04-08"/>
+      <modified by="Gunther Rademacher" on="2025-04-23" change="reported as a parsing failure, so added response code FODC0002"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>exists(fn:doc("../docs/bib-with-internal-dtd-and-external-entities.xml", {'dtd-validation':true(), 'entity-expansion-limit':1})//title[contains(., 'TCP/IP')])</test>
       <result>
-         <error code="FODC0006"/>
+         <any-of>
+            <error code="FODC0002"/>
+            <error code="FODC0006"/>
+         </any-of>
       </result>
    </test-case>
    
@@ -768,10 +800,14 @@
    <test-case name="fn-doc-40-022" covers-40="PR1910">
       <description>Options on fn:doc - dtd validation, document valid, internal DTD with internal entities, entity-expansion-limit=20</description>
       <created by="Michael Kay" on="2025-04-08"/>
+      <modified by="Gunther Rademacher" on="2025-04-23" change="reported as a parsing failure, so added response code FODC0002"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>exists(fn:doc("../docs/bib-with-internal-dtd-and-internal-entities.xml", {'dtd-validation':true(), 'entity-expansion-limit':20})//title[contains(., 'TCP/IP')])</test>
       <result>
-         <error code="FODC0006"/>
+         <any-of>
+            <error code="FODC0002"/>
+            <error code="FODC0006"/>
+         </any-of>
       </result>
    </test-case>
    
@@ -879,7 +915,9 @@
    <test-case name="fn-doc-40-045" covers-40="PR1910">
       <description>Options on fn:doc - stable with schema validation</description>
       <created by="Michael Kay" on="2025-04-08"/>
+      <modified by="Gunther Rademacher" on="2025-04-23" change="added missing dependency to schemaImport feature"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
       <environment ref="bib-with-schema"/>
       <test>fn:doc("../docs/bib.xml", {'stable':true(), 'xsd-validation':'strict'})
           is fn:doc("../docs/bib.xml", {'stable':true(), 'xsd-validation':'skip'}) </test>
