@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" 
+   name="fn-unparsed-binary" covers-40="PR1587">
+   <description>Tests for the unparsed-binary() function</description>
+
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <environment name="unparsed-binary">
+      <resource file="unparsed-text/text-plain-utf-8.txt"
+                media-type="application/octet-stream" 
+                uri="http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt">
+         <description>UTF-8 encoded plain text.</description>
+         <created by="Tim Mills" on="2012-01-05"/>
+      </resource>
+      <resource file="unparsed-text/non-xml-character.txt" 
+                uri="http://www.w3.org/fots/unparsed-text/non-xml-character.txt">
+         <description>A file containing a non-XML character</description>
+         <created by="Tim Mills" on="2012-01-05"/>
+      </resource>
+      <resource file="unparsed-text/invalid-xml.xml" 
+                media-type="application/octet-stream" 
+                uri="http://www.w3.org/fots/unparsed-text/invalid-xml.xml">
+         <description>Invalid XML.</description>
+         <created by="Tim Mills" on="2012-01-05"/>
+         <modified by="O'Neil Delpratt" on="2012-10-16" change="Added the encoding attribute"/>
+      </resource>
+   </environment>
+
+   <environment name="unparsed-text-with-base-uri">
+      <static-base-uri uri="http://www.w3.org/fots/unparsed-text/" />
+      <resource file="unparsed-text/text-plain-utf-8.txt"
+                media-type="application/octet-stream" 
+                uri="http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt">
+         <description>UTF-8 encoded plain text.</description>
+         <created by="Tim Mills" on="2012-01-05"/>
+      </resource>
+   </environment>
+
+   <environment name="unparsed-text-with-base-uri-2">
+      <static-base-uri uri="http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt" />
+      <resource file="unparsed-text/text-plain-utf-8.txt"
+                media-type="application/octet-stream" 
+                uri="http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt">
+         <description>UTF-8 encoded plain text.</description>
+         <created by="Tim Mills" on="2012-01-05"/>
+      </resource>
+   </environment>
+
+   <test-case name="fn-unparsed-binary-001">
+      <description>Attempts to evaluate the "unparsed-binary" function with no arguments.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <test>fn:unparsed-binary()</test>
+      <result>
+         <error code="XPST0017" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-002">
+      <description>Attempts to reference the "unparsed-binary" function with arity zero.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <test>fn:unparsed-binary#0</test>
+      <result>
+         <error code="XPST0017" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-003">
+      <description>Attempts to reference the "unparsed-binary" function with arity one.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <test>fn:exists( fn:unparsed-binary#1 )</test>
+      <result>
+         <assert-true />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-004">
+      <description>Attempts to reference the "unparsed-binary" function with arity two.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <test>fn:exists( fn:unparsed-binary#2 )</test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-005">
+      <description>Attempts to evaluate the "unparsed-binary" function with three arguments.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <test>fn:unparsed-binary(static-base-uri(), "utf-8", "")</test>
+      <result>
+         <error code="XPST0017" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-006">
+      <description>Attempts to reference the "unparsed-binary" function with arity three.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <test>fn:unparsed-text#3</test>
+      <result>
+         <error code="XPST0017" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-007">
+      <description>Tests the type checking of the $href argument.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <test>fn:unparsed-binary( if ( fn:current-dateTime() ne
+                                   fn:dateTime( fn:current-date(),
+                                                fn:current-time() ))
+                              then "http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt"
+                              else 1 )</test>
+      <result>
+         <error code="XPTY0004" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-008">
+      <description>Tests the type checking of the $href argument.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <test>( fn:unparsed-binary( if (current-date() eq xs:date('1900-01-01'))
+                                then "http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt"
+                                else 1 ),
+              fn:unparsed-binary( if (current-date() eq xs:date('1900-01-01'))
+                                then 1
+                                else "http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt") )</test>
+      <result>
+         <error code="XPTY0004" />
+      </result>
+   </test-case>
+
+   
+   <test-case name="fn-unparsed-binary-013">
+      <description>Evaluates the "unparsed-binary" function with the argument set as follows: $href contains a fragment identifier.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <test>fn:unparsed-binary("http://www.example.org/#fragment")</test>
+      <result>
+         <error code="FOUT1170" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-015">
+      <description>Evaluates the "unparsed-binary" function with the argument set as follows: $href is an invalid xs:anyURI.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <test>fn:unparsed-binary("http://www.example.org/%gg")</test>
+      <result>
+         <error code="FOUT1170" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-017">
+      <description>Evaluates the "unparsed-binary" function with the argument set as follows: $href is an invalid xs:anyURI.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <test>fn:unparsed-binary(":/")</test>
+      <result>
+         <error code="FOUT1170" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-019">
+      <description>Evaluates the "unparsed-binary" function with the argument set as follows: $href refers to a non-existent file.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <test>fn:unparsed-binary( "http://www.w3.org/fots/unparsed-text/does-not-exist.txt")</test>
+      <result>
+         <error code="FOUT1170" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-021">
+      <description>Evaluates the "unparsed-binary" function with the argument set as follows: $href uses a (probably) unsupported URI scheme.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <test>fn:unparsed-binary("surely-nobody-supports-this:/path.txt")</test>
+      <result>
+         <error code="FOUT1170" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-023">
+      <description>Evaluates the "unparsed-binary" function with the argument set as follows: $href is a relative URI, static base URI undefined.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <environment>
+	     <static-base-uri uri="#UNDEFINED" />
+      </environment>
+      <test>fn:unparsed-binary("unparsed-text/text-plain-utf-8.txt")</test>
+      <result>
+         <error code="FOUT1170"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-025">
+      <description>Evaluates the "unparsed-binary" function with the argument set as follows: $href is a relative URI, static base is defined.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <environment>
+         <static-base-uri uri="http://www.w3.org/fots/unparsed-text/" />
+      </environment>
+      <test>fn:unparsed-binary("does-not-exist.txt")</test>
+      <result>
+	     <error code="FOUT1170" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-027">
+      <description>Evaluates the "unparsed-binary" function with the argument set as follows: $href is a relative URI, static base is defined.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <environment ref="unparsed-text-with-base-uri" />
+      <test>fn:unparsed-binary("text-plain-utf-8.txt")</test>
+      <result>
+	     <assert-eq>xs:base64Binary('aGVsbG/CoHdvcmxk')</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-029">
+      <description>Evaluates the "unparsed-binary" function with the argument set as follows: $href is a Windows file path.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <environment ref="unparsed-text-with-base-uri" />
+      <test>fn:unparsed-binary("C:\file-might-exist.txt")</test>
+      <result>
+	     <error code="FOUT1170" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-031">
+      <description>Evaluates the "unparsed-binary" function with the argument set as follows: $href is an empty string.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <environment ref="unparsed-text-with-base-uri-2" />
+      <test>fn:unparsed-binary("")</test>
+      <result>
+	     <assert-eq>xs:base64Binary('aGVsbG/CoHdvcmxk')</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-033">
+      <description>Evaluates the "unparsed-binary" function with the argument set as follows: $href is an empty string.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <environment>
+         <static-base-uri uri="http://www.w3.org/fots/unparsed-text/does-not-exists.txt" />
+      </environment>
+      <test>fn:unparsed-binary("")</test>
+      <result>
+	     <error code="FOUT1170" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-039">
+      <description>Evaluates the "unparsed-binary" function with the argument set as follows: $href refers to a file which contains non-XML characters.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <environment ref="unparsed-binary" />
+      <test>fn:unparsed-binary("http://www.w3.org/fots/unparsed-text/non-xml-character.txt")</test>
+      <result>
+         <assert-eq>xs:base64Binary("77u/AAAAAAA=")</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-binary-040">
+      <description>Evaluates the "unparsed-binary" function with the argument set as follows: $href refers to a file which does not contain well-formed XML.</description>
+      <created by="Michael Kay" on="2025-04-30"/>
+      <environment ref="unparsed-binary" />
+      <test>fn:unparsed-binary("http://www.w3.org/fots/unparsed-text/invalid-xml.xml")</test>
+      <result>
+	     <assert-eq>xs:base64Binary("//48AD8AeABtAGwAIAB2AGUAcgBzAGkAbwBuAD0AIgAxAC4AMAAiACAAZQBuAGMAbwBkAGkAbgBnAD0AIgB1AHQAZgAtADEANgAiAD8APgA8AHQAZQB4AHQAPgBoAGUAbABsAG8AoAB3AG8AcgBsAGQADQAKAA==")</assert-eq>  
+      </result>
+   </test-case>
+
+   
+
+</test-set>
