@@ -504,6 +504,27 @@
         </result>
     </test-case>
     
+    <test-case name="parse-xml-440" covers-40="PR1931">
+        <description>parse-xml test - schema validation with xsi:schemaLocation</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="simplexsd"/>
+        <dependency type="spec" value="XQ40+"/>
+        <dependency type="feature" value="schemaImport"/>
+        <dependency type="feature" value="schemaValidation"/>
+        <test><![CDATA[
+            (: import schema namespace simple="http://www.w3.org/XQueryTest/simple"; :)
+            parse-xml('<duration xmlns="http://www.w3.org/XQueryTest/simple"
+                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                 xsi:schemaLocation="http://www.w3.org/XQueryTest/simple ../prod/ValidateExpr/simple.xsd"
+                       >P23D</duration>', 
+                      {'xsd-validation': 'strict',
+                       'xsi-schema-location': true()})
+         ]]></test>
+        <result>
+            <assert>data($result/*:duration) instance of xs:dayTimeDuration</assert>
+        </result>
+    </test-case>
+    
     <test-case name="parse-xml-450" covers-40="PR1879">
         <description>parse-xml test - with local DTD, OK even with allow-external-entities=false</description>
         <created by="Michael Kay" on="2025-03-26"/>        
