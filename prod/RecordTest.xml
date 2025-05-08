@@ -141,6 +141,66 @@
       </result>
    </test-case>
    
+   <test-case name="RecordTest-011" covers-40="PR1874">
+      <description>Coercion to a record type changes order of fields</description>
+      <created by="Michael Kay" on="2025-03-17"/>
+      <test>
+         let $k := function($x as record(a, b, c, d)) as xs:string* {map:keys($x)}
+         return $k({'c':(), 'a':(), 'b':(), 'd':()})
+      </test>
+      <result>
+         <assert-deep-eq>"a", "b", "c", "d"</assert-deep-eq>      
+      </result>
+   </test-case>
+   
+   <test-case name="RecordTest-012" covers-40="PR1874">
+      <description>Coercion to a record type changes order of fields</description>
+      <created by="Michael Kay" on="2025-03-17"/>
+      <test>
+         let $k := function($x as record(a, b, d, c, *)) as xs:string* {map:keys($x)}
+         return $k({'e':(), 'c':(), 'a':(), 'g':(), 'b':(), 'd':()})
+      </test>
+      <result>
+         <assert-deep-eq>"a", "b", "d", "c", 'e', 'g'</assert-deep-eq>      
+      </result>
+   </test-case>
+   
+   <test-case name="RecordTest-013" covers-40="PR1874">
+      <description>Coercion to a record type changes order of fields</description>
+      <created by="Michael Kay" on="2025-03-17"/>
+      <test>
+         let $k := function($x as record(a, b, d?, c, *)) as xs:string* {map:keys($x)}
+         return $k({'e':(), 'c':(), 'a':(), 'g':(), 'b':()})
+      </test>
+      <result>
+         <assert-deep-eq>"a", "b", "c", 'e', 'g'</assert-deep-eq>      
+      </result>
+   </test-case>
+   
+   <test-case name="RecordTest-014" covers-40="PR1874">
+      <description>Coercion to a record type changes order of fields</description>
+      <created by="Michael Kay" on="2025-03-17"/>
+      <test>
+         let $k := function($x as record(a as xs:int, b as xs:int, d? as xs:int, c as xs:int, *)) as xs:string* {map:keys($x)}
+         return $k({'e':0, 'c':0, 'a':0, 'g':0, 'b':0})
+      </test>
+      <result>
+         <assert-deep-eq>"a", "b", "c", 'e', 'g'</assert-deep-eq>      
+      </result>
+   </test-case>
+   
+   <test-case name="RecordTest-015">
+      <description>Coercion changes values</description>
+      <created by="Michael Kay" on="2025-03-17"/>
+      <test>
+         let $k := function($x as record(a as xs:int, b as xs:int, d? as xs:int, c as xs:int)) as item()* {$x?*}
+         return $k({'c':0, 'a':0, 'b':0})
+      </test>
+      <result>
+         <assert-type>xs:int*</assert-type>      
+      </result>
+   </test-case>
+   
    <test-case name="RecordTest-103">
       <description>record(*) is now allowed</description>
       <created by="Michael Kay" on="2023-09-19"/>

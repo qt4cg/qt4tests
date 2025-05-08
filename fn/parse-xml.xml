@@ -226,7 +226,7 @@
     </test-case>
     
     <test-case name="parse-xml-410" covers-40="PR1257">
-        <description>parse-xml test - with local DTD - invalid against DTD</description>
+        <description>parse-xml test - with internal DTD - invalid against DTD</description>
         <created by="Michael Kay" on="2013-01-07"/>        
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
@@ -238,7 +238,7 @@
     </test-case>
     
     <test-case name="parse-xml-411" covers-40="PR1257">
-        <description>parse-xml test - with local DTD - valid against DTD</description>
+        <description>parse-xml test - with internal DTD - valid against DTD</description>
         <created by="Michael Kay" on="2013-01-07"/>        
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
@@ -282,6 +282,18 @@
             {'dtd-validation': true()})]]></test>
         <result>
             <error code="FODC0007"/>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-415" covers-40="PR1257">
+        <description>parse-xml test - with internal DTD, but with validation off</description>
+        <created by="Michael Kay" on="2025-03-16"/>        
+        <environment ref="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml("<!DOCTYPE a [<!ELEMENT a (#PCDATA)>]><a><b/></a>",
+                {'dtd-validation':false()})]]></test>
+        <result>
+            <assert>/a/b</assert>
         </result>
     </test-case>
     
@@ -492,6 +504,27 @@
         </result>
     </test-case>
     
+    <test-case name="parse-xml-440" covers-40="PR1931">
+        <description>parse-xml test - schema validation with xsi:schemaLocation</description>
+        <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <environment ref="simplexsd"/>
+        <dependency type="spec" value="XQ40+"/>
+        <dependency type="feature" value="schemaImport"/>
+        <dependency type="feature" value="schemaValidation"/>
+        <test><![CDATA[
+            (: import schema namespace simple="http://www.w3.org/XQueryTest/simple"; :)
+            parse-xml('<duration xmlns="http://www.w3.org/XQueryTest/simple"
+                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                 xsi:schemaLocation="http://www.w3.org/XQueryTest/simple ../prod/ValidateExpr/simple.xsd"
+                       >P23D</duration>', 
+                      {'xsd-validation': 'strict',
+                       'use-xsi-schema-location': true()})
+         ]]></test>
+        <result>
+            <assert>data($result/*:duration) instance of xs:dayTimeDuration</assert>
+        </result>
+    </test-case>
+    
     <test-case name="parse-xml-450" covers-40="PR1879">
         <description>parse-xml test - with local DTD, OK even with allow-external-entities=false</description>
         <created by="Michael Kay" on="2025-03-26"/>        
@@ -506,9 +539,10 @@
     <test-case name="parse-xml-451" covers-40="PR1879">
         <description>parse-xml test - with external DTD, not OK because disallowed</description>
         <created by="Michael Kay" on="2025-03-26"/>        
+        <modified by="Gunther Rademacher" on="2025-04-23" change="add 'dtd-validation': true()"/>
         <environment name="empty"/>
         <test><![CDATA[parse-xml("<!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>",
-            { 'allow-external-entities': false() } )]]></test>
+            { 'dtd-validation': true(), 'allow-external-entities': false() } )]]></test>
         <result>
             <error code="FODC0006"/>
         </result>
