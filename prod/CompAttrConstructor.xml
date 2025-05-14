@@ -399,7 +399,7 @@
    <test-case name="K2-ComputeConAttr-1">
       <description> The name can't be specified as a string literal. </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <dependency type="spec" value="XQ10 XQ30 XQ31"></dependency>
+      <dependency type="spec" value="XQ10+"></dependency>
       <test>attribute "name" {"content"}</test>
       <result>
          <error code="XPST0003"/>
@@ -1035,26 +1035,26 @@
          <assert-xml><![CDATA[<foo div=""/>]]></assert-xml>
       </result>
    </test-case>
-   
-   <test-case name="K2-ComputeConAttr-63" covers-40="PR1259">
+
+   <test-case name="K2-ComputeConAttr-63" covers-40="PR1989">
       <description> Allow name to be a QName literal </description>
       <created by="Michael Kay" on="2024-06-11"/>
-      <modified by="Gunther Rademacher" on="2025-05-14" change="replace string by QName literal, adapting to new syntax"/>
+      <modified by="Michael Kay" on="2025-05-14" change="Use QName rather than string literal"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[<foo>{attribute #div {}}</foo>]]></test>
       <result>
          <assert-xml><![CDATA[<foo div=""/>]]></assert-xml>
       </result>
    </test-case>
-   
+
    <test-case name="K2-ComputeConAttr-64" covers-40="PR1259">
       <description> Allow name to be a QName literal </description>
       <created by="Michael Kay" on="2024-06-11"/>
       <modified by="Gunther Rademacher" on="2025-05-14" change="replace string by QName literal, adapting to new syntax"/>
       <dependency type="spec" value="XQ40+"/>
-      <test><![CDATA[<foo>{attribute #Q{}div {}}</foo>]]></test>
+      <test><![CDATA[<foo>{attribute # div  {}}</foo>]]></test>
       <result>
-         <assert-xml><![CDATA[<foo div=""/>]]></assert-xml>
+         <error code="XPST0003"/>
       </result>
    </test-case>
    
@@ -1105,6 +1105,70 @@
       </test>
       <result>
          <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConAttr-67" covers-40="PR1989">
+      <description> Allow name to be a QName literal </description>
+      <created by="Michael Kay" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<foo>{attribute #Q{}div {}}</foo>]]></test>
+      <result>
+         <assert-xml><![CDATA[<foo div=""/>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConAttr-68" covers-40="PR1989">
+      <description> Allow name to be a QName literal </description>
+      <created by="Michael Kay" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<foo>{attribute #xml:space {"preserve"}}</foo>]]></test>
+      <result>
+         <assert-xml><![CDATA[<foo xml:space="preserve"/>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConAttr-69" covers-40="PR1989">
+      <description> Allow name to be a QName literal </description>
+      <created by="Michael Kay" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<foo>{attribute #Q{http://www.w3.org/XML/1998/namespace}space {"preserve"}}</foo>]]></test>
+      <result>
+         <assert-xml><![CDATA[<foo xml:space="preserve"/>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConAttr-70" covers-40="PR1989">
+      <description> Allow name to be a QName literal </description>
+      <created by="Michael Kay" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<foo>{attribute #Q{}space {"preserve"}}</foo>]]></test>
+      <result>
+         <assert-xml><![CDATA[<foo space="preserve"/>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConAttr-71" covers-40="PR1989">
+      <description> Allow name to be a QName literal </description>
+      <created by="Michael Kay" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<foo>{attribute #Q{http://example.com/}space {"preserve"}}</foo>]]></test>
+      <result>
+         <all-of>
+            <assert>exists($result/@*:space)</assert>
+            <assert>name($result/@*:space) => contains(":")</assert>
+            <assert>namespace-uri($result/@*:space) = "http://example.com/"</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConAttr-72" covers-40="PR1480">
+      <description> Interpret reserved name as operator </description>
+      <created by="Michael Kay" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<_><attribute>10</attribute></_> ! <foo>{attribute div {}!(map:size(.)+2)}</foo>]]></test>
+      <result>
+         <assert-xml><![CDATA[<foo>5</foo>]]></assert-xml>
       </result>
    </test-case>
 

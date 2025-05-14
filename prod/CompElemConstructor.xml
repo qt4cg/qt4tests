@@ -610,7 +610,7 @@
    <test-case name="K2-ComputeConElem-1">
       <description> The name can't be specified as a string literal. </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>element "name" {"content"}</test>
       <result>
          <error code="XPST0003"/>
@@ -778,8 +778,8 @@
          <assert-xml><![CDATA[<array/>]]></assert-xml>
       </result>
    </test-case>
-   
-   <test-case name="K2-ComputeConElem-18" covers-40="PR1259">
+
+   <test-case name="K2-ComputeConElem-18" covers-40="PR1989">
       <description> Allow name to be a QName literal </description>
       <created by="Michael Kay" on="2024-06-11"/>
       <modified by="Gunther Rademacher" on="2025-05-14" change="replace string by QName literal, adapting to new syntax"/>
@@ -791,13 +791,13 @@
    </test-case>
    
    <test-case name="K2-ComputeConElem-19" covers-40="PR1259">
-      <description> Allow name to be a QName literal </description>
+      <description> QName literal cannot contain whitespace </description>
       <created by="Michael Kay" on="2024-06-11"/>
       <modified by="Gunther Rademacher" on="2025-05-14" change="replace string by QName literal, adapting to new syntax"/>
       <dependency type="spec" value="XQ40+"/>
-      <test><![CDATA[element #Q{}div {}]]></test>
+      <test><![CDATA[element # Q{}div {}]]></test>
       <result>
-         <assert-xml><![CDATA[<div/>]]></assert-xml>
+         <error code="XPST0003"/>
       </result>
    </test-case>
    
@@ -805,11 +805,13 @@
       <description> Disallow reserved names </description>
       <created by="Michael Kay" on="2024-06-11"/>
       <modified by="Gunther Rademacher" on="2025-02-18" change="replace error codes - this is not a syntax error XPST0003"/>
+      <modified by="Michael Kay" on="2025-05-14" change="add error code XPTY0004 (node divided by map)"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[element div {}]]></test>
       <result>
          <any-of>
             <error code="XPDY0002"/>
+            <error code="XPTY0004"/>
             <error code="FOTY0013"/>
          </any-of>   
       </result>
@@ -852,6 +854,51 @@
       </test>
       <result>
          <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConElem-22" covers-40="PR1989">
+      <description> Allow name to be a QName literal </description>
+      <created by="Michael Kay" on="2024-06-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[element #fn:div {}]]></test>
+      <result>
+         <assert-xml><![CDATA[<fn:div xmlns:fn="http://www.w3.org/2005/xpath-functions"/>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConElem-23" covers-40="PR1989">
+      <description> Allow name to be a QName literal </description>
+      <created by="Michael Kay" on="2024-06-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[element #Q{}div {}]]></test>
+      <result>
+         <assert-xml><![CDATA[<div/>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConElem-24" covers-40="PR1989">
+      <description> Allow name to be a QName literal. Prefix is impl'n defined. </description>
+      <created by="Michael Kay" on="2024-06-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[element #Q{http://example.com/}div {}]]></test>
+      <result>
+         <all-of>
+            <assert>local-name($result) = "div"</assert>
+            <assert>namespace-uri($result) = "http://example.com/"</assert>
+            <assert>map:items(in-scope-namespaces($result)) = "http://example.com/"</assert>
+            <assert>ends-with(name($result), "div")</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="K2-ComputeConElem-25" covers-40="PR1480">
+      <description> Treat reserved name as operator </description>
+      <created by="Michael Kay" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<a/> ! (element otherwise {})]]></test>
+      <result>
+         <assert-deep-eq>{}</assert-deep-eq> 
       </result>
    </test-case>
 

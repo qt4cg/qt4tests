@@ -2054,6 +2054,18 @@ line2</assert-string-value>
       </result>
    </test-case>
    
+   <test-case name="Literals-40-048" covers-40="PR1976 PR1982">
+      <description> QName literals - no whitespace needed to distinguish from pragma </description>
+      <created by="Michael Kay" on="2025-05-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         prefix-from-QName(#xml:space)
+      </test>
+      <result>
+         <assert-eq>"xml"</assert-eq>
+      </result>
+   </test-case>
+   
    <test-case name="Literals-40-050" covers-40="PR1976">
       <description> QName literals - in map constructor</description>
       <created by="Michael Kay" on="2025-05-06"/>
@@ -2309,17 +2321,16 @@ line2</assert-string-value>
          <error code="XPST0081"/>
       </result>
    </test-case>
-   
-   <test-case name="Literals-40-925" covers-40="PR1976">
-      <description> QName literals - whitespace needed to distinguish from pragma </description>
+
+   <test-case name="Literals-40-925" covers-40="PR1976 PR1982">
+      <description> QName literals - disallowed whitespace</description>
       <created by="Michael Kay" on="2025-05-06"/>
-      <modified by="Gunther Rademacher" on="2025-05-14" change="no error, after required space has been introduced to pragma"/>
-      <dependency type="spec" value="XQ40+"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
       <test>
-         prefix-from-QName(#xml:space)
+         namespace-uri-from-QName( # Q{http://www.example.com/ns}local )
       </test>
       <result>
-         <assert-eq>"xml"</assert-eq>
+         <error code="XPST0003"/>
       </result>
    </test-case>
 
@@ -2332,6 +2343,20 @@ line2</assert-string-value>
       </test>
       <result>
          <assert-eq>"fn"</assert-eq>
+         <error code="XPST0003"/>
       </result>
    </test-case>
+   
+   <test-case name="Literals-40-926" covers-40="PR1976">
+      <description> QName literals - disllowed comments</description>
+      <created by="Michael Kay" on="2025-05-06"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>
+         namespace-uri-from-QName( #(:improbably:)Q{http://www.example.com/ns}local )
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
 </test-set>
