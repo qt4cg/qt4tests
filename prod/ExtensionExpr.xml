@@ -264,7 +264,19 @@
    <test-case name="K-ExtensionExpression-1">
       <description> A pragma expression that never ends is syntactically invalid. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>(#local:pr content # {1}</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="K-ExtensionExpression-1a">
+      <description> A pragma expression that never ends is syntactically invalid. Same as K-ExtensionExpression-1, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>(# local:pr content # {1}</test>
       <result>
          <error code="XPST0003"/>
       </result>
@@ -282,7 +294,19 @@
    <test-case name="K-ExtensionExpression-3">
       <description> A simple pragma expression. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>declare namespace prefix = "http://example.com/NotRecognized"; (#prefix:pr content #) {1 eq 1}</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="K-ExtensionExpression-3a">
+      <description> A simple pragma expression. Same as K-ExtensionExpression-3, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace prefix = "http://example.com/NotRecognized"; (# prefix:pr content #) {1 eq 1}</test>
       <result>
          <assert-true/>
       </result>
@@ -304,8 +328,20 @@
       <description> A pragma expression can be in the empty namespace in XQ 3.1. </description>
       <created by="Frans Englich" on="2007-11-26"/>
       <modified by="Michael Kay" on="2016-08-31" change="Spec change in XQ 3.1:  If the EQName is an unprefixed NCName, it is interpreted as a name in no namespace (and the pragma is therefore ignored)."/>
-      <dependency type="spec" value="XQ31+"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="change dependency"/>
+      <dependency type="spec" value="XQ31"/>
       <test>(#name content #) {1}</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="K-ExtensionExpression-4b"
+              covers="pragma-no-namespace">
+      <description> A pragma expression can be in the empty namespace in XQ 4.0. Same as K-ExtensionExpression-4a, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>(# name content #) {1}</test>
       <result>
          <assert-eq>1</assert-eq>
       </result>
@@ -323,7 +359,19 @@
    <test-case name="K-ExtensionExpression-6">
       <description> A pragma expression containing complex content. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>declare namespace prefix = "http://example.com/NotRecognized"; 1 eq (#prefix:notRecognized ##cont## # # ( "# ) # )# )#ent #) {1}</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="K-ExtensionExpression-6a">
+      <description> A pragma expression containing complex content. Same as K-ExtensionExpression-6, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace prefix = "http://example.com/NotRecognized"; 1 eq (# prefix:notRecognized ##cont## # # ( "# ) # )# )#ent #) {1}</test>
       <result>
          <assert-true/>
       </result>
@@ -334,7 +382,19 @@
       <created by="Frans Englich" on="2007-11-26"/>
       <modified by="Josh Spiegel" on="2016-01-11" change="bug 29225"/>
       <modified by="Josh Spiegel" on="2016-05-18" change="bug 29526"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>declare namespace prefix = "http://example.com/NotRecognized"; (#prefix:PragmaNotSupported content #) {}</test>
+      <result>
+         <error code="XQST0079"/>
+      </result>
+   </test-case>
+
+   <test-case name="K-ExtensionExpression-7a">
+      <description> A fallback expression must be present when no supported pragmas are specified.  Same as K-ExtensionExpression-7, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace prefix = "http://example.com/NotRecognized"; (# prefix:PragmaNotSupported content #) {}</test>
       <result>
          <error code="XQST0079"/>
       </result>
@@ -343,8 +403,22 @@
    <test-case name="K-ExtensionExpression-8">
       <description> A pragma expression containing many comments. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>declare namespace prefix = "http://example.com/NotRecognized";
 (::)1(::)eq(::)(#prefix:name ##cont## # # ( "# ) #
+		)# )#ent #)(::){(::)1(::)}(::)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="K-ExtensionExpression-8a">
+      <description> A pragma expression containing many comments. Same as K-ExtensionExpression-8, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace prefix = "http://example.com/NotRecognized";
+(::)1(::)eq(::)(# prefix:name ##cont## # # ( "# ) #
 		)# )#ent #)(::){(::)1(::)}(::)</test>
       <result>
          <assert-true/>
@@ -354,7 +428,19 @@
    <test-case name="K2-ExtensionExpression-1">
       <description> An extension expression cannot be in an undeclared namespace. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>declare namespace xs = ""; (#xs:name content #) {1}</test>
+      <result>
+         <error code="XPST0081"/>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ExtensionExpression-1a">
+      <description> An extension expression cannot be in an undeclared namespace. Same as K2-ExtensionExpression-1, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace xs = ""; (# xs:name content #) {1}</test>
       <result>
          <error code="XPST0081"/>
       </result>
@@ -363,7 +449,19 @@
    <test-case name="K2-ExtensionExpression-2">
       <description> Whitespace isn't required if there is no pragma content. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>declare namespace ex = "http://example.com/"; (#ex:myExtensionExpression#) {true()}</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ExtensionExpression-2a">
+      <description> Whitespace isn't required if there is no pragma content. Same as K2-ExtensionExpression-2, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace ex = "http://example.com/"; (# ex:myExtensionExpression#) {true()}</test>
       <result>
          <assert-true/>
       </result>
@@ -372,7 +470,19 @@
    <test-case name="K2-ExtensionExpression-3">
       <description> Whitespace is allowed but not required if there is no pragma content. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>declare namespace ex = "http://example.com/"; (#ex:myExtensionExpression #) {true()}</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ExtensionExpression-3a">
+      <description> Whitespace is allowed but not required if there is no pragma content. Same as K2-ExtensionExpression-3, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace ex = "http://example.com/"; (# ex:myExtensionExpression #) {true()}</test>
       <result>
          <assert-true/>
       </result>
@@ -381,7 +491,19 @@
    <test-case name="K2-ExtensionExpression-4">
       <description> Content looking like comments are not recognized as so in pragma content. asdad </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>declare namespace ex = "http://example.com/"; (#ex:myExtensionExpression content#) {true()}</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ExtensionExpression-4a">
+      <description> Content looking like comments are not recognized as so in pragma content. Same as K2-ExtensionExpression-4, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace ex = "http://example.com/"; (# ex:myExtensionExpression content#) {true()}</test>
       <result>
          <assert-true/>
       </result>
@@ -390,7 +512,19 @@
    <test-case name="K2-ExtensionExpression-5">
       <description> Content looking like comments are not recognized as so in pragma content. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>declare namespace ex = "http://example.com/"; (#ex:myExtensionExpression (:(:(:(:(: content #) {true()}</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ExtensionExpression-5a">
+      <description> Content looking like comments are not recognized as so in pragma content. Same as K2-ExtensionExpression-5, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace ex = "http://example.com/"; (# ex:myExtensionExpression (:(:(:(:(: content #) {true()}</test>
       <result>
          <assert-true/>
       </result>
@@ -399,7 +533,19 @@
    <test-case name="K2-ExtensionExpression-6">
       <description> A single whitespace must separate pragma name and content. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>declare namespace ex = "http://example.com/"; (#ex:myExtensionExpression(content)#) {true()}</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ExtensionExpression-6a">
+      <description> A single whitespace must separate pragma name and content. Same as K2-ExtensionExpression-6, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace ex = "http://example.com/"; (# ex:myExtensionExpression(content)#) {true()}</test>
       <result>
          <error code="XPST0003"/>
       </result>
@@ -408,8 +554,21 @@
    <test-case name="K2-ExtensionExpression-7">
       <description> A single whitespace must separate pragma name and content. content </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>declare namespace ex = "http://example.com/";
 (#ex:myExtensionExpression(:content:)#) {true()}</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ExtensionExpression-7a">
+      <description> A single whitespace must separate pragma name and content. Same as K2-ExtensionExpression-7, but adapted to new pragma syntax.  </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace ex = "http://example.com/";
+(# ex:myExtensionExpression(:content:)#) {true()}</test>
       <result>
          <error code="XPST0003"/>
       </result>
@@ -418,7 +577,19 @@
    <test-case name="K2-ExtensionExpression-8">
       <description> A single whitespace must separate pragma name and content. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>declare namespace ex = "http://example.com/"; (#ex:myExtensionExpression:)#) {true()}</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ExtensionExpression-8a">
+      <description> A single whitespace must separate pragma name and content. Same as K2-ExtensionExpression-8, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace ex = "http://example.com/"; (# ex:myExtensionExpression:)#) {true()}</test>
       <result>
          <error code="XPST0003"/>
       </result>
@@ -427,7 +598,8 @@
    <test-case name="K2-ExtensionExpression-9">
       <description> Whitespace between pragma-start and name cannot contain comments. a comment </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <test>declare namespace ex = "http://example.com/"; (#ex:myExtensionExpression:)#) {true()}</test>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add comment to make test distinct from K2-ExtensionExpression-8"/>
+      <test>declare namespace ex = "http://example.com/"; (#(:comment:)ex:myExtensionExpression#) {true()}</test>
       <result>
          <error code="XPST0003"/>
       </result>
@@ -436,7 +608,8 @@
    <test-case name="K2-ExtensionExpression-10">
       <description> Whitespace between pragma-start and name cannot contain comments. </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <test>declare namespace ex = "http://example.com/"; (#ex:myExtensionExpression:)#) {true()}</test>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add comment to make test distinct from K2-ExtensionExpression-8"/>
+      <test>declare namespace ex = "http://example.com/"; (# (:comment:) ex:myExtensionExpression#) {true()}</test>
       <result>
          <error code="XPST0003"/>
       </result>
@@ -446,6 +619,18 @@
       <description> A single whitespace must separate pragma name and content. </description>
       <created by="Frans Englich" on="2007-11-26"/>
       <test>declare namespace ex = "http://example.com/"; (#ex:myExtensionExpression :)#) {true()}</test>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ExtensionExpression-11a">
+      <description> A single whitespace must separate pragma name and content. Same as K2-ExtensionExpression-11, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace ex = "http://example.com/"; (# ex:myExtensionExpression :)#) {true()}</test>
       <result>
          <assert-true/>
       </result>
@@ -454,7 +639,19 @@
    <test-case name="K2-ExtensionExpression-12">
       <description> No whitespace is required between pragma content and name if the content is empty. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>declare namespace ex = "http://example.com/"; (#ex:myExtensionExpression#) {true()}</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ExtensionExpression-12a">
+      <description> No whitespace is required between pragma content and name if the content is empty. Same as K2-ExtensionExpression-12, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace ex = "http://example.com/"; (# ex:myExtensionExpression#) {true()}</test>
       <result>
          <assert-true/>
       </result>
@@ -463,7 +660,8 @@
    <test-case name="K2-ExtensionExpression-13">
       <description> A pragma expression that hasn't even specified a name, but has trailing whitespace. </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <test>declare namespace ex = "http://example.com/"; (#</test>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add trailing whitespace in order to make test distinct from K2-ExtensionExpression-14"/>
+      <test>declare namespace ex = "http://example.com/"; (#  </test>
       <result>
          <error code="XPST0003"/>
       </result>
@@ -481,7 +679,8 @@
    <test-case name="K2-ExtensionExpression-15">
       <description> A pragma expression with name and trailing whitespace, but without content and end. </description>
       <created by="Frans Englich" on="2007-11-26"/>
-      <test>declare namespace ex = "http://example.com/"; (# ex:name</test>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add trailing whitespace in order to make test distinct from K2-ExtensionExpression-16"/>
+      <test>declare namespace ex = "http://example.com/"; (# ex:name </test>
       <result>
          <error code="XPST0003"/>
       </result>
@@ -499,7 +698,19 @@
    <test-case name="K2-ExtensionExpression-17">
       <description> Use four nested pragma expressions. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="add dependency"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>(#xs:a#)(#xs:a#)(#local:a#){-5}</test>
+      <result>
+         <assert-eq>-5</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ExtensionExpression-17a">
+      <description> Use four nested pragma expressions. Same as K2-ExtensionExpression-5, but adapted to new pragma syntax. </description>
+      <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>(# xs:a#)(# xs:a#)(# local:a#){-5}</test>
       <result>
          <assert-eq>-5</assert-eq>
       </result>
@@ -509,8 +720,20 @@
               covers="pragma-no-namespace">
       <description>If pragma name is in no namespace, then the pragma is ignored.</description>
       <created by="Tim Mills" on="2016-08-19"/>
-      <dependency type="spec" value="XQ31+"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="change dependency"/>
+      <dependency type="spec" value="XQ31"/>
       <test>(#Q{}unprefixed-pragma #) {}</test>
+      <result>
+         <error code="XQST0079"/>
+      </result>
+   </test-case>
+
+   <test-case name="pragma-no-namespace-001a"
+              covers="pragma-no-namespace">
+      <description>If pragma name is in no namespace, then the pragma is ignored. Same as pragma-no-namespace-001, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>(# Q{}unprefixed-pragma #) {}</test>
       <result>
          <error code="XQST0079"/>
       </result>
@@ -520,8 +743,20 @@
               covers="pragma-no-namespace">
       <description>If pragma name is in no namespace, then the pragma is ignored.</description>
       <created by="Tim Mills" on="2016-08-19"/>
-      <dependency type="spec" value="XQ31+"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="change dependency"/>
+      <dependency type="spec" value="XQ31"/>
       <test>(#Q{}unprefixed-pragma #) (#Q{}another-unprefixed-pragma#) {}</test>
+      <result>
+         <error code="XQST0079"/>
+      </result>
+   </test-case>
+
+   <test-case name="pragma-no-namespace-002a"
+              covers="pragma-no-namespace">
+      <description>If pragma name is in no namespace, then the pragma is ignored. Same as pragma-no-namespace-002, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>(# Q{}unprefixed-pragma #) (# Q{}another-unprefixed-pragma#) {}</test>
       <result>
          <error code="XQST0079"/>
       </result>
@@ -531,8 +766,20 @@
               covers="pragma-no-namespace">
       <description>If pragma name is in no namespace, then the pragma is ignored.</description>
       <created by="Tim Mills" on="2016-08-19"/>
-      <dependency type="spec" value="XQ31+"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="change dependency"/>
+      <dependency type="spec" value="XQ31"/>
       <test>(#Q{}unprefixed-pragma #) { false() }</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="pragma-no-namespace-003a"
+              covers="pragma-no-namespace">
+      <description>If pragma name is in no namespace, then the pragma is ignored. Same as pragma-no-namespace-003, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>(# Q{}unprefixed-pragma #) { false() }</test>
       <result>
          <assert-false/>
       </result>
@@ -542,8 +789,20 @@
               covers="pragma-no-namespace">
       <description>If pragma name is in no namespace, then the pragma is ignored.</description>
       <created by="Tim Mills" on="2016-08-19"/>
-      <dependency type="spec" value="XQ31+"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="change dependency"/>
+      <dependency type="spec" value="XQ31"/>
       <test>(#Q{}unprefixed-pragma #) (#Q{}another-unprefixed-pragma #) { false() }</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="pragma-no-namespace-004a"
+              covers="pragma-no-namespace">
+      <description>If pragma name is in no namespace, then the pragma is ignored. Same as pragma-no-namespace-004, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>(# Q{}unprefixed-pragma #) (# Q{}another-unprefixed-pragma #) { false() }</test>
       <result>
          <assert-false/>
       </result>
@@ -553,8 +812,20 @@
               covers="pragma-no-namespace">
       <description>If pragma name is in no namespace, then the pragma is ignored.</description>
       <created by="Tim Mills" on="2016-08-19"/>
-      <dependency type="spec" value="XQ31+"/>
+      <modified by="Gunther Rademacher" on="2025-05-14" change="change dependency"/>
+      <dependency type="spec" value="XQ31"/>
       <test>(#Q{}unprefixed-pragma #) (#Q{http://www.example.org/}prefixed-pragma #) { false() }</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="pragma-no-namespace-005a"
+              covers="pragma-no-namespace">
+      <description>If pragma name is in no namespace, then the pragma is ignored. Same as pragma-no-namespace-005, but adapted to new pragma syntax. </description>
+      <created by="Gunther Rademacher" on="2025-05-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>(# Q{}unprefixed-pragma #) (# Q{http://www.example.org/}prefixed-pragma #) { false() }</test>
       <result>
          <assert-false/>
       </result>
