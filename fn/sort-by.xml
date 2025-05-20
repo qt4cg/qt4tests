@@ -1,0 +1,814 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-sort-by" covers-40="PR2001">
+
+   <description>Tests the fn:sort-by() function (4.0)</description>
+
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+ 
+
+   <test-case name="fn-sort-by-1">
+      <description>Empty sequence as input gives empty sequence as output</description>
+      <created by="Liam R E Quin" on="2015-01-08"/>
+      <test>fn:empty(fn:sort-by( () ))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-2">
+      <description>Simple sequence of integers</description>
+      <created by="Liam R E Quin" on="2015-01-08"/>
+      <test>let $r := fn:sort-by( (1, 2, 3) ) return (count($r) eq 3 and $r[1] eq 1 and $r[2] eq 2 and
+         $r[3] eq 3)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-3">
+      <description>Simple sequence of integers, descending</description>
+      <created by="Liam R E Quin" on="2015-01-08"/>
+      <test>let $r := fn:sort-by( (3, 2, 1) ) return (count($r) eq 3 and $r[1] eq 1 and $r[2] eq 2 and
+         $r[3] eq 3)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+
+   <test-case name="fn-sort-by-4">
+      <description>Singleton integer</description>
+      <created by="Liam R E Quin" on="2015-01-08"/>
+      <test>let $r := fn:sort-by( (1) ) return (count($r) eq 1 and $r[1] eq 1)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-5">
+      <description>Singleton integer not expressed as sequence</description>
+      <created by="Liam R E Quin" on="2015-01-08"/>
+      <test>fn:sort-by(42) = 42</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-6">
+      <description>Length 1</description>
+      <created by="Liam R E Quin" on="2015-01-18"/>
+      <test>let $r := fn:sort-by( (1) ) return (count($r) eq 1 and $r[1] eq 1)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-7">
+      <description>length 2</description>
+      <created by="Liam R E Quin" on="2015-01-18"/>
+      <test>let $r := fn:sort-by( (1, 17) ) return (count($r) eq 2 and $r[1] eq 1 and $r[2] eq
+         17)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-8">
+      <description>length 2, disordered</description>
+      <created by="Liam R E Quin" on="2015-01-18"/>
+      <test>let $r := fn:sort-by( (17, 1) ) return (count($r) eq 2 and $r[1] eq 1 and $r[2] eq
+         17)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-9">
+      <description>length 2, duplicates</description>
+      <created by="Liam R E Quin" on="2015-01-18"/>
+      <test>let $r := fn:sort-by( (17, 17) ) return (count($r) eq 2 and $r[1] eq 17 and $r[2] eq
+         17)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-10">
+      <description>length 3, disordered</description>
+      <created by="Liam R E Quin" on="2015-01-18"/>
+      <test>let $r := fn:sort-by( (17, 5, 14) ) return (count($r) eq 3 and $r[1] eq 5 and $r[2] eq 14
+         and$r[3] eq 17)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-11">
+      <description>length 3, duplicates</description>
+      <created by="Liam R E Quin" on="2015-01-18"/>
+      <test>let $r := fn:sort-by( (4, 4, 4) ) return (count($r) eq 3 and $r[1] eq 4 and $r[2] eq 4 and
+         $r[3] eq 4)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-12">
+      <description>length 3, descending</description>
+      <created by="Liam R E Quin" on="2015-01-18"/>
+      <test>let $r := fn:sort-by( (17, 14, 5) ) return (count($r) eq 3 and $r[1] eq 5 and $r[2] eq 14
+         and $r[3] eq 17)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-13">
+      <description>length 6</description>
+      <created by="Liam R E Quin" on="2015-01-18"/>
+      <test>let $r := fn:sort-by( (-42, 14, 5, 6, 14, 0) ) return (count($r) eq 6 and $r[1] eq -42 and
+         $r[2] eq 0 and $r[3] eq 5 and $r[4] eq 6 and $r[5] eq 14 and $r[6] eq 14) </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-14">
+      <description>One-argument sort-by where input is not simple </description>
+      <created by="Josh Spiegel" on="2015-08-10"/>
+      <modified by="Debbie Lockett" on="2015-08-12" change="Added XQuery dependency"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test><![CDATA[
+        <turtles>
+          <name>Leonardo</name>
+          <name>Raphael</name>
+          <name>Donatello</name>
+          <name>Michelangelo</name>
+        </turtles>
+        !sort-by(*)!data()
+      ]]></test>
+      <result>
+         <assert-deep-eq><![CDATA["Donatello", "Leonardo", "Michelangelo", "Raphael"]]></assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-15">
+      <description>One-argument sort-by where input is not simple </description>
+      <created by="Josh Spiegel" on="2015-08-10"/>
+      <modified by="Debbie Lockett" on="2015-08-12"
+         change="Added XQuery dependency, move deep-equal into test"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test><![CDATA[
+         deep-equal(
+            sort-by(
+              (
+                [<e>a</e>, <e>b</e>],
+                [(<f>a</f>, <f>b</f>)],
+                [<g>a</g>, <g>b</g>],
+                "A",
+                <h><i><j>A</j></i></h>   
+              )
+            )
+            ,(
+                "A",
+                <h><i><j>A</j></i></h>,     
+                [<e>a</e>, <e>b</e>],
+                [(<f>a</f>, <f>b</f>)],
+                [<g>a</g>, <g>b</g>]  
+              )
+            )
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-16">
+      <description>One-argument sort-by where input is a mix of simple and complex</description>
+      <created by="Josh Spiegel" on="2015-08-10"/>
+      <modified by="Debbie Lockett" on="2015-08-12"
+         change="Added XQuery dependency, move deep-equal into test"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test><![CDATA[deep-equal(
+         sort-by(("b", "d", <e>a</e>, "c", <f>e</f>))
+         ,(<e>a</e>, "b", "c", "d", <f>e</f>)
+         )
+         ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-17">
+      <description>sort-by NaN values. Result may depend on the outcome of bug 29044</description>
+      <created by="Josh Spiegel" on="2015-08-10"/>
+      <modified by="Debbie Lockett" on="2015-08-12"
+         change="Edit test to use XPath let expression syntax"/>
+      <modified by="Michael Kay" on="2015-11-27" change="Avoid HOF dependency in assertion"/>
+      <test><![CDATA[
+          let $a := [xs:float("NaN"), 1],     
+          $b := [xs:float("NaN"), 2]
+          return     
+             sort-by(($a,$b,$a,$b))
+        ]]></test>
+      <result>
+         <all-of>
+            <assert>every $x in 1 to 4 satisfies deep-equal($result[$x]?1, xs:float("NaN"))</assert>
+            <assert>$result[1]?2 eq 1 and $result[2]?2 eq 1</assert>
+            <assert>$result[3]?2 eq 2 and $result[4]?2 eq 2</assert>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-18">
+      <description>sort-by values with unequal key lengths</description>
+      <created by="Tim MIlls" on="2016-07-07"/>
+      <test>fn:sort-by( (1, [1, 2]) )</test>
+      <result>
+         <assert-deep-eq>(1, [1, 2])</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-19">
+      <description>sort-by values with unequal key lengths</description>
+      <created by="Tim MIlls" on="2016-07-07"/>
+      <test>fn:sort-by( ([1, 2], 1) )</test>
+      <result>
+         <assert-deep-eq>(1, [1, 2])</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-20">
+      <description>sort-by values with unequal key lengths</description>
+      <created by="Tim MIlls" on="2016-07-07"/>
+      <test>fn:sort-by( ([()], 1) )</test>
+      <result>
+         <assert-deep-eq>([()], 1)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-21">
+      <description>sort-by values with unequal key lengths</description>
+      <created by="Tim MIlls" on="2016-07-07"/>
+      <test>fn:sort-by( (1, [()]) )</test>
+      <result>
+         <assert-deep-eq>([()], 1)</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-22">
+      <description>sort-by maps</description>
+      <created by="Michael Kay" on="2016-08-18"/>
+      <modified by="Tim Mills" on="2016-08-19" change="Added environment ref"/>
+      <environment ref="map"/>
+      <test>fn:sort-by( (map{"key":1, "value":89}, map{"key":6, "value":21}, map{"key":2, "value":33}),
+         {'key': map:get(?, "key")})?value</test>
+      <result>
+         <assert-deep-eq>89, 33, 21</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-23">
+      <description>Related to Bugzilla #5183, effect of type promotion in fn:distinct-values;
+         explore the effect of non-transitivity on fn:sort-by.
+      
+         The first test assertion asserts that there are no two values in the sort-byed sequence such that
+         the first value (in sequence order) is greater than the second value.
+         
+         The second test assertion accepts that this might not always be the case, given pathological input.
+         
+         The worst-case outcome is that sort-bying may not terminate; some sort-by algorithms will fail
+         to terminate if the "lt" relation used by the comparator is not transitive.
+      
+      </description>
+      <created by="Michael Kay" on="2020-01-28"/>
+      <test><![CDATA[
+         let $input := (xs:float(  '1.0'), 
+                        xs:decimal('1.0000000000100000000001'),
+                        xs:decimal('1.0000000000100000000002'),
+                        xs:double( '1.00000000001'),
+                        xs:float(  '1.00000000001'),
+                        xs:decimal('1.00000000001000000000011'),
+                        xs:decimal('1.00000000001000000000012'),
+                        xs:decimal('1.00000000001'),
+                        xs:double( '1.0000000000100000000001')),
+         $more := ($input, reverse($input), $input),               
+         $sorted := sort-by($more)
+         return empty(for $i in 1 to count($sorted), $j in $i+1 to count($sorted) 
+                      return 'x'[$sorted[$i] gt $sorted[$j]])
+         ]]></test>
+      <result>
+         <any-of>
+            <assert-true/>  <!-- sorting delivered a sorted result -->
+            <assert-false/>  <!-- The task completed, but the result is not perfectly sorted -->
+         </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-24">
+      <description>sort-by using a map to generate sort keys</description>
+      <created by="Michael Kay" on="2020-06-25"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <environment ref="map"/>
+      <test>fn:sort-by(("Monday", "Friday", "Tuesday"), {'key':{"Monday":1, "Tuesday":2, "Wednesday":3, "Thursday":4, "Friday":5}})</test>
+      <result>
+         <assert-deep-eq>"Monday", "Tuesday", "Friday"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-25">
+      <description>sort-by using an array to generate sort-by keys</description>
+      <created by="Michael Kay" on="2020-06-25"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <environment ref="map"/>
+      <test>fn:sort-by(1 to 5, {'key':[10, 9, 8, 7, 6]})</test>
+      <result>
+         <assert-deep-eq>5, 4, 3, 2, 1</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <!--* ##fractions *-->
+
+   <test-case name="fn-sort-by-frac-1">
+      <!--* do we have a numeric fuzz function for comparing? *-->
+      <description>numeric but not all integers</description>
+      <created by="Liam R E Quin" on="2015-01-18"/>
+      <modified by="Christian Gruen" on="2015-01-27" change="comparison values fixed"/>
+      <test>let $r := fn:sort-by( (-4.2, 14.25, 5.99, 6, 14.24, 0) ) return (count($r) eq 6 and $r[1]
+         eq -4.2 and $r[2] eq 0 and $r[3] eq 5.99 and $r[4] eq 6 and $r[5] eq 14.24 and $r[6] eq
+         14.25) </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <!--* ##strings *-->
+   <test-case name="fn-sort-by-str-1">
+      <description>Simple sequence of strings</description>
+      <created by="Liam R E Quin" on="2015-01-08"/>
+      <test>let $r := fn:sort-by( ("boy","for","new","chosen","black","pope") ) return (count($r) eq 6
+         and $r[1] eq "black" and $r[2] eq "boy" and $r[3] eq "chosen" and $r[4] eq "for" and $r[5]
+         eq "new" and $r[6] eq "pope" ) </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <!--* now some fn:sort-by#2 tests *-->
+   <test-case name="fn-sort-by2-str-1">
+      <description>Simple sequence of strings with fn</description>
+      <created by="Liam R E Quin" on="2015-01-08"/>
+      <modified by="Michael Kay" on="2016-07-26" change="add collation argument, bug 29722"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>let $r := fn:sort-by( ("boy","for","new","chosen","black","pope"), {'key':fn:data#1} ) return
+         (count($r) eq 6 and $r[1] eq "black" and $r[2] eq "boy" and $r[3] eq "chosen" and $r[4] eq
+         "for" and $r[5] eq "new" and $r[6] eq "pope" ) </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by2-str-2">
+      <description>Simple sequence of strings with user-defined fn</description>
+      <created by="Liam R E Quin" on="2015-01-08"/>
+      <modified by="Michael Kay" on="2016-07-26" change="add collation argument, bug 29722"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>let $r := fn:sort-by( ("boy","for","new","chosen","black","pope"), {'key':function($input as
+         xs:anyAtomicType *) as item()* { fn:data($input) }} ) return (count($r) eq 6 and $r[1] eq
+         "black" and $r[2] eq "boy" and $r[3] eq "chosen" and $r[4] eq "for" and $r[5] eq "new" and
+         $r[6] eq "pope" ) </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <!--* some error cases *-->
+
+   <test-case name="fn-sort-by-error-1">
+      <description>check for type error</description>
+      <created by="Liam R E Quin" on="2015-01-18"/>
+      <test>fn:sort-by( (1, "a") )</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-error-2">
+      <description>check for type error</description>
+      <created by="Michael Kay" on="2016-08-18"/>
+      <modified by="Tim Mills" on="2016-08-19" change="Added environment ref"/>
+      <environment ref="map"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>fn:sort-by( (map{"key":1}, map{"key":"a"}), {'key':map:get(?, "key")})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-error-3">
+      <description>check for type error</description>
+      <created by="Michael Kay" on="2017-09-18"/>
+      <test>fn:sort-by( (1, xs:untypedAtomic("2")) )</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-error-4">
+      <description>check for type error</description>
+      <created by="Michael Kay after Christian Gruen" on="2017-11-16"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test><![CDATA[fn:sort-by( (1, <a>1</a>) )]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <!--* the examples from the spec *-->
+   <test-case name="fn-sort-by-spec-1">
+      <description>spec example 1</description>
+      <created by="Liam R E Quin" on="2015-01-08"/>
+      <modified by="Josh Spiegel" on="2015-01-21" change="Fix typo"/>
+      <modified by="Michael Kay" on="2016-07-26" change="add collation argument, bug 29722"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>let $r := fn:sort-by((1, 4, 6, 5, 3), {'key':fn:data#1} ) return (count($r) eq 5 and $r[1] eq 1
+         and $r[2] eq 3 and $r[3] eq 4 and $r[4] eq 5 and $r[5] eq 6 ) </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-spec-1b">
+      <description>spec example 1 but check numeric, not lexical</description>
+      <created by="Liam R E Quin" on="2015-01-08"/>
+      <modified by="Josh Spiegel" on="2015-01-21" change="Fix typo"/>
+      <modified by="Michael Kay" on="2016-07-26" change="add collation argument, bug 29722"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>let $r := fn:sort-by((10, 4, 6, 5, 3), {'key':fn:data#1} ) return (count($r) eq 5 and $r[1] eq
+         3 and $r[2] eq 4 and $r[3] eq 5 and $r[4] eq 6 and $r[5] eq 10 ) </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-spec-2">
+      <description>spec example 2</description>
+      <created by="Liam R E Quin" on="2015-01-08"/>
+      <modified by="Josh Spiegel" on="2015-01-21" change="Fix typo"/>
+      <modified by="Michael Kay" on="2016-07-26" change="add collation argument, bug 29722"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>let $r := fn:sort-by((1, -2, 5, 10, -10, 10, 8), {'key':fn:abs#1}) return (count($r) eq 7 and
+         $r[1] eq 1 and $r[2] eq -2 and $r[3] eq 5 and $r[4] eq 8 and $r[5] eq 10 and $r[6] eq -10
+         and $r[7] eq 10 ) </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+
+   <test-case name="fn-sort-by-spec-4">
+      <description>spec example 4</description>
+      <created by="Liam R E Quin" on="2015-01-08"/>
+      <modified by="Josh Spiegel" on="2015-01-21"
+         change="Add CDATA to test element (otherwise element constructors are treated as xml)"/>
+      <modified by="Debbie Lockett" on="2015-02-27" change="Change dependency"/>
+      <modified by="Michael Kay" on="2016-07-26" change="add collation argument, bug 29722"/>
+      <test><![CDATA[let
+	  $employees := (
+	    <emp><name><first>Reginald</first><last>Cawcutt</last></name></emp>,
+	    <emp><name><first>Hans</first><last>Gro&#xeb;r</last></name></emp>,
+	    <emp><name><first>Domingo</first><last>De Silveira</last></name></emp>,
+	    <emp><name><first>Keith</first><last>O'Brien</last></name></emp>,
+	    <emp><name><first>Susan</first><last>Cawcutt</last></name></emp>,
+	    <emp><name><first>Martin</first><last>Cawcutt</last></name></emp>
+	    ),
+	  $r := fn:sort-by($employees, {'collation': default-collation(), 'key':function($emp) {$emp/name/last, $emp/name/first}})
+	  return (count($r) eq 6
+	  and fn:data($r[1]/name/first) eq "Martin"
+	  and fn:data($r[2]/name/first) eq "Reginald"
+	  and fn:data($r[3]/name/first) eq "Susan"
+	  and fn:data($r[4]/name/first) eq "Domingo"
+	  and fn:data($r[5]/name/first) eq "Hans"
+	  and fn:data($r[6]/name/first) eq "Keith"
+	  )
+     ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-spec-5">
+      <description>Variable length sort-by keys</description>
+      <created by="Michael Kay" on="2016-08-18"/>
+      <test><![CDATA[let
+	  $employees := (
+	    <emp id='1'><name><last>Cawcutt</last></name></emp>,
+	    <emp id='2'><name><first>Hans</first><last>Gro&#xeb;r</last></name></emp>,
+	    <emp id='3'><name><first>Domingo</first><last>De Silveira</last></name></emp>,
+	    <emp id='4'><name><first>Keith</first><last>O'Brien</last></name></emp>,
+	    <emp id='5'><name><first>Susan</first><last>Cawcutt</last></name></emp>,
+	    <emp id='6'><name><first>Martin</first><last>Cawcutt</last></name></emp>,
+	    <emp id='7'><name><first>Martin</first><first>James</first><last>Cawcutt</last></name></emp>
+	    )
+	    return fn:sort-by($employees, {'collation':default-collation(), 'key':function($emp) {$emp/name/last, $emp/name/first}}) ! number(@id)
+     ]]></test>
+      <result>
+         <assert-deep-eq>1, 6, 7, 5, 3, 2, 4</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-spec-6">
+      <description>Variable length sort-by keys: XPath version of fn-sort-by-spec-5</description>
+      <created by="Michael Kay" on="2020-11-19"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test><![CDATA[let
+	  $employees := parse-xml("<emps>
+	    <emp id='1'><name><last>Cawcutt</last></name></emp>
+	    <emp id='2'><name><first>Hans</first><last>Gro&#xeb;r</last></name></emp>
+	    <emp id='3'><name><first>Domingo</first><last>De Silveira</last></name></emp>
+	    <emp id='4'><name><first>Keith</first><last>O'Brien</last></name></emp>
+	    <emp id='5'><name><first>Susan</first><last>Cawcutt</last></name></emp>
+	    <emp id='6'><name><first>Martin</first><last>Cawcutt</last></name></emp>
+	    <emp id='7'><name><first>Martin</first><first>James</first><last>Cawcutt</last></name></emp>
+	  </emps>"  
+	    )
+	    return fn:sort-by($employees//emp, {'collation':default-collation(), 'key':function($emp) {$emp/name/last, $emp/name/first}}) ! number(@id)
+     ]]></test>
+      <result>
+         <assert-deep-eq>1, 6, 7, 5, 3, 2, 4</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-collation-1">
+      <description>fn:sort-by#1 uses the default collation</description>
+      <created by="Michael Kay" on="2016-08-18"/>
+      <modified by="Michael Kay" on="2016-08-18" change="see bug 29779"/>
+      <environment>
+         <collation uri="http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"/>
+      </environment>
+      <dependency type="spec" value="XQ31+"/>
+      <test><![CDATA[
+         declare default collation "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
+         fn:sort-by(("Red", "green", "blUE", "PINK", "ORanGE"))
+     ]]></test>
+      <result>
+         <assert-deep-eq>"blUE", "green", "ORanGE", "PINK", "Red"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-collation-2">
+      <description>fn:sort-by#2 uses the default collation by default</description>
+      <created by="Michael Kay" on="2016-08-18"/>
+      <modified by="Michael Kay" on="2016-08-18" change="see bug 29779"/>
+      <environment>
+         <collation uri="http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"/>
+      </environment>
+      <dependency type="spec" value="XQ31+"/>
+      <test><![CDATA[
+         declare default collation "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
+         fn:sort-by(("Red", "green", "blUE", "PINK", "ORanGE"), {})
+     ]]></test>
+      <result>
+         <assert-deep-eq>"blUE", "green", "ORanGE", "PINK", "Red"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-collation-3">
+      <description>fn:sort-by#3 uses the default collation by default</description>
+      <created by="Michael Kay" on="2016-08-18"/>
+      <modified by="Michael Kay" on="2016-08-18" change="see bug 29779"/>
+      <modified by="Josh Spiegel" on="2016-09-22" change="add HOF dependency"/>
+      <environment>
+         <collation uri="http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"/>
+      </environment>
+      <dependency type="spec" value="XQ31+"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test><![CDATA[
+         declare default collation "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
+         fn:sort-by(("Red", "green", "blUE", "PINK", "ORanGE"), {'key':string#1})
+     ]]></test>
+      <result>
+         <assert-deep-eq>"blUE", "green", "ORanGE", "PINK", "Red"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-collation-4">
+      <description>fn:sort-by#2 with an explicit collation</description>
+      <created by="Michael Kay" on="2016-08-18"/>
+      <modified by="Michael Kay" on="2016-08-18" change="see bug 29779"/>
+      <environment>
+         <collation uri="http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"/>
+      </environment>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>fn:sort-by(("Red", "green", "blUE", "PINK", "ORanGE"),
+         {'collation':"http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"})</test>
+      <result>
+         <assert-deep-eq>"blUE", "green", "ORanGE", "PINK", "Red"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-collation-5">
+      <description>fn:sort-by#3 with an explicit collation</description>
+      <created by="Michael Kay" on="2016-08-18"/>
+      <modified by="Michael Kay" on="2016-08-18" change="see bug 29779"/>
+      <environment>
+         <collation uri="http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"/>
+      </environment>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>fn:sort-by(("Red", "green", "blUE", "PINK", "ORanGE"),
+         {'collation':"http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive", 'key':fn:string#1})</test>
+      <result>
+         <assert-deep-eq>"blUE", "green", "ORanGE", "PINK", "Red"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-collation-6">
+      <description>fn:sort-by#2 with explicit codepoint collation</description>
+      <created by="Michael Kay" on="2016-08-18"/>
+      <modified by="Michael Kay" on="2016-08-18" change="see bug 29779"/>
+      <environment>
+         <collation uri="http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"/>
+      </environment>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>fn:sort-by(("Red", "green", "blUE", "PINK", "ORanGE"),
+         {'collation':"http://www.w3.org/2005/xpath-functions/collation/codepoint"})</test>
+      <result>
+         <assert-deep-eq>"ORanGE", "PINK", "Red", "blUE", "green"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-collation-7">
+      <description>fn:sort-by#3 with explicit codepoint collation</description>
+      <created by="Michael Kay" on="2016-08-18"/>
+      <modified by="Michael Kay" on="2016-08-18" change="see bug 29779"/>
+      <environment>
+         <collation uri="http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"/>
+      </environment>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test>fn:sort-by(("Red", "green", "blUE", "PINK", "ORanGE"),
+         {'collation':"http://www.w3.org/2005/xpath-functions/collation/codepoint", 'key':fn:string#1})</test>
+      <result>
+         <assert-deep-eq>"ORanGE", "PINK", "Red", "blUE", "green"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-sort-by-collation-8">
+      <description>fn:sort-by#3 with explicit collation, sort-bying numbers</description>
+      <created by="Michael Kay" on="2016-08-18"/>
+      <modified by="Michael Kay" on="2016-08-18" change="see bug 29779"/>
+      <environment>
+         <collation uri="http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"/>
+      </environment>
+      <dependency type="spec" value="XQ31+"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test><![CDATA[
+         declare function local:key($n as xs:integer) as xs:string {
+             ("Red", "green", "blUE", "PINK", "ORanGE")[$n]
+         };
+         fn:sort-by((1 to 5), {'collation':"http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive", 'key':local:key#1})
+         ]]></test>
+      <result>
+         <assert-deep-eq>3, 2, 5, 4, 1</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-100">
+      <description>sort descending</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("red", "green", "blue", "pink", "orange"),
+         {'order':'descending'})</test>
+      <result>
+         <assert-deep-eq>"red", "pink", "orange", "green", "blue"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-101">
+      <description>sort with multiple keys</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("pink", "red", "green", "blue", "violet", "orange", "indigo"),
+         ({'key': string-length#1}, {'key':identity#1}))</test>
+      <result>
+         <assert-deep-eq>"red", "blue", "pink", "green", "indigo", "orange", "violet"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-102">
+      <description>sort with multiple keys</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("pink", "red", "green", "blue", "violet", "orange", "indigo"),
+         ({'key': string-length#1}, {}))</test>
+      <result>
+         <assert-deep-eq>"red", "blue", "pink", "green", "indigo", "orange", "violet"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-103">
+      <description>sort with multiple keys, one descending</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("pink", "red", "green", "blue", "violet", "orange", "indigo"),
+         ({'key': string-length#1}, {'key': string#1, 'order':'descending'}))</test>
+      <result>
+         <assert-deep-eq>"red", "pink", "blue", "green", "violet", "orange", "indigo" </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-104">
+      <description>sort with multiple keys, one descending</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("pink", "red", "green", "blue", "violet", "orange", "indigo"),
+         ({'key': string-length#1, 'order':'descending'}, {'key': string#1, 'order':'ascending'}))</test>
+      <result>
+         <assert-deep-eq>"indigo", "orange", "violet", "green", "blue", "pink", "red"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-105">
+      <description>sort with multiple keys, one descending, one case-blind</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("pink", "red", "redder", "RED", "green", "BLUE", "blue", "violet", "orange", "indigo"),
+         ({'key': string-length#1, 'order':'descending'}, 
+          {'key': string#1, 'collation':"http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"}))</test>
+      <result>
+         <assert-deep-eq>"indigo", "orange", "redder", "violet", "green", "BLUE", "blue", "pink", "red", "RED"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-900">
+      <description>Error case: non-comparable values</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("pink", current-date()))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-901">
+      <description>Error case: unknown collation</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("pink", "blue"), {'collation': 'sdpiuuv'})</test>
+      <result>
+         <error code="FOCH0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-902">
+      <description>Error case: collation not a string</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("pink", "blue"), {'collation': 837})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-903">
+      <description>Error case: key function has wrong arity</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("pink", "blue"), {'key': fn:contains#2})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-904">
+      <description>Error case: key function accepts wrong type of argument</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("pink", "blue"), {'key': fn:abs#1})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-905">
+      <description>Error case: key is not a function</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("pink", "blue"), {'key': 23})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-906">
+      <description>Error case: order is not ascending or descending</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("pink", "blue"), {'order': 'random'})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-sort-by-907">
+      <description>Error case: order is not a string</description>
+      <created by="Michael Kay" on="2025-05-18"/>
+      <test>fn:sort-by(("pink", "blue"), {'order': current-date()})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+
+</test-set>
