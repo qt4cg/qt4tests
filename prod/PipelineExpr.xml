@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-PipelineExpr" covers-40="PR1686">
+   <description>Tests for the 4.0 PipelineExpr production</description>
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+    
+   <test-case name="pipeline-001">
+      <description> Test that the operator is recognized </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test>
+         23 -> . 
+      </test>
+      <result>
+         <assert-eq>23</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="pipeline-002">
+      <description> Test that the context value can contain multiple items </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test>
+         (23, 24) -> . 
+      </test>
+      <result>
+         <assert-deep-eq>23, 24</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="pipeline-003">
+      <description> Test that the context value can be empty </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test>
+         () -> . 
+      </test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="pipeline-004">
+      <description> Feed into axis expression </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test><![CDATA[
+         parse-xml("<a><b id='1'/><b id='2'/><b id='3'/></a>")//b -> @id -> data() 
+      ]]></test>
+      <result>
+         <assert-deep-eq>'1', '2', '3'</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="pipeline-005">
+      <description> Error feeding multiple nodes into name() function </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test><![CDATA[
+         parse-xml("<a><b id='1'/><b id='2'/><b id='3'/></a>")//b -> name() 
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="pipeline-006">
+      <description> Feed empty sequence into name() function </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test><![CDATA[
+         parse-xml("<a><b id='1'/><b id='2'/><b id='3'/></a>")//c -> name() 
+      ]]></test>
+      <result>
+         <assert-eq>""</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="pipeline-007">
+      <description> Operator precedence lower than => </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test>
+         -1 => abs() -> string() => string-length()
+      </test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="pipeline-008">
+      <description> Chainable </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test>
+         (1, 2, 3) -> data() -> string-join(.) -> string-length(.)
+      </test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="pipeline-009">
+      <description> Operator precedence greater than cast </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test>
+         -3 -> abs(.) cast as xs:string
+      </test>
+      <result>
+         <assert-eq>"3"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="pipeline-010">
+      <description> Effect on document order </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test><![CDATA[
+         parse-xml("<a><b id='1'/><b id='2'/><b id='3'/></a>")
+         !(descendant::b[@id='3'], descendant::b[@id='1']) ! @id -> data() 
+      ]]></test>
+      <result>
+         <assert-deep-eq>'3', '1'</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="pipeline-011">
+      <description> Effect on position() </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test>
+         (1, 2, 3) -> position()
+      </test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="pipeline-012">
+      <description> Effect on last() </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test>
+         (1, 2, 3) -> last()
+      </test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="pipeline-013">
+      <description> LHS depends on focus </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test>
+         5 -> (1, 2, .) -> sum(.)
+      </test>
+      <result>
+         <assert-eq>8</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="pipeline-014">
+      <description> Use with focus functions </description>
+      <created by="Michael Kay" on="2025-06-06"/>
+      <test>
+         let $f := fn{distinct-values(.)} return $f(("x", "r", "x", "j"))
+      </test>
+      <result>
+         <assert-deep-eq>"x", "r", "j"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+</test-set>
