@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-JNode" covers-40="PR2031">
+   <description>Tests for the fn:JNode() function</description>
+
+
+   <test-case name="fn-JNode-001">
+      <description> JNode applied to an array </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode([1,2,3]) => fn:JNode-value()</test>
+      <result>
+         <all-of>
+            <assert-type>array(xs:integer)</assert-type>
+            <assert-deep-eq>[1,2,3]</assert-deep-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-002">
+      <description> JNode applied to a map </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode({"a": 1, "b": 2}) => fn:JNode-value()</test>
+      <result>
+         <all-of>
+            <assert-type>map(xs:string, xs:integer)</assert-type>
+            <assert-deep-eq>{"a": 1, "b": 2}</assert-deep-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-003">
+      <description> JNode applied to empty sequence </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode(())</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-004">
+      <description> JNode applied to a JNode - works by virtue of coercion </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode(fn:JNode([1,2,3])) => fn:JNode-value()</test>
+      <result>
+         <all-of>
+            <assert-type>array(xs:integer)</assert-type>
+            <assert-deep-eq>[1,2,3]</assert-deep-eq>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-005">
+      <description> JNode applied to an atomic value </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode(22)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-006">
+      <description> JNode applied to an array - type of result</description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode([1,2,3]) instance of JNode(array(xs:integer))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-007">
+      <description> JNode applied to a map - type of result</description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode({"a":1, "b": 2}) instance of JNode(map(xs:string, xs:integer))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-008">
+      <description> JNode applied to an array - type of result</description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode([1,2,3]) instance of JNode()</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-009">
+      <description> JNode applied to a map - type of result</description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode({"a":1, "b": 2}) instance of JNode()</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-010">
+      <description> JNode coerced to atomic value</description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode([22]) gt 21</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-011">
+      <description> JNode coerced to atomic value</description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode([22]) + 21</test>
+      <result>
+         <assert-eq>43</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-012">
+      <description> JNode coerced to array</description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode([22, 23]) => array:size()</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-013">
+      <description> JNode coerced to map</description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode({"a":1, "b":2}) => map:size()</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-014">
+      <description> Parent of root JNode is absent </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode({}) ? parent::*</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-015">
+      <description> Selector of root JNode is absent </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode({"a":1, "b":2}) => fn:JNode-selector()</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-016">
+      <description> Position of root JNode is absent </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode({"a":1, "b":2}) => fn:JNode-position()</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-017">
+      <description> Array with one child: selector </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode([12]) ? child::* => fn:JNode-selector()</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-018">
+      <description> Array with one child: position </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode([12]) ? child::* => fn:JNode-position()</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-019">
+      <description> Array with one child: parent </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode([12]) ? child::* ? parent::* => fn:JNode-value()</test>
+      <result>
+         <assert-deep-eq>[12]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-020">
+      <description> Array with one child: value </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode([12]) ? child::* => fn:JNode-value()</test>
+      <result>
+         <assert-deep-eq>12</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-021">
+      <description> Array with one child: implicit atomization </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode([12]) ? child::* + 2</test>
+      <result>
+         <assert-deep-eq>14</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-022">
+      <description> Map with one child: selector </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode({"a":1}) ? child::* => fn:JNode-selector()</test>
+      <result>
+         <assert-eq>"a"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-023">
+      <description> Map with one child: position </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode({"a":1}) ? child::* => fn:JNode-position()</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-024">
+      <description> Map with one child: parent </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode({"a":1}) ? child::* ? parent::* => fn:JNode-value()</test>
+      <result>
+         <assert-deep-eq>{"a":1}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-025">
+      <description> Map with one child: value </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode({"a":13}) ? child::* => fn:JNode-value()</test>
+      <result>
+         <assert-deep-eq>13</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-JNode-026">
+      <description> Map with one child: implicit atomization </description>
+      <created by="Michael Kay" on="2025-06-16"/>
+      <test>fn:JNode({"a":13}) ? child::* + 2</test>
+      <result>
+         <assert-deep-eq>15</assert-deep-eq>
+      </result>
+   </test-case>
+
+
+
+</test-set>
