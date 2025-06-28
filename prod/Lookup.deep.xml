@@ -146,21 +146,27 @@
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-012">
+   <test-case name="DeepLookup-012" covers-40="PR2031">
       <description>Binary lookup when context item is not an array or map - no error</description>
       <created by="Michael Kay" on="2023-11-26"/>
+      <modified by="Michael Kay" on="2025-06-17" change="The status-quo spec (pre-JNodes) says: 
+                    A type error is raised if the value of the left-hand expression 
+                    includes an item that is neither a map nor an array."/>
       <test>(1 to 10)[.??1 = 3]</test>
       <result>
-         <assert-empty/>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-013">
+   <test-case name="DeepLookup-013" covers-40="PR2031">
       <description>Binary lookup when context item is a function but not an array or map</description>
       <created by="Michael Kay" on="2023-11-26"/>
+      <modified by="Michael Kay" on="2025-06-17" change="The status-quo spec (pre-JNodes) says: 
+                    A type error is raised if the value of the left-hand expression 
+                    includes an item that is neither a map nor an array."/>
       <test>(floor#1, ceiling#1, round#1, abs#1)[.??1 = 1]</test>
       <result>
-         <assert-empty/>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
@@ -265,7 +271,7 @@
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-024">
+   <test-case name="DeepLookup-024" covers-40="PR2031">
       <description>Binary lookup on rhs of "/". Context item is a node; no problem.</description>
       <created by="Michael Kay" on="2023-11-26"/>
       <dependency type="spec" value="XQ40+"/>
@@ -273,7 +279,7 @@
         let $x := (<x>1</x>, <y>2</y>) return $x / .??1
       ]]></test>
       <result>
-         <assert-empty/>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
@@ -349,10 +355,10 @@
       </result>
    </test-case>
    
-   <test-case name="DeepLookup-047">
+   <test-case name="DeepLookup-047" covers-40="PR2031">
       <description>Multi-step path may select duplicates</description>
       <created by="Michael Kay" on="2024-01-06"/>
-      <test>[[["a"],["b"]],[["c"],["d"]]]??1??1</test>
+      <test>[[["a"],["b"]],[["c"],["d"]]]??1??1 => JNode-value()</test>
       <result>
          <assert-deep-eq>["a"],"a","b","a","c"</assert-deep-eq>
       </result>
@@ -380,7 +386,7 @@
                   map{12: "peach", 13: "rust", 14: "gold"}
                ]}
           ]
-          return $data??14           
+          return $data??14 =!> JNode-value()          
       </test>
       <result>
          <all-of>
@@ -391,7 +397,7 @@
       </result>
    </test-case>
    
-   <test-case name="DeepLookup-051">
+   <test-case name="DeepLookup-051" covers-40="PR2031">
       <description>Multiple select from a deeper structure</description>
       <created by="Michael Kay" on="2024-01-06"/>
       <test>
@@ -413,7 +419,7 @@
          map{12: "peach", 13: "rust", 14: "gold"}
          ]}
          ]
-         return $data??(24, 14)           
+         return $data??(24, 14) =!> JNode-value()          
       </test>
       <result>
          <all-of>
@@ -424,7 +430,7 @@
       </result>
    </test-case>
    
-   <test-case name="DeepLookup-052">
+   <test-case name="DeepLookup-052" covers-40="PR2031">
       <description>Multiple select from a deeper structure with dynamic key</description>
       <created by="Michael Kay" on="2024-01-06"/>
       <test>
@@ -446,7 +452,7 @@
          map{12: "peach", 13: "rust", 14: ["gold", "bronze"]}
          ]}
          ]
-         return $data??(current-date(), 14)           
+         return $data??(current-date(), 14)  =!> JNode-value()         
       </test>
       <result>
          <all-of>
@@ -488,7 +494,7 @@
       </result>
    </test-case>-->
    
-   <test-case name="DeepLookup-054">
+   <test-case name="DeepLookup-054" covers-40="PR2031">
       <description>Select from a deeper structure, multi-step path</description>
       <created by="Michael Kay" on="2024-01-06"/>
       <test>
@@ -510,7 +516,7 @@
          map{12: "peach", 13: "rust", 14: "gold"}
          ]}
          ]
-         return $data??a??14           
+         return $data??a??14 =!> JNode-value()          
       </test>
       <result>
          <assert-permutation>"lilac", "vanilla", "vermillion", "khaki"</assert-permutation>
@@ -647,28 +653,28 @@
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-112">
+   <test-case name="DeepLookup-112" covers-40="PR2031">
       <description>Binary lookup when lhs is not an array or map</description>
       <created by="Michael Kay" on="2023-11-26"/>
       <test>(1 to 10)??1</test>
       <result>
-         <assert-empty/>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-113">
+   <test-case name="DeepLookup-113" covers-40="PR2031">
       <description>Binary lookup when lhs is a function but not an array or map</description>
       <created by="Michael Kay" on="2023-11-26"/>
       <test>(floor#1, ceiling#1, round#1, abs#1)??1</test>
       <result>
-         <assert-empty/>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-114">
+   <test-case name="DeepLookup-114" covers-40="PR2031">
       <description>Binary lookup selecting all items of an array</description>
       <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??*</test>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??* =!> string()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'c', 'b', 'c', 'd', 'e', 'f', 'b'</assert-deep-eq>
       </result>
@@ -710,10 +716,10 @@
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-119">
+   <test-case name="DeepLookup-119" covers-40="PR2031">
       <description>Decimal literal now allowed in parentheses (coercion rules turn it into an integer)</description>
       <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??(1.0)</test>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??(1.0) =!> string()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'e'</assert-deep-eq>
       </result>
@@ -746,10 +752,10 @@
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-122">
+   <test-case name="DeepLookup-122" covers-40="PR2031">
       <description>Double-flattening a sequence of arrays using ??*??*</description>
       <created by="Michael Kay" on="2023-11-26"/>
-      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]??*??*</test>
+      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]??*??* => string()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'c', 'b', 'c', 'd', 'e', 'f', 'b'</assert-deep-eq>
       </result>
