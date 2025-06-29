@@ -318,6 +318,36 @@
       </result>
    </test-case>
    
+   <test-case name="letexprwith-31" covers-40="PR1131">
+      <description> Empty sequence not allowed </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $var as xs:integer := (1 to 100)[. lt 0] return $var</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="letexprwith-32" covers-40="PR1131">
+      <description> Multiple items not allowed </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $var as xs:integer := (1 to 100)[. lt 44][. gt 40] return $var</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="letexprwith-33" covers-40="PR1131">
+      <description> Multiple items not allowed </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $var as xs:integer := (1 to 100)[. lt 44][. gt 42] return $var</test>
+      <result>
+         <assert-eq>43</assert-eq>
+      </result>
+   </test-case>
+   
    <test-case name="LetExpr001">
       <description>Purpose : Assign a simple string using let </description>
       <created by="Ravindranath Chennoju" on="2005-05-11"/>
@@ -2374,6 +2404,638 @@
       <result>
          <assert-true/>
       </result>
-   </test-case>   
+   </test-case>
+
+   <test-case name="let-seq-001" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $($x, $y) := (1,2) return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-002" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $($x, $y) := (1,2,3) return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-003" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $($x, $y) := 1 return ($x, $y)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-004" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $($x, $x, $x) := (1, 2, 3) return $x</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-005" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $($x, $y) := (1,2), $($p, $q) := (3,4) return string-join(($x, $y, $p, $q), '-')</test>
+      <result>
+         <assert-eq>"1-2-3-4"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-006" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $($x, $y) as xs:integer+ := (1,2) return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-007" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $($x, $y) as xs:double+ := (1,2) return ($x, $y)</test>
+      <result>
+         <assert-type>xs:double+</assert-type>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-008" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $( $x, $y ) as xs:double+ := (1,"two") return ($x, $y)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-009" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $($x) := 1 to 10 return $x</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-010" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $() := 1 to 10 return 42</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-011" covers-40="PR2055">
+      <description> Deconstruct sequence: "$(" is two tokens. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $ (: deconstructing :) ($x, $y) as xs:double+ := (1,2) return ($x, $y)</test>
+      <result>
+         <all-of>
+            <assert-deep-eq>1, 2</assert-deep-eq>
+            <assert-type>xs:double+</assert-type>
+         </all-of>        
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-012" covers-40="PR2055">
+      <description> Deconstruct sequence: "$(" is two tokens. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $ ($x, $y) as xs:double+ := (1,2) return ($x, $y)</test>
+      <result>
+         <all-of>
+            <assert-deep-eq>1, 2</assert-deep-eq>
+            <assert-type>xs:double+</assert-type>
+         </all-of>  
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-013" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $( $x as xs:integer, $y as xs:string ):= (1,"two") return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, "two"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-014" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $( $x as xs:integer, $y as xs:date ):= (1,"two") return ($x, $y)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-015" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $( $x as xs:integer, $y as xs:string, $z as xs:date ):= (1,"two") return ($x, $y)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-016" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $( $x as xs:integer, $y as xs:string, $z as xs:date? ):= (1,"two") return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, "two"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-017" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $( $x, $y, $z ) as xs:integer* := [3, 4, 5] return string-join(($x, $y, $z), '-')</test>
+      <result>
+         <assert-deep-eq>"3-4-5"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-seq-018" covers-40="PR2055">
+      <description> Deconstruct sequence. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $( $x, $y, $z ) := [3, 4, 5] return `x={$x} y={$y} z={$z}`</test>
+      <result>
+         <assert-eq>"x=3 4 5 y= z="</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-001" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[$x, $y] := [1,2] return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-002" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[$x, $y] := [1,2,3] return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-003" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[$x, $y] := [1] return ($x, $y)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-004" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[$x, $x, $x] := [1, 2, 3] return $x</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-005" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[$x, $y] := [1,2], $[$p, $q] := [3,4] return string-join(($x, $y, $p, $q), '-')</test>
+      <result>
+         <assert-eq>"1-2-3-4"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-006" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[$x, $y] as array(xs:integer+) := [1,2] return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-007" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[$x, $y] as array(xs:double+) := [1,2] return ($x, $y)</test>
+      <result>
+         <assert-type>xs:double+</assert-type>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-008" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[ $x, $y ] as array(xs:double+) := [1,"two"] return ($x, $y)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-009" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[$x] := array{1 to 10} return $x</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-010" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[] := array{1 to 10} return 42</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-011" covers-40="PR2055">
+      <description> Deconstruct array: "$(" is two tokens. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $ (: deconstructing :) [$x, $y] as array(xs:double+) := [1,2] return ($x, $y)</test>
+      <result>
+         <all-of>
+            <assert-deep-eq>1, 2</assert-deep-eq>
+            <assert-type>xs:double+</assert-type>
+         </all-of>        
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-012" covers-40="PR2055">
+      <description> Deconstruct array: "$(" is two tokens. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $ [$x, $y] as array(xs:double+) := [1,2] return ($x, $y)</test>
+      <result>
+         <all-of>
+            <assert-deep-eq>1, 2</assert-deep-eq>
+            <assert-type>xs:double+</assert-type>
+         </all-of>  
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-013" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[ $x as xs:integer, $y as xs:string ]:= [1,"two"] return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, "two"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-014" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[ $x as xs:integer, $y as xs:date ]:= [1,"two"] return ($x, $y)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-015" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[ $x as xs:integer, $y as xs:string, $z as xs:date ]:= [1,"two"] return ($x, $y)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-016" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[ $x as xs:integer, $y as xs:string, $z as xs:date? ]:= [1,"two"] return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, "two"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-017" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[ $x, $y, $z ] as array(xs:integer*) := [3, 4, 5] return string-join(($x, $y, $z), '-')</test>
+      <result>
+         <assert-deep-eq>"3-4-5"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-018" covers-40="PR2055">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[ $x, $y, $z ] := [3, 4, 5] return `x={$x} y={$y} z={$z}`</test>
+      <result>
+         <assert-eq>"x=3 y=4 z=5"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-019" covers-40="PR2055">
+      <description> Deconstruct array. Coerced expression must return an array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[ $x, $y, $z ] as xs:integer* := [3, 4, 5] return `x={$x} y={$y} z={$z}`</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-020" covers-40="PR2055">
+      <description> Deconstruct array. Coerced expression must return a single array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[ $x, $y, $z ] as array(*)? := [3, 4, 5][array:size(.) gt 3] return `x={$x} y={$y} z={$z}`</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-021" covers-40="PR2055">
+      <description> Deconstruct array. Coerced expression must return a single array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[ $x, $y, $z ] as array(*)* := ([3, 4, 5], [4, 5, 6], [5, 6, 7])[array:size(.) eq 3] return `x={$x} y={$y} z={$z}`</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-001" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${$x, $y} := {'x':1, 'y':2} return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-002" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${$x, $y} := {'x':1, 'y':2, 'z':3} return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-003" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${$x, $y} := {'x':1} return ($x, $y)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-004" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${$x, $x, $x} := {'x':1, 'y':2, 'z':3} return $x</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-005" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${$x, $y} := {'x':1, 'y':2}, ${$p, $q} := {'p':3, 'q':4, 'r':5} return string-join(($x, $y, $p, $q), '-')</test>
+      <result>
+         <assert-eq>"1-2-3-4"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-006" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${$x, $y} as map(xs:string, xs:integer+) := {'x':1, 'y':2} return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-007" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${$x, $y} as map(xs:string, xs:double+) := {'x':1, 'y':2} return ($x, $y)</test>
+      <result>
+         <assert-type>xs:double+</assert-type>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-008" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x, $y } as map(xs:string, xs:double+) := {'x':1, 'y':'two'} return ($x, $y)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-009" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${$x3, $x5} := map:build(1 to 10, fn{'x'||.}) return ($x3, $x5)</test>
+      <result>
+         <assert-deep-eq>3, 5</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-010" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${} := {1:true(), 2:false()} return 42</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-011" covers-40="PR2055">
+      <description> Deconstruct map: "${" is two tokens. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $ (: deconstructing :) {$x, $y} as map(xs:string, xs:double+) := {'x':1,'y':2} return ($x, $y)</test>
+      <result>
+         <all-of>
+            <assert-deep-eq>1, 2</assert-deep-eq>
+            <assert-type>xs:double+</assert-type>
+         </all-of>        
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-012" covers-40="PR2055">
+      <description> Deconstruct map: "$(" is two tokens. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $ {$x, $y} as map(xs:string, xs:double+) := {'x':1,'y':2} return ($x, $y)</test>
+      <result>
+         <all-of>
+            <assert-deep-eq>1, 2</assert-deep-eq>
+            <assert-type>xs:double+</assert-type>
+         </all-of>  
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-013" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x as xs:integer, $y as xs:string }:= {'x':1,'y':'two'} return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, "two"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-014" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x as xs:integer, $y as xs:date }:= {'x':1,'y':'two'} return ($x, $y)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-015" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x as xs:integer, $y as xs:string, $z as xs:date }:= {'x':1,'y':'two'} return ($x, $y)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-016" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x as xs:integer, $y as xs:string, $z as xs:date? }:= {'x':1,'y':'two'} return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, "two"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-017" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x, $y, $z } as map(xs:string, xs:integer*) := {'x':3, 'y':4, 'z':5} return string-join(($x, $y, $z), '-')</test>
+      <result>
+         <assert-deep-eq>"3-4-5"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-018" covers-40="PR2055">
+      <description> Deconstruct map. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x, $y, $z } := {'x':3, 'y':4, 'z':5} return `x={$x} y={$y} z={$z}`</test>
+      <result>
+         <assert-eq>"x=3 y=4 z=5"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-019" covers-40="PR2055">
+      <description> Deconstruct map. Coerced expression must return a single map</description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x, $y, $z } := {'x':3, 'y':4, 'z':5}[map:contains(., 'q')] return `x={$x} y={$y} z={$z}`</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-020" covers-40="PR2055">
+      <description> Deconstruct map. Coerced expression must return a single map</description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x, $y, $z } as map(*)? := {'x':3, 'y':4, 'z':5}[map:contains(., 'q')] return `x={$x} y={$y} z={$z}`</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-021" covers-40="PR2055">
+      <description> Deconstruct map. Coerced expression must return a single map</description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $key, $value } as map(*)? := map:pairs({'x':3, 'y':4, 'z':5}) return ($key, $value)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-map-022" covers-40="PR2055">
+      <description> Deconstruct map. Extract fields of key-value pairs</description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>for $kvp in map:pairs({'x':3, 'y':4, 'z':5}) 
+            let ${$key, $value} := $kvp
+            return `{$key}={$value}`</test>
+      <result>
+         <assert-deep-eq>"x=3", "y=4", "z=5"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   
 
 </test-set>
