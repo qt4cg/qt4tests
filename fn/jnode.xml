@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-jnode"  covers-40="PR2083">
+   <description>Tests for the jnode() function</description>
+   
+   <dependency type="spec" value="XP40+ XQ40+"/>
+   
+
+   <test-case name="fn-jnode-001">
+      <description> applied to empty sequence </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>jnode(())</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-002">
+      <description> applied to an array </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>jnode([1, 2, 3])</test>
+      <result>
+         <all-of>
+            <assert-type>jnode()</assert-type>
+            <assert-type>jnode(array(*))</assert-type>
+            <assert-type>jnode(array(xs:integer))</assert-type>
+            <assert>count($result) = 1</assert>
+            <assert>deep-equal(jnode-content($result), [1, 2, 3])</assert>
+            <assert>empty(jnode-selector($result))</assert>
+            <assert>empty(jnode-position($result))</assert>
+            <assert>empty($result/..)</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-003">
+      <description> applied to a map </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>jnode({"a":1, "b":2})</test>
+      <result>
+         <all-of>
+            <assert-type>jnode()</assert-type>
+            <assert-type>jnode(map(*))</assert-type>
+            <assert-type>jnode(map(xs:string, xs:integer))</assert-type>
+            <assert>count($result) = 1</assert>
+            <assert>deep-equal(jnode-content($result), {"a":1, "b":2})</assert>
+            <assert>empty(jnode-selector($result))</assert>
+            <assert>empty(jnode-position($result))</assert>
+            <assert>empty($result/..)</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-004">
+      <description> applied to a map or array decided dynamically </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>jnode(if (month-from-date(current-date()) lt 7) then ["z"] else {1:"z"})</test>
+      <result>
+         <all-of>
+            <assert-type>jnode()</assert-type>
+            <assert>count($result) = 1</assert>
+            <assert>jnode-content($result)?1 eq "z"</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-005">
+      <description> JNode identity </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>let $array := [1, 2, 3] return jnode($array) is jnode($array)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-006">
+      <description> JNode identity </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>jnode({"a":1, "b":2}) is jnode({"b":2, "a":1})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-007">
+      <description> applied to a JNode (content is extracted where the required type is map or array)</description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>jnode(jnode([1]))</test>
+      <result>
+         <all-of>
+            <assert-type>jnode()</assert-type>
+            <assert>jnode-content($result) instance of array(xs:integer)</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-008">
+      <description> atomization </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>jnode([1,2,3,4]) = 3</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-009">
+      <description> atomization </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>jnode([1,2,3,4]) != 3</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-010">
+      <description> effective boolean value </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>if (jnode([1,2,3,4])) then 1 else 0</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-011">
+      <description> effective boolean value </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>if (jnode([false()])) then 1 else 0</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-012">
+      <description> effective boolean value </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>if (jnode({})) then 1 else 0</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-013">
+      <description> children of array </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>count(jnode([1,2,3])!*)</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-014">
+      <description> children of map </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>count(jnode({"a":1, "b":2})!*)</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-015">
+      <description> properties of children</description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>jnode([2,3,4])!*</test>
+      <result>
+         <all-of>
+            <assert>jnode-selector($result[2]) eq 2</assert>
+            <assert>jnode-position($result[2]) eq 1</assert>
+            <assert>jnode-content($result[2]) eq 3</assert>
+            <assert>deep-equal(jnode-content($result[2]/..), [2,3,4])</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-016">
+      <description> properties of children</description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>jnode({"a":2, "b":3, "c":4})!*</test>
+      <result>
+         <all-of>
+            <assert>jnode-selector($result[2]) eq "b"</assert>
+            <assert>jnode-position($result[2]) eq 1</assert>
+            <assert>jnode-content($result[2]) eq 3</assert>
+            <assert>deep-equal(jnode-content($result[2]/..), {"a":2, "b":3, "c":4})</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   
+   <test-case name="fn-jnode-901">
+      <description> applied to a sequence of arrays </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>jnode(([1], [2]))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-902">
+      <description> applied to a string </description>
+      <created by="Michael Kay" on="2025-07-11"/>
+      <test>jnode("flamingo")</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   
+   
+ 
+</test-set>

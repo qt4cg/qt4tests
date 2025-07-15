@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-Lookup.deep"
-   covers-40="PR837">
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-PathExpr.J"
+   covers-40="PR2083">
    <description>
-      Tests for the Binary Deep Lookup operator on maps and arrays in XPath and XQuery 4.0.
-      Note: many of the tests simply do shallow lookup.
+      Originally written as tests for the Binary Deep Lookup operator on maps and arrays in XPath and XQuery 4.0.
+      Now converted to use path expressions based on JNodes.
    </description>
+   
+   <!-- Note: tests submitted 2025-07-15 although most are not yet working in Saxon -->
 
    <dependency type="spec" value="XP40+ XQ40+"/>
 
@@ -46,8 +48,8 @@
 
    <test-case name="DeepLookup-001">
       <description>Integer subscript into an array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b'], ['c', 'd'])[.??1 eq 'c']</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b'], ['c', 'd'])[*[1] eq 'c'] =!> jnode-value()</test>
       <result>
          <assert-deep-eq>['c', 'd']</assert-deep-eq>
       </result>
@@ -55,9 +57,9 @@
 
    <test-case name="DeepLookup-002">
       <description>Variable subscript into an array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <dependency type="spec" value="XP31+ XQ31+"/>
-      <test>let $i := 1 return (['a', 'b'], ['c', 'd'])[.??($i) eq 'c']</test>
+      <test>let $i := 1 return (['a', 'b'], ['c', 'd'])[*[$i] eq 'c'] =!> jnode-value()</test>
       <result>
          <assert-deep-eq>['c', 'd']</assert-deep-eq>
       </result>
@@ -65,28 +67,28 @@
 
    <test-case name="DeepLookup-003">
       <description>Integer subscript into an array: leading zeroes allowed</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <dependency type="spec" value="XP31+ XQ31+"/>
-      <test>(['a', 'b'], ['c', 'd'])[ .?? 001 eq 'c']</test>
+      <test>(['a', 'b'], ['c', 'd'])[get(001) eq 'c'] =!> jnode-value()</test>
       <result>
          <assert-deep-eq>['c', 'd']</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-004">
+   <!--<test-case name="DeepLookup-004">
       <description>Integer subscript into an array: minus sign not allowed</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <dependency type="spec" value="XP31+ XQ31+"/>
       <test>(['a', 'b'], ['c', 'd'])[ .?? -1 eq 'c']</test>
       <result>
          <error code="XPST0003"/>
       </result>
-   </test-case>
+   </test-case>-->
 
    <test-case name="DeepLookup-005">
       <description>Integer subscript into an array: array index too low. No error.</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b'], ['c', 'd'])[ .??0 eq 'c']</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b'], ['c', 'd'])[ *[0] eq 'c'] =!> jnode-value()</test>
       <result>
          <assert-empty/>
       </result>
@@ -94,8 +96,8 @@
 
    <test-case name="DeepLookup-006">
       <description>Integer subscript into an array: array index too high but error ignored</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b'], ['c', 'd'], ['e'])[ .??2 eq 'b']</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b'], ['c', 'd'], ['e'])[ *[2] eq 'b'] => jnode-value()</test>
       <result>
          <assert-deep-eq>['a', 'b']</assert-deep-eq>
       </result>
@@ -103,8 +105,8 @@
 
    <test-case name="DeepLookup-007">
       <description>Integer subscript into an array: range of subscripts</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[ .??(1 to 2) = 'b']</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[ *[1 to 2] = 'b'] =!> jnode-value()</test>
       <result>
          <assert-deep-eq>['a', 'b', 'c'], ['b', 'c', 'd']</assert-deep-eq>
       </result>
@@ -112,8 +114,12 @@
 
    <test-case name="DeepLookup-008">
       <description>Integer subscript into an array: variable range of subscripts</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>let $i := (1, 3) return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[ .??($i) = 'b']</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>
+         let $i := (1, 3) 
+         return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[ get($i) = 'b']
+            =!> jnode-value()
+      </test>
       <result>
          <assert-deep-eq>['b', 'c', 'd'], ['e', 'f', 'b']</assert-deep-eq>
       </result>
@@ -121,8 +127,8 @@
 
    <test-case name="DeepLookup-009">
       <description>Name lookup into an array: no error for deep lookup</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[ .??first = 'b']</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[ first = 'b']  =!> jnode-value()</test>
       <result>
          <assert-empty/>
       </result>
@@ -130,8 +136,12 @@
 
    <test-case name="DeepLookup-010">
       <description>Variable lookup into an array: no type error</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>let $d := current-date() return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[ .??($d) = 'b']</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>
+         let $d := current-date() 
+         return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[ get($d) = 'b']
+            =!> jnode-value()
+      </test>
       <result>
          <assert-empty/>
       </result>
@@ -139,35 +149,35 @@
 
    <test-case name="DeepLookup-011">
       <description>Binary lookup with no context item</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>let $d := function($x) {$x + .??2} return $d(12)</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>let $d := function($x) {$x + ./get(2)} return $d(12)</test>
       <result>
          <error code="XPDY0002"/>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-012">
-      <description>Binary lookup when context item is not an array or map - no error</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(1 to 10)[.??1 = 3]</test>
+      <description>Binary lookup when context item is not an array or map -  error</description>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(1 to 10)[./get(1) = 3]</test>
       <result>
-         <assert-empty/>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-013">
       <description>Binary lookup when context item is a function but not an array or map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(floor#1, ceiling#1, round#1, abs#1)[.??1 = 1]</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(floor#1, ceiling#1, round#1, abs#1)[*[1] = 1]</test>
       <result>
-         <assert-empty/>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-014">
       <description>Binary lookup selecting all items of an array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[ .??* = 'c']</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[* = 'c']</test>
       <result>
          <assert-deep-eq>['a', 'b', 'c'], ['b', 'c', 'd']</assert-deep-eq>
       </result>
@@ -175,8 +185,8 @@
 
    <test-case name="DeepLookup-015">
       <description>Result of Binary lookup is atomized</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>([1, [2], [3]], [[2], 2, [4]])[ .??1 = 4 ]</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>([1, [2], [3]], [[2], 2, [4]])[ get(1) = 4 ]</test>
       <result>
          <assert-deep-eq>[[2], 2, [4]]</assert-deep-eq>
       </result>
@@ -184,8 +194,8 @@
 
    <test-case name="DeepLookup-016">
       <description>No syntactic confusion with place-markers</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[contains(.??1, ?, 'http://www.w3.org/2005/xpath-functions/collation/codepoint')('a')]</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[contains(get(1), ?, 'http://www.w3.org/2005/xpath-functions/collation/codepoint')('a')]</test>
       <result>
          <assert-deep-eq>['a', 'b', 'c']</assert-deep-eq>
       </result>
@@ -193,27 +203,27 @@
 
    <test-case name="DeepLookup-017">
       <description>No syntactic confusion with place-markers</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[contains(.??1, ?)('a')]</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[contains(get(1), ?)('a')]</test>
       <result>
          <assert-deep-eq>['a', 'b', 'c']</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-018">
+   <!--<test-case name="DeepLookup-018">
       <description>Decimal literal not allowed</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <dependency type="spec" value="XP31+ XQ31+"/>
       <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[.??1.0 = 'a']</test>
       <result>
          <error code="XPST0003"/>
       </result>
-   </test-case>
+   </test-case>-->
 
    <test-case name="DeepLookup-019">
       <description>Decimal literal now allowed in parentheses (coercion rules turn it into an integer)</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[.??(1.0) = 'a']</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[get(1.0) = 'a']</test>
       <result>
          <assert-deep-eq>['a', 'b', 'c']</assert-deep-eq>
       </result>
@@ -221,12 +231,12 @@
 
    <test-case name="DeepLookup-020">
       <description>Subscript is atomized</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="schemaValidation"/>
       <test><![CDATA[
         let $x := (validate type xs:integer {<x>1</x>}, validate type xs:integer {<y>2</y>}) return
-        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[.??($x) = 'b']
+        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[get($x) = 'b']
       ]]></test>
       <result>
          <assert-deep-eq>(['a', 'b', 'c'], ['b', 'c', 'd'])</assert-deep-eq>
@@ -235,11 +245,11 @@
 
    <test-case name="DeepLookup-021">
       <description>Subscript is atomized, and untypedAtomic is NOT converted to xs:integer</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         let $x := (<x>1</x>, <y>2</y>) return
-        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[.??($x, 2) = 'b']
+        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[get($x, 2) = 'b']
       ]]></test>
       <result>
          <assert-deep-eq>(['a', 'b', 'c'])</assert-deep-eq>
@@ -247,10 +257,10 @@
    </test-case>
 
    <test-case name="DeepLookup-022">
-      <description>Filtering a sequence of arrays produced using ??*</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]??*
-               [.??1 instance of xs:string and .??1 = 'a']</test>
+      <description>Filtering a sequence of arrays produced using //*</description>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]//*
+               [.//get(1) instance of xs:string and .//get(1) = 'a'] =!> jnode-value()</test>
       <result>
          <assert-deep-eq>['a', 'b', 'c']</assert-deep-eq>
       </result>
@@ -258,19 +268,19 @@
 
    <test-case name="DeepLookup-023">
       <description>Binary lookup on rhs of "!"</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]!.??*!.??1</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]! * ! get(1)  =!> jnode-value()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'e'</assert-deep-eq>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-024">
-      <description>Binary lookup on rhs of "/". Context item is a node; no problem.</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <description>Binary lookup on rhs of "/". Context item is an XNode; no problem.</description>
+      <created by="Michael Kay" on="2025-07-15"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
-        let $x := (<x>1</x>, <y>2</y>) return $x / .??1
+        let $x := (<x>1</x>, <y>2</y>) return $x / get(1)
       ]]></test>
       <result>
          <assert-empty/>
@@ -279,8 +289,8 @@
 
    <test-case name="DeepLookup-025">
       <description>Select nothing from an array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[exists(.??())]</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[exists(get(()))]</test>
       <result>
          <assert-empty/>
       </result>
@@ -288,8 +298,8 @@
 
    <test-case name="DeepLookup-040">
       <description>Lookup by name in a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(map{'a':1, 'b':2, 'c':3},  map{'a':2, 'b':3, 'c':4})[.??b eq 3]</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(map{'a':1, 'b':2, 'c':3},  map{'a':2, 'b':3, 'c':4})[b eq 3]</test>
       <result>
          <assert-deep-eq>map{'a':2, 'b':3, 'c':4}</assert-deep-eq>
       </result>
@@ -297,8 +307,8 @@
 
    <test-case name="DeepLookup-041">
       <description>Lookup by number in a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[.??2 eq 3]</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[get(2) eq 3]</test>
       <result>
          <assert-deep-eq>map{1:2, 2:3, 3:4}</assert-deep-eq>
       </result>
@@ -306,8 +316,8 @@
 
    <test-case name="DeepLookup-042">
       <description>Lookup by range of values in a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[.??(1 to 2) = 3]</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[get(1 to 2) = 3]</test>
       <result>
          <assert-deep-eq>map{1:2, 2:3, 3:4}</assert-deep-eq>
       </result>
@@ -315,26 +325,26 @@
 
    <test-case name="DeepLookup-043">
       <description>Lookup by hyphenated name in a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(map{'a-1':1, 'b-1':2, 'c-1':3},  map{'a-1':2, 'b-1':3, 'c-1':4})[.??b-1 eq 3]</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(map{'a-1':1, 'b-1':2, 'c-1':3},  map{'a-1':2, 'b-1':3, 'c-1':4})[b-1 eq 3]</test>
       <result>
          <assert-deep-eq>map{'a-1':2, 'b-1':3, 'c-1':4}</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-044">
+   <!--<test-case name="DeepLookup-044">
       <description>Comment appearing after ".??"</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <test>(map{'a-1':1, 'b-1':2, 'c-1':3},  map{'a-1':2, 'b-1':3, 'c-1':4})[.?? (:confusing.??:) b-1 eq 3]</test>
       <result>
          <assert-deep-eq>map{'a-1':2, 'b-1':3, 'c-1':4}</assert-deep-eq>
       </result>
-   </test-case>
+   </test-case>-->
 
    <test-case name="DeepLookup-045">
       <description>Get all entries in a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[.??* = 3]</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[* = 3]</test>
       <result>
          <assert-deep-eq>map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4}</assert-deep-eq>
       </result>
@@ -342,19 +352,19 @@
 
    <test-case name="DeepLookup-046">
       <description>Select nothing from a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[exists(.??())]</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[exists(get(()))]</test>
       <result>
          <assert-empty/>
       </result>
    </test-case>
    
    <test-case name="DeepLookup-047">
-      <description>Multi-step path may select duplicates</description>
+      <description>Multi-step path eliminates duplicates</description>
       <created by="Michael Kay" on="2024-01-06"/>
-      <test>[[["a"],["b"]],[["c"],["d"]]]??1??1</test>
+      <test>[[["a"],["b"]],[["c"],["d"]]]//get(1)//get(1)</test>
       <result>
-         <assert-deep-eq>["a"],"a","b","a","c"</assert-deep-eq>
+         <assert-deep-eq>["a"],"a","b","c"</assert-deep-eq>
       </result>
    </test-case>
    
@@ -380,14 +390,10 @@
                   map{12: "peach", 13: "rust", 14: "gold"}
                ]}
           ]
-          return $data??14           
+          return $data//get(14) =!> jnode-value()          
       </test>
       <result>
-         <all-of>
-            <assert-permutation>"lilac", "vanilla", "magnolia", "grey", "vermillion", "khaki", "silver", "gold"</assert-permutation>
-            <assert>index-of($result, "lilac") lt index-of($result, "vanilla")</assert>
-            <assert>index-of($result, "lilac") lt index-of($result, "vermillion")</assert>
-         </all-of>
+         <assert-deep-eq>"lilac", "vanilla", "magnolia", "grey", "vermillion", "khaki", "silver", "gold"</assert-deep-eq>
       </result>
    </test-case>
    
@@ -397,30 +403,26 @@
       <test>
          let $data := [
          map{"a": [
-         map{12: "pink", 13: "orange", 24: "lilac"},
-         map{12: "mauve", 13: "beige", 14: "vanilla"}
+            map{12: "pink", 13: "orange", 24: "lilac"},
+            map{12: "mauve", 13: "beige", 14: "vanilla"}
          ],
          "b": [
-         map{12: "teal", 13: "turquoise", 14: "magnolia"},
-         map{12: "cerise", 13: "mustard", 24: "grey"}
+            map{12: "teal", 13: "turquoise", 14: "magnolia"},
+            map{12: "cerise", 13: "mustard", 24: "grey"}
          ]},
          map{"a": [
-         map{12: "puce", 13: "rose", 14: "vermillion"},
-         map{12: "violet", 13: "indigo", 24: "khaki"}
+            map{12: "puce", 13: "rose", 14: "vermillion"},
+            map{12: "violet", 13: "indigo", 24: "khaki"}
          ],
          "b": [
-         map{12: "sand", 13: "sky", 24: "silver"},
-         map{12: "peach", 13: "rust", 14: "gold"}
+            map{12: "sand", 13: "sky", 24: "silver"},
+            map{12: "peach", 13: "rust", 14: "gold"}
          ]}
          ]
-         return $data??(24, 14)           
+         return $data//get(24, 14)           
       </test>
       <result>
-         <all-of>
-            <assert-permutation>"lilac", "vanilla", "magnolia", "grey", "vermillion", "khaki", "silver", "gold"</assert-permutation>
-            <assert>index-of($result, "lilac") lt index-of($result, "vanilla")</assert>
-            <assert>index-of($result, "lilac") lt index-of($result, "vermillion")</assert>
-         </all-of>
+          <assert-deep-eq>"lilac", "vanilla", "magnolia", "grey", "vermillion", "khaki", "silver", "gold"</assert-deep-eq>
       </result>
    </test-case>
    
@@ -430,30 +432,26 @@
       <test>
          let $data := [
          map{"a": [
-         map{12: "pink", 13: "orange", current-date(): "lilac"},
-         map{12: "mauve", 13: "beige", 14: "vanilla"}
+            map{12: "pink", 13: "orange", current-date(): "lilac"},
+            map{12: "mauve", 13: "beige", 14: "vanilla"}
          ],
          "b": [
-         map{12: "teal", 13: "turquoise", 14: "magnolia"},
-         map{12: "cerise", 13: "mustard", current-date(): "grey"}
+            map{12: "teal", 13: "turquoise", 14: "magnolia"},
+            map{12: "cerise", 13: "mustard", current-date(): "grey"}
          ]},
          map{"a": [
-         map{12: "puce", 13: "rose", 14: "vermillion"},
-         map{12: "violet", 13: "indigo", current-date(): "khaki"}
+            map{12: "puce", 13: "rose", 14: "vermillion"},
+            map{12: "violet", 13: "indigo", current-date(): "khaki"}
          ],
          "b": [
-         map{12: "sand", 13: "sky", current-date(): "silver"},
-         map{12: "peach", 13: "rust", 14: ["gold", "bronze"]}
+            map{12: "sand", 13: "sky", current-date(): "silver"},
+            map{12: "peach", 13: "rust", 14: ["gold", "bronze"]}
          ]}
          ]
-         return $data??(current-date(), 14)           
+         return $data//get(current-date(), 14) =!> jnode-value()          
       </test>
       <result>
-         <all-of>
-            <assert-permutation>"lilac", "vanilla", "magnolia", "grey", "vermillion", "khaki", "silver", ["gold", "bronze"]</assert-permutation>
-            <assert>index-of($result, "lilac") lt index-of($result, "vanilla")</assert>
-            <assert>index-of($result, "lilac") lt index-of($result, "vermillion")</assert>
-         </all-of>
+         <assert-deep-eq>"lilac", "vanilla", "magnolia", "grey", "vermillion", "khaki", "silver", ["gold", "bronze"]</assert-deep-eq>
       </result>
    </test-case>
    
@@ -494,63 +492,63 @@
       <test>
          let $data := [
          map{"a": [
-         map{12: "pink", 13: "orange", 14: "lilac"},
-         map{12: "mauve", 13: "beige", 14: "vanilla"}
+            map{12: "pink", 13: "orange", 14: "lilac"},
+            map{12: "mauve", 13: "beige", 14: "vanilla"}
          ],
          "b": [
-         map{12: "teal", 13: "turquoise", 14: "magnolia"},
-         map{12: "cerise", 13: "mustard", 14: "grey"}
+            map{12: "teal", 13: "turquoise", 14: "magnolia"},
+            map{12: "cerise", 13: "mustard", 14: "grey"}
          ]},
          map{"a": [
-         map{12: "puce", 13: "rose", 14: "vermillion"},
-         map{12: "violet", 13: "indigo", 14: "khaki"}
+            map{12: "puce", 13: "rose", 14: "vermillion"},
+            map{12: "violet", 13: "indigo", 14: "khaki"}
          ],
          "b": [
-         map{12: "sand", 13: "sky", 14: "silver"},
-         map{12: "peach", 13: "rust", 14: "gold"}
+            map{12: "sand", 13: "sky", 14: "silver"},
+            map{12: "peach", 13: "rust", 14: "gold"}
          ]}
          ]
-         return $data??a??14           
+         return $data//a//get(14)           
       </test>
       <result>
-         <assert-permutation>"lilac", "vanilla", "vermillion", "khaki"</assert-permutation>
+         <assert-deep-eq>"lilac", "vanilla", "vermillion", "khaki"</assert-deep-eq>
       </result>
    </test-case>
    
    <test-case name="DeepLookup-055">
       <description>Select from a deeper structure, multi-step path. Note that the result
-      includes duplicates.</description>
+      eliminates duplicates.</description>
       <created by="Michael Kay" on="2024-01-06"/>
       <test>
          let $data := [
          map{"a": [
-         map{12: "pink", 13: "orange", 14: "lilac"},
-         map{12: "mauve", 13: "beige", 14: "vanilla"}
+            map{12: "pink", 13: "orange", 14: "lilac"},
+            map{12: "mauve", 13: "beige", 14: "vanilla"}
          ],
          "b": [
-         map{12: "teal", 13: "turquoise", 14: "magnolia"},
-         map{12: "cerise", 13: "mustard", 14: "grey"}
+            map{12: "teal", 13: "turquoise", 14: "magnolia"},
+            map{12: "cerise", 13: "mustard", 14: "grey"}
          ]},
          map{"a": [
-         map{12: "puce", 13: "rose", 14: "vermillion"},
-         map{12: "violet", 13: "indigo", 14: "khaki"}
+            map{12: "puce", 13: "rose", 14: "vermillion"},
+            map{12: "violet", 13: "indigo", 14: "khaki"}
          ],
          "b": [
-         map{12: "sand", 13: "sky", 14: "silver"},
-         map{12: "peach", 13: "rust", 14: "gold"}
+            map{12: "sand", 13: "sky", 14: "silver"},
+            map{12: "peach", 13: "rust", 14: "gold"}
          ]}
          ]
-         return $data??1??14           
+         return $data//get(1)//get(14)   =!> jnode-value()          
       </test>
       <result>
-         <assert-permutation>"lilac", "vanilla", "magnolia", "grey", "lilac", "magnolia", "vermillion", "silver"</assert-permutation>
+         <assert-deep-eq>"lilac", "vanilla", "magnolia", "grey", "lilac", "magnolia", "vermillion", "silver"</assert-deep-eq>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-101">
       <description>Integer subscript into an array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b'], ['c', 'd'])??1</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b'], ['c', 'd'])/get(1)   =!> jnode-value()</test>
       <result>
          <assert-deep-eq>'a', 'c'</assert-deep-eq>
       </result>
@@ -558,8 +556,8 @@
 
    <test-case name="DeepLookup-102">
       <description>Variable subscript into an array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>let $i := 1 return (['a', 'b'], ['c', 'd'])??($i)</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>let $i := 1 return (['a', 'b'], ['c', 'd']) // get($i)   =!> jnode-value()</test>
       <result>
          <assert-deep-eq>'a', 'c'</assert-deep-eq>
       </result>
@@ -567,26 +565,26 @@
 
    <test-case name="DeepLookup-103">
       <description>Integer subscript into an array: leading zeroes allowed</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b'], ['c', 'd'])?? 001</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b'], ['c', 'd']) // get(001)</test>
       <result>
          <assert-deep-eq>'a', 'c'</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-104">
+   <!--<test-case name="DeepLookup-104">
       <description>Integer subscript into an array: minus sign not allowed</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <test>(['a', 'b'], ['c', 'd'])?? -1</test>
       <result>
          <error code="XPST0003"/>
       </result>
-   </test-case>
+   </test-case>-->
 
    <test-case name="DeepLookup-105">
       <description>Integer subscript into an array: array index too low</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b'], ['c', 'd'])??0</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b'], ['c', 'd']) // get(0)</test>
       <result>
          <assert-empty/>
       </result>
@@ -594,9 +592,9 @@
 
    <test-case name="DeepLookup-106">
       <description>Integer subscript into an array: array index too high</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <dependency type="spec" value="XP31+ XQ31+"/>
-      <test>(['a', 'b'], ['c', 'd'], ['e'])??2</test>
+      <test>(['a', 'b'], ['c', 'd'], ['e']) // get(2)   =!> jnode-value()</test>
       <result>
          <assert-deep-eq>'b', 'd'</assert-deep-eq>
       </result>
@@ -604,8 +602,8 @@
 
    <test-case name="DeepLookup-107">
       <description>Integer subscript into an array: range of subscripts</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??(1 to 2)</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']) // get(1 to 2)   =!> jnode-value()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'b', 'c', 'e', 'f'</assert-deep-eq>
       </result>
@@ -613,8 +611,8 @@
 
    <test-case name="DeepLookup-108">
       <description>Integer subscript into an array: variable range of subscripts</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>let $i := (1, 3) return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??($i)</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>let $i := (1, 3) return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])// get($i)   =!> jnode-value()</test>
       <result>
          <assert-deep-eq>'a', 'c', 'b', 'd', 'e', 'b'</assert-deep-eq>
       </result>
@@ -622,8 +620,8 @@
 
    <test-case name="DeepLookup-109">
       <description>Name lookup into an array: no type error</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']) ??first</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']) //first</test>
       <result>
          <assert-empty/>
       </result>
@@ -631,8 +629,11 @@
 
    <test-case name="DeepLookup-110">
       <description>Variable lookup into an array: no type error</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>let $d := current-date() return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??($d)</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>
+         let $d := current-date() 
+         return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])//get($d)   
+         =!> jnode-value()</test>
       <result>
          <assert-empty/>
       </result>
@@ -640,8 +641,8 @@
 
    <test-case name="DeepLookup-111">
       <description>Binary lookup with no context item</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>let $d := function($x) {$x??2} return $d([12, 13])</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>let $d := function($x) {$x//get(2)} return $d([12, 13])   =!> jnode-value()</test>
       <result>
          <assert-eq>13</assert-eq>
       </result>
@@ -649,26 +650,26 @@
 
    <test-case name="DeepLookup-112">
       <description>Binary lookup when lhs is not an array or map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(1 to 10)??1</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(1 to 10)//get(1)</test>
       <result>
-         <assert-empty/>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-113">
       <description>Binary lookup when lhs is a function but not an array or map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(floor#1, ceiling#1, round#1, abs#1)??1</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(floor#1, ceiling#1, round#1, abs#1)//*[1]</test>
       <result>
-         <assert-empty/>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-114">
       <description>Binary lookup selecting all items of an array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??*</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])//*   =!> jnode-value()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'c', 'b', 'c', 'd', 'e', 'f', 'b'</assert-deep-eq>
       </result>
@@ -676,17 +677,17 @@
 
    <test-case name="DeepLookup-115">
       <description>Result of Binary lookup is atomized</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>([1, [2], [3]], [[2], 2, [4]])??3 = 3</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>([1, [2], [3]], [[2], 2, [4]])//get(3) = 3</test>
       <result>
          <assert-true/>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-116">
-      <description>No syntactic confusion with occurrence indicators (syntax error, treat as is not a primary)</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>['a', 'b', 'c'] treat as array(*)???1</test>
+      <description>No syntactic confusion with occurrence indicators (syntax error, 'treat as' is not a primary)</description>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>['a', 'b', 'c'] treat as array(*)? //get(1)</test>
       <result>
          <error code="XPST0003"/>
       </result>
@@ -694,26 +695,26 @@
 
    <test-case name="DeepLookup-117">
       <description>No syntactic confusion with occurrence indicators</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>['a', 'b', 'c'] treat as array(*) ?? 1</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>['a', 'b', 'c'] treat as array(*) // get(1)</test>
       <result>
          <error code="XPST0003"/>
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-118">
+   <!--<test-case name="DeepLookup-118">
       <description>Decimal literal not allowed</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??1.0 </test>
       <result>
          <error code="XPST0003"/>
       </result>
-   </test-case>
+   </test-case>-->
 
    <test-case name="DeepLookup-119">
       <description>Decimal literal now allowed in parentheses (coercion rules turn it into an integer)</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??(1.0)</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])//get(1.0)   =!> jnode-value()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'e'</assert-deep-eq>
       </result>
@@ -721,12 +722,12 @@
 
    <test-case name="DeepLookup-120">
       <description>Subscript is atomized</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="schemaValidation"/>
       <test><![CDATA[
         let $x := (validate type xs:integer {<x>1</x>}, validate type xs:integer {<y>2</y>}) return
-        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??($x)
+        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']) // ($x)   =!> jnode-value()
       ]]></test>
       <result>
          <assert-deep-eq>'a', 'b', 'b', 'c', 'e', 'f'</assert-deep-eq>
@@ -735,11 +736,11 @@
 
    <test-case name="DeepLookup-121">
       <description>Subscript is atomized, but untypedAtomic is not converted to xs:integer</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         let $x := (<x>1</x>, <y>2</y>) return
-        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??($x!number())
+        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']) // get($x!number())   =!> jnode-value()
       ]]></test>
       <result>
          <assert-deep-eq>'a', 'b', 'b', 'c', 'e', 'f'</assert-deep-eq>
@@ -748,8 +749,8 @@
 
    <test-case name="DeepLookup-122">
       <description>Double-flattening a sequence of arrays using ??*??*</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]??*??*</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] // * // *   =!> jnode-value()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'c', 'b', 'c', 'd', 'e', 'f', 'b'</assert-deep-eq>
       </result>
@@ -757,8 +758,8 @@
 
    <test-case name="DeepLookup-123">
       <description>Select nothing from an array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])??()</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']) // get(())   =!> jnode-value()</test>
       <result>
          <assert-empty/>
       </result>
@@ -766,8 +767,8 @@
 
    <test-case name="DeepLookup-140">
       <description>Lookup by name in a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(map{'a':1, 'b':2, 'c':3},  map{'a':2, 'b':3, 'c':4})??b</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(map{'a':1, 'b':2, 'c':3},  map{'a':2, 'b':3, 'c':4}) // b   =!> jnode-value()</test>
       <result>
          <assert-deep-eq>2, 3</assert-deep-eq>
       </result>
@@ -775,8 +776,8 @@
 
    <test-case name="DeepLookup-141">
       <description>Lookup by number in a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})??2</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4}) // get(2)   =!> jnode-value()</test>
       <result>
          <assert-deep-eq>2, 3</assert-deep-eq>
       </result>
@@ -784,8 +785,8 @@
 
    <test-case name="DeepLookup-142">
       <description>Lookup by range of values in a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(map{1:1, 2:2, 3:3},  map{2:3, 3:4, 4:5})??(1 to 2)</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(map{1:1, 2:2, 3:3},  map{2:3, 3:4, 4:5}) // get(1 to 2)   =!> jnode-value()</test>
       <result>
          <assert-deep-eq>1, 2, 3</assert-deep-eq>
       </result>
@@ -793,35 +794,35 @@
 
    <test-case name="DeepLookup-143">
       <description>Lookup by hyphenated name in a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(map{'a-1':1, 'b-1':2, 'c-1':3},  map{'a-1':2, 'b-1':3, 'c-1':4})??c-1</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(map{'a-1':1, 'b-1':2, 'c-1':3},  map{'a-1':2, 'b-1':3, 'c-1':4}) // c-1   =!> jnode-value()</test>
       <result>
          <assert-deep-eq>3, 4</assert-deep-eq>
       </result>
    </test-case>
 
-   <test-case name="DeepLookup-144">
+   <!--<test-case name="DeepLookup-144">
       <description>Comment appearing after "??"</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <test>(map{'a-1':1, 'b-1':2, 'c-1':3},  map{'a-1':2, 'b-1':3, 'c-1':4})?? (:confusing.??:) b-1</test>
       <result>
          <assert-deep-eq>2, 3</assert-deep-eq>
       </result>
-   </test-case>
+   </test-case>-->
 
    <test-case name="DeepLookup-145">
       <description>Get all entries in a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})??*</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})//*   =!> jnode-value()</test>
       <result>
-         <assert-permutation>1, 2, 3, 2, 3, 4</assert-permutation>
+         <assert-deep-eq>1, 2, 3, 2, 3, 4</assert-deep-eq>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-146">
       <description>Select nothing from a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})??()</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4}) // get(())   =!> jnode-value()</test>
       <result>
          <assert-empty/>
       </result>
@@ -829,8 +830,8 @@
 
    <test-case name="DeepLookup-147">
       <description>Select from empty sequence</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>()??banana</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>() // banana</test>
       <result>
          <assert-empty/>
       </result>
@@ -838,8 +839,8 @@
 
    <test-case name="DeepLookup-148">
       <description>Select from empty sequence</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>()??12</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>()// get(12)</test>
       <result>
          <assert-empty/>
       </result>
@@ -847,8 +848,8 @@
 
    <test-case name="DeepLookup-149">
       <description>Select from empty sequence</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>(())??(())</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>(()) // (())</test>
       <result>
          <assert-empty/>
       </result>
@@ -856,8 +857,8 @@
 
    <test-case name="DeepLookup-150">
       <description>Numeric Lookup followed by function call</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>[floor#1, ceiling#1, round#1, abs#1]??2(1.3)</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>[floor#1, ceiling#1, round#1, abs#1] // get(2)(1.3)</test>
       <result>
          <assert-eq>2.0</assert-eq>
       </result>
@@ -865,8 +866,8 @@
 
    <test-case name="DeepLookup-151">
       <description>Name Lookup followed by function call</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1}??c(1.3)</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1} // c(1.3)</test>
       <result>
          <assert-eq>2.0</assert-eq>
       </result>
@@ -874,8 +875,8 @@
 
    <test-case name="DeepLookup-152">
       <description>Parenthesized Lookup followed by function call</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1}??("c")(1.3)</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1} // get("c")(1.3)</test>
       <result>
          <assert-eq>2.0</assert-eq>
       </result>
@@ -883,8 +884,8 @@
 
    <test-case name="DeepLookup-153">
       <description>Parenthesized Lookup preceded by predicate</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1}[1]??("c")(1.3)</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1}[1] // get("c")(1.3)</test>
       <result>
          <assert-eq>2.0</assert-eq>
       </result>
@@ -892,8 +893,8 @@
 
    <test-case name="DeepLookup-154">
       <description>Wildcard Lookup followed by (mapped) function call</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1}??*!.(1.3)</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1}//* ! .(1.3)</test>
       <result>
          <assert-permutation>1.0, 2.0, 1.0, 1.3</assert-permutation>
       </result>
@@ -901,8 +902,8 @@
 
    <test-case name="DeepLookup-155">
       <description>Lookup by name in a map; name is a keyword</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>map{'or':true(), 'and':true(), 'but':false()} ?? or or 2 = 3</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>map{'or':true(), 'and':true(), 'but':false()} // or or 2 = 3</test>
       <result>
          <assert-true/>
       </result>
@@ -910,26 +911,35 @@
 
    <test-case name="DeepLookup-156">
       <description>Lookup by name in a map; name is a QName</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>map{'xs:decimal':true(), 'xs:integer':true(), 'xs:polygon':false()} ?? xs:integer</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>map{#xs:decimal :true(), #xs:integer :true(), #xs:polygon :false()} // xs:integer   =!> jnode-value()</test>
       <result>
-         <error code="XPST0003"/>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="DeepLookup-156a">
+      <description>Lookup by name in a map; name is a QName</description>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>map{#xs:decimal :true(), #xs:integer :true(), #xs:polygon :false()} // get(#xs:integer)   =!> jnode-value()</test>
+      <result>
+         <assert-true/>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-157">
       <description>Lookup by name in a map; name is an EQName</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>map{'decimal':true(), 'integer':true(), 'polygon':false()} ?? Q{}integer</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>map{'decimal':true(), 'integer':true(), 'polygon':false()} // Q{}integer</test>
       <result>
-         <error code="XPST0003"/>
+         <assert-empty/>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-158">
       <description>Double lookup into an array of maps</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>[map{'decimal':true(), 'integer':true(), 'polygon':false()}, map{}] ??1??decimal</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>[map{'decimal':true(), 'integer':true(), 'polygon':false()}, map{}] // *[1] //decimal =!> jnode-value()</test>
       <result>
          <assert-true/>
       </result>
@@ -937,8 +947,8 @@
 
    <test-case name="DeepLookup-159">
       <description>Double lookup into a map of arrays</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>map{'decimal':true(), 'integer':true(), 'polygon':[11,22,33]}??polygon??2</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>map{'decimal':true(), 'integer':true(), 'polygon':[11,22,33]} // polygon // get(2) =!> jnode-value()</test>
       <result>
          <assert-eq>22</assert-eq>
       </result>
@@ -946,8 +956,8 @@
 
    <test-case name="DeepLookup-160">
       <description>Process all values in a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>some $x in map{'decimal':true(), 'integer':true(), 'polygon':false()}??* satisfies $x</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>some $x in map{'decimal':true(), 'integer':true(), 'polygon':false()}//* satisfies jnode-value($x)</test>
       <result>
          <assert-true/>
       </result>
@@ -955,8 +965,8 @@
 
    <test-case name="DeepLookup-161">
       <description>Process all values in a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>count(map{'decimal':true(), 'integer':true(), 'polygon':false()}??*[.])</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>count(map{'decimal':true(), 'integer':true(), 'polygon':false()} //* [jnode-value(.)])</test>
       <result>
          <assert-eq>2</assert-eq>
       </result>
@@ -964,8 +974,8 @@
 
    <test-case name="DeepLookup-162">
       <description>Process all values in a map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>max(map{'decimal':12, 'integer':18, 'polygon':-4}??*)</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>max(map{'decimal':12, 'integer':18, 'polygon':-4}//*)</test>
       <result>
          <assert-eq>18</assert-eq>
       </result>
@@ -973,8 +983,8 @@
 
    <test-case name="DeepLookup-163">
       <description>Decimal literal not allowed for maps</description>
-      <created by="Debbie Lockett" on="2023-11-26"/>
-      <test>(map{1.1:1, 2.2:2, 3.3:3},  map{1.1:2, 2.2:3, 3.3:4})??2.2 </test>
+      <created by="Debbie Lockett" on="2025-07-15"/>
+      <test>(map{1.1:1, 2.2:2, 3.3:3},  map{1.1:2, 2.2:3, 3.3:4}) // 2.2 </test>
       <result>
          <error code="XPST0003"/>
       </result>
@@ -982,44 +992,44 @@
 
    <test-case name="DeepLookup-164">
       <description>Decimal literal allowed in parentheses for maps</description>
-      <created by="Debbie Lockett" on="2023-11-26"/>
-      <test>(map{1.1:1, 2.2:2, 3.3:3},  map{1.1:2, 2.2:3, 3.3:4})??(2.2) </test>
+      <created by="Debbie Lockett" on="2025-07-15"/>
+      <test>(map{1.1:1, 2.2:2, 3.3:3},  map{1.1:2, 2.2:3, 3.3:4}) // get(2.2) </test>
       <result>
          <assert-deep-eq>2, 3</assert-deep-eq>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-165">
-      <description>Ensure that an operator symbol after binary "??" is parsed correctly</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>let $x := map{"div":18} return $x??div</test>
+      <description>Ensure that an operator symbol after binary "//" is parsed correctly</description>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>let $x := map{"div":18} return $x // div</test>
       <result>
          <assert-eq>18</assert-eq>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-166">
-      <description>Ensure that an operator symbol after unary "??" is parsed correctly</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>let $x := map{"else":18} return exists($x[??else = 18])</test>
+      <description>Ensure that an operator symbol after unary "//" is parsed correctly</description>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>let $x := map{"else":18} return exists($x[//else = 18])</test>
       <result>
          <assert-true/>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-167">
-      <description>Ensure that a hyphenated name after binary "??" is parsed correctly</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>let $x := map{"div":81, "div-2":18} return $x??div-2</test>
+      <description>Ensure that a hyphenated name after binary "//" is parsed correctly</description>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>let $x := map{"div":81, "div-2":18} return $x//div-2</test>
       <result>
          <assert-eq>18</assert-eq>
       </result>
    </test-case>
 
    <test-case name="DeepLookup-168">
-      <description>Ensure that a hyphenated name after unary "??" is parsed correctly</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>let $x := map{"else":81, "else-2":18} return exists($x[??else-2 = 18])</test>
+      <description>Ensure that a hyphenated name after unary "//" is parsed correctly</description>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>let $x := map{"else":81, "else-2":18} return exists($x[//else-2 = 18])</test>
       <result>
          <assert-true/>
       </result>
@@ -1027,8 +1037,8 @@
 
    <test-case name="DeepLookup-200">
       <description>Deep Lookup in 2D array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>[[1,2],[3,4]]??1</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>[[1,2],[3,4]]//get(1) =!> jnode-value()</test>
       <result>
          <assert-deep-eq>[1,2],1,3</assert-deep-eq>
       </result>
@@ -1036,8 +1046,8 @@
 
    <test-case name="DeepLookup-201">
       <description>Deep Lookup in 2D array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>[[1,2],[3,4]]??2</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>[[1,2],[3,4]]//get(2) =!> jnode-value()</test>
       <result>
          <assert-deep-eq>2,[3,4],4</assert-deep-eq>
       </result>
@@ -1045,8 +1055,8 @@
 
    <test-case name="DeepLookup-202">
       <description>Deep Lookup in 2D array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>[[1,2,3],[4,5,6]]??3</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>[[1,2,3],[4,5,6]]//get(3) =!> jnode-value()</test>
       <result>
          <assert-deep-eq>3,6</assert-deep-eq>
       </result>
@@ -1054,8 +1064,8 @@
 
    <test-case name="DeepLookup-203">
       <description>Deep Lookup in 2D array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>[[1,2,3],[4,5,6],7]??3</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>[[1,2,3],[4,5,6],7] // get(3) =!> jnode-value()</test>
       <result>
          <assert-deep-eq>3,6,7</assert-deep-eq>
       </result>
@@ -1063,8 +1073,8 @@
 
    <test-case name="DeepLookup-204">
       <description>Deep Lookup in 2D array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>[[1,2,3],[4,5,6],7,8]??2</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>[[1,2,3],[4,5,6],7,8] // get(2) =!> jnode-value()</test>
       <result>
          <assert-deep-eq>2,[4,5,6],5</assert-deep-eq>
       </result>
@@ -1072,8 +1082,8 @@
 
    <test-case name="DeepLookup-205">
       <description>Deep Lookup in 2D array</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>[[(),2,3],[(),5,6],7,8]??2</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>[[(),2,3],[(),5,6],7,8] // get(2)</test>
       <result>
          <assert-deep-eq>2,[(),5,6],5</assert-deep-eq>
       </result>
@@ -1081,8 +1091,8 @@
 
    <test-case name="DeepLookup-206">
       <description>Deep Lookup in 2D map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1}}??(true())</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1}} // get(true()) =!> jnode-value()</test>
       <result>
          <assert-permutation>0,1</assert-permutation>
       </result>
@@ -1090,8 +1100,8 @@
 
    <test-case name="DeepLookup-207">
       <description>Deep Lookup in 2D map</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1},'z':3,true():77}??(true())</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1},'z':3,true():77}// get(true()) =!> jnode-value()</test>
       <result>
          <assert-permutation>0,1,77</assert-permutation>
       </result>
@@ -1099,8 +1109,8 @@
 
    <test-case name="DeepLookup-208">
       <description>Deep Lookup in mixed maps and arrays</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>[map{1:'x',2:'y'},['p','q']]??1</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>[map{1:'x',2:'y'},['p','q']]// get(1) =!> jnode-value()</test>
       <result>
          <assert-permutation>map{1:'x',2:'y'},'x','p'</assert-permutation>
       </result>
@@ -1108,8 +1118,8 @@
 
    <test-case name="DeepLookup-209">
       <description>Deep Lookup, wildcard, in mixed maps and arrays</description>
-      <created by="Michael Kay" on="2023-11-26"/>
-      <test>[map{1:'x',2:'y'},['p','q']]??*</test>
+      <created by="Michael Kay" on="2025-07-15"/>
+      <test>[map{1:'x',2:'y'},['p','q']] // * =!> jnode-value()</test>
       <result>
          <assert-permutation>map{1:'x',2:'y'},['p','q'],'x','y','p','q'</assert-permutation>
       </result>
@@ -1117,7 +1127,7 @@
 
    <!--<test-case name="DeepLookup-210">
       <description>Deep Lookup, type-qualified wildcard, in mixed maps and arrays</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <test>[map{1:'x',2:'y'},['p','q']]??*::xs:string</test>
       <result>
          <assert-permutation>'x','y','p','q'</assert-permutation>
@@ -1126,7 +1136,7 @@
 -->
    <!--<test-case name="DeepLookup-211">
       <description>Deep Lookup, type-qualified wildcard, in mixed maps and arrays</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <test>[map{1:'x',2:'y'},['p','q']]??*::map(*)</test>
       <result>
          <assert-deep-eq>map{1:'x',2:'y'}</assert-deep-eq>
@@ -1135,7 +1145,7 @@
 
    <!--<test-case name="DeepLookup-212">
       <description>Deep Lookup, type-qualified wildcard, in mixed maps and arrays</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <test>[map{1:'x',2:'y'},['p','q']]??*::array(*)</test>
       <result>
          <assert-deep-eq>['p','q']</assert-deep-eq>
@@ -1144,9 +1154,9 @@
 
    <test-case name="DeepLookup-300">
       <description>Example from JSONPath spec: the authors of all books in the store</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <environment ref="jsonpath"/>
-      <test>$m?store?book?*?author</test>
+      <test>$m/store/book/*/author  =!> jnode-value()</test>
       <result>
          <assert-deep-eq>"Nigel Rees",
             "Evelyn Waugh",
@@ -1157,9 +1167,9 @@
    
    <test-case name="DeepLookup-301">
       <description>Example from JSONPath spec: all authors</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <environment ref="jsonpath"/>
-      <test>$m??author</test>
+      <test>$m // author =!> jnode-value()</test>
       <result>
          <assert-deep-eq>"Nigel Rees",
             "Evelyn Waugh",
@@ -1171,10 +1181,10 @@
    <test-case name="DeepLookup-302">
       <description>Example from JSONPath spec: all things in store, which are some
          books and a red bicycle</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Michael Kay" on="2024-09-06" change="allow different order of results"/>
       <environment ref="jsonpath"/>
-      <test>$m?store?*</test>
+      <test>$m/store/* =!> jnode-value() </test>
       <result>
          <any-of>
             <all-of>
@@ -1195,9 +1205,9 @@
    
    <test-case name="DeepLookup-303">
       <description>Example from JSONPath spec: all prices</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <environment ref="jsonpath"/>
-      <test>$m?store??price</test>
+      <test>$m?store//price=!> jnode-value() </test>
       <result>
          <any-of>
             <assert-deep-eq>8.95e0, 12.99e0, 8.99e0, 22.99e0, 399e0</assert-deep-eq>
@@ -1208,9 +1218,9 @@
    
    <test-case name="DeepLookup-304">
       <description>Example from JSONPath spec: the third book</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <environment ref="jsonpath"/>
-      <test>$m??book?3</test>
+      <test>$m//book/*[3] =!> jnode-value()</test>
       <result>
          <assert-deep-eq>map{"author":"Herman Melville","price":8.99e0,"isbn":"0-553-21311-3","category":"fiction","title":"Moby Dick"}</assert-deep-eq>
       </result>
@@ -1218,9 +1228,9 @@
    
    <test-case name="DeepLookup-305">
       <description>Example from JSONPath spec: the third book's author</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <environment ref="jsonpath"/>
-      <test>$m??book?3?author</test>
+      <test>$m//book/get(3)/author =!> jnode-value()</test>
       <result>
          <assert-eq>"Herman Melville"</assert-eq>
       </result>
@@ -1229,9 +1239,9 @@
    <test-case name="DeepLookup-306">
       <description>Example from JSONPath spec: empty result: the third book does not
          have a "publisher" member</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <environment ref="jsonpath"/>
-      <test>$m??book?3?publisher</test>
+      <test>$m//book/get(3)/publisher =!> jnode-value()</test>
       <result>
          <assert-empty/>
       </result>
@@ -1239,9 +1249,9 @@
    
    <test-case name="DeepLookup-307">
       <description>Example from JSONPath spec: the last book</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <environment ref="jsonpath"/>
-      <test>$m??book => array:foot()</test>
+      <test>$m // book =!> array:foot()</test>
       <result>
          <assert-deep-eq>map{"author":"J. R. R. Tolkien","price":2.299e1,"isbn":"0-395-19395-8","category":"fiction","title":"The Lord of the Rings"}</assert-deep-eq>
       </result>
@@ -1249,9 +1259,9 @@
    
    <test-case name="DeepLookup-308">
       <description>Example from JSONPath spec: the first two books</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <environment ref="jsonpath"/>
-      <test>$m??book?(1,2)</test>
+      <test>$m // book / get(1,2) =!> jnode-value()</test>
       <result>
          <assert-deep-eq>
             map{"author":"Nigel Rees","price":8.95e0,"category":"reference","title":"Sayings of the Century"},
@@ -1262,9 +1272,9 @@
    
    <test-case name="DeepLookup-309">
       <description>Example from JSONPath spec: all books with an ISBN number</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <environment ref="jsonpath"/>
-      <test>$m??book?*[?isbn]</test>
+      <test>$m // book / * [isbn] =!> jnode-value()</test>
       <result>
          <assert-deep-eq>
             map{"author":"Herman Melville","price":8.99e0,"isbn":"0-553-21311-3","category":"fiction","title":"Moby Dick"},
@@ -1275,9 +1285,9 @@
    
    <test-case name="DeepLookup-310">
       <description>Example from JSONPath spec:  all books cheaper than 10</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <environment ref="jsonpath"/>
-      <test>$m??book?*[?price lt 10]</test>
+      <test>$m // book / * [price lt 10] =!> jnode-value()</test>
       <result>
          <assert-deep-eq>
             map{"author":"Nigel Rees","price":8.95e0,"category":"reference","title":"Sayings of the Century"},
@@ -1289,10 +1299,10 @@
    <test-case name="DeepLookup-311" covers-40="PR1132">
       <description>Example from JSONPath spec:  all member values and array elements
          contained in the input value</description>
-      <created by="Michael Kay" on="2023-11-26"/>
+      <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <environment ref="jsonpath"/>
-      <test>$m??*[. instance of (xs:string | xs:double)]</test>
+      <test>$m // type(xs:string | xs:double)]</test>
       <result>
          <assert-permutation>
             "red",
