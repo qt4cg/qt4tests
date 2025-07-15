@@ -108,7 +108,7 @@
    <test-case name="fn-sort-by-11">
       <description>length 3, duplicates</description>
       <created by="Liam R E Quin" on="2015-01-18"/>
-      <test>let $r := fn:sort-by( (4, 4, 4), () ) return (count($r) eq 3 and $r[1] eq 4 and $r[2] eq 4 and
+      <test>let $r := fn:sort-by( (4, 4, 4), ()  ) return (count($r) eq 3 and $r[1] eq 4 and $r[2] eq 4 and
          $r[3] eq 4)</test>
       <result>
          <assert-true/>
@@ -118,7 +118,7 @@
    <test-case name="fn-sort-by-12">
       <description>length 3, descending</description>
       <created by="Liam R E Quin" on="2015-01-18"/>
-      <test>let $r := fn:sort-by( (17, 14, 5), () ) return (count($r) eq 3 and $r[1] eq 5 and $r[2] eq 14
+      <test>let $r := fn:sort-by( (17, 14, 5), ()  ) return (count($r) eq 3 and $r[1] eq 5 and $r[2] eq 14
          and $r[3] eq 17)</test>
       <result>
          <assert-true/>
@@ -138,14 +138,16 @@
    <test-case name="fn-sort-by-14">
       <description>One-argument sort-by where input is not simple </description>
       <created by="Josh Spiegel" on="2015-08-10"/>
+      <modified by="Debbie Lockett" on="2015-08-12" change="Added XQuery dependency"/>
+      <dependency type="spec" value="XQ31+"/>
       <test><![CDATA[
         <turtles>
           <name>Leonardo</name>
           <name>Raphael</name>
           <name>Donatello</name>
           <name>Michelangelo</name>
-        </turtles>  
-        !sort-by(*, ())!data()
+        </turtles>
+        !sort-by(*, () )!data()
       ]]></test>
       <result>
          <assert-deep-eq><![CDATA["Donatello", "Leonardo", "Michelangelo", "Raphael"]]></assert-deep-eq>
@@ -155,6 +157,9 @@
    <test-case name="fn-sort-by-15">
       <description>One-argument sort-by where input is not simple </description>
       <created by="Josh Spiegel" on="2015-08-10"/>
+      <modified by="Debbie Lockett" on="2015-08-12"
+         change="Added XQuery dependency, move deep-equal into test"/>
+      <dependency type="spec" value="XQ31+"/>
       <test><![CDATA[
          deep-equal(
             sort-by(
@@ -164,7 +169,7 @@
                 [<g>a</g>, <g>b</g>],
                 "A",
                 <h><i><j>A</j></i></h>   
-              ), ()
+              ), () 
             )
             ,(
                 "A",
@@ -183,8 +188,11 @@
    <test-case name="fn-sort-by-16">
       <description>One-argument sort-by where input is a mix of simple and complex</description>
       <created by="Josh Spiegel" on="2015-08-10"/>
+      <modified by="Debbie Lockett" on="2015-08-12"
+         change="Added XQuery dependency, move deep-equal into test"/>
+      <dependency type="spec" value="XQ31+"/>
       <test><![CDATA[deep-equal(
-         sort-by(("b", "d", <e>a</e>, "c", <f>e</f>), ())
+         sort-by(("b", "d", <e>a</e>, "c", <f>e</f>), () )
          ,(<e>a</e>, "b", "c", "d", <f>e</f>)
          )
          ]]></test>
@@ -196,11 +204,14 @@
    <test-case name="fn-sort-by-17">
       <description>sort-by NaN values. Result may depend on the outcome of bug 29044</description>
       <created by="Josh Spiegel" on="2015-08-10"/>
+      <modified by="Debbie Lockett" on="2015-08-12"
+         change="Edit test to use XPath let expression syntax"/>
+      <modified by="Michael Kay" on="2015-11-27" change="Avoid HOF dependency in assertion"/>
       <test><![CDATA[
           let $a := [xs:float("NaN"), 1],     
           $b := [xs:float("NaN"), 2]
           return     
-             sort-by(($a,$b,$a,$b), ())
+             sort-by(($a,$b,$a,$b), () )
         ]]></test>
       <result>
          <all-of>
@@ -214,7 +225,7 @@
    <test-case name="fn-sort-by-18">
       <description>sort-by values with unequal key lengths</description>
       <created by="Tim MIlls" on="2016-07-07"/>
-      <test>fn:sort-by( (1, [1, 2]), () )</test>
+      <test>fn:sort-by( (1, [1, 2]), ()  )</test>
       <result>
          <assert-deep-eq>(1, [1, 2])</assert-deep-eq>
       </result>
@@ -223,7 +234,7 @@
    <test-case name="fn-sort-by-19">
       <description>sort-by values with unequal key lengths</description>
       <created by="Tim MIlls" on="2016-07-07"/>
-      <test>fn:sort-by( ([1, 2], 1), () )</test>
+      <test>fn:sort-by( ([1, 2], 1), ()  )</test>
       <result>
          <assert-deep-eq>(1, [1, 2])</assert-deep-eq>
       </result>
@@ -232,7 +243,7 @@
    <test-case name="fn-sort-by-20">
       <description>sort-by values with unequal key lengths</description>
       <created by="Tim MIlls" on="2016-07-07"/>
-      <test>fn:sort-by( ([()], 1), () )</test>
+      <test>fn:sort-by( ([()], 1), ()  )</test>
       <result>
          <assert-deep-eq>([()], 1)</assert-deep-eq>
       </result>
@@ -241,7 +252,7 @@
    <test-case name="fn-sort-by-21">
       <description>sort-by values with unequal key lengths</description>
       <created by="Tim MIlls" on="2016-07-07"/>
-      <test>fn:sort-by( (1, [()]), () )</test>
+      <test>fn:sort-by( (1, [()]), ()  )</test>
       <result>
          <assert-deep-eq>([()], 1)</assert-deep-eq>
       </result>
@@ -284,7 +295,7 @@
                         xs:decimal('1.00000000001'),
                         xs:double( '1.0000000000100000000001')),
          $more := ($input, reverse($input), $input),               
-         $sorted := sort-by($more, ())
+         $sorted := sort-by($more, () )
          return empty(for $i in 1 to count($sorted), $j in $i+1 to count($sorted) 
                       return 'x'[$sorted[$i] gt $sorted[$j]])
          ]]></test>
@@ -325,7 +336,7 @@
       <description>numeric but not all integers</description>
       <created by="Liam R E Quin" on="2015-01-18"/>
       <modified by="Christian Gruen" on="2015-01-27" change="comparison values fixed"/>
-      <test>let $r := fn:sort-by( (-4.2, 14.25, 5.99, 6, 14.24, 0), () ) return (count($r) eq 6 and $r[1]
+      <test>let $r := fn:sort-by( (-4.2, 14.25, 5.99, 6, 14.24, 0), ()  ) return (count($r) eq 6 and $r[1]
          eq -4.2 and $r[2] eq 0 and $r[3] eq 5.99 and $r[4] eq 6 and $r[5] eq 14.24 and $r[6] eq
          14.25) </test>
       <result>
@@ -337,7 +348,7 @@
    <test-case name="fn-sort-by-str-1">
       <description>Simple sequence of strings</description>
       <created by="Liam R E Quin" on="2015-01-08"/>
-      <test>let $r := fn:sort-by( ("boy","for","new","chosen","black","pope"), () ) return (count($r) eq 6
+      <test>let $r := fn:sort-by( ("boy","for","new","chosen","black","pope"), ()  ) return (count($r) eq 6
          and $r[1] eq "black" and $r[2] eq "boy" and $r[3] eq "chosen" and $r[4] eq "for" and $r[5]
          eq "new" and $r[6] eq "pope" ) </test>
       <result>
@@ -545,7 +556,7 @@
       <dependency type="spec" value="XQ31+"/>
       <test><![CDATA[
          declare default collation "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
-         fn:sort-by(("Red", "green", "blUE", "PINK", "ORanGE"), ())
+         fn:sort-by(("Red", "green", "blUE", "PINK", "ORanGE"), () )
      ]]></test>
       <result>
          <assert-deep-eq>"blUE", "green", "ORanGE", "PINK", "Red"</assert-deep-eq>
