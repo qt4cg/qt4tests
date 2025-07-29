@@ -16,7 +16,7 @@
       </result>
    </test-case>
    
-   <test-case name="fn-op-002">
+   <test-case name="fn-op-002" covers-40="PR2130">
       <description>Test that all permitted operators work.</description>
       <created by="Michael Kay" on="2022-09-30"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
@@ -24,7 +24,7 @@
          "+", "-", "*", "div", "idiv", "mod",
          "=", "<", "<=", ">", ">=", "!=",
          "eq", "lt", "le", "gt", "ge", "ne",
-         "<<", ">>", "is", "||", "|",
+         "<<", ">>", "is", "is-not", "precedes", "follows", "||", "|",
          "union", "except", "intersect", "to",
          "otherwise") satisfies function-arity(op($s)) = 2]]></test>
       <result>
@@ -42,7 +42,7 @@
       </result>
    </test-case>
    
-   <test-case name="fn-op-004">
+   <test-case name="fn-op-004" covers-40="PR2130">
       <description>All permitted operators accept an empty sequence.</description>
       <created by="Michael Kay" on="2022-09-30"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
@@ -50,7 +50,7 @@
          "+", "-", "*", "div", "idiv", "mod",
          "=", "<", "<=", ">", ">=", "!=",
          "eq", "lt", "le", "gt", "ge", "ne",
-         "<<", ">>", "is", "||", "|",
+         "<<", ">>", "is", "is-not", "precedes", "follows", "||", "|",
          "union", "except", "intersect", "to",
          "otherwise") satisfies not(op($s)((),()))]]></test>
       <result>
@@ -98,7 +98,7 @@
       </result>
    </test-case>
    
-   <test-case name="fn-op-009">
+   <test-case name="fn-op-009" covers-40="PR2130">
       <description>Repeated partial application of the result.</description>
       <created by="Michael Kay" on="2022-09-30"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
@@ -106,7 +106,7 @@
          "+", "-", "*", "div", "idiv", "mod",
          "=", "<", "<=", ">", ">=", "!=",
          "eq", "lt", "le", "gt", "ge", "ne",
-         "<<", ">>", "is", "||", "|",
+         "<<", ">>", "is", "is-not", "precedes", "follows", "||", "|",
          "union", "except", "intersect", "to",
          "otherwise") 
          return let $f := op($s)((), ?) return ((() => $f() => $f() => $f()) ! not(.)))]]></test>
@@ -369,6 +369,25 @@
       </test>
       <result>
          <error code="XPTY0004"/>       
+      </result>
+   </test-case>
+   
+   <test-case name="fn-op-node-003" covers-40="PR2130">
+      <description>Node comparisons</description>
+      <created by="Michael Kay" on="2025-07-29"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $in := parse-xml('<doc><a/><b/><c/></doc>') return
+         for $s in ("is-not", "follows", "precedes")
+         return array{for-each-pair($in//doc/*, replicate($in//doc/b, 3), op($s))}
+         ]]>
+      </test>
+      <result>
+         <assert-deep-eq>
+            [true(), true(), false()],
+            [true(), false(), true()],
+            [false(), false(), false()]
+         </assert-deep-eq>       
       </result>
    </test-case>
    
