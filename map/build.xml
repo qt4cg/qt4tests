@@ -664,6 +664,36 @@
         </result>
     </test-case>
     
+    <test-case name="map-build-223" covers-40="PR1174">
+        <description>See spec issue 1978</description>
+        <created by="Michael Kay" on="2024-06-26"/>
+        <test>
+            let $input := ("apple", "apricot", "banana", "blueberry", "cherry")
+            return map:build(
+                    distinct-values($input =!> characters()), 
+                    identity#1, 
+                    fn($char){$input[duplicate-values(characters(.)) = $char]}
+            )
+        </test>
+        <result>
+            <assert-deep-eq> map{
+  "a":  "banana",
+  "b": "blueberry",
+  "c": (),
+  "e": "blueberry",
+  "h": (),
+  "i": (),
+  "l": (), (: Lowercase L :)
+  "n": "banana",
+  "o": (),
+  "p": "apple",
+  "r": ("blueberry", "cherry"),
+  "t": (),
+  "y": ()
+}</assert-deep-eq>
+        </result>
+    </test-case>
+    
  
 
 </test-set>
