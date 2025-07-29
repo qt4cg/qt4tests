@@ -2556,7 +2556,7 @@
       <description> Deconstruct sequence. </description>
       <created by="Michael Kay" on="2025-06-29"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
-      <test>let $( $x as xs:integer, $y as xs:string, $z as xs:date ):= (1,"two") return ($x, $y)</test>
+      <test>let $( $x as xs:integer, $y as xs:string, $z as xs:date ):= (1,"two") return ($x, $y, $z)</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -2566,7 +2566,7 @@
       <description> Deconstruct sequence. </description>
       <created by="Michael Kay" on="2025-06-29"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
-      <test>let $( $x as xs:integer, $y as xs:string, $z as xs:date? ):= (1,"two") return ($x, $y)</test>
+      <test>let $( $x as xs:integer, $y as xs:string, $z as xs:date? ):= (1,"two") return ($x, $y, $z)</test>
       <result>
          <assert-deep-eq>1, "two"</assert-deep-eq>
       </result>
@@ -2591,7 +2591,32 @@
          <assert-eq>"x=3 4 5 y= z="</assert-eq>
       </result>
    </test-case>
+
+   <test-case name="let-seq-019" covers-40="PR2055">
+      <description> Deconstruct sequence. Check local variable goes out of scope</description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $( $x, $y, $z ) := [3, 4, 5] return `x={$x} y={$y} z={$z}`, $x</test>
+      <result>
+         <error code="XPST0008"/>
+      </result>
+   </test-case>
    
+   <test-case name="let-seq-020" covers-40="PR2055">
+      <description> Deconstruct sequence. Check local variable is in scope for the rest of the FLWOR</description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+            for member $m in [(1,2,3), (4,5,6), (7,8,9)]
+            let $( $x, $y, $z ) := $m
+            where $y eq 5 
+            return `x={$x} y={$y} z={$z}`</test>
+      <result>
+         <assert-eq>"x=4 y=5 z=6"</assert-eq>
+      </result>
+   </test-case>
+   
+
    <test-case name="let-arr-001" covers-40="PR2055">
       <description> Deconstruct array. </description>
       <created by="Michael Kay" on="2025-06-29"/>
@@ -2753,7 +2778,7 @@
       <description> Deconstruct array. </description>
       <created by="Michael Kay" on="2025-06-29"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
-      <test>let $[ $x as xs:integer, $y as xs:string, $z as xs:date? ]:= [1,"two"] return ($x, $y)</test>
+      <test>let $[ $x as xs:integer, $y as xs:string, $z as xs:date? ]:= [1,"two"] return ($x, $y, $z)</test>
       <result>
          <assert-deep-eq>1, "two"</assert-deep-eq>
       </result>
@@ -2809,6 +2834,18 @@
       </result>
    </test-case>
    
+
+   <test-case name="let-arr-022" covers-40="PR2055">
+      <description> Deconstruct array. Check local variable goes out of scope</description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[ $x, $y, $z ] := [3, 4, 5] return `x={$x} y={$y} z={$z}`, $x</test>
+      <result>
+         <error code="XPST0008"/>
+      </result>
+   </test-case>
+   
+
    <test-case name="let-map-001" covers-40="PR2055">
       <description> Deconstruct map. </description>
       <created by="Michael Kay" on="2025-06-29"/>
@@ -2959,7 +2996,7 @@
       <description> Deconstruct map. </description>
       <created by="Michael Kay" on="2025-06-29"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
-      <test>let ${ $x as xs:integer, $y as xs:string, $z as xs:date }:= {'x':1,'y':'two'} return ($x, $y)</test>
+      <test>let ${ $x as xs:integer, $y as xs:string, $z as xs:date }:= {'x':1,'y':'two'} return ($x, $y, $z)</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -2969,7 +3006,7 @@
       <description> Deconstruct map. </description>
       <created by="Michael Kay" on="2025-06-29"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
-      <test>let ${ $x as xs:integer, $y as xs:string, $z as xs:date? }:= {'x':1,'y':'two'} return ($x, $y)</test>
+      <test>let ${ $x as xs:integer, $y as xs:string, $z as xs:date? }:= {'x':1,'y':'two'} return ($x, $y, $z)</test>
       <result>
          <assert-deep-eq>1, "two"</assert-deep-eq>
       </result>
@@ -3036,7 +3073,17 @@
          <assert-deep-eq>"x=3", "y=4", "z=5"</assert-deep-eq>
       </result>
    </test-case>
-   
+
+   <test-case name="let-map-023" covers-40="PR2055">
+      <description> Deconstruct map. Check local variable goes out of scope</description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x, $y, $z } as map(*)? := {'x':3, 'y':4, 'z':5} return `x={$x} y={$y} z={$z}`, $x</test>
+      <result>
+         <error code="XPST0008"/>
+      </result>
+   </test-case>
+
    
 
 </test-set>
