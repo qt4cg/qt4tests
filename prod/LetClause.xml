@@ -2416,13 +2416,13 @@
       </result>
    </test-case>
    
-   <test-case name="let-seq-002" covers-40="PR2055">
+   <test-case name="let-seq-002" covers-40="PR2055 PR2080">
       <description> Deconstruct sequence. </description>
       <created by="Michael Kay" on="2025-06-29"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
-      <test>let $($x, $y) := (1,2,3) return ($x, $y)</test>
+      <test>let $($x, $y) := (1,2,3) return [ $x, $y ]</test>
       <result>
-         <assert-deep-eq>1, 2</assert-deep-eq>
+         <assert-deep-eq>[1, (2, 3) ]</assert-deep-eq>
       </result>
    </test-case>
    
@@ -2486,13 +2486,13 @@
       </result>
    </test-case>
    
-   <test-case name="let-seq-009" covers-40="PR2055">
+   <test-case name="let-seq-009" covers-40="PR2055 PR2080">
       <description> Deconstruct sequence. </description>
       <created by="Michael Kay" on="2025-06-29"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
-      <test>let $($x) := 1 to 10 return $x</test>
+      <test>let $($x) := 1 to 3 return $x</test>
       <result>
-         <assert-eq>1</assert-eq>
+         <assert-deep-eq>1, 2, 3</assert-deep-eq>
       </result>
    </test-case>
    
@@ -2637,13 +2637,13 @@
       </result>
    </test-case>
    
-   <test-case name="let-arr-003" covers-40="PR2055">
+   <test-case name="let-arr-003" covers-40="PR2055 PR2080">
       <description> Deconstruct array. </description>
       <created by="Michael Kay" on="2025-06-29"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
       <test>let $[$x, $y] := [1] return ($x, $y)</test>
       <result>
-         <assert-eq>1</assert-eq>
+         <error code="FOAY0001"/>
       </result>
    </test-case>
    
@@ -2768,19 +2768,38 @@
       <created by="Michael Kay" on="2025-06-29"/>
       <modified by="Gunther Rademacher" on="2025-07-02" change="avoid skipping of type check by having $z contribute to the result"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
-      <test>let $[ $x as xs:integer, $y as xs:string, $z as xs:date ]:= [1,"two"] return ($x, $y, $z)</test>
+      <test>let $[ $x as xs:integer, $y as xs:date ]:= [1,"two"] return ($x, $y)</test>
       <result>
          <error code="XPTY0004"/>
       </result>
    </test-case>
    
-   <test-case name="let-arr-016" covers-40="PR2055">
+   <test-case name="let-arr-015a" covers-40="PR2055 PR2080">
+      <description> Deconstruct array. </description>
+      <created by="Christian Gruen" on="2025-07-31"/>
+      <test>let $[ $x as xs:integer, $y as xs:string, $z as xs:date ]:= [1,"two"] return ($x, $y, $z)</test>
+      <result>
+         <error code="FOAY0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-016" covers-40="PR2055 PR2080">
+      <description> Deconstruct array. </description>
+      <created by="Michael Kay" on="2025-06-29"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let $[ $x as xs:integer, $y as xs:date? ]:= [1,()] return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="let-arr-016a" covers-40="PR2055 PR2080">
       <description> Deconstruct array. </description>
       <created by="Michael Kay" on="2025-06-29"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
       <test>let $[ $x as xs:integer, $y as xs:string, $z as xs:date? ]:= [1,"two"] return ($x, $y, $z)</test>
       <result>
-         <assert-deep-eq>1, "two"</assert-deep-eq>
+         <error code="FOAY0001"/>
       </result>
    </test-case>
    
