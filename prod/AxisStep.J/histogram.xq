@@ -2,7 +2,7 @@
 xquery version "4.0";
 module namespace ax="http://www.w3.org/TestModules/AxisStepJ/Histogram";
 
-declare function ax:histogram($origin as jnode-type()) as map(xs:string, xs:integer) {
+declare function ax:histogram($origin as jnode()) as map(xs:string, xs:integer) {
   map {
     "ancestor": count($origin/ancestor::*),
     "ancestor-or-self": count($origin/ancestor-or-self::*),
