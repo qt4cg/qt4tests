@@ -45,6 +45,102 @@
        }
      }&apos;)'/>        
    </environment>
+   
+   <environment name="books">
+      <param name="in" select='parse-json(&apos;
+{ "books":
+   [
+     { "Title": "Der Steppenwolf",
+       "Author": "Hermann Hesse", 
+       "Language": "German",
+       "Category": "Fiction",
+       "Format": "Perfect Paperback",
+       "Price": {"GBP": 11.50},
+       "Publication Date": "1981-08-01",
+       "Dimensions": [10.8, 1.91, 17.15],
+       "ISBN-13": "978-3518366752"
+     },
+     { "Title": "Steppenwolf",
+       "Author": "Hermann Hesse",
+       "Translator": ["Walter Sorell", "Basil Creighton"],
+       "Language": "English",
+       "Category": "Fiction",
+       "Publisher": "Penguin Essentials",
+       "Format": "Paperback",
+       "Publication Date": "2011-04-07",
+       "Price": {"GBP": 7.40},
+       "Note": "out of print",
+       "Pages": 256,
+       "Dimensions": [11.3, 1.6, 18.1],
+       "ISBN-13": "978-0141192093"
+     },
+     { "Title": "Steppenwolf",
+       "Author": "Hermann Hesse",
+       "Translator": "David Horrocks",
+       "Language": "English",
+       "Category": "Fiction",
+       "Publisher": "Penguin Modern Classics",
+       "Format": "Paperback",
+       "Publication Date": "2011-04-07",
+       "Price": {"GBP": 12.00},
+       "Note": "out of print",
+       "Dimensions": [12.1, 9.6, 1.0],
+       "ISBN-13": "978-0241951521"
+     },
+     { "Title": "The Glass Bead Game",
+       "Author": "Hermann Hesse",
+       "Translator": ["Clara Winston", "Richard Winston"],
+       "Language": "English",
+       "Category": "Fiction",
+       "Publisher": "Vintage Classics",
+       "Format": "Paperback",
+       "Publication Date": "2000-07-06",
+       "Price": {"GBP": 9.96},
+       "Pages": 544,
+       "Dimensions": [12.8, 3.3, 19.7],
+       "ISBN-13": "978-0099283621"
+     },
+     { "Title": "The Glass Bead Game: (Magister Ludi)",
+       "Author": "Hermann Hesse",
+       "Translator": ["Clara Winston", "Richard Winston"],
+       "Language": "English",
+       "Category": "Fiction",
+       "Publisher": "Picador",
+       "Format": "Paperback",
+       "Publication Date": "2002-12-06",
+       "Price": {"GBP": 20.72},
+       "Pages": 576,
+       "Dimensions": [12.8, 3.3, 19.7],
+       "ISBN-13": "978-0312278496"
+     },
+     { "Title": "Das Glasperlenspiel",
+       "Author": "Hesse, H.",
+       "Language": "German",
+       "Category": "Fiction",
+       "Publisher": "Suhrkamp Verlag",
+       "Format": "Soft Cover",
+       "Publication Date": "1981",
+       "Condition": "Used: very good",
+       "Price": {"GBP": 5.75},
+       "ISBN-13": "978-3518365793"
+     }
+   ],
+   "audiobooks": [
+     { "Title": "Steppenwolf",
+       "Author": "Hermann Hesse",
+       "Translator": "Basil Creighton",
+       "Reader": "Peter Weller",
+       "Language": "English",
+       "Category": "Fiction",
+       "Publisher": "BBC Audiobooks America",
+       "Publication Date": "2008-04-15",
+       "Price": {"GBP": 39.11},
+       "Dimensions": [15.11, 2.54, 16.03],
+       "ISBN-13": "978-1602833517"
+     }
+   ]
+}&apos;)'/>        
+   </environment>     
 
    <test-case name="PathExpr-J-001">
       <description>Integer subscript into an array</description>
@@ -186,7 +282,7 @@
    <test-case name="PathExpr-J-015">
       <description>Result of Binary lookup is atomized</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>([1, [2], [3]], [[2], 2, [4]])[ get(1) = 4 ]</test>
+      <test>([1, [2], [3]], [[2], 2, [4]])[ .//get(1) = 4 ]</test>
       <result>
          <assert-deep-eq>[[2], 2, [4]]</assert-deep-eq>
       </result>
@@ -363,7 +459,7 @@
    <test-case name="PathExpr-J-047">
       <description>Multi-step path eliminates duplicates</description>
       <created by="Michael Kay" on="2024-01-06"/>
-      <test>[[["a"],["b"]],[["c"],["d"]]]//get(1)//get(1)</test>
+      <test>[[["a"],["b"]],[["c"],["d"]]]//get(1)//get(1) =!> jnode-content()</test>
       <result>
          <assert-deep-eq>["a"],"a","b","c"</assert-deep-eq>
       </result>
@@ -514,7 +610,7 @@
          ]}
          ]
 
-         return $data//a//get(14)  =!> JNode-value()          
+         return $data//a//get(14)  =!> jnode-content()          
 
       </test>
       <result>
@@ -548,7 +644,7 @@
          return $data//get(1)//get(14)   =!> jnode-content()          
       </test>
       <result>
-         <assert-deep-eq>"lilac", "vanilla", "magnolia", "grey", "lilac", "magnolia", "vermillion", "silver"</assert-deep-eq>
+         <assert-deep-eq>"lilac", "vanilla", "magnolia", "grey", "vermillion", "silver"</assert-deep-eq>
       </result>
    </test-case>
 
@@ -557,7 +653,11 @@
       <created by="Michael Kay" on="2025-07-15"/>
       <test>(['a', 'b'], ['c', 'd'])/get(1)   =!> jnode-content()</test>
       <result>
-         <assert-deep-eq>'a', 'c'</assert-deep-eq>
+         <any-of>
+            <!-- document order of the two top-level arrays is impl-def -->
+            <assert-deep-eq>'a', 'c'</assert-deep-eq>
+            <assert-deep-eq>'c', 'a'</assert-deep-eq>
+         </any-of>        
       </result>
    </test-case>
 
@@ -566,16 +666,24 @@
       <created by="Michael Kay" on="2025-07-15"/>
       <test>let $i := 1 return (['a', 'b'], ['c', 'd']) // get($i)   =!> jnode-content()</test>
       <result>
-         <assert-deep-eq>'a', 'c'</assert-deep-eq>
+         <any-of>
+            <!-- document order of the two top-level arrays is impl-def -->
+            <assert-deep-eq>'a', 'c'</assert-deep-eq>
+            <assert-deep-eq>'c', 'a'</assert-deep-eq>
+         </any-of>
       </result>
    </test-case>
 
    <test-case name="PathExpr-J-103">
       <description>Integer subscript into an array: leading zeroes allowed</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(['a', 'b'], ['c', 'd']) // get(001)</test>
+      <test>(['a', 'b'], ['c', 'd']) // get(001)   =!> jnode-content()</test>
       <result>
-         <assert-deep-eq>'a', 'c'</assert-deep-eq>
+         <!-- document order of the two top-level arrays is impl-def -->
+         <any-of>
+            <assert-deep-eq>'a', 'c'</assert-deep-eq>
+            <assert-deep-eq>'c', 'a'</assert-deep-eq>
+         </any-of>
       </result>
    </test-case>
 
@@ -603,14 +711,18 @@
       <dependency type="spec" value="XP31+ XQ31+"/>
       <test>(['a', 'b'], ['c', 'd'], ['e']) // get(2)   =!> jnode-content()</test>
       <result>
-         <assert-deep-eq>'b', 'd'</assert-deep-eq>
+         <any-of>
+            <!-- document order of the two top-level arrays is impl-def -->
+            <assert-deep-eq>'b', 'd'</assert-deep-eq>
+            <assert-deep-eq>'d', 'b'</assert-deep-eq>
+         </any-of>
       </result>
    </test-case>
 
    <test-case name="PathExpr-J-107">
       <description>Integer subscript into an array: range of subscripts</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']) // get(1 to 2)   =!> jnode-content()</test>
+      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] / * / get(1 to 2)   =!> jnode-content()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'b', 'c', 'e', 'f'</assert-deep-eq>
       </result>
@@ -619,7 +731,7 @@
    <test-case name="PathExpr-J-108">
       <description>Integer subscript into an array: variable range of subscripts</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>let $i := (1, 3) return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])// get($i)   =!> jnode-content()</test>
+      <test>let $i := (1, 3) return [['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] / * / get($i)   =!> jnode-content()</test>
       <result>
          <assert-deep-eq>'a', 'c', 'b', 'd', 'e', 'b'</assert-deep-eq>
       </result>
@@ -677,7 +789,7 @@
       <description>Binary lookup selecting all items of an array</description>
 
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])//*   =!> jnode-content()</test>
+      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]//type(xs:string)   =!> jnode-content()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'c', 'b', 'c', 'd', 'e', 'f', 'b'</assert-deep-eq>
       </result>
@@ -722,7 +834,7 @@
    <test-case name="PathExpr-J-119" covers-40="PR2031">
       <description>Decimal literal now allowed in parentheses (coercion rules turn it into an integer)</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])//get(1.0)   =!> jnode-content()</test>
+      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]/*/get(1.0)   =!> jnode-content()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'e'</assert-deep-eq>
       </result>
@@ -735,7 +847,7 @@
       <dependency type="feature" value="schemaValidation"/>
       <test><![CDATA[
         let $x := (validate type xs:integer {<x>1</x>}, validate type xs:integer {<y>2</y>}) return
-        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']) // ($x)   =!> jnode-content()
+        [['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] / * / get($x)   =!> jnode-content()
       ]]></test>
       <result>
          <assert-deep-eq>'a', 'b', 'b', 'c', 'e', 'f'</assert-deep-eq>
@@ -748,7 +860,7 @@
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         let $x := (<x>1</x>, <y>2</y>) return
-        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']) // get($x!number())   =!> jnode-content()
+        [['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] /*/ get($x!number())   =!> jnode-content()
       ]]></test>
       <result>
          <assert-deep-eq>'a', 'b', 'b', 'c', 'e', 'f'</assert-deep-eq>
@@ -776,7 +888,7 @@
    <test-case name="PathExpr-J-140">
       <description>Lookup by name in a map</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(map{'a':1, 'b':2, 'c':3},  map{'a':2, 'b':3, 'c':4}) // b   =!> jnode-content()</test>
+      <test>[map{'a':1, 'b':2, 'c':3},  map{'a':2, 'b':3, 'c':4}] // b   =!> jnode-content()</test>
       <result>
          <assert-deep-eq>2, 3</assert-deep-eq>
       </result>
@@ -787,7 +899,10 @@
       <created by="Michael Kay" on="2025-07-15"/>
       <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4}) // get(2)   =!> jnode-content()</test>
       <result>
-         <assert-deep-eq>2, 3</assert-deep-eq>
+         <any-of>
+            <assert-deep-eq>2, 3</assert-deep-eq>
+            <assert-deep-eq>3, 2</assert-deep-eq>
+         </any-of>
       </result>
    </test-case>
 
@@ -796,32 +911,26 @@
       <created by="Michael Kay" on="2025-07-15"/>
       <test>(map{1:1, 2:2, 3:3},  map{2:3, 3:4, 4:5}) // get(1 to 2)   =!> jnode-content()</test>
       <result>
-         <assert-deep-eq>1, 2, 3</assert-deep-eq>
+         <any-of>
+            <assert-deep-eq>1, 2, 3</assert-deep-eq>
+            <assert-deep-eq>3, 1, 2</assert-deep-eq>
+         </any-of>        
       </result>
    </test-case>
 
    <test-case name="PathExpr-J-143">
       <description>Lookup by hyphenated name in a map</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(map{'a-1':1, 'b-1':2, 'c-1':3},  map{'a-1':2, 'b-1':3, 'c-1':4}) // c-1   =!> jnode-content()</test>
+      <test>[map{'a-1':1, 'b-1':2, 'c-1':3},  map{'a-1':2, 'b-1':3, 'c-1':4}] // c-1   =!> jnode-content()</test>
       <result>
          <assert-deep-eq>3, 4</assert-deep-eq>
       </result>
    </test-case>
 
-   <!--<test-case name="PathExpr-J-144">
-      <description>Comment appearing after "??"</description>
-      <created by="Michael Kay" on="2025-07-15"/>
-      <test>(map{'a-1':1, 'b-1':2, 'c-1':3},  map{'a-1':2, 'b-1':3, 'c-1':4})?? (:confusing.??:) b-1</test>
-      <result>
-         <assert-deep-eq>2, 3</assert-deep-eq>
-      </result>
-   </test-case>-->
-
    <test-case name="PathExpr-J-145">
       <description>Get all entries in a map</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})//*   =!> jnode-content()</test>
+      <test>[map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4}]// type(xs:integer)   =!> jnode-content()</test>
       <result>
          <assert-deep-eq>1, 2, 3, 2, 3, 4</assert-deep-eq>
       </result>
@@ -866,7 +975,7 @@
    <test-case name="PathExpr-J-150">
       <description>Numeric Lookup followed by function call</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>([floor#1, ceiling#1, round#1, abs#1] // get(2))(1.3)</test>
+      <test>([floor#1, ceiling#1, round#1, abs#1] / get(2))(1.3)</test>
       <result>
          <assert-eq>2.0</assert-eq>
       </result>
@@ -875,7 +984,7 @@
    <test-case name="PathExpr-J-151">
       <description>Name Lookup followed by function call</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1} // c(1.3)</test>
+      <test>jnode-content(map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1} / c) (1.3)</test>
       <result>
          <assert-eq>2.0</assert-eq>
       </result>
@@ -989,21 +1098,15 @@
       </result>
    </test-case>
 
-   <test-case name="PathExpr-J-163">
-      <description>Decimal literal not allowed for maps</description>
-      <created by="Debbie Lockett" on="2025-07-15"/>
-      <test>(map{1.1:1, 2.2:2, 3.3:3},  map{1.1:2, 2.2:3, 3.3:4}) // 2.2 </test>
-      <result>
-         <error code="XPST0003"/>
-      </result>
-   </test-case>
-
    <test-case name="PathExpr-J-164">
       <description>Decimal literal allowed in parentheses for maps</description>
       <created by="Debbie Lockett" on="2025-07-15"/>
-      <test>(map{1.1:1, 2.2:2, 3.3:3},  map{1.1:2, 2.2:3, 3.3:4}) // get(2.2) </test>
+      <test>(map{1.1:1, 2.2:2, 3.3:3},  map{1.1:2, 2.2:3, 3.3:4}) // get(2.2)  =!> jnode-content()</test>
       <result>
-         <assert-deep-eq>2, 3</assert-deep-eq>
+         <any-of>
+            <assert-deep-eq>2, 3</assert-deep-eq>
+            <assert-deep-eq>3, 2</assert-deep-eq>
+         </any-of>
       </result>
    </test-case>
 
@@ -1017,9 +1120,9 @@
    </test-case>
 
    <test-case name="PathExpr-J-166">
-      <description>Ensure that an operator symbol after unary "//" is parsed correctly</description>
+      <description>Ensure that an operator symbol after unary "/" is parsed correctly</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>let $x := map{"else":18} return exists($x[//else = 18])</test>
+      <test>let $x := jtree([map{"else":18}]) return exists($x[/else = 18])</test>
       <result>
          <assert-true/>
       </result>
@@ -1091,7 +1194,7 @@
    <test-case name="PathExpr-J-205">
       <description>Deep Lookup in 2D array</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>[[(),2,3],[(),5,6],7,8] // get(2)</test>
+      <test>[[(),2,3],[(),5,6],7,8] / descendant-or-self::get(2) =!> jnode-content()</test>
       <result>
          <assert-deep-eq>2,[(),5,6],5</assert-deep-eq>
       </result>
@@ -1310,7 +1413,7 @@
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <environment ref="jsonpath"/>
-      <test>$m // type(xs:string | xs:double)]</test>
+      <test>$m // type((xs:string | xs:double)) =!> jnode-content()</test>
       <result>
          <assert-permutation>
             "red",
@@ -1337,6 +1440,153 @@
       </result>
    </test-case>
    
+   <test-case name="PathExpr-J-400">
+      <description>Descendant selection with predicate</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>$in//*[Language="German"] => count()</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+      
+   <test-case name="PathExpr-J-401">
+      <description>Descendant selection with positional predicate</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>$in//*[Language="German"][1] => count()</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+      
+   <test-case name="PathExpr-J-402">
+      <description>Descendant selection using record type</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>$in//record("Author", "Title", *) => count()</test>
+      <result>
+         <assert-eq>7</assert-eq>
+      </result>
+   </test-case>
+      
+   <test-case name="PathExpr-J-403">
+      <description>Ancestor selection within predicate</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>$in//record("Author", "Title", *)[not(ancestor::audiobooks)] => count()</test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-404">
+      <description>Except selection</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>
+         let $jin := jtree($in)
+         return ($jin//record("Author", "Title", *) except $jin/audiobooks//record("Author", "Title", *)) => count()</test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+      
+   <test-case name="PathExpr-J-405">
+      <description>With string template on RHS</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>$in//child::record(Author, Title, *)[Language="German"]/{'Author':string(Author), 'Title':string(Title)}</test>
+      <result>
+         <assert-deep-eq>
+            {"Author":"Hermann Hesse", "Title": "Der Steppenwolf"}, 
+            {"Author":"Hesse, H.", "Title": "Das Glasperlenspiel"}
+         </assert-deep-eq>
+      </result>
+   </test-case> 
+      
+   <test-case name="PathExpr-J-406">
+      <description>With string template on RHS using lookup operator</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>$in/descendant::record(Author, Title, *)[Language="German"]/{'Author':?Author, 'Title':?Title}</test>
+      <result>
+         <assert-deep-eq>
+            {"Author":"Hermann Hesse", "Title": "Der Steppenwolf"}, 
+            {"Author":"Hesse, H.", "Title": "Das Glasperlenspiel"}
+         </assert-deep-eq>
+      </result>
+   </test-case> 
+      
+   <test-case name="PathExpr-J-407">
+      <description>With following-sibling on RHS</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>$in//record(Author, Title, *)[Language="German"]/following-sibling::*[1]/ISBN-13 => string()</test>
+      <result>
+         <assert-deep-eq>"978-0141192093"</assert-deep-eq>
+      </result>
+   </test-case>
+      
+   <test-case name="PathExpr-J-408">
+      <description>With preceding-sibling on RHS</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>$in//record(Author, Title, *)[Language="German"]/preceding-sibling::*[1]/ISBN-13 ! string()</test>
+      <result>
+         <assert-deep-eq>"978-0312278496"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="PathExpr-J-409">
+      <description>With parent axis on RHS</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>$in//Language[.="German"]/../ISBN-13 ! string()</test>
+      <result>
+         <assert-deep-eq>"978-3518366752", "978-3518365793"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="PathExpr-J-410">
+      <description>following-sibling in a map</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>$in//Language[.="German"]/following-sibling::ISBN-13[1] ! string()</test>
+      <result>
+         <assert-deep-eq>"978-3518366752", "978-3518365793"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="PathExpr-J-411">
+      <description>preceding-sibling in a map</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>$in//Language[.="German"]/preceding-sibling::Title[1] =!> jnode-content()</test>
+      <result>
+         <assert-deep-eq>"Der Steppenwolf", "Das Glasperlenspiel"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="PathExpr-J-412">
+      <description>precedes operator in a map</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>every $book in $in//record(Title, ISBN-13, *) satisfies $book/Title precedes $book/ISBN-13</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="PathExpr-J-413">
+      <description>follows operator in a map</description>
+      <created by="Michael Kay" on="2025-08-01"/>
+      <environment ref="books"/>
+      <test>every $book in $in//record(Title, ISBN-13, *) satisfies $book/ISBN-13 follows $book/Title</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
  
 
 </test-set>
