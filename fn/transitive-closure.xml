@@ -198,7 +198,28 @@
         </result>
     </test-case>
     
-    
+    <test-case name="trans-closure-025">
+        <description>Example from spec, adapted to JNodes</description>
+        <created by="Michael Kay" on="2025-08-04"/>       
+        <test><![CDATA[let $data := parse-json('
+            [ { "id": 0 },
+              { "id": 1, "manager": 0 },
+              { "id": 2, "manager": 0 },
+              { "id": 3, "manager": 2 },
+              { "id": 4, "manager": 2 },
+              { "id": 5, "manager": 1 },
+              { "id": 6, "manager": 3 },
+              { "id": 7, "manager": 6 },
+              { "id": 8, "manager": 6 }
+            ]') => jtree()  
+            return transitive-closure($data//record(id, *)[id=2], 
+                                      function($p){$data//record(id, *)[manager=$p/id]})
+                    /string(id)                            
+        ]]></test>
+        <result>
+            <assert-deep-eq>("3", "4", "6", "7", "8")</assert-deep-eq>
+        </result>
+    </test-case>
     
     <test-case name="trans-closure-903">
         <description>Apply result to non-node</description>

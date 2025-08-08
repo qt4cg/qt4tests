@@ -306,6 +306,119 @@
          <assert-eq>""</assert-eq>
       </result>
    </test-case>
+
+   <test-case name="generate-id-025" covers-40="PR2083">
+      <description> In 4.0, applies to JNodes. IDs must be ascii alphanumeric.</description>
+      <created by="Michael Kay" on="2025-08-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([]) => generate-id() => matches('^[A-Za-z][A-Za-z0-9]*$')</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="generate-id-026" covers-40="PR2083">
+      <description> In 4.0, applies to JNodes. IDs must be ascii alphanumeric.</description>
+      <created by="Michael Kay" on="2025-08-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree({}) => generate-id() => matches('^[A-Za-z][A-Za-z0-9]*$')</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="generate-id-027" covers-40="PR2083">
+      <description> In 4.0, applies to JNodes. IDs must be unique.</description>
+      <created by="Michael Kay" on="2025-08-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree({'a':1, 'b':2})/* =!> generate-id() => distinct-values() => count()</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="generate-id-028" covers-40="PR2083">
+      <description> In 4.0, applies to JNodes. IDs must be unique.</description>
+      <created by="Michael Kay" on="2025-08-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1, 2, 3])/* =!> generate-id() => distinct-values() => count()</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="generate-id-029" covers-40="PR2083">
+      <description> In 4.0, applies to JNodes. IDs must be ascii alphanumeric.</description>
+      <created by="Michael Kay" on="2025-08-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree({'abc"d':2})/* => generate-id() => matches('^[A-Za-z][A-Za-z0-9]*$')</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="generate-id-030" covers-40="PR2083">
+      <description> In 4.0, applies to JNodes. IDs must be unique.</description>
+      <created by="Michael Kay" on="2025-08-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree({2025:2, xs:gYear('2025'):2})/* =!> generate-id() => distinct-values() => count()</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="generate-id-031" covers-40="PR2083">
+      <description> In 4.0, applies to JNodes. IDs must be unique.</description>
+      <created by="Michael Kay" on="2025-08-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $in := {'a':1, 'b':2}
+         let $in2 := map:put($in, 'c', 3)
+         return generate-id(jtree($in)/a) eq generate-id(jtree($in2)/a)
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="generate-id-032" covers-40="PR2083">
+      <description> In 4.0, applies to JNodes. IDs must be unique.</description>
+      <created by="Michael Kay" on="2025-08-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $in := {'a':1, 'b':2, 'c': [1, 2, 3, {'d':4}]} => jtree()
+         return generate-id($in) eq generate-id(root($in//d))
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="generate-id-033" covers-40="PR2083">
+      <description> In 4.0, applies to JNodes. IDs must be unique.</description>
+      <created by="Michael Kay" on="2025-08-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $in := {'a':1, 'b':2, 'c': [1, 2, 3, {'d':4}]} => jtree()
+         return generate-id($in/b) eq generate-id($in/a/following-sibling::*[1])
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="generate-id-034" covers-40="PR2083">
+      <description> In 4.0, applies to JNodes. IDs must be unique.</description>
+      <created by="Michael Kay" on="2025-08-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $in := {'a':1, 'b':2, 'c': [1, 2, 3, {'b':4}]} => jtree()
+         return generate-id($in/b) ne generate-id($in/c//b)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
       
    <test-case name="generate-id-901">
       <description>generate-id() with no context item</description>

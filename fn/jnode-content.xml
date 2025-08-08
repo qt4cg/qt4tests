@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-jnode-content" covers-40="PR2031">
+   <description>Tests for the fn:jnode-content() function</description>
+
+
+   <test-case name="fn-jnode-content-001">
+      <description> Applied to root node </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>fn:jtree([1,2,3]) => fn:jnode-content()</test>
+      <result>
+         <assert-deep-eq>[1,2,3]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-content-002">
+      <description> Applied to root node </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>fn:jtree({}) => fn:jnode-content()</test>
+      <result>
+         <assert-deep-eq>{}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-content-003">
+      <description> Applied to empty sequence </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>fn:jnode-content(())</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-content-004">
+      <description> Applied to child of array </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>[4,5,6] / child::get(2) => fn:jnode-content()</test>
+      <result>
+         <assert-eq>5</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-content-005">
+      <description> Applied to integer entry in map </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>{'a':23, 'b':24} / child::b => fn:jnode-content()</test>
+      <result>
+         <assert-eq>24</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-content-006">
+      <description> Applied to sequence entry in map </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>{'a': 23, 'b': 1 to 5} / b => fn:jnode-content()</test>
+      <result>
+         <assert-deep-eq>1, 2, 3, 4, 5</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-content-007">
+      <description> Applied to array entry in map </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>{'a': 23, 'b': array{1 to 5}} / b => fn:jnode-content()</test>
+      <result>
+         <assert-deep-eq>[1, 2, 3, 4, 5]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-content-008">
+      <description> Applied to map entry in array </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>[2, 4, {'a':20}] / get(3) =!> fn:jnode-content()</test>
+      <result>
+         <assert-deep-eq>{'a':20}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-content-009">
+      <description> Sequence of arrays in map entry </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>{'a': 23, 'b': ([1,2,3], [4,5,6])} / b / * ! array{ fn:jnode-content() }</test>
+      <result>
+         <assert-deep-eq>[1],[2],[3],[4],[5],[6]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-content-050" covers-40="PR2109">
+      <description> Applied to context item </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>[2, 4, {'a':20}] / *[3] / a ! fn:jnode-content()</test>
+      <result>
+         <assert-eq>20</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-content-901">
+      <description> Requires singleton </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>{xs:date('2019-01-01') : 23, xs:date('2020-01-01') : 24} / child::* => fn:jnode-content()</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-content-902">
+      <description> Requires JNode </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>parse-xml("<a/>") => fn:jnode-content()</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-content-903">
+      <description> Context item absent </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>fn() { fn:jnode-content() }()</test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-content-904">
+      <description> Context item not a JNode </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>parse-xml("<a/>") ! fn:jnode-content()</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   
+
+
+</test-set>
