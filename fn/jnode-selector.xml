@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-jnode-selector" covers-40="PR2031">
+   <description>Tests for the fn:jnode-selector() function</description>
+
+
+   <test-case name="fn-jnode-selector-001">
+      <description> Applied to root node </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>fn:jtree([1,2,3]) => fn:jnode-selector()</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-selector-002">
+      <description> Applied to root node </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>fn:jtree({}) => fn:jnode-selector()</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-selector-003">
+      <description> Applied to empty sequence </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>fn:jnode-selector(())</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-selector-004">
+      <description> Applied to child of array </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>[1,2,3] / child::get(2) => fn:jnode-selector()</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-selector-005">
+      <description> Applied to string key of map </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>{'a':23, 'b':24} / child::b => fn:jnode-selector()</test>
+      <result>
+         <assert-eq>"b"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-selector-006">
+      <description> Applied to QName key of map </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>{#xml:space : 23, #xml:id : 24} / child::xml:space => fn:jnode-selector()</test>
+      <result>
+         <assert-eq>#xml:space</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-selector-007">
+      <description> Applied to xs:date() key of map </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>{xs:date('2019-01-01') : 23, xs:date('2020-01-01') : 24} / child::* =!> fn:jnode-selector()</test>
+      <result>
+         <assert-deep-eq>(xs:date('2019-01-01'), xs:date('2020-01-01'))</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-selector-008">
+      <description> Applied to integer key of map </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>{1: 'a', 2: 'b'} / get(2) =!> fn:jnode-selector()</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-selector-009" covers-40="PR2109">
+      <description> Applied to context item </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>{xs:date('2019-01-01') : 23, xs:date('2020-01-01') : 24} / child::* ! fn:jnode-selector()</test>
+      <result>
+         <assert-deep-eq>(xs:date('2019-01-01'), xs:date('2020-01-01'))</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-selector-010">
+      <description> Sequence of arrays in map entry </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>{'a': 23, 'b': ([1,2,3], [4,5,6])} / b / * ! array{ fn:jnode-selector() }</test>
+      <result>
+         <assert-deep-eq>[1],[2],[3],[1],[2],[3]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-selector-901">
+      <description> Requires singleton </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>{xs:date('2019-01-01') : 23, xs:date('2020-01-01') : 24} / child::* => fn:jnode-selector()</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-selector-902">
+      <description> Requires JNode </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>parse-xml("<a/>") => fn:jnode-selector()</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-selector-903">
+      <description> Context item absent </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>fn() { fn:jnode-selector() }()</test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-jnode-selector-904">
+      <description> Context item not a JNode </description>
+      <created by="Michael Kay" on="2025-08-08"/>
+      <test>parse-xml("<a/>") ! fn:jnode-selector()</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   
+
+
+</test-set>
