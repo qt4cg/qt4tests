@@ -8830,6 +8830,32 @@ Himmlische, dein Heiligtum.
       </result>
    </test-case>
 
+   <test-case name="fo-test-fn-path-018">
+      <description>Test case for fn:path</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-08-12"/>
+      <environment ref="global"/>
+      <test>
+        let $in := [{"b":[3,4]}]
+return path($in/*[1]/b/*[2])
+      </test>
+      <result>
+         <assert-deep-eq>"/*[1]/b/*[2]</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-path-019">
+      <description>Test case for fn:path</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-08-12"/>
+      <environment ref="global"/>
+      <test>
+        let $in := [[{'a':1}], [{'a':2}]]
+return path($in//a[. = 2])
+      </test>
+      <result>
+         <assert-deep-eq>"/*[2]/*[1]/a</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-fn-has-children-001">
       <description>Test case for fn:has-children</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-08-12"/>
@@ -8998,6 +9024,30 @@ Himmlische, dein Heiligtum.
       </result>
    </test-case>
 
+   <test-case name="fo-test-fn-has-children-008">
+      <description>Test case for fn:has-children</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-08-12"/>
+      <environment ref="global"/>
+      <test>
+        [1,2,3] =&gt; has-children()
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-has-children-009">
+      <description>Test case for fn:has-children</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-08-12"/>
+      <environment ref="global"/>
+      <test>
+        [] =&gt; has-children()
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-fn-distinct-ordered-nodes-001">
       <description>Test case for fn:distinct-ordered-nodes</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-08-12"/>
@@ -9023,6 +9073,62 @@ return distinct-ordered-nodes(
       </test>
       <result>
          <assert-deep-eq>1</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-innermost-001">
+      <description>Test case for fn:innermost</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-08-12"/>
+      <environment ref="global"/>
+      <test>
+        parse-xml("&lt;doc&gt;
+    &lt;div id='a'&gt;&lt;div id='b'&gt;&lt;div id='c'/&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;/doc&gt;")//div
+   =&gt; innermost() =&gt; string(@id)
+      </test>
+      <result>
+         <assert-deep-eq>"c"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-innermost-002">
+      <description>Test case for fn:innermost</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-08-12"/>
+      <environment ref="global"/>
+      <test>
+        [[[1,2], [3,4]], [[5,6], [7,8]]]")//array(*)
+   =&gt; innermost()
+      </test>
+      <result>
+         <assert-deep-eq>[1,2], [3,4], [5,6], [7,8]</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-outermost-001">
+      <description>Test case for fn:outermost</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-08-12"/>
+      <environment ref="global"/>
+      <test>
+        parse-xml("&lt;doc&gt;
+     &lt;div id='a'&gt;&lt;div id='b'&gt;&lt;div id='c'/&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;/doc&gt;")//div
+   =&gt; outermost() =&gt; string(@id)
+      </test>
+      <result>
+         <assert-deep-eq>"a"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-outermost-002">
+      <description>Test case for fn:outermost</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-08-12"/>
+      <environment ref="global"/>
+      <test>
+        [[[1], [2]], [[3], [4]], [[5], [6]]]")//array(*)
+   =&gt; outermost() =&gt; array:size()
+      </test>
+      <result>
+         <assert-deep-eq>3</assert-deep-eq>
       </result>
    </test-case>
 
