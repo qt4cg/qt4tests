@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-MethodCall" covers-40="PR2147">
+   <description>Tests for the MethodCall production: 4.0 proposal</description>
+             
+   <dependency type="spec" value="XP40+ XQ40+"/>
+   
+   <test-case name="method-001">
+      <description>simple case</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <test>
+         let $rectangle := {'length':3, 'width':2, 'area':fn{?length × ?width}}
+         return $rectangle ?> area()
+      </test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="method-002">
+      <description>more complex case with params and chaining</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <test>
+         let $rectangle := {'length': 3, 
+                            'width': 2, 
+                            'area': fn{?length × ?width}, 
+                            'resize': fn($rect, $scale){$rect 
+                                           => map:put('length', $rect?length × $scale)
+                                           => map:put('width', $rect?width × $scale)
+                                      }
+                           }
+         return $rectangle ?> resize(2) ?> area()
+      </test>
+      <result>
+         <assert-eq>24</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="method-003">
+      <description>empty sequence</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <test>
+         let $rectangle := {'length':3, 'width':2, 'area':fn{?length × ?width}}
+         return $rectangle[2] ?> area()
+      </test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="method-004">
+      <description>multiple maps</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <test>
+         let $rectangles := ({'length':3, 'width':2, 'area':fn{?length × ?width}},
+                             {'length':4, 'width':5, 'area':fn{?length × ?width}})
+         return $rectangles ?> area()
+      </test>
+      <result>
+         <assert-deep-eq>6, 20</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="method-005">
+      <description>chaining</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <test>
+         let $proto := {'add': map:put#3}
+         return $proto ?> add('x', 3) ?> add('y', 4) => map:remove('add')
+      </test>
+      <result>
+         <assert-deep-eq>{'x':3, 'y':4}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="method-006">
+      <description>mutual recursion</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <test>
+         let $proto := {'odd':  fn($map, $n) {$map ?> even($n - 1)},
+                        'even': fn($map, $n) {$n = 0 or $map ?> odd($n - 1)}
+                       }
+         return $proto ?> odd(3)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="method-901">
+      <description>LHS is not a map</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <test>
+         let $rectangle := [3, 2]
+         return $rectangle ?> area()
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="method-902">
+      <description>method does not exist</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <test>
+         let $rectangle := {'length':3, 'width':2, 'area':fn{?length × ?width}}
+         return $rectangle ?> perimeter()
+      </test>
+      <result>
+         <error code="XPDY0050"/>
+      </result>
+   </test-case>
+   
+   <test-case name="method-903">
+      <description>method is not a function</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <test>
+         let $rectangle := {'length':3, 'width':2, 'area':fn{?length × ?width}}
+         return $rectangle ?> length()
+      </test>
+      <result>
+         <error code="XPDY0050"/>
+      </result>
+   </test-case>
+   
+   <test-case name="method-904">
+      <description>method is not a single function</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <test>
+         let $rectangle := {'length':3, 'width':2, 'area':(fn{?length × ?width}, fn{?length})}
+         return $rectangle ?> area()
+      </test>
+      <result>
+         <error code="XPDY0050"/>
+      </result>
+   </test-case>
+   
+   <test-case name="method-905">
+      <description>method does not expect a map as first argument</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <test>
+         let $rectangle := {'length':3, 'width':2, 'area':fn:contains#2}
+         return $rectangle ?> area()
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="method-906">
+      <description>method has arity zero</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <test>
+         let $rectangle := {'length':3, 'width':2, 'area':math:pi#0}
+         return $rectangle ?> area()
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+</test-set>
