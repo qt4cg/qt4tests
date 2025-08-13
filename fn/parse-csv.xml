@@ -7,13 +7,10 @@
   <test-case name="parse-csv-001">
     <description>Empty sequence</description>
     <created by="Michael Kay" on="2024-03-07"/>
+    <modified by="Gunther Rademacher" on="2025-08-13" change="now expecting an empty sequence"/>
     <test><![CDATA[fn:parse-csv(())]]></test>
     <result>
-      <all-of>
-        <assert>empty(?columns)</assert>
-        <assert>deep-equal(?column-index, map{})</assert>
-        <assert>empty(?rows)</assert>
-      </all-of>  
+      <assert-empty/>
     </result>
   </test-case>
   
@@ -980,9 +977,13 @@
   <test-case name="parse-csv-907">
     <description>Row delimiter not a single string</description>
     <created by="Michael Kay" on="2024-03-07"/>
+    <modified by="Gunther Rademacher" on="2025-08-13" change="added alternate error code FOCV0002"/>
     <test>fn:parse-csv('one,two', map{'row-delimiter':('|','||')})</test>
     <result>
-      <error code="XPTY0004"/>
+      <any-of>
+        <error code="XPTY0004"/>
+        <error code="FOCV0002"/>
+      </any-of>
     </result>
   </test-case>
   
