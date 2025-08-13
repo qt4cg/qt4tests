@@ -677,4 +677,135 @@
          <error code="XPTY0004"/>
       </result>
    </test-case>
+   
+   <test-case name="path100" covers-40="PR2149">
+      <description>Apply to JNodes</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([]) => path()</test>
+      <result>
+         <assert-string-value>/</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path101" covers-40="PR2149">
+      <description>Apply to JNodes</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree({}) => path()</test>
+      <result>
+         <assert-string-value>/</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path102" covers-40="PR2149">
+      <description>Apply to JNodes</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,3]) => path()</test>
+      <result>
+         <assert-string-value>/</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path103" covers-40="PR2149">
+      <description>Apply to JNodes</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[5,6,7]])/type(array(xs:integer)) => path()</test>
+      <result>
+         <assert-string-value>/*[3]</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path104" covers-40="PR2149">
+      <description>Apply to JNodes</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,{'x':[5,6,7]}])//x => path()</test>
+      <result>
+         <assert-string-value>/*[3]/x</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path105" covers-40="PR2149">
+      <description>Apply to JNodes</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[{'x':[5,6,7]}]])//x => path()</test>
+      <result>
+         <assert-string-value>/*[3]/*[1]/x</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path106" covers-40="PR2149">
+      <description>Apply to JNodes, with origin</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>let $in := jtree([1,2,[{'x':[5,6,7]}]]) return path($in//x, {'origin':$in/*[3]})</test>
+      <result>
+         <assert-string-value>*[1]/x</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path107" covers-40="PR2149">
+      <description>Apply to JNodes, with invalid origin</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>let $in := jtree([1,2,[{'x':[5,6,7]}]]) return path($in//x, {'origin':$in/*[1]})</test>
+      <result>
+         <error code="FOPA0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="path108" covers-40="PR2149">
+      <description>Apply to JNodes, with non-NCName key</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[{'12x':[5,6,7]}]])//get('12x') => path()</test>
+      <result>
+         <assert-string-value>/*[3]/*[1]/get("12x")</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path109" covers-40="PR2149">
+      <description>Apply to JNodes, with integer key</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[{17:[5,6,7]}]])//get(17) => path()</test>
+      <result>
+         <assert-string-value>/*[3]/*[1]/get(17)</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path110" covers-40="PR2149">
+      <description>Apply to JNodes, with QName key</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[{#xml:space:[5,6,7]}]])//xml:space => path()</test>
+      <result>
+         <assert-string-value>/*[3]/*[1]/Q{http://www.w3.org/XML/1998/namespace}space</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path111" covers-40="PR2149">
+      <description>Apply to JNodes, with xs:date key</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[{xs:date('1999-12-31'):current-date()}]])//type(xs:date) => path()</test>
+      <result>
+         <assert-string-value>/*[3]/*[1]/get(xs:date("1999-12-31"))</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path112" covers-40="PR2149">
+      <description>Apply to JNodes, with boolean key</description>
+      <created by="Michael Kay" on="2025-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[{true():false()}]])//type(xs:boolean) => path()</test>
+      <result>
+         <assert-string-value>/*[3]/*[1]/get(true())</assert-string-value>
+      </result>
+   </test-case>
+   
 </test-set>
