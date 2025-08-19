@@ -1637,6 +1637,16 @@
       </result>
    </test-case>
 
+   <test-case name="K-SeqDeepEqualFunc-24a" covers-40="PR2168">
+      <description> A test whose essence is: `deep-equal((1, 2, xs:base64Binary("FFFF")), (1, 2, xs:base64Binary("FFFF")))`. </description>
+      <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Christian Gruen" on="2025-08-19" change="PR2168"/>
+      <test>deep-equal((1, 2, xs:base64Binary("FFFF")), (1, 2, xs:hexBinary(xs:base64Binary("FFFF"))))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
    <test-case name="K-SeqDeepEqualFunc-25">
       <description> A test whose essence is: `deep-equal((1, 1, 1), (1, 1, 1))`. </description>
       <created by="Frans Englich" on="2007-11-26"/>
@@ -5182,8 +5192,6 @@ return deep-equal(
          <assert-false/>
       </result>
    </test-case>
-   
-  
 
    <test-case name="fn-deep-equal-empty">
       <description>Optional argument: empty sequence</description>
@@ -5191,6 +5199,42 @@ return deep-equal(
       <modified by="Michael Kay" on="2024-05-21" change="three arguments"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>deep-equal(1, 1, ())</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="deep-equal-binary-01" covers-40="PR2168">
+      <description>Compare binary types.</description>
+      <created by="Christian Gruen" on="2025-08-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(xs:base64Binary(''), xs:hexBinary(''))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="deep-equal-binary-02" covers-40="PR2168">
+      <description>Compare binary types.</description>
+      <created by="Christian Gruen" on="2025-08-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(xs:hexBinary(''), xs:base64Binary(''))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="deep-equal-binary-03" covers-40="PR2168">
+      <description>Compare binary types.</description>
+      <created by="Christian Gruen" on="2025-08-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+        let $s := string(year-from-date(current-date()) mod 10 + 10)
+        let $h := xs:hexBinary($s)
+        let $b := xs:base64Binary($h)
+        return deep-equal($h, $h) and deep-equal($b, $b) and
+               deep-equal($h, $b) and deep-equal($b, $h)
+      </test>
       <result>
          <assert-true/>
       </result>
