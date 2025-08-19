@@ -288,6 +288,36 @@
       </result>
    </test-case>
    
+   <test-case name="Lookup-026">
+      <description>Select multiple items from an array</description>
+      <created by="Michael Kay" on="2025-08-14"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>['a', 'b', 'c', 'd']?(2 to 4)</test>
+      <result>
+         <assert-deep-eq>'b', 'c', 'd'</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Lookup-027">
+      <description>Select multiple items from an array, out of order</description>
+      <created by="Michael Kay" on="2025-08-14"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>['a', 'b', 'c', 'd']?(3, 2)</test>
+      <result>
+         <assert-deep-eq>'c', 'b'</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="Lookup-028">
+      <description>Select multiple items from an array, one out of range</description>
+      <created by="Michael Kay" on="2025-08-14"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>['a', 'b', 'c', 'd']?(2 to 5)</test>
+      <result>
+         <error code="FOAY0001"/>
+      </result>
+   </test-case>
+   
    <test-case name="Lookup-040">
       <description>Lookup by name in a map</description>
       <created by="Michael Kay" on="2014-11-27"/>
@@ -1162,9 +1192,11 @@
    <test-case name="Lookup-232" covers="postfix-lookup">
       <description>Lookup on a sequence of key/value pairs (which use a custom map implementation in Saxon)</description>
       <created by="Michael Kay" on="2021-08-13"/>
+      <modified by="Michael Kay" on="2025-08-14" change="map:pairs is no more"/>
       <dependency type="spec" value="XP31+ XQ31+"/>
       <test>
-         let $pairs := map:build(1 to 300, value := fn{. * .}) => map:pairs() 
+         let $kv-pairs := fn{map:entries(.) ! {'key':map:keys(.), 'value':map:items(.)}}
+         let $pairs := map:build(1 to 300, value := fn{. * .}) => $kv-pairs() 
          return $pairs[?key = 100]?value</test>
       <result>
          <assert-eq>10000</assert-eq>
