@@ -769,4 +769,72 @@
          </assert-deep-eq>
       </result>
    </test-case>
+   
+   <test-case name="JAxes-041">
+      <description> Evaluate all axes in JSON document, modified using map:put() </description>
+      <created by="Michael Kay" on="2025-08-20"/>
+      <dependency type="spec" value="XQ40+"/>
+      <module uri="http://www.w3.org/TestModules/AxisStepJ/Histogram" file="AxisStep.J/histogram.xq"/>
+      <test>
+         import module namespace ax="http://www.w3.org/TestModules/AxisStepJ/Histogram";
+         let $in := json-doc("AxisStep.J/json-map.json")
+         let $rootPlus := jtree($in)/root => jnode-content() => map:put("H", [1, 2, (3, 4)])
+         let $inPlus := { "root": $rootPlus }
+         return ax:histogram(jtree($inPlus)/root/C)
+      </test>
+      <result>
+         <assert-deep-eq>{
+            "ancestor": 2,
+            "ancestor-or-self": 3,
+            "child": 0,
+            "descendant": 0,
+            "descendant-or-self": 1,
+            "following": 14,
+            "following-or-self": 15,
+            "following-sibling": 5,
+            "following-sibling-or-self": 6,
+            "parent": 1,
+            "preceding": 8,
+            "preceding-or-self": 9,
+            "preceding-sibling": 2,
+            "preceding-sibling-or-self": 3,
+            "self": 1
+            }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-042">
+      <description> Evaluate all axes in JSON document, modified using map:remove() and map:put() </description>
+      <created by="Michael Kay" on="2025-08-20"/>
+      <dependency type="spec" value="XQ40+"/>
+      <module uri="http://www.w3.org/TestModules/AxisStepJ/Histogram" file="AxisStep.J/histogram.xq"/>
+      <test>
+         import module namespace ax="http://www.w3.org/TestModules/AxisStepJ/Histogram";
+         let $in := json-doc("AxisStep.J/json-map.json")
+         let $rootPlus := jtree($in)/root => jnode-content() => map:remove("A") => map:put("H", [1, 2, (3, 4)]) 
+         let $inPlus := { "root": $rootPlus }
+         return ax:histogram(jtree($inPlus)/root/C)
+      </test>
+      <result>
+         <assert-deep-eq>{
+            "ancestor": 2,
+            "ancestor-or-self": 3,
+            "child": 0,
+            "descendant": 0,
+            "descendant-or-self": 1,
+            "following": 14,
+            "following-or-self": 15,
+            "following-sibling": 5,
+            "following-sibling-or-self": 6,
+            "parent": 1,
+            "preceding": 4,
+            "preceding-or-self": 5,
+            "preceding-sibling": 1,
+            "preceding-sibling-or-self": 2,
+            "self": 1
+            }
+         </assert-deep-eq>
+      </result>
+   </test-case>
 </test-set>
