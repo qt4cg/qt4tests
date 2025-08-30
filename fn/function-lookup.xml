@@ -4476,12 +4476,26 @@
       <assert-true/>
     </result>
   </test-case>
+  
   <test-case name="fn-function-lookup-530" covers-30="dynamic-function-call">
     <description>Attempts to invoke the non-existant function local:missing.</description>
     <created by="Tim Mills" on="2011-11-28"/>
+    <dependency type="spec" value="XP30 XP31 XQ30 XQ31"></dependency>
     <test>function-lookup(fn:QName('http://www.w3.org/2005/xquery-local-functions', 'missing'), 1)("arg")</test>
     <result>
       <error code="XPTY0004" />
+    </result>
+  </test-case>
+  
+  <test-case name="fn-function-lookup-530a">
+    <description>Attempts to invoke the non-existant function local:missing.</description>
+    <created by="Tim Mills" on="2011-11-28"/>
+    <modified by="Michael Kay" on="2025-08-29" 
+              change="In 4.0, the target of a dynamic function call can be ()"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>function-lookup(fn:QName('http://www.w3.org/2005/xquery-local-functions', 'missing'), 1)("arg")</test>
+    <result>
+      <assert-empty/>
     </result>
   </test-case>
   
@@ -4577,7 +4591,7 @@
    <test-case name="fn-function-lookup-610" covers-30="dynamic-function-call private-functions">
       <description>Call the function with the wrong number of arguments</description>
       <created by="Michael Kay" on="2011-10-27"/>
-      <dependency type="spec" value="XQ30+"/>
+      <dependency type="spec" value="XQ30 XQ31"/>
       <test><![CDATA[
         xquery version "3.0";
       	declare %private function local:square($i as xs:integer) as xs:integer { $i*$i };
@@ -4585,6 +4599,20 @@
       ]]></test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+  <test-case name="fn-function-lookup-610a">
+      <description>Call the function with the wrong number of arguments</description>
+      <created by="Michael Kay" on="2011-10-27"/>
+      <modified by="Michael Kay" on="2025-08-29" change="dynamic function call in 4.0 can supply extra arcguments"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        xquery version "3.0";
+      	declare %private function local:square($i as xs:integer) as xs:integer { $i*$i };
+        function-lookup(QName("http://www.w3.org/2005/xquery-local-functions", "square"), 1)(13, 12)
+      ]]></test>
+      <result>
+         <assert-eq>169</assert-eq>
       </result>
    </test-case>
    <test-case name="fn-function-lookup-611" covers-30="private-functions dynamic-function-call">
