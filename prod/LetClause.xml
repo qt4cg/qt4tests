@@ -3074,8 +3074,12 @@
    <test-case name="let-map-021" covers-40="PR2055">
       <description> Deconstruct map. Coerced expression must return a single map</description>
       <created by="Michael Kay" on="2025-06-29"/>
+      <modified by="Michael Kay" on="2025-08-30" change="map:pairs is no more"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
-      <test>let ${ $key, $value } as map(*)? := map:pairs({'x':3, 'y':4, 'z':5}) return ($key, $value)</test>
+      <test>
+         let $pairs := map:for-each(?, fn($k, $v){{'key':$k, 'value':$v}})
+         let ${ $key, $value } as map(*)? := $pairs({'x':3, 'y':4, 'z':5}) 
+         return ($key, $value)</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -3084,10 +3088,13 @@
    <test-case name="let-map-022" covers-40="PR2055">
       <description> Deconstruct map. Extract fields of key-value pairs</description>
       <created by="Michael Kay" on="2025-06-29"/>
+      <modified by="Michael Kay" on="2025-08-30" change="map:pairs is no more"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
-      <test>for $kvp in map:pairs({'x':3, 'y':4, 'z':5}) 
-            let ${$key, $value} := $kvp
-            return `{$key}={$value}`</test>
+      <test>
+         let $pairs := map:for-each(?, fn($k, $v){{'key':$k, 'value':$v}})
+         for $kvp in $pairs({'x':3, 'y':4, 'z':5}) 
+         let ${$key, $value} := $kvp
+         return `{$key}={$value}`</test>
       <result>
          <assert-deep-eq>"x=3", "y=4", "z=5"</assert-deep-eq>
       </result>

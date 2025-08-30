@@ -8,6 +8,7 @@
        <created by="Josh Spiegel" on="2015-07-22"/>
        <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/>
        <modified by="Michael Kay" on="2016-07-28" change="test assumed last duplicate wins"/>
+       <modified by="Michael Kay" on="2025-08-29" change="key type is implementation-defined"/>
        <environment ref="map" />
        <test>
            map:merge((
@@ -23,8 +24,8 @@
           <all-of>
              <assert>map:size($result) eq 3</assert>
              <assert>count(map:keys($result)) eq 3</assert>
-             <assert>map:keys($result)[deep-equal(.,"abc")] instance of xs:anyURI</assert>
-             <assert>map:keys($result)[deep-equal(.,"xyz")] instance of xs:untypedAtomic</assert>
+             <assert>map:keys($result)[deep-equal(.,"abc")] instance of (xs:anyURI|xs:string|xs:untypedAtomic)</assert>
+             <assert>map:keys($result)[deep-equal(.,"xyz")] instance of (xs:string|xs:untypedAtomic)</assert>
              <assert>$result?abc eq 1</assert>
           </all-of>
        </result>
@@ -74,6 +75,7 @@
        <created by="Josh Spiegel" on="2015-07-22"/>
        <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/>
        <modified by="Michael Kay" on="2016-07-28" change="test assumes last duplicate wins"/>
+       <modified by="Michael Kay" on="2025-08-29" change="key type is implementation-defined"/>
        <environment ref="map" />
        <test>
             map:merge((
@@ -88,7 +90,7 @@
        <result>
           <all-of>
              <assert>map:size($result) eq 3</assert>
-             <assert>map:keys($result) instance of xs:float+</assert>
+             <assert>map:keys($result) instance of (xs:float|xs:double)+</assert>
              <assert>$result?(xs:double('NaN')) eq 1</assert>
              <assert>$result?(xs:double('INF')) eq 2</assert>
              <assert>$result?(xs:double('-INF')) eq 3</assert>
@@ -101,6 +103,7 @@
        <created by="Josh Spiegel" on="2015-07-22"/>
        <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/>
        <modified by="Michael Kay" on="2016-07-28" change="test assumed last duplicate wins"/>
+       <modified by="Michael Kay" on="2025-08-29" change="key type is implementation-defined"/>
        <environment ref="map" />
        <test>
             map:merge((
@@ -115,7 +118,7 @@
        <result>
           <all-of>
              <assert>map:size($result) eq 3</assert>
-             <assert>map:keys($result) instance of xs:float+</assert>
+             <assert>map:keys($result) instance of (xs:float|xs:double)+</assert>
              <assert>$result?(xs:double('NaN')) eq 1</assert>
              <assert>$result?(xs:double('INF')) eq 2</assert>
              <assert>$result?(xs:double('-INF')) eq 3</assert>
@@ -517,8 +520,9 @@
    <test-case name="same-key-021">
        <description>op:same-key over xs:boolean, xs:hexBinary, xs:base64Binary, xs:duration, and xs:QName</description>
        <created by="Josh Spiegel" on="2015-07-22"/>
-       <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/>
+       <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/
        <modified by="Christian Gruen" on="2025-08-19" change="PR2168"/>
+
        <test>
             map {
                fn:true() : 1,
@@ -541,6 +545,28 @@
              <assert>$result?(QName((), "abc")) eq 6</assert>
              <assert>$result?(QName("http://example.org", "abc")) eq 7</assert>
           </all-of>
+       </result>
+   </test-case>
+    
+    <test-case name="same-key-021a">
+       <description>op:same-key over xs:boolean, xs:hexBinary, xs:base64Binary, xs:duration, and xs:QName</description>
+       <created by="Josh Spiegel" on="2015-07-22"/>
+       <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/>
+       <modified by="Michael Kay" on="2028-08-29" change="results change in 4.0"/>
+       <dependency type="spec" value="XP40+ XQ40+"/>
+       <test>
+            map {
+               fn:true() : 1,
+               fn:false() : 2,
+               xs:hexBinary("ff") : 3,
+               xs:base64Binary(xs:hexBinary("ff")) : 4,
+               xs:duration("P12M") : 5,
+               QName((), "abc") : 6,
+               QName("http://example.org", "abc") : 7
+            }
+       </test>
+       <result>
+          <error code="XQDY0137"/>
        </result>
    </test-case>
    
