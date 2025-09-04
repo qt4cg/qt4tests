@@ -24,11 +24,12 @@
   <test-case name="fn-build-uri-from-parse-002">
     <description>Builds a URI with a complicated authority</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Michael Kay" on="2025-08-30" change="port must be an integer"/>
     <test>fn:build-uri(map {'uri': 'https://user:password@example.com:443/path',
                            'scheme': 'https',
                            'authority': 'user:password@example.com:443',
                            'host': 'example.com',
-                           'port': '443',
+                           'port': 443,
                            'path-segments': ('', 'path'),
                            'path': '/path'})</test>
     <result><assert-eq>"https://example.com:443/path"</assert-eq></result>
@@ -48,10 +49,11 @@
   <test-case name="fn-build-uri-from-parse-004">
     <description>Builds a URI with a escaped path components</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Michael Kay" on="2025-08-30" change="port must be an integer"/>
     <test>fn:build-uri(map {'scheme': 'https',
                            'uri': 'https://user:password@example.com:443/path/a%2fb/a+b',
                            'authority': 'user:password@example.com:443',
-                           'port': '443',
+                           'port': 443,
                            'host': 'example.com',
                            'path-segments': ('','path','a/b','a b'),
                            'path': '/path/a%2fb/a+b'})</test>
@@ -110,22 +112,23 @@
     <description>Builds an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
     <modified by="Michael Kay" on="2023-03-16" change="run both on XPath and XQuery"/>
+    <modified by="Michael Kay" on="2025-08-30" change="port must be an integer"/>
     <test>
       let $amp := codepoints-to-string(38) return
       fn:build-uri(map {
-  "uri": "https://example.com:8080/path?s=%22hello world%22" || $amp || "sort=relevance",
-  "scheme": "https",
-  "authority": "example.com:8080",
-  "host": "example.com",
-  "port": "8080",
-  "path": "/path",
-  "query": "s=%22hello world%22" || $amp || ";sort=relevance",
-  "query-parameters": map {
-    "s": """hello world""",
-    "sort": "relevance"
-  },
-  "path-segments": ("", "path")
-})</test>
+                    "uri": "https://example.com:8080/path?s=%22hello world%22" || $amp || "sort=relevance",
+                    "scheme": "https",
+                    "authority": "example.com:8080",
+                    "host": "example.com",
+                    "port": 8080,
+                    "path": "/path",
+                    "query": "s=%22hello world%22" || $amp || ";sort=relevance",
+                    "query-parameters": map {
+                      "s": """hello world""",
+                      "sort": "relevance"
+                    },
+                    "path-segments": ("", "path")
+      })</test>
     <result>
       <any-of>
         <assert-eq>`https://example.com:8080/path?s="hello%20world"&amp;sort=relevance`</assert-eq>
@@ -354,15 +357,16 @@
   <test-case name="fn-build-uri-from-parse-024">
     <description>Builds an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Michael Kay" on="2025-08-30" change="port must be an integer"/>
     <test>fn:build-uri(map {
-  "uri": "telnet://192.0.2.16:80/",
-  "scheme": "telnet",
-  "authority": "192.0.2.16:80",
-  "host": "192.0.2.16",
-  "port": "80",
-  "path": "/",
-  "path-segments": ("", "")
-})</test>
+            "uri": "telnet://192.0.2.16:80/",
+            "scheme": "telnet",
+            "authority": "192.0.2.16:80",
+            "host": "192.0.2.16",
+            "port": 80,
+            "path": "/",
+            "path-segments": ("", "")
+          })</test>
     <result><assert-eq>"telnet://192.0.2.16:80/"</assert-eq></result>
   </test-case>
 
@@ -370,11 +374,11 @@
     <description>Builds an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
     <test>fn:build-uri(map {
-  "uri": "urn:oasis:names:specification:docbook:dtd:xml:4.1.2",
-  "scheme": "urn",
-  "path": "oasis:names:specification:docbook:dtd:xml:4.1.2",
-  "path-segments": "oasis:names:specification:docbook:dtd:xml:4.1.2"
-})</test>
+           "uri": "urn:oasis:names:specification:docbook:dtd:xml:4.1.2",
+           "scheme": "urn",
+           "path": "oasis:names:specification:docbook:dtd:xml:4.1.2",
+           "path-segments": "oasis:names:specification:docbook:dtd:xml:4.1.2"
+         })</test>
     <result><assert-eq>"urn:oasis:names:specification:docbook:dtd:xml:4.1.2"</assert-eq></result>
   </test-case>
 
@@ -408,11 +412,11 @@
     <description>Builds an example from the specification</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
     <test>fn:build-uri(map {
-  "uri": "jar:file:/C:/Program%20Files/test.jar!/foo/bar",
-  "scheme": "jar",
-  "path": "file:/C:/Program%20Files/test.jar!/foo/bar",
-  "path-segments": ("file:", "C:", "Program Files", "test.jar!", "foo", "bar")
-})</test>
+            "uri": "jar:file:/C:/Program%20Files/test.jar!/foo/bar",
+            "scheme": "jar",
+            "path": "file:/C:/Program%20Files/test.jar!/foo/bar",
+            "path-segments": ("file:", "C:", "Program Files", "test.jar!", "foo", "bar")
+          })</test>
     <result>
       <assert-eq>"jar:file:/C:/Program Files/test.jar!/foo/bar"</assert-eq>
     </result>
@@ -435,12 +439,13 @@
   <test-case name="fn-build-uri-from-parse-031">
     <description>Builds a URI preserving deprecated features</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Michael Kay" on="2025-08-30" change="port must be an integer"/>
     <test>fn:build-uri(map {'uri': 'https://user:password@example.com:443/path',
                            'scheme': 'https',
                            'authority': 'user:password@example.com:443',
                            'userinfo': 'user:password',
                            'host': 'example.com',
-                           'port': '443',
+                           'port': 443,
                            'path-segments': ('', 'path'),
                            'path': '/path'},
                         map { 'allow-deprecated-features': true() })</test>
@@ -450,11 +455,12 @@
   <test-case name="fn-build-uri-from-parse-032-modified">
     <description>Builds a URI omitting known ports</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
+    <modified by="Michael Kay" on="2025-08-30" change="port must be an integer"/>
     <test>fn:build-uri(map {'uri': 'https://user:password@example.com:443/path',
                            'scheme': 'https',
                            'authority': 'user:password@example.com:443',
                            'host': 'example.com',
-                           'port': '443',
+                           'port': 443,
                            'path-segments': ('', 'path'),
                            'path': '/path'}, map { 'omit-default-ports': true() })</test>
     <result><assert-eq>"https://example.com/path"</assert-eq></result>
