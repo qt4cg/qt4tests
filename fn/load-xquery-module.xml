@@ -345,6 +345,8 @@
     <description>Global functions from a module imported by the loaded module are not included in the result of load-xquery-module().</description>
     <created by="Debbie Lockett" on="2015-05-18"/>
     <modified by="Debbie Lockett" on="2015-09-04" change="Use XPath syntax in test"/>
+    <modified by="Michael Kay" on="2025-09-08" change="In 4.0, dynamic call on empty sequence doesn't fail"/>
+    <dependency type="spec" value="XP31 XQ31"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/import/module" file="load-xquery-module/import-module.xqm"/>
     <module uri="http://www.w3.org/TestModules/module1" file="../prod/ModuleImport/module1-lib.xq"/>
     <module uri="http://www.w3.org/TestModules/module2" file="../prod/ModuleImport/module2-lib.xq"/>
@@ -354,7 +356,31 @@
        $mod1-ns := "http://www.w3.org/TestModules/module1"
       return
       let $fns := $module("functions")
-      return $fns(QName($mod1-ns, "x"))(0)()
+      let $f0 := $fns(QName($mod1-ns, "x"))(0)
+      return $f0(0)()
+    </test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="fn-load-xquery-module-023a">
+    <description>Global functions from a module imported by the loaded module are not included in the result of load-xquery-module().</description>
+    <created by="Debbie Lockett" on="2015-05-18"/>
+    <modified by="Debbie Lockett" on="2015-09-04" change="Use XPath syntax in test"/>
+    <modified by="Michael Kay" on="2025-09-08" change="In 4.0, dynamic call on empty sequence doesn't fail"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/import/module" file="load-xquery-module/import-module.xqm"/>
+    <module uri="http://www.w3.org/TestModules/module1" file="../prod/ModuleImport/module1-lib.xq"/>
+    <module uri="http://www.w3.org/TestModules/module2" file="../prod/ModuleImport/module2-lib.xq"/>
+    <test>
+      let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/import/module",
+       $module := fn:load-xquery-module($module-ns),
+       $mod1-ns := "http://www.w3.org/TestModules/module1"
+      return
+      let $fns := $module("functions")
+      let $f0 := $fns(QName($mod1-ns, "x"))(0)
+      return $f0(0)() otherwise fn:error(#err:XPTY0004)
     </test>
     <result>
       <error code="XPTY0004"/>
@@ -365,6 +391,7 @@
     <description>Global functions from a module imported by the loaded module are not included in the result of load-xquery-module().</description>
     <created by="Debbie Lockett" on="2015-05-18"/>
     <modified by="Debbie Lockett" on="2015-09-04" change="Use XPath syntax in test"/>
+    <modified by="Michael Kay" on="2025-09-08" change="In 4.0, dynamic call on empty sequence doesn't fail"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/import/module" file="load-xquery-module/import-module.xqm"/>
     <module uri="http://www.w3.org/TestModules/module1" file="../prod/ModuleImport/module1-lib.xq"/>
     <module uri="http://www.w3.org/TestModules/module2" file="../prod/ModuleImport/module2-lib.xq"/>
@@ -375,10 +402,10 @@
        $mod2-ns := "http://www.w3.org/TestModules/module2"
       return
       let $fns := $module("functions")
-      return $fns(QName($mod2-ns, "y"))(0)()
+      return exists($fns(QName($mod2-ns, "y"))(0))
     </test>
     <result>
-      <error code="XPTY0004"/>
+      <assert-false/>
     </result>
   </test-case>
   
