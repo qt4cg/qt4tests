@@ -530,6 +530,7 @@
         <description>parse-xml test - with local DTD, OK even with allow-external-entities=false</description>
         <created by="Michael Kay" on="2025-03-26"/>        
         <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml("<?xml version='1.0' encoding='iso-8859-1'?><!DOCTYPE a [<!ELEMENT a (#PCDATA)>]><a>foo</a>",
             { 'allow-external-entities': false()} )]]></test>
         <result>
@@ -542,6 +543,7 @@
         <created by="Michael Kay" on="2025-03-26"/>        
         <modified by="Gunther Rademacher" on="2025-04-23" change="add 'dtd-validation': true()"/>
         <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml("<!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>",
             { 'dtd-validation': true(), 'allow-external-entities': false() } )]]></test>
         <result>
@@ -553,6 +555,7 @@
         <description>parse-xml test - internal DTD with external entities, not OK because disallowed</description>
         <created by="Michael Kay" on="2025-03-26"/>        
         <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml(`<!DOCTYPE foo [ <!ENTITY ext SYSTEM 'parse-xml/foo.entity'> ]><foo>&ext;</foo>`,
             { 'allow-external-entities': false() } )]]></test>
         <result>
@@ -564,6 +567,7 @@
         <description>parse-xml test - internal DTD with external entities, OK because allowed</description>
         <created by="Michael Kay" on="2025-03-26"/>        
         <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml(`<!DOCTYPE foo [ <!ENTITY ext SYSTEM 'parse-xml/foo.entity'> ]><foo>&ext;</foo>`,
             { 'allow-external-entities': true() } )]]></test>
         <result>
@@ -575,6 +579,7 @@
         <description>parse-xml test - internal DTD with external entities, OK because allowed</description>
         <created by="Michael Kay" on="2025-03-26"/>        
         <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml(`<!DOCTYPE foo [ <!ENTITY ext SYSTEM 'parse-xml/foo.entity'> ]><foo>&ext;</foo>`)]]></test>
         <result>
             <assert-xml><![CDATA[<foo><bar>baz</bar></foo>]]></assert-xml>
@@ -585,6 +590,7 @@
         <description>parse-xml test - entity expansion limit exceeded</description>
         <created by="Michael Kay" on="2025-03-26"/>        
         <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml(`
             
             <!DOCTYPE lolz [
@@ -611,6 +617,7 @@
         <description>parse-xml test - entity expansion limit not exceeded</description>
         <created by="Michael Kay" on="2025-03-26"/>        
         <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml(`
             
             <!DOCTYPE lolz [
@@ -639,6 +646,7 @@
         <description>parse-xml test - xinclude processing on</description>
         <created by="Michael Kay" on="2025-03-26"/>        
         <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml(`<foo xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="parse-xml/foo.entity"/>
 </foo>`,
@@ -655,11 +663,34 @@
         <description>parse-xml test - xinclude processing off</description>
         <created by="Michael Kay" on="2025-03-26"/>        
         <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml(
             `<foo xmlns:xi="http://www.w3.org/2001/XInclude"><xi:include href="parse-xml/foo.entity"/></foo>`,
             { 'xinclude': false() } )]]></test>
         <result>
             <assert-xml><![CDATA[<foo xmlns:xi="http://www.w3.org/2001/XInclude"><xi:include href="parse-xml/foo.entity"/></foo>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-501" covers-40="PR2013">
+        <description>Parse from base64Binary</description>
+        <created by="Michael Kay" on="2025-09-09"/>        
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>parse-xml(unparsed-binary("../docs/atomic.xml"))</test>
+        <result>
+            <assert-type>document-node(element(*,xs:untyped))</assert-type>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-502" covers-40="PR2013">
+        <description>Parse from hexBinary</description>
+        <created by="Michael Kay" on="2025-09-09"/>        
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>unparsed-binary("../docs/atomic.xml") => xs:hexBinary() => parse-xml()</test>
+        <result>
+            <assert-type>document-node(element(*,xs:untyped))</assert-type>
         </result>
     </test-case>
     
