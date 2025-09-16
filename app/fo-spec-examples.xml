@@ -9069,7 +9069,7 @@ return distinct-ordered-nodes(($x//c, $x//b, $x//a, $x//b)) ! name()
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-09-16"/>
       <environment ref="global"/>
       <test>
-        let $x := [1, "a", true()]}}
+        let $x := [1, "a", true()]
 return distinct-ordered-nodes(
            ($x/*[1], $x/type(xs:integer)) 
        =&gt; count() 
@@ -9087,7 +9087,7 @@ return distinct-ordered-nodes(
         parse-xml("&lt;doc&gt;
     &lt;div id='a'&gt;&lt;div id='b'&gt;&lt;div id='c'/&gt;&lt;/div&gt;&lt;/div&gt;
   &lt;/doc&gt;")//div
-   =&gt; innermost() =&gt; string(@id)
+   =&gt; innermost() =!&gt; string(@id)
       </test>
       <result>
          <assert-deep-eq>"c"</assert-deep-eq>
@@ -11516,7 +11516,7 @@ return for-each(1 to 10, $mapping otherwise void#0)
         deep-equal(
   parse-xml("&lt;a&gt;&lt;b/&gt;&lt;c/&gt;&lt;/a&gt;"),
   parse-xml("&lt;a&gt;&lt;c/&gt;&lt;b/&gt;&lt;/a&gt;"),
-  options := { 'unordered-elements': #a) }
+  options := { 'unordered-elements': #a }
 )
       </test>
       <result>
@@ -14031,6 +14031,14 @@ return map:keys-where($birthdays, fn($name, $date) {
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-09-16"/>
       <environment ref="global"/>
       <test>
+          let $week := {
+  0: "Sonntag", 1: "Montag", 2: "Dienstag", 3: "Mittwoch",
+  4: "Donnerstag", 5: "Freitag", 6: "Samstag"
+}
+          
+           return 
+
+        
         map:get($week, 7, "n/a")
       </test>
       <result>
@@ -14892,7 +14900,8 @@ element-to-map-plan((&lt;a&gt;&lt;b/&gt;&lt;b/&gt;&lt;/a&gt;, &lt;a&gt;&lt;b/&gt
       &lt;last&gt;Smith&lt;/last&gt;
     &lt;/name&gt;, 
     { 'plan': {'name': { 'layout': 'record' },
-               'middle': { 'layout': 'deep-skip' },
+               'middle': { 'layout': 'deep-skip' }
+              },
       'name-format' : 'local'
     }
   )
@@ -17546,7 +17555,7 @@ return deep-equal(
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-09-16"/>
       <environment ref="global"/>
       <test>
-        array:sort-by([1, 4, 6, 5, 3])
+        array:sort-by([1, 4, 6, 5, 3], {})
       </test>
       <result>
          <assert-deep-eq>[1, 3, 4, 5, 6]</assert-deep-eq>
@@ -17689,7 +17698,7 @@ let $exec := load-xquery-module(
   { 'content':$module }
 )
 let $variables := $exec?variables
-return $variables( #dyn:value )
+return $variables( #Q{http://example.com/dyn}value )
       </test>
       <result>
          <assert-deep-eq>4</assert-deep-eq>
@@ -19579,7 +19588,7 @@ return $array / child::type(xs:integer) =!&gt; jnode-selector()
       <environment ref="global"/>
       <test>
         let $map := {'Mo': 'Monday', 'Tu': 'Tuesday', 'We': 'Wednesday'}
-return $map / child::("Mo", "We", "Fr", "Su") =!&gt; jnode-selector()
+return $map / child::get("Mo", "We", "Fr", "Su") =!&gt; jnode-selector()
       </test>
       <result>
          <assert-deep-eq>"Mo", "We"</assert-deep-eq>
