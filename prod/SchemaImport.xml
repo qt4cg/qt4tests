@@ -62,7 +62,10 @@
   <environment name="substitution">
     <schema uri="http://www.w3.org/XQueryTest/substitution" file="SchemaImport/substitution.xsd"
       xsd-version="1.0">
-      <description>Defines some edge-case substitution groups.</description>
+      <description>
+        Defines some edge-case substitution groups. 
+        Note: see https://www.w3.org/Bugs/Public/show_bug.cgi?id=30039
+        which explains why this schema works in XSD 1.0 but not in XSD 1.1</description>
       <created by="Michael Kay" on="2012-10-10"/>
     </schema>
   </environment>
@@ -1214,6 +1217,7 @@
     <created by="Michael Kay" on="2006-11-14"/>
     <environment ref="QNameComparisonTest"/>
     <dependency type="spec" value="XQ10+"/>
+    
     <test><![CDATA[
         declare construction preserve; 
         declare copy-namespaces preserve, inherit; 
@@ -2225,6 +2229,33 @@
         import schema namespace s="http://www.w3.org/XQueryTest/substitution";
         declare function local:f($p as schema-element(s:H)) as xs:integer {3}; 
         local:f#1 instance of function(schema-element(s:G)) as xs:integer
+      ]]></test>
+    <result>
+      <assert-false/>
+    </result>
+  </test-case>
+  
+  <test-case name="substitution-033">
+    <description>
+      4.0 clarifies that the type of an element declaration is the {type definition}
+      property as defined in XSD, which defaults to the first named substitution group.
+      The result of the test is false, because schema-element() requires that the type
+      matches the {type definition} of the named element, which defaults to the type
+      of the substitution group head.
+    </description>
+    <created by="Michael Kay" on="2025-09-21"/>
+    <environment ref="substitution"/>
+    <dependency type="spec" value="XQ30+"/>
+    <dependency type="xsd-version" value="1.0"/>
+    <test><![CDATA[
+        import schema namespace s="http://www.w3.org/XQueryTest/substitution"; 
+        declare variable $in :=
+            validate strict { 
+                <s:cuckoo>
+                  <s:Z>23</s:Z>
+                </s:cuckoo>
+            }; 
+        $in//s:Z instance of schema-element(s:Z)
       ]]></test>
     <result>
       <assert-false/>
