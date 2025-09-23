@@ -1358,6 +1358,41 @@
     </result>
   </test-case>
   
+  <test-case name="fn-load-xquery-module-403">
+    <description>Load a module that needs 4.0 features (specifically, JNodes).</description>
+    <created by="Michael Kay" on="2025-09-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/valid/module" file="load-xquery-module/valid-module.xqm"/>
+    <test>
+      let $module-text := ``[
+          xquery version "4.0";
+          
+          module namespace vm = "http://www.w3.org/fots/fn/load-xquery-module/valid/module";
+         
+          declare function vm:jpath() {
+              {'a':1, 'b':[2, 3]} / b / get(2) / jnode-content()
+          };
+          
+      ]``
+      
+      let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/valid/module",
+          $module := fn:load-xquery-module($module-ns, 
+                          {'content': $module-text,
+                           'xquery-version': 4.0
+                          })
+      return
+        let $vars := $module("variables"),
+            $fns := $module("functions")
+        return
+          let $f := $fns(QName($module-ns, "jpath"))(0)
+          return $f() eq 3
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
   <test-case name="fn-load-xquery-module-901">
     <description>Checks for an error when calling fn:load-xquery-module without a module-uri.</description>
     <created by="Tim Mills" on="2016-09-07"/>
