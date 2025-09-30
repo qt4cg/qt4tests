@@ -875,7 +875,7 @@ declare option output:version  "4.0";
       change="added dependency inline with bug issue #21868"/>
     <modified by="Michael Kay" on="2013-06-14" change="relax the expected result pattern"/>
     <dependency type="feature" value="serialization" satisfied="true"/>
-    <dependency type="spec" value="XQ30+"/>
+    <dependency type="spec" value="XQ30 XQ31"/>
     <test><![CDATA[
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 declare option output:method  "html";
@@ -895,6 +895,35 @@ declare option output:version  "5.0";
       </all-of>
     </result>
   </test-case>
+  
+  <test-case name="Serialization-html-36a" covers-40="PR2212">
+    <description>Test media-type and include-content-type parameters for HTML 5.0, where input had a head element</description>
+    <created by="Henry Zongaro" on="2012-10-26"/>
+    <modified by="O'Neil Delpratt" on="2013-05-30"
+      change="added dependency inline with bug issue #21868"/>
+    <modified by="Michael Kay" on="2013-06-14" change="relax the expected result pattern"/>
+    <modified by="Michael Kay" on="2025-09-30" change="constrain the expected result pattern as per PR2212"/>
+    <dependency type="feature" value="serialization" satisfied="true"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+declare option output:method  "html";
+declare option output:indent  "no";
+declare option output:include-content-type  "yes";
+declare option output:media-type  "text/html";
+declare option output:encoding  "UTF-8";
+declare option output:version  "5.0";
+
+<html><head/></html>
+]]></test>
+    <result>
+      <all-of>
+        <serialization-matches flags="i"
+          ><![CDATA[<!DOCTYPE\s+html\s*>\s*<html><head><meta charset=['"]UTF-8['"] *></head></html>]]></serialization-matches>
+        <serialization-matches><![CDATA[<!.......\s+(html|HTML)\s*>\s*<html><head><[^>]*></head></html>]]></serialization-matches>
+      </all-of>
+    </result>
+  </test-case>
 
   <test-case name="Serialization-html-37" covers-30="html-output">
     <description>Test media-type and include-content-type parameters for HTML 5.0, where input had a head element already containing a meta element</description>
@@ -903,7 +932,7 @@ declare option output:version  "5.0";
       change="added dependency inline with bug issue #21868"/>
     <modified by="Michael Kay" on="2013-06-14" change="relax the expected result pattern"/>
     <dependency type="feature" value="serialization" satisfied="true"/>
-    <dependency type="spec" value="XQ30+"/>
+    <dependency type="spec" value="XQ30 XQ31"/>
     <test><![CDATA[
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 declare option output:method  "html";
@@ -919,6 +948,35 @@ declare option output:version  "5.0";
       <all-of>
         <serialization-matches flags="i"
           ><![CDATA[<!DOCTYPE +html *>\s*<html><head><meta +(?:(?:http-equiv=(['"])content-type\1 +content=(['"])text/html; *charset=UTF-8\2)|(?:content=(['"])text/html; *charset=UTF-8\3 +http-equiv=(['"])content-type\4)) *></head></html>]]></serialization-matches>
+        <serialization-matches><![CDATA[<!....... +(html|HTML) *>\s*<html><head><[^>]*></head></html>]]></serialization-matches>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="Serialization-html-37a" covers-40="PR2212">
+    <description>Test media-type and include-content-type parameters for HTML 5.0, where input had a head element already containing a meta element</description>
+    <created by="Henry Zongaro" on="2012-10-26"/>
+    <modified by="O'Neil Delpratt" on="2013-05-30"
+      change="added dependency inline with bug issue #21868"/>
+    <modified by="Michael Kay" on="2013-06-14" change="relax the expected result pattern"/>
+    <modified by="Michael Kay" on="2025-09-30" change="constrain the expected result pattern as per PR2212"/>
+    <dependency type="feature" value="serialization" satisfied="true"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+declare option output:method  "html";
+declare option output:indent  "no";
+declare option output:include-content-type  "yes";
+declare option output:media-type  "text/html";
+declare option output:encoding  "UTF-8";
+declare option output:version  "5.0";
+
+<html><head><meta http-equiv="Content-Type" content="text/html;version='3.0'"/></head></html>
+]]></test>
+    <result>
+      <all-of>
+        <serialization-matches flags="i"
+          ><![CDATA[<!DOCTYPE +html *>\s*<html><head><meta +charset=['"]UTF-8['"] *></head></html>]]></serialization-matches>
         <serialization-matches><![CDATA[<!....... +(html|HTML) *>\s*<html><head><[^>]*></head></html>]]></serialization-matches>
       </all-of>
     </result>
