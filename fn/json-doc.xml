@@ -794,14 +794,16 @@
    <test-case name="json-doc-045">
       <description>Use supplied number-parser</description>
       <created by="Michael Kay, Saxonica" on="2020-12-15"/>
+      <modified by="Christian Gruen" on="2025-10-02" change="bug fix"/>
+      <environment ref="json-doc-array"/>
       <dependency type="spec" value="XP40+ XQ40+"></dependency>
-      <test>'{"a":1, "b":2.01}' => parse-json(map { 'number-parser': function($x){$x=>xs:double()=>xs:integer()} })</test>
+      <test>fn:json-doc(
+        'http://www.w3.org/qt3/json/arrayNumber-json',
+        { 'number-parser': fn { . div 2 } }
+      )</test>
       <result>
          <all-of>
-            <assert>$result?a = 1</assert>
-            <assert>$result?b = 2</assert>
-            <assert>$result?a instance of xs:integer</assert>
-            <assert>$result?b instance of xs:integer</assert>
+            <assert-deep-eq>[0.5]</assert-deep-eq>
          </all-of>
       </result>
    </test-case>
@@ -1111,7 +1113,7 @@
       <description>
 
          "The function may raise any error defined for the
-         fn:unparsed-text or fn:parse-json functions."
+         fn:unparsed-text or fn:json-doc functions."
 
          "A dynamic error is raised [err:FOUT1170] if $href contains a
          fragment identifier, or if it cannot be resolved to an
@@ -1133,7 +1135,7 @@
       <description>
 
          "The function may raise any error defined for the
-         fn:unparsed-text or fn:parse-json functions."
+         fn:unparsed-text or fn:json-doc functions."
 
          Derived from fn-unparsed-text-015
 
@@ -1149,7 +1151,7 @@
       <description>
 
          "The function may raise any error defined for the
-         fn:unparsed-text or fn:parse-json functions."
+         fn:unparsed-text or fn:json-doc functions."
 
          Derived from fn-unparsed-text-019
 
@@ -1165,7 +1167,7 @@
       <description>
 
          "The function may raise any error defined for the
-         fn:unparsed-text or fn:parse-json functions."
+         fn:unparsed-text or fn:json-doc functions."
 
          Derived from fn-unparsed-text-023
  
@@ -1184,7 +1186,7 @@
       <description>
 
          "The function may raise any error defined for the
-         fn:unparsed-text or fn:parse-json functions."
+         fn:unparsed-text or fn:json-doc functions."
 
          Derived from fn-unparsed-text-025
 
@@ -1207,6 +1209,57 @@
       <test>json-doc('http://www.w3.org/qt3/json/mapZeroLength-json', ())</test>
       <result>
          <assert-deep-eq>map{"":"", "0":"0"}</assert-deep-eq>         
+      </result>
+   </test-case>
+
+   <test-case name="fn-json-doc-bom-001" covers-40="PR2013">
+      <description>Binary file input</description>
+      <created by="Christian Gruen" on="2025-10-02"/>        
+      <environment name="empty"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>json-doc('parse-json/bom-none.json')</test>
+      <result>
+         <assert-deep-eq>{ "𱁬": "Taito" }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-json-doc-bom-002" covers-40="PR2013">
+      <description>Binary file input with BOM</description>
+      <created by="Christian Gruen" on="2025-10-02"/>        
+      <environment name="empty"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>json-doc('parse-json/bom-utf8.json')</test>
+      <result>
+         <assert-deep-eq>{ "𱁬": "Taito" }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-json-doc-bom-003" covers-40="PR2013">
+      <description>Binary file input with BOM</description>
+      <created by="Christian Gruen" on="2025-10-02"/>        
+      <environment name="empty"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>json-doc('parse-json/bom-utf16le.json')</test>
+      <result>
+         <assert-deep-eq>{ "𱁬": "Taito" }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-json-doc-bom-004" covers-40="PR2013">
+      <description>Binary file input with BOM</description>
+      <created by="Christian Gruen" on="2025-10-02"/>        
+      <environment name="empty"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>json-doc('parse-json/bom-utf16be.json')</test>
+      <result>
+         <assert-deep-eq>{ "𱁬": "Taito" }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-json-doc-bom-005" covers-40="PR2013">
+      <description>Binary file input with invalid BOM</description>
+      <created by="Christian Gruen" on="2025-10-02"/>        
+      <environment name="empty"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>json-doc('parse-json/bom-invalid.json')</test>
+      <result>
+         <error code="FOUT1200"/>
       </result>
    </test-case>
 
