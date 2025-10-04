@@ -1,4 +1,4 @@
-The data files in this directory are taken from http://json.org/example.html
+The data files data001.json-data005.json are taken from http://json.org/example.html
 
 The original carries no copyright or licensing information.
 
