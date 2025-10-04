@@ -5,27 +5,30 @@
   <test-case name="sort-with-001">
     <description>Empty sequence</description>
     <created by="Christian Gruen" on="2024-02-19"/>
+    <modified by="Michael Kay" on="2025-10-04" change="PR2228 requires second arg to be non-empty"/>
     <test>sort-with((), ())</test>
     <result>
-      <assert-empty/>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
   
   <test-case name="sort-with-002">
     <description>No comparator</description>
     <created by="Christian Gruen" on="2024-02-19"/>
+    <modified by="Michael Kay" on="2025-10-04" change="PR2228 requires second arg to be non-empty"/>
     <test>sort-with(1 to 3, ())</test>
     <result>
-      <assert-deep-eq>1, 2, 3</assert-deep-eq>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
   
   <test-case name="sort-with-003">
     <description>No comparator</description>
     <created by="Christian Gruen" on="2024-02-19"/>
+    <modified by="Michael Kay" on="2025-10-04" change="PR2228 requires second arg to be non-empty"/>
     <test>sort-with(reverse(1 to 3), ())</test>
     <result>
-      <assert-deep-eq>3, 2, 1</assert-deep-eq>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
   
@@ -237,10 +240,79 @@ sort-with(
   <test-case name="sort-with-019">
     <description>Empty list of comparators</description>
     <created by="Michael Kay" on="2024-03-22"/>
+    <modified by="Michael Kay" on="2025-10-04" change="PR2228 requires second arg to be non-empty"/>    
     <test>sort-with(('c', 'b', 'a'), ())</test>
     <result>
-      <assert-deep-eq>'c', 'b', 'a'</assert-deep-eq>
+      <error code="XPTY0004"/>
     </result>
+  </test-case>
+  
+  <test-case name="sort-with-020">
+    <description>Empty input sequence</description>
+    <created by="Michael Kay" on="2025-10-04"/>    
+    <test>sort-with((), compare#2)</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-021">
+    <description>Singleton input sequence</description>
+    <created by="Michael Kay" on="2025-10-04"/>    
+    <test>sort-with(42, compare#2)</test>
+    <result>
+      <assert-eq>42</assert-eq>>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-022">
+    <description>NaN is equal to itself and less than any other value</description>
+    <created by="Michael Kay" on="2025-10-04"/>    
+    <test>sort-with((42, xs:double('NaN'), xs:float('NaN'), xs:double("-INF")), compare#2)</test>
+    <result>
+      <all-of>
+        <assert>is-NaN($result[1])</assert>
+        <assert>is-NaN($result[2])</assert>
+        <assert>string($result[3]) eq "-INF"</assert>
+        <assert>$result[4] eq 42</assert>
+        <assert>$result[1] instance of xs:double</assert>
+        <assert>$result[2] instance of xs:float</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-023">
+    <description>compare#2 with non-comparables</description>
+    <created by="Michael Kay" on="2025-10-04"/>    
+    <test>sort-with((42, "forty-two"), compare#2)</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="sort-with-024">
+    <description>sort first by type then by value</description>
+    <created by="Michael Kay" on="2025-10-04"/>    
+    <test>sort-with((42, "forty-two", xs:date("2022-02-22"), xs:dayTimeDuration("P1D"),
+                     29, "twenty-nine", xs:date("2015-05-08"), xs:dayTimeDuration("P2D")), 
+                     ( fn($x, $y) { compare(
+                                     atomic-type-annotation($x)?primitive-type()?name => string(),
+                                     atomic-type-annotation($y)?primitive-type()?name => string()) },
+                       compare#2
+                     ))</test>
+    <result>
+      <assert-deep-eq>
+        xs:date("2015-05-08"),
+        xs:date("2022-02-22"),
+        29,
+        42,
+        xs:dayTimeDuration("P1D"),
+        xs:dayTimeDuration("P2D"),
+        "forty-two",
+        "twenty-nine"       
+      </assert-deep-eq>
+    </result>,
+    
   </test-case>
   
 </test-set>

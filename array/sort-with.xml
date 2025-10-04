@@ -1,0 +1,340 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="array-sort-with" covers-40="PR2228">
+  <description>Tests for the fn:sort-with function</description>
+  <dependency type="spec" value="XP40+ XQ40+"/>
+  
+  <test-case name="array-sort-with-001">
+    <description>Empty sequence</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <modified by="Michael Kay" on="2025-10-04" change="PR2228 requires second arg to be non-empty"/>
+    <test>array:sort-with([], ())</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-002">
+    <description>No comparator</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <modified by="Michael Kay" on="2025-10-04" change="PR2228 requires second arg to be non-empty"/>
+    <test>array:sort-with([1, 2, 3], ())</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-003">
+    <description>No comparator</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <modified by="Michael Kay" on="2025-10-04" change="PR2228 requires second arg to be non-empty"/>
+    <test>array:sort-with(array:reverse([1, 2, 3]), ())</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-004">
+    <description>Compare input as numbers</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>array:sort-with(array:reverse([8, 9, 10]), compare#2)</test>
+    <result>
+      <assert-deep-eq>[8, 9, 10]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-005">
+    <description>Compare input as numbers</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>array:sort-with(array:reverse([8, 9, 10]), op('-'))</test>
+    <result>
+      <assert-deep-eq>[8, 9, 10]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-006">
+    <description>Compare input as numbers</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>array:sort-with(array:reverse([8, 9, 10]), fn($a, $b) { $a - $b })</test>
+    <result>
+      <assert-deep-eq>[8, 9, 10]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-007">
+    <description>Compare input as numbers</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>array:sort-with([8, 9, 10], fn($a, $b) { $b - $a })</test>
+    <result>
+      <assert-deep-eq>[10, 9, 8]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-008">
+    <description>Compare input as strings</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>array:sort-with(reverse([8, 9, 10]), fn($a, $b) { compare(string($a), string($b)) })</test>
+    <result>
+      <assert-deep-eq>[10, 8, 9]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-009">
+    <description>Compare input as strings</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>array:sort-with(reverse([8, 9, 10]), fn($a, $b) { compare(string($b), string($a)) })</test>
+    <result>
+      <assert-deep-eq>[9, 8, 10]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-010">
+    <description>Compare multiple types</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>
+      array:sort-with(
+        [xs:date('2001-01-01'), '2001', 2001.3e0, 2001.5],
+        fn($a, $b) { compare(string($a), string($b)) }
+      )
+    </test>
+    <result>
+      <assert-deep-eq>['2001', xs:date('2001-01-01'), 2001.3e0, 2001.5]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-011">
+    <description>Stable sort</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>array:sort-with([1, 1e0, 1.0, 1e0, 1], compare#2)</test>
+    <result>
+      <any-of>
+        <assert-deep-eq>[1, 1e0, 1.0, 1e0, 1]</assert-deep-eq>
+        <assert>$result?1 instance of xs:integer</assert>
+        <assert>$result?2 instance of xs:double</assert>
+        <assert>$result?3 instance of xs:decimal</assert>
+        <assert>$result?4 instance of xs:double</assert>
+        <assert>$result?5 instance of xs:integer</assert>
+      </any-of>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-012">
+    <description>Multiple comparators</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>array:sort-with(['c', 'b', 'a'], (compare#2, compare#2, compare#2))</test>
+    <result>
+      <assert-deep-eq>['a', 'b', 'c']</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-013">
+    <description>Multiple comparators</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>
+      array:sort-with(
+        [[ 1, 'uno' ], [ 2, 'dos' ], [ 3, 'tres' ],
+         [ 1, 'un' ], [ 2, 'deux' ], [ 3, 'trois' ]],
+        (
+          fn($a, $b) { compare($a(1), $b(1)) },
+          fn($a, $b) { compare($a(2), $b(2)) }
+        )
+      )
+    </test>
+    <result>
+      <assert-deep-eq>
+        [[ 1, "un" ], [ 1, "uno" ], [ 2, "deux" ], [ 2, "dos" ], [ 3, "tres" ], [ 3, "trois" ]]
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="array-sort-with-014">
+    <description>Custom comparator</description>
+    <created by="Christian Gruen" on="2024-02-19"/>
+    <test>
+      array:sort-with(
+        [[ 1, 'uno' ], [ 2, 'dos' ], [ 3, 'tres' ],
+         [ 1, 'un' ], [ 2, 'deux' ], [ 3, 'trois' ]],
+        fn($a, $b) {
+          fold-left(1 to array:size($a), 0, fn($df, $i) {
+            if($df != 0) then $df else compare($a($i), $b($i))
+          })
+        }
+      )
+    </test>
+    <result>
+      <assert-deep-eq>
+        [[ 1, "un" ], [ 1, "uno" ], [ 2, "deux" ], [ 2, "dos" ], [ 3, "tres" ], [ 3, "trois" ]]
+      </assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-015">
+    <description>Sort nodes</description>
+    <created by="Michael Kay" on="2024-03-22"/>
+    <test><![CDATA[
+      array:sort-with(array{parse-xml("<doc><a>x</a><a>t</a><a>e</a></doc>")//a}, 
+                compare#2)]]></test>
+    <result>
+      <all-of>
+        <assert-type>array(element(a)+)</assert-type>
+        <assert>array:size($result) = 3</assert>
+        <assert>string($result?1) eq 'e'</assert>
+        <assert>string($result?2) eq 't'</assert>
+        <assert>string($result?3) eq 'x'</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-016">
+    <description>Sort maps</description>
+    <created by="Michael Kay" on="2024-03-22"/>
+    <test>
+      array:sort-with([map{12:'x'}, map{15:'y', 3:'z'}, map{11:'a', 6:'b'}], 
+                fn($a,$b){max(map:keys($a)) - max(map:keys($b))})
+    </test>
+    <result>
+      <all-of>
+        <assert-type>array(map(xs:integer, xs:string)+)</assert-type>
+        <assert>array:size($result) = 3</assert>
+        <assert>($result?1?11) = 'a'</assert>
+        <assert>($result?2?12) = 'x'</assert>
+        <assert>($result?3?15) = 'y'</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-017">
+    <description>Sort arrays</description>
+    <created by="Michael Kay" on="2024-03-22"/>
+    <test>
+      let $in := "q,w,e,r,t,y"||char(10)||"a,s,d,f,g,h"||char(10)||"a,z,e,r,t,y"
+      let $arrays := array{csv-to-arrays($in)}
+      return array:sort-with($arrays, for $cell in 1 to 6 return fn($a,$b){compare($a?$cell, $b?$cell)})
+    </test>
+    <result>
+      <all-of>
+        <assert-type>array(array(xs:string)+)</assert-type>
+        <assert>array:size($result) = 3</assert>
+        <assert>string-join($result?1?*) eq "asdfgh"</assert>
+        <assert>string-join($result?2?*) eq "azerty"</assert>
+        <assert>string-join($result?3?*) eq "qwerty"</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-018">
+    <description>Sort nodes</description>
+    <created by="Michael Kay" on="2024-03-22"/>
+    <test><![CDATA[
+      let $doc1 := parse-xml("<doc><a>1</a><a>2</a><a>3</a></doc>")
+      let $doc2 := parse-xml("<cod><a>4</a><a>5</a><a>6</a></cod>")
+      let $doc-order := fn($x, $y) {if ($x is $y) then 0 else if ($x << $y) then -1 else +1}
+      let $root-name := fn($x){local-name($x/ancestor::*[last()])}     
+      return array:sort-with([$doc1//a, $doc2//a], 
+                       (fn($x,$y){compare($root-name($x), $root-name($y))}, $doc-order))
+      ]]></test>
+    <result>
+      <assert>string-join($result?*!string()) eq "456123"</assert>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-019">
+    <description>Empty list of comparators</description>
+    <created by="Michael Kay" on="2024-03-22"/>
+    <modified by="Michael Kay" on="2025-10-04" change="PR2228 requires second arg to be non-empty"/>    
+    <test>array:sort-with(['c', 'b', 'a'], ())</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-020">
+    <description>Empty input sequence</description>
+    <created by="Michael Kay" on="2025-10-04"/>    
+    <test>array:sort-with([], compare#2)</test>
+    <result>
+      <assert-deep-eq>[]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-021">
+    <description>Singleton input sequence</description>
+    <created by="Michael Kay" on="2025-10-04"/>    
+    <test>array:sort-with([42], compare#2)</test>
+    <result>
+      <assert-eq>[42]</assert-eq>>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-022">
+    <description>NaN is equal to itself and less than any other value</description>
+    <created by="Michael Kay" on="2025-10-04"/>    
+    <test>array:sort-with([42, xs:double('NaN'), xs:float('NaN'), xs:double("-INF")], compare#2)</test>
+    <result>
+      <all-of>
+        <assert>is-NaN($result?1)</assert>
+        <assert>is-NaN($result?2)</assert>
+        <assert>string($result?3) eq "-INF"</assert>
+        <assert>$result?4 eq 42</assert>
+        <assert>$result?1 instance of xs:double</assert>
+        <assert>$result?2 instance of xs:float</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-023">
+    <description>compare#2 with non-comparables</description>
+    <created by="Michael Kay" on="2025-10-04"/>    
+    <test>array:sort-with([42, "forty-two"], compare#2)</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="array-sort-with-024">
+    <description>sort first by type then by value</description>
+    <created by="Michael Kay" on="2025-10-04"/>    
+    <test>array:sort-with([42, "forty-two", xs:date("2022-02-22"), xs:dayTimeDuration("P1D"),
+                     29, "twenty-nine", xs:date("2015-05-08"), xs:dayTimeDuration("P2D")], 
+                     ( fn($x, $y) { compare(
+                                     atomic-type-annotation($x)?primitive-type()?name => string(),
+                                     atomic-type-annotation($y)?primitive-type()?name => string()) },
+                       compare#2
+                     ))</test>
+    <result>
+      <assert-deep-eq> [
+        xs:date("2015-05-08"),
+        xs:date("2022-02-22"),
+        29,
+        42,
+        xs:dayTimeDuration("P1D"),
+        xs:dayTimeDuration("P2D"),
+        "forty-two",
+        "twenty-nine"
+      ]  
+      </assert-deep-eq>
+    </result>,
+    
+  </test-case>
+  
+  <test-case name="array-sort-with-025">
+    <description>sort array of maps</description>
+    <created by="Michael Kay" on="2025-10-04"/>    
+    <test>array:sort-with([{"a":1, "b":1, "c":1},
+                           {"a":2, "b":1, "c":1},
+                           {"a":1, "b":2, "c":5},
+                           {"a":2, "b":1, "c":4},
+                           {"a":2, "b":2, "c":3},
+                           {"a":1, "b":2, "c":3}],
+          for $k in ("a", "b", "c") return fn($x, $y) { $x?$k - $y?$k })</test>
+    <result>
+      <assert-deep-eq>
+        [{"a":1, "b":1, "c":1},
+         {"a":1, "b":2, "c":3},
+         {"a":1, "b":2, "c":5},
+         {"a":2, "b":1, "c":1},
+         {"a":2, "b":1, "c":4},
+         {"a":2, "b":2, "c":3}]
+      </assert-deep-eq>
+    </result>
+  </test-case>
+  
+</test-set>
