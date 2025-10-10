@@ -427,6 +427,93 @@ it put its sooty foot.</fn:non-match></fn:analyze-string-result>]]></assert-xml>
       </result>
    </test-case>
    
+   <test-case name="analyzeString-033" covers-40="PR1856">
+      <description>Both ordinary and lookahead captured groups present</description>
+      <created by="Michael Kay" on="2025-10-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>fn:analyze-string("Chapter 17", "(Chapter|Appendix)\s+(?=(\d+))")</test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions">
+   <match><group nr="1">Chapter</group> <lookahead-group nr="2" position="9" value="17"/></match>
+   <non-match>17</non-match>
+</analyze-string-result>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="analyzeString-034" covers-40="PR1856">
+      <description>Multiple lookahead captured groups present</description>
+      <created by="Michael Kay" on="2025-10-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>fn:analyze-string("Chapter 17c", "(Chapter|Appendix)\s+(?=(\d+)([a-z])?)")</test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions">
+   <match><group nr="1">Chapter</group> <lookahead-group nr="2" position="9" value="17"/><lookahead-group nr="3" position="11" value="c"/></match>
+   <non-match>17c</non-match>
+</analyze-string-result>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="analyzeString-035" covers-40="PR1856">
+      <description>Zero-length lookahead captured groups present</description>
+      <created by="Michael Kay" on="2025-10-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>fn:analyze-string("Chapter 17", "(Chapter|Appendix)\s+(?=(\d+)([a-z]?))")</test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions">
+   <match><group nr="1">Chapter</group> <lookahead-group nr="2" position="9" value="17"/><lookahead-group nr="3" position="11" value=""/></match>
+   <non-match>17</non-match>
+</analyze-string-result>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="analyzeString-036" covers-40="PR1856">
+      <description>Type annotations on result</description>
+      <created by="Michael Kay" on="2025-10-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test>document { fn:analyze-string("Chapter 17", "(Chapter|Appendix)\s+(?=(\d+))") }</test>
+      <result>
+         <all-of>
+            <assert>node-type-annotation(/*:analyze-string-result)?name eq #fn:analyze-string-result-type</assert>
+            <assert>node-type-annotation(/*/*:match)?name eq #fn:match-type</assert>
+            <assert>node-type-annotation(/*/*/*:group)?name eq #fn:group-type</assert>
+            <assert>node-type-annotation(/*/*/*:group/@nr)?name eq #xs:positiveInteger</assert>
+            <assert>node-type-annotation(/*/*/*:lookahead-group)?name eq #fn:lookahead-group-type</assert>
+            <assert>node-type-annotation(/*/*/*:lookahead-group/@nr)?name eq #xs:positiveInteger</assert>
+            <assert>node-type-annotation(/*/*/*:lookahead-group/@position)?name eq #xs:positiveInteger</assert>
+            <assert>node-type-annotation(/*/*/*:lookahead-group/@value)?name eq #xs:string</assert>
+            <assert>node-type-annotation(/*/*:non-match)?name eq #xs:string</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="analyzeString-037" covers-40="PR1856">
+      <description>Validate result against build-in schema for FN namespace</description>
+      <created by="Michael Kay" on="2025-10-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test>
+         import schema "http://www.w3.org/2005/xpath-functions";
+         let $d1 := document { fn:analyze-string("Chapter 17", "(Chapter|Appendix)\s+(?=(\d+))") }
+         let $d2 := validate type xs:untyped {$d1}
+         let $d3 := validate strict { $d2 }
+         return $d3
+      </test>
+      <result>
+         <all-of>
+            <assert>node-type-annotation(/*:analyze-string-result)?name eq #fn:analyze-string-result-type</assert>
+            <assert>node-type-annotation(/*/*:match)?name eq #fn:match-type</assert>
+            <assert>node-type-annotation(/*/*/*:group)?name eq #fn:group-type</assert>
+            <assert>node-type-annotation(/*/*/*:group/@nr)?name eq #xs:positiveInteger</assert>
+            <assert>node-type-annotation(/*/*/*:lookahead-group)?name eq #fn:lookahead-group-type</assert>
+            <assert>node-type-annotation(/*/*/*:lookahead-group/@nr)?name eq #xs:positiveInteger</assert>
+            <assert>node-type-annotation(/*/*/*:lookahead-group/@position)?name eq #xs:positiveInteger</assert>
+            <assert>node-type-annotation(/*/*/*:lookahead-group/@value)?name eq #xs:string</assert>
+            <assert>node-type-annotation(/*/*:non-match)?name eq #xs:string</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
    <test-case name="analyzeString-901">
       <description> analyze-string, error, bad regex pattern</description>
       <created by="Michael Kay" on="2009-10-18"/>
