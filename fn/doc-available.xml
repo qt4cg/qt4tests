@@ -11,6 +11,17 @@
       </source>
       <param name="uri" as="xs:string" select="'http://www.w3.org/fots/docs/works-mod.xml'" declared="false"/>
    </environment>
+   
+   <environment name="bib-with-schema">
+      <source file="../docs/bib.xml" uri="http://www.w3.org/fots/docs/bib.xml">
+         <description>A few books</description>
+         <created by="Carmelo Montanez" on="2005-03-04"/>
+      </source>
+      <schema uri="" file="../docs/bib.xsd">
+         <description>A schema for bib.xml.</description>
+         <created by="Michael Kay" on="2025-04-15"/>
+      </schema>
+   </environment>
 
    <test-case name="fn-doc-available-1">
       <description> Evaluation of ana fn:doc-available function with wrong arity. </description>
@@ -415,9 +426,10 @@
    <test-case name="fn-doc-available-40-065" covers-40="PR1910">
       <description>Options on fn:doc-available - schema validation - schema-location</description>
       <created by="Michael Kay" on="2025-04-08"/>
+      <modified by="Michael Kay" on="2025-10-06" change="correct option name"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <dependency type="feature" value="schemaImport"/>
-      <test>fn:doc-available("../docs/bib.xml", {'xsd-validation':'strict', 'xsi-schema-location':true()})</test>
+      <test>fn:doc-available("../docs/bib-with-schema-location.xml", {'xsd-validation':'strict', 'use-xsi-schema-location':true()})</test>
       <result>
          <assert-true/>
       </result>
@@ -426,9 +438,10 @@
    <test-case name="fn-doc-available-40-066" covers-40="PR1910">
       <description>Options on fn:doc-available - schema validation - schema-location</description>
       <created by="Michael Kay" on="2025-04-08"/>
+      <modified by="Michael Kay" on="2025-10-06" change="correct option name"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <dependency type="feature" value="schemaImport"/>
-      <test>fn:doc-available("../docs/bib.xml", {'xsd-validation':'strict', 'xsi-schema-location':false()})</test>
+      <test>fn:doc-available("../docs/bib.xml", {'xsd-validation':'strict', 'use-xsi-schema-location':false()})</test>
       <result>
          <assert-false/>
       </result>
@@ -439,6 +452,41 @@
       <created by="Michael Kay" on="2025-04-08"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <dependency type="feature" value="schemaImport"/>
+      <test>fn:doc-available("../docs/bib.xml", {'xsd-validation':'strict'})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-doc-available-40-068" covers-40="PR1910 PR2232">
+      <description>Options on fn:doc-available - invalid option</description>
+      <created by="Michael Kay" on="2025-04-08"/>
+      <environment ref="bib-with-schema"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test>fn:doc-available("../docs/bib.xml", {'xsd-validation':'use rng'})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-doc-available-40-069" covers-40="PR1910 PR2232">
+      <description>Options on fn:doc-available - invalid option</description>
+      <created by="Michael Kay" on="2025-04-08"/>
+      <environment ref="bib-with-schema"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test>fn:doc-available("../docs/bib.xml", {'rng-validation':true()})</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-doc-available-40-070" covers-40="PR1910 PR2232">
+      <description>Options on fn:doc-available - schema validation - non-schema-aware processor</description>
+      <created by="Michael Kay" on="2025-04-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <dependency type="feature" value="schemaImport" satisfied="false"/>
       <test>fn:doc-available("../docs/bib.xml", {'xsd-validation':'strict'})</test>
       <result>
          <assert-false/>
