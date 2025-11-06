@@ -37,6 +37,7 @@
    <test-case name="invisible-xml-003">
       <description>Simple date grammar as XML</description>
       <created by="Norm Tovey-Walsh" on="2024-08-29"/>
+      <modified by="Christian Gruen" on="2025-11-03"/>
       <test>
          let $grammar := <![CDATA[parse-xml("<ixml><rule name='date'><alt><nonterminal name='year'/>
            <literal tmark='-' string='-'/><nonterminal name='month'/><literal tmark='-' string='-'/>
@@ -49,11 +50,35 @@
            <alt><literal string='3'/><inclusion><member string='0'/><member string='1'/>
            </inclusion></alt></rule><rule mark='-' name='d'><alt><inclusion>
            <member from='0' to='9'/></inclusion></alt></rule></ixml>")]]>
-         let $parse := invisible-xml($grammar)
+         let $parse := invisible-xml($grammar/ixml)
          return $parse("2023-10-31")
       </test>
       <result>
          <assert-xml><![CDATA[<date><year>2023</year><month>10</month><day>31</day></date>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="invisible-xml-006">
+      <description>Simple grammar: document node</description>
+      <created by="Christian Gruen" on="2025-11-03"/>
+      <test><![CDATA[
+        let $grammar := parse-xml("<ixml><rule name='s'/></ixml>")
+        return invisible-xml($grammar)('')
+      ]]></test>
+      <result>
+         <error code="FOIX0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="invisible-xml-007">
+      <description>Simple grammar: element</description>
+      <created by="Christian Gruen" on="2025-11-03"/>
+      <test><![CDATA[
+        let $grammar := parse-xml("<ixml><rule name='s'/></ixml>")/*
+        return invisible-xml($grammar)('')
+      ]]></test>
+      <result>
+         <assert-xml><![CDATA[<s/>]]></assert-xml>
       </result>
    </test-case>
    

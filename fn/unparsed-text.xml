@@ -957,44 +957,267 @@
       </result>
    </test-case>
 
-   <test-case name="fn-unparsed-text-bom-001">
-      <description>File input</description>
-      <created by="Christian Gruen" on="2025-10-02"/>        
-      <test>unparsed-text('parse-json/bom-none.json')</test>
+   <test-case name="fn-unparsed-text-bom-001" covers-40="PR2249">
+      <description>File input: no BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-none.csv')</test>
       <result>
-         <assert-string-value>{ "𱁬": "Taito" }</assert-string-value>
+         <assert-string-value>𱁬</assert-string-value>
       </result>
    </test-case>
-   <test-case name="fn-unparsed-text-bom-002">
-      <description>File input with BOM</description>
-      <created by="Christian Gruen" on="2025-10-02"/>        
-      <test>unparsed-text('parse-json/bom-utf8.json')</test>
+   <test-case name="fn-unparsed-text-bom-002" covers-40="PR2249">
+      <description>File input: no BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-none.csv', 'utf-8')</test>
       <result>
-         <assert-string-value>{ "𱁬": "Taito" }</assert-string-value>
+         <assert-string-value>𱁬</assert-string-value>
       </result>
    </test-case>
-   <test-case name="fn-unparsed-text-bom-003">
-      <description>File input with BOM</description>
-      <created by="Christian Gruen" on="2025-10-02"/>        
-      <test>unparsed-text('parse-json/bom-utf16le.json')</test>
+   <test-case name="fn-unparsed-text-bom-003" covers-40="PR2249">
+      <description>File input: no BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-none.csv', 'utf-16')
+      => string-to-codepoints() =!> format-integer('16^x')</test>
       <result>
-         <assert-string-value>{ "𱁬": "Taito" }</assert-string-value>
+         <assert-deep-eq>'f0b1', '81ac'</assert-deep-eq>
       </result>
    </test-case>
-   <test-case name="fn-unparsed-text-bom-004">
-      <description>File input with BOM</description>
-      <created by="Christian Gruen" on="2025-10-02"/>        
-      <test>unparsed-text('parse-json/bom-utf16be.json')</test>
+   <test-case name="fn-unparsed-text-bom-004" covers-40="PR2249">
+      <description>File input: no BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-none.csv', 'utf-16be')
+      => string-to-codepoints() =!> format-integer('16^x')</test>
       <result>
-         <assert-string-value>{ "𱁬": "Taito" }</assert-string-value>
+         <assert-deep-eq>'f0b1', '81ac'</assert-deep-eq>
       </result>
    </test-case>
-   <test-case name="fn-unparsed-text-bom-005">
-      <description>File input with invalid BOM</description>
-      <created by="Christian Gruen" on="2025-10-02"/>        
-      <test>unparsed-text('parse-json/bom-invalid.json')</test>
+   <test-case name="fn-unparsed-text-bom-005" covers-40="PR2249">
+      <description>File input: no BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-none.csv', 'utf-16le')
+      => string-to-codepoints() =!> format-integer('16^x')</test>
+      <result>
+         <assert-deep-eq>'b1f0', 'ac81'</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-006" covers-40="PR2249">
+      <description>File input: no BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-none.csv', 'iso-8859-1')
+      => string-to-codepoints() =!> format-integer('16^x')</test>
+      <result>
+         <any-of>
+            <assert-deep-eq>'f0', 'b1', '81', 'ac'</assert-deep-eq>
+            <error code="FOUT1190"/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-011" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf8.csv')</test>
+      <result>
+         <assert-string-value>𱁬</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-012" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf8.csv', 'utf-8')</test>
+      <result>
+         <assert-string-value>𱁬</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-013" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf8.csv', 'utf-16')</test>
       <result>
          <error code="FOUT1200"/>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-014" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf8.csv', 'utf-16be')</test>
+      <result>
+         <error code="FOUT1200"/>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-015" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf8.csv', 'utf-16le')</test>
+      <result>
+         <error code="FOUT1200"/>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-016" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf8.csv', 'iso-8859-1')
+      => string-to-codepoints() =!> format-integer('16^x')</test>
+      <result>
+         <any-of>
+            <assert-deep-eq>'ef', 'bb', 'bf', 'f0', 'b1', '81', 'ac'</assert-deep-eq>
+            <error code="FOUT1190"/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-021" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf16le.csv')</test>
+      <result>
+         <assert-string-value>𱁬</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-022" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf16le.csv', 'utf-8')</test>
+      <result>
+         <error code="FOUT1200"/>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-023" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf16le.csv', 'utf-16')</test>
+      <result>
+         <assert-string-value>𱁬</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-024" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf16le.csv', 'utf-16be')</test>
+      <result>
+         <error code="FOUT1190"/>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-025" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf16le.csv', 'utf-16le')</test>
+      <result>
+         <assert-string-value>𱁬</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-026" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf16le.csv', 'iso-8859-1')
+      => string-to-codepoints() =!> format-integer('16^x')</test>
+      <result>
+         <any-of>
+            <assert-deep-eq>'ff', 'fe', '84', 'd8', '6c', 'dc'</assert-deep-eq>
+            <error code="FOUT1190"/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-031" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf16be.csv')</test>
+      <result>
+         <assert-string-value>𱁬</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-032" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf16be.csv', 'utf-8')</test>
+      <result>
+         <error code="FOUT1200"/>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-033" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf16be.csv', 'utf-16')</test>
+      <result>
+         <assert-string-value>𱁬</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-034" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf16be.csv', 'utf-16be')</test>
+      <result>
+         <assert-string-value>𱁬</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-035" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf16be.csv', 'utf-16le')</test>
+      <result>
+         <error code="FOUT1190"/>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-036" covers-40="PR2249">
+      <description>File input: BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-utf16be.csv', 'iso-8859-1')
+      => string-to-codepoints() =!> format-integer('16^x')</test>
+      <result>
+         <any-of>
+            <assert-deep-eq>'fe', 'ff', 'd8', '84', 'dc', '6c'</assert-deep-eq>
+            <error code="FOUT1190"/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-041" covers-40="PR2249">
+      <description>File input: invalid BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-invalid.csv')</test>
+      <result>
+         <error code="FOUT1200"/>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-042" covers-40="PR2249">
+      <description>File input: invalid BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-invalid.csv', 'utf-8')</test>
+      <result>
+         <error code="FOUT1200"/>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-043" covers-40="PR2249">
+      <description>File input: invalid BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-invalid.csv', 'utf-16')</test>
+      <result>
+         <error code="FOUT1190"/>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-044" covers-40="PR2249">
+      <description>File input: invalid BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-invalid.csv', 'utf-16be')</test>
+      <result>
+         <error code="FOUT1190"/>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-045" covers-40="PR2249">
+      <description>File input: invalid BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-invalid.csv', 'utf-16le')</test>
+      <result>
+         <error code="FOUT1190"/>
+      </result>
+   </test-case>
+   <test-case name="fn-unparsed-text-bom-046" covers-40="PR2249">
+      <description>File input: invalid BOM, different encodings</description>
+      <created by="Christian Gruen" on="2025-10-27"/>
+      <test>unparsed-text('parse-csv/bom-invalid.csv', 'iso-8859-1')
+      => string-to-codepoints() =!> format-integer('16^x')</test>
+      <result>
+         <any-of>
+            <assert-deep-eq>'ff', 'ff', '84', 'd8', '6c', 'dc'</assert-deep-eq>
+            <error code="FOUT1190"/>
+         </any-of>
       </result>
    </test-case>
 

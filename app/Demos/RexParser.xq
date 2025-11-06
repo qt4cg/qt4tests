@@ -415,16 +415,6 @@ declare function p:parse($input as xs:string,
                          $stack as xs:integer*,
                          $lexer-state as item()+)
 {
-  trace
-  (
-    (),
-    concat
-    (
-      "count($stack): ", count($stack), ", ",
-      "actual size: ", local:actual-size($stack)
-    )
-  ),
-
   if ($lexer-state[$p:error]) then
     $lexer-state
   else
