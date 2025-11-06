@@ -332,6 +332,18 @@
          </any-of>
       </result>
    </test-case>
+   
+   <test-case name="function-declaration-023a">
+      <description> Demonstrate function declaration - negative tests </description>
+      <created by="Ravindranath Chennoju" on="2005-08-30"/>
+      <dependency type="spec" value="XQ40"></dependency>
+      <test>
+        declare function foo ($n as xs:integer) { $n };
+        foo(4)</test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
 
    <test-case name="function-declaration-023a">
       <description>Function declaration with no namespace, allowed in 4.0</description>
@@ -366,6 +378,18 @@
         foo(4, 1)</test>
       <result>
          <error code="XQST0060"/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-declaration-025a">
+      <description> Function Declaration with no namespace. </description>
+      <created by="Carmelo Montanez" on="2006-02-06"/>
+      <dependency type="spec" value="XQ40"/>
+      <test>declare default function namespace "";
+        declare function foo ($n as xs:integer, $m as xs:integer) { $n };
+        foo(4, 1)</test>
+      <result>
+         <assert-eq>4</assert-eq>
       </result>
    </test-case>
 
@@ -1713,7 +1737,8 @@
    </test-case>
 
    <test-case name="K2-FunctionProlog-38">
-      <description> Trigger a crash in an implementation by having a user declared function with type, that has a text node constructor containing a call to a nonexisting function. </description>
+      <description> Trigger a crash in an implementation by having a user declared function 
+         with type, that has a text node constructor containing a call to a nonexisting function. </description>
       <created by="Frans Englich" on="2008-11-13"/>
       <test>
         declare function local:foo() as xs:boolean { text {local:doesNotExist()} };
@@ -2603,11 +2628,14 @@
       <created by="Michael Kay" on="2025-10-04"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
-         let $m := load-xquery-module({"content":"
-            module namespace 'http://f/40-027'; 
-            declare %private function abs($x) {-$x};
-            declare variable $x := abs(23);"})
-         return $m?variables?#Q{}x
+         let $m := load-xquery-module("http://f/40-027", 
+                     {"content":"
+                        module namespace m = 'http://f/40-027'; 
+                        declare %private function abs($x) {-$x};
+                        declare variable $m:x := abs(23);",
+                      "xquery-version": 4.0 
+                     })
+         return $m?variables?#Q{http://f/40-027}x
       </test>
       <result>
          <assert-eq>-23</assert-eq>
@@ -2691,6 +2719,54 @@
       </test>
       <result>
          <assert-eq>5</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-035" covers-40="PR2200">
+      <description>Forward reference, function call in locally-declared namespace</description>
+      <created by="Michael Kay" on="2025-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function foo($x as xs:integer) as xs:integer {
+           <a b="{p:inc($x)}" xmlns:p="http://p.com/"/>/@b
+         };
+         declare function Q{http://p.com/}inc($x as xs:integer) as xs:integer {$x + 3};
+         foo(-5)
+      ]]></test>
+      <result>
+         <assert-eq>-2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-036" covers-40="PR2200">
+      <description>Forward reference, function reference in locally-declared namespace</description>
+      <created by="Michael Kay" on="2025-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function foo($x as xs:integer) as xs:integer {
+           <a b="{p:inc#1($x)}" xmlns:p="http://p.com/"/>/@b
+         };
+         declare function Q{http://p.com/}inc($x as xs:integer) as xs:integer {$x + 3};
+         foo(-5)
+      ]]></test>
+      <result>
+         <assert-eq>-2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-037" covers-40="PR2200">
+      <description>Forward reference, function reference supplied as EQName</description>
+      <created by="Michael Kay" on="2025-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function foo($x as xs:integer) as xs:integer {
+           <a b="{Q{http://p.com/}p:inc#1($x)}" xmlns:p="http://p.com/"/>/@b
+         };
+         declare function Q{http://p.com/}inc($x as xs:integer) as xs:integer {$x + 3};
+         foo(-5)
+      ]]></test>
+      <result>
+         <assert-eq>-2</assert-eq>
       </result>
    </test-case>
  
