@@ -2721,6 +2721,54 @@
          <assert-eq>5</assert-eq>
       </result>
    </test-case>
+   
+   <test-case name="function-decl-40-035" covers-40="PR2200">
+      <description>Forward reference, function call in locally-declared namespace</description>
+      <created by="Michael Kay" on="2025-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function foo($x as xs:integer) as xs:integer {
+           <a b="{p:inc($x)}" xmlns:p="http://p.com/"/>/@b
+         };
+         declare function Q{http://p.com/}inc($x as xs:integer) as xs:integer {$x + 3};
+         foo(-5)
+      ]]></test>
+      <result>
+         <assert-eq>-2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-036" covers-40="PR2200">
+      <description>Forward reference, function reference in locally-declared namespace</description>
+      <created by="Michael Kay" on="2025-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function foo($x as xs:integer) as xs:integer {
+           <a b="{p:inc#1($x)}" xmlns:p="http://p.com/"/>/@b
+         };
+         declare function Q{http://p.com/}inc($x as xs:integer) as xs:integer {$x + 3};
+         foo(-5)
+      ]]></test>
+      <result>
+         <assert-eq>-2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-037" covers-40="PR2200">
+      <description>Forward reference, function reference supplied as EQName</description>
+      <created by="Michael Kay" on="2025-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function foo($x as xs:integer) as xs:integer {
+           <a b="{Q{http://p.com/}p:inc#1($x)}" xmlns:p="http://p.com/"/>/@b
+         };
+         declare function Q{http://p.com/}inc($x as xs:integer) as xs:integer {$x + 3};
+         foo(-5)
+      ]]></test>
+      <result>
+         <assert-eq>-2</assert-eq>
+      </result>
+   </test-case>
  
    
    <test-case name="function-decl-40-901" covers-40="PR197">
