@@ -265,10 +265,23 @@
    <test-case name="fn-string-length-25">
       <description>Call string-length() with . as argument when context item is an integer.</description>
       <created by="Michael Kay" on="2011-06-25"/>
+      <modified by="Christian Gruen" on="2025-11-19" change="PR2286"/>
       <environment ref="qname"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"/>
       <test>(1 to 100)[string-length(.) = 3]</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-string-length-25a" covers-40="PR2286">
+      <description>Call string-length() with . as argument when context item is an integer.</description>
+      <created by="Christian Gruen" on="2025-11-19"/>
+      <environment ref="qname"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(1 to 100)[string-length(.) = 3]</test>
+      <result>
+         <assert-eq>100</assert-eq>
       </result>
    </test-case>
    
@@ -294,9 +307,66 @@
       </result>
    </test-case>
    
-   
-   http://www.w3.org/XQueryTest
+   <test-case name="fn-string-length-40" covers-40="PR2286">
+      <description>Call function with items other than strings.</description>
+      <created by="Christian Gruen" on="2025-11-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-length(111)</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
 
+   <test-case name="fn-string-length-41" covers-40="PR2286">
+      <description>Call function with items other than strings.</description>
+      <created by="Christian Gruen" on="2025-11-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-length(xs:date('2002-01-01'))</test>
+      <result>
+         <assert-eq>10</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-string-length-42" covers-40="PR2286">
+      <description>Call function with items other than strings.</description>
+      <created by="Christian Gruen" on="2025-11-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-length(xs:double('NaN'))</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-string-length-43" covers-40="PR2286">
+      <description>Call function with items other than strings.</description>
+      <created by="Christian Gruen" on="2025-11-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(0, '', xs:token(''), xs:date('0001-01-01'))[boolean(string-length(.))]</test>
+      <result>
+         <assert-deep-eq>0, xs:date('0001-01-01')</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-string-length-44" covers-40="PR2286">
+      <description>Call function with items other than strings.</description>
+      <created by="Christian Gruen" on="2025-11-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+every $item in (
+  -1, 0, 1, 10, -1.0, 0.0, 1.0, 10.0, -1e0, 0e0, 1e0, 10e0,
+  xs:double('NaN'), xs:double('INF'), xs:double('-INF'), false(), true(),
+  '', 'a', xs:token(''), xs:anyURI('a'), xs:base64Binary(''), xs:hexBinary('41'),
+  xs:QName('a'), xs:date('2001-01-01'), xs:yearMonthDuration('P1Y'), xs:gMonth('--01'),
+  parse-xml('<a/>'), parse-xml('<a>1</a>')
+) satisfies (
+  fn { string-length() = string-length(.) }($item)
+)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
    <test-case name="K-StringLengthFunc-1">
       <description>A test whose essence is: `string-length("a string", "wrong param")`.</description>
       <created by="Frans Englich" on="2007-11-26"/>

@@ -340,6 +340,66 @@ newline characters.")</test>
       </result>
    </test-case>
 
+   <test-case name="fn-normalize-space-40" covers-40="PR2286">
+      <description>Call function with items other than strings.</description>
+      <created by="Christian Gruen" on="2025-11-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>normalize-space(111)</test>
+      <result>
+         <assert-string-value>111</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-normalize-space-41" covers-40="PR2286">
+      <description>Call function with items other than strings.</description>
+      <created by="Christian Gruen" on="2025-11-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>normalize-space(xs:date('2002-01-01'))</test>
+      <result>
+         <assert-string-value>2002-01-01</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-normalize-space-42" covers-40="PR2286">
+      <description>Call function with items other than strings.</description>
+      <created by="Christian Gruen" on="2025-11-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>normalize-space(xs:double('NaN'))</test>
+      <result>
+         <assert-string-value>NaN</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-normalize-space-43" covers-40="PR2286">
+      <description>Call function with items other than strings.</description>
+      <created by="Christian Gruen" on="2025-11-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>(0, '', xs:token(''), xs:date('0001-01-01'))[normalize-space(.)]</test>
+      <result>
+         <assert-deep-eq>0, xs:date('0001-01-01')</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-normalize-space-44" covers-40="PR2286">
+      <description>Call function with items other than strings.</description>
+      <created by="Christian Gruen" on="2025-11-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+every $item in (
+  -1, 0, 1, 10, -1.0, 0.0, 1.0, 10.0, -1e0, 0e0, 1e0, 10e0,
+  xs:double('NaN'), xs:double('INF'), xs:double('-INF'), false(), true(),
+  '', 'a', xs:token(''), xs:anyURI('a'), xs:base64Binary(''), xs:hexBinary('41'),
+  xs:QName('a'), xs:date('2001-01-01'), xs:yearMonthDuration('P1Y'), xs:gMonth('--01'),
+  parse-xml('<a/>'), parse-xml('<a>1</a>')
+) satisfies (
+  fn { normalize-space() = normalize-space(.) }($item)
+)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
    <test-case name="K-NormalizeSpaceFunc-1">
       <description> A test whose essence is: `normalize-space("a string", "wrong param")`. </description>
       <created by="Frans Englich" on="2007-11-26"/>
