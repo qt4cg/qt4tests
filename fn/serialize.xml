@@ -2176,6 +2176,76 @@
         </result>
     </test-case>
     
+    <test-case name="serialize-xml-149" covers-40="PR2259">
+        <description>canonical serialization parameter</description>
+        <created by="Michael Kay" on="2021-04-09"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+              let $params := map {"method": "xml", "canonical" : true()},
+                  $data := parse-xml("<a z='2' y='3' x='4'/>")
+              return serialize($data, $params)
+        ]]></test>
+        <result>
+            <assert><![CDATA[contains($result,'<a x="4" y="3" z="2"></a>')]]></assert>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-xml-150" covers-40="PR2259">
+        <description>canonical serialization parameter: relative URIs not allowed as namespaces</description>
+        <created by="Michael Kay" on="2021-04-09"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+              let $params := map {"method": "xml", "canonical" : true()},
+                  $data := parse-xml("<a xmlns='local.ns' z='2' y='3' x='4'/>")
+              return serialize($data, $params)
+        ]]></test>
+        <result>
+            <error code="SERE0024"/>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-xml-151" covers-40="PR2259">
+        <description>canonical serialization parameter: document must be well-formed</description>
+        <created by="Michael Kay" on="2021-04-09"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+              let $params := map {"method": "xml", "canonical" : true()},
+                  $data := document{ <a/>, <b/> }
+              return serialize($data, $params)
+        ]]></test>
+        <result>
+            <error code="SERE0024"/>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-xhtml-149" covers-40="PR2259">
+        <description>canonical serialization parameter</description>
+        <created by="Michael Kay" on="2021-04-09"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+              let $params := map {"method": "xhtml", "canonical" : true()},
+                  $data := parse-xml("<html xmlns='http://www.w3.org/1999/xhtml'><body class='bclass' id='abc' bgcolor='black'/></html>")
+              return serialize($data, $params)
+        ]]></test>
+        <result>
+            <assert><![CDATA[contains($result,'<body bgcolor="black" class="bclass" id="abc"></body>')]]></assert>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-xhtml-150" covers-40="PR2259">
+        <description>canonical serialization parameter: relative URIs not allowed as namespaces</description>
+        <created by="Michael Kay" on="2021-04-09"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+              let $params := map {"method": "xhtml", "canonical" : true()},
+                  $data := parse-xml("<html xmlns='http://www.w3.org/1999/xhtml' my:ns='local.ns'><body class='bclass' id='abc' bgcolor='black'/></html>")
+              return serialize($data, $params)
+        ]]></test>
+        <result>
+            <error code="SERE0024"/>
+        </result>
+    </test-case>
+    
     <test-case name="serialize-html-001" covers="fn-serialize">
         <description>serialize test - html method</description>
         <created by="Michael Kay, Saxonica" on="2018-04-16"/>
@@ -2994,6 +3064,16 @@
             </any-of>
         </result>
     </test-case>
+    
+    <test-case name="serialize-json-137" covers-40="PR1703">
+        <description>Preserves map order</description>
+        <created by="Michael Kay, Saxonica" on="2025-01-22"/>
+        <dependency type="spec" value="XP31+ XQ31+"/>
+        <test>serialize({'a':1, 'v':2, 'r':5, 'h':7}, map{'method':'json'})</test>
+        <result>
+            <assert-eq>'{"a":1,"v":2,"r":5,"h":7}'</assert-eq>
+        </result>
+    </test-case>
 
     <test-case name="serialize-json-200" covers="fn-serialize json-output" covers-40="PR1497">
         <description>json-lines serialization</description>
@@ -3065,6 +3145,7 @@
         </result>
     </test-case>
     
+    
     <test-case name="serialize-json-205" covers="fn-serialize json-output" covers-40="PR1497">
         <description>json-lines serialization</description>
         <created by="Michael Kay" on="2025-02-23"/>
@@ -3079,15 +3160,20 @@
         </result>
     </test-case>
     
-    <test-case name="serialize-json-137" covers-40="PR1703">
-        <description>Preserves map order</description>
-        <created by="Michael Kay, Saxonica" on="2025-01-22"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
-        <test>serialize({'a':1, 'v':2, 'r':5, 'h':7}, map{'method':'json'})</test>
+    <test-case name="serialize-json-206" covers-40="PR2259">
+        <description>canonical serialization parameter</description>
+        <created by="Michael Kay" on="2025-11-25"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+              let $params := map {"method": "json", "canonical" : true()},
+                  $data := {"x":2, "alpha":42, "⍺":069, "0":"zero"}
+              return serialize($data, $params)
+        ]]></test>
         <result>
-            <assert-eq>'{"a":1,"v":2,"r":5,"h":7}'</assert-eq>
+            <assert><![CDATA[contains($result,'{"0":"zero", "alpha":42, "x":2, "⍺":69})]]></assert>
         </result>
     </test-case>
+    
     
     <test-case name="serialize-adaptive-001">
         <description>Adaptive method, atomic values</description>
