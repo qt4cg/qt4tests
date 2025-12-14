@@ -2218,6 +2218,20 @@
         </result>
     </test-case>
     
+    <test-case name="serialize-xml-152">
+        <description>Unicode normalization</description>
+        <created by="Michael Kay" on="2025-12-03"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+              let $in := parse-xml("<a>A" || char(778) || "</a>")
+              return serialize($in, {'method':'xml', 'normalization-form':'NFC'})
+        ]]></test>
+        <result>
+            <assert-eq>"&lt;a&gt;&#197;&lt;/a&gt;"</assert-eq>
+        </result>
+    </test-case>
+
+    
     <test-case name="serialize-xhtml-149" covers-40="PR2259">
         <description>canonical serialization parameter</description>
         <created by="Michael Kay" on="2021-04-09"/>
@@ -3170,10 +3184,505 @@
               return serialize($data, $params)
         ]]></test>
         <result>
-            <assert><![CDATA[contains($result,'{"0":"zero", "alpha":42, "x":2, "⍺":69})]]></assert>
+            <assert><![CDATA[contains($result,'{"0":"zero","alpha":42,"x":2,"⍺":69}')]]></assert>
         </result>
     </test-case>
     
+    <test-case name="serialize-json-207" covers-40="PR2259">
+        <description>canonical serialization parameter: sort order is based on UTF-16 code points</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+              let $params := map {"method": "json", "canonical" : true()},
+                  $data := {char(0x2f804):"2F804", char(42):"*", char(0xFF00):"FF00"}
+              return serialize($data, $params) => parse-json() => map:values()
+        ]]></test>
+        <result>
+            <assert-deep-eq>"*", "2F804", "FF00"</assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-208" covers-40="PR2259">
+        <description>canonical serialization parameter: example from RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+              let $params := map {"method": "json", "canonical" : true()},
+                  $data := parse-json('{
+                               "\u20ac": "Euro Sign",
+                               "\r": "Carriage Return",
+                               "\ufb33": "Hebrew Letter Dalet With Dagesh",
+                               "1": "One",
+                               "\ud83d\ude00": "Emoji: Grinning Face",
+                               "\u0080": "Control",
+                               "\u00f6": "Latin Small Letter O With Diaeresis"
+                             }'),
+                  $lex := serialize($data, $params),
+                  $data2 := parse-json($lex)
+               return map:values($data2)
+                  (:          Expected argument order after sorting property strings:
+                            
+                              "Carriage Return"
+                              "One"
+                              "Control"
+                              "Latin Small Letter O With Diaeresis"
+                              "Euro Sign"
+                              "Emoji: Grinning Face"
+                              "Hebrew Letter Dalet With Dagesh"')
+                  :)
+        ]]></test>
+        <result>
+            <assert-deep-eq>  "Carriage Return",
+                              "One",
+                              "Control",
+                              "Latin Small Letter O With Diaeresis",
+                              "Euro Sign",
+                              "Emoji: Grinning Face",
+                              "Hebrew Letter Dalet With Dagesh"
+            </assert-deep-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-209" covers-40="PR2259">
+        <description>canonical serialization parameter: effect on escaping</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <dependency type="xml-version" value="1.1"/>
+        <test><![CDATA[
+              let $params := map {"method": "json", "canonical" : true()}
+              let $str := `{char(7)}{char(8)}{char(9)}{char(10)}{char(11)}{char(12)}{char(13)}`
+              return serialize($str, $params)    
+        ]]></test>
+        <result>
+            <assert-string-value>"\u0007\b\t\n\u000b\f\r"</assert-string-value>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-210" covers-40="PR2259">
+        <description>canonical serialization parameter: effect on escaping</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <dependency type="xml-version" value="1.1"/>
+        <test><![CDATA[
+              let $params := map {"method": "json", "canonical" : true()}
+              let $str := ` "\/%`
+              return serialize($str, $params)    
+        ]]></test>
+        <result>
+            <assert>$result eq `" \"\\/%"`</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-211" covers-40="PR2259">
+        <description>canonical serialization parameter: effect on escaping</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <dependency type="xml-version" value="1.1"/>
+        <test><![CDATA[
+              let $params := map {"method": "json", "canonical" : true()}
+              let $str := ` "\/%`
+              return serialize($str, $params)    
+        ]]></test>
+        <result>
+            <assert>$result eq `" \"\\/%"`</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-212" covers-40="PR2259">
+        <description>canonical serialization parameter: effect on escaping</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <dependency type="xml-version" value="1.1"/>
+        <test><![CDATA[
+              let $params := map {"method": "json", "canonical" : true()}
+              let $str := parse-json('["\uD83D\uDE00"]')
+              return serialize($str, $params)    
+        ]]></test>
+        <result>
+            <assert>$result eq `["😀"]`</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-213" covers-40="PR2259">
+        <description>canonical serialization parameter: effect on escaping</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <dependency type="xml-version" value="1.1"/>
+        <test><![CDATA[
+              let $params := map {"method": "json", "canonical" : true()}
+              let $str := `{char(127)}{char(132)}`
+              return serialize($str, $params)    
+        ]]></test>
+        <result>
+            <assert>$result eq '"' || char(127) || char(132) || '"'</assert>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-214" covers-40="PR2259">
+        <description>canonical serialization parameter: duplicate keys disallowed</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+              let $params := map {"method": "json", "canonical" : true()}
+              return serialize({'2020-01-01':1, xs:date('2020-01-01'):2}, $params)    
+        ]]></test>
+        <result>
+            <error code="SERE0022"/>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-300" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("0000000000000000"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[0]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-301" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("8000000000000000"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[0]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-302" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("0000000000000001"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[5e-324]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-303" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("8000000000000001"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[-5e-324]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-304" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("7fefffffffffffff"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[1.7976931348623157e+308]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-305" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("ffefffffffffffff"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[-1.7976931348623157e+308]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-306" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("4340000000000000"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[9007199254740992]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-307" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("c340000000000000"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[-9007199254740992]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-308" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("4430000000000000"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[295147905179352830000]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-309" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("44b52d02c7e14af5"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[9.999999999999997e+22]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-310" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("44b52d02c7e14af6"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[1e+23]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-311" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("44b52d02c7e14af7"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[1.0000000000000001e+23]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-312" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("444b1ae4d6e2ef4e"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[999999999999999700000]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-313" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("444b1ae4d6e2ef4f"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[999999999999999900000]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-314" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("444b1ae4d6e2ef50"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[1e+21]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-315" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("3eb0c6f7a0b5ed8c"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[9.999999999999997e-7]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-316" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("3eb0c6f7a0b5ed8d"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[0.000001]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-317" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("41b3de4355555553"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[333333333.3333332]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-318" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("41b3de4355555554"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[333333333.33333325]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-319" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("41b3de4355555555"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[333333333.3333333]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-320" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("41b3de4355555556"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[333333333.3333334]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-321" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("41b3de4355555557"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[333333333.33333343]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-322" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("becbf647612f3696"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[-0.0000033333333333333333]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-323" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("43143ff3c1cb0959"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <assert-eq>'[1424953923781206.2]'</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-330" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785: NaN</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("7fffffffffffffff"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <error code="SERE0020"/>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-331" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785: Infinity</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("7ff0000000000000"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <error code="SERE0020"/>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-332" covers-40="PR2259">
+        <description>canonical JSON: numerics from appendix B of RFC 8785: Negative Infinity</description>
+        <created by="Michael Kay" on="2025-12-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(
+                [Q{http://expath.org/ns/binary}unpack-double(xs:hexBinary("fff0000000000000"), 0)], 
+                {'method':'json', 'canonical':true()})
+        </test>
+        <result>
+            <error code="SERE0020"/>
+        </result>
+    </test-case>
+ 
+
     
     <test-case name="serialize-adaptive-001">
         <description>Adaptive method, atomic values</description>
