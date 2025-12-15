@@ -1331,9 +1331,20 @@
    <test-case name="K-SeqMINFunc-38">
       <description> A test whose essence is: `min(QName("example.com/", "ncname"))`. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"/>
       <test>min(QName("example.com/", "ncname"))</test>
       <result>
          <error code="FORG0006"/>
+      </result>
+   </test-case>
+   
+   <test-case name="K-SeqMINFunc-38a">
+      <description> A test whose essence is: `min(QName("example.com/", "ncname"))`. </description>
+      <created by="Michael Kay" on="2025-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>min(QName("example.com/", "ncname"))</test>
+      <result>
+         <assert-eq>QName("example.com/", "ncname")</assert-eq>
       </result>
    </test-case>
 
@@ -1686,6 +1697,7 @@
    <test-case name="fn-min-8">
       <description>Test fn:min on a sequence of xs:yearMonthDuration and xs:dayTimeDuration arguments</description>
       <created by="Oliver Hallam" on="2010-03-15"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ30 XQ31"/>
       <test>min((xs:yearMonthDuration("P1Y"), xs:dayTimeDuration("P1D")))</test>
       <result>
          <any-of>
@@ -1694,16 +1706,37 @@
          </any-of>
       </result>
    </test-case>
+   
+   <test-case name="fn-min-8a" covers-40="PR2256">
+      <description>Test fn:min on a sequence of xs:yearMonthDuration and xs:dayTimeDuration arguments</description>
+      <created by="Michael Kay" on="2025-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>min((xs:yearMonthDuration("P1Y"), xs:dayTimeDuration("P1D")))</test>
+      <result>
+         <assert-eq>xs:dayTimeDuration("P1D")</assert-eq>
+      </result>
+   </test-case>
 
    <test-case name="fn-min-9">
       <description>Test fn:min on a sequence of xs:duration arguments</description>
       <created by="Oliver Hallam" on="2010-03-15"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ30 XQ31"/>
       <test>min(xs:duration("P1Y1M1D"))</test>
       <result>
          <any-of>
             <error code="FORG0006"/>
             <error code="XPTY0004"/>
          </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-min-9a" covers-40="PR2256">
+      <description>Test fn:min on a sequence of xs:duration arguments</description>
+      <created by="Michael Kay" on="2025-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>min(xs:duration("P1Y1M1D"))</test>
+      <result>
+         <assert-eq>xs:duration("P1Y1M1D")</assert-eq>
       </result>
    </test-case>
 
@@ -1852,6 +1885,46 @@
          <assert-eq>"a"</assert-eq>
       </result>
    </test-case>
+   
+   <test-case name="fn-min-42" covers-40="PR2256">
+      <description> apply to QName (4.0)</description>
+      <created by="Michael Kay" on="2025-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>min((#xml:space, #xml:id, #fn:min))</test>
+      <result>
+         <assert-eq>#fn:min</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-min-43" covers-40="PR2256">
+      <description> apply to duration (4.0)</description>
+      <created by="Michael Kay" on="2025-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>min((xs:duration("-PT1S"), xs:dayTimeDuration("P0D"), xs:yearMonthDuration("-P1Y")))</test>
+      <result>
+         <assert-eq>xs:yearMonthDuration("-P1Y")</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-min-44" covers-40="PR2256">
+      <description> apply to gYearMonth (4.0)</description>
+      <created by="Michael Kay" on="2025-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>min((xs:gYearMonth("2022-05"), xs:gYearMonth("2021-03"), xs:gYearMonth("2024-06")))</test>
+      <result>
+         <assert-eq>xs:gYearMonth("2021-03")</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-min-45" covers-40="PR2256">
+      <description> apply to gYearMonth with timezone (4.0)</description>
+      <created by="Michael Kay" on="2025-12-15"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>min((xs:gYearMonth("2022-05Z"), xs:gYearMonth("2021-03Z"), xs:gYearMonth("2024-06Z")))</test>
+      <result>
+         <assert-eq>xs:gYearMonth("2021-03Z")</assert-eq>
+      </result>
+   </test-case>
       
    <test-case name="cbcl-min-001">
       <description> test fn:min on xs:boolean arguments </description>
@@ -1947,13 +2020,26 @@
    <test-case name="cbcl-min-008">
       <description> Test fn:min with xs:dayTimeDuration argument causing type error </description>
       <created by="Oliver Hallam" on="2008-04-16"/>
-      <dependency type="spec" value="XQ10+"/>     
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>     
       <test>
       	declare function local:f($x as xs:integer) { if ($x = 3) then xs:duration("P1D") else xs:dayTimeDuration("PT3S") }; 
       	min(for $x in (1,2,3) return local:f($x))
       </test>
       <result>
          <error code="FORG0006"/>
+      </result>
+   </test-case>   
+   
+   <test-case name="cbcl-min-008a">
+      <description> Test fn:min with xs:dayTimeDuration argument causing type error </description>
+      <created by="Michael Kay" on="2025-12-15"/>
+      <dependency type="spec" value="XQ40+"/>     
+      <test>
+      	declare function local:f($x as xs:integer) { if ($x = 3) then xs:duration("P1D") else xs:dayTimeDuration("PT3S") }; 
+      	min(for $x in (1,2,3) return local:f($x))
+      </test>
+      <result>
+         <assert-eq>xs:dayTimeDuration("PT3S")</assert-eq>
       </result>
    </test-case>   
 
@@ -2088,7 +2174,7 @@
    <test-case name="cbcl-min-016">
       <description> Test fn:min with xs:yearMonthDuration argument causing type error </description>
       <created by="Oliver Hallam" on="2008-04-16"/>
-      <dependency type="spec" value="XQ10+"/>      
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>      
       <test>
       	declare function local:f($x as xs:integer) { if ($x = 3) then xs:duration("P1Y") else xs:yearMonthDuration("P11M") }; 
       	min(for $x in (1,2,3) return local:f($x))
@@ -2098,16 +2184,42 @@
       </result>
    </test-case>
    
+   <test-case name="cbcl-min-016a">
+      <description> Test fn:min with xs:yearMonthDuration argument causing type error </description>
+      <created by="Michael Kay" on="2025-12-15"/>
+      <dependency type="spec" value="XQ40+"/>      
+      <test>
+      	declare function local:f($x as xs:integer) { if ($x = 3) then xs:duration("P1Y") else xs:yearMonthDuration("P11M") }; 
+      	min(for $x in (1,2,3) return local:f($x))
+      </test>
+      <result>
+         <assert-eq>xs:yearMonthDuration("P11M")</assert-eq>
+      </result>
+   </test-case>
+   
    <test-case name="cbcl-min-017">
       <description> Test fn:min with invalid type for first argument </description>
       <created by="Oliver Hallam" on="2008-04-16"/>
-      <dependency type="spec" value="XQ10+"/>      
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>      
       <test>
       	declare function local:f($x as xs:integer) as xs:duration { if ($x = 1) then xs:duration("P1Y") else xs:yearMonthDuration("P11M") }; 
       	min(for $x in (1,2,3) return local:f($x))
       </test>
       <result>
          <error code="FORG0006"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cbcl-min-017a">
+      <description> Test fn:min with invalid type for first argument </description>
+      <created by="Michael Kay" on="2025-12-15"/>
+      <dependency type="spec" value="XQ40+"/>      
+      <test>
+      	declare function local:f($x as xs:integer) as xs:duration { if ($x = 1) then xs:duration("P1Y") else xs:yearMonthDuration("P11M") }; 
+      	min(for $x in (1,2,3) return local:f($x))
+      </test>
+      <result>
+         <assert-eq>xs:yearMonthDuration("P11M")</assert-eq>
       </result>
    </test-case>
    
