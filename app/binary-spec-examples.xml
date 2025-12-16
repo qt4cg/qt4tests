@@ -475,6 +475,92 @@
       </result>
    </test-case>
 
+   <test-case name="fo-test-bin-infer-encoding-001">
+      <description>Test case for bin:infer-encoding</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
+      <environment ref="global"/>
+      <test>
+        bin:infer-encoding(bin:hex('41 42 43'))
+      </test>
+      <result>
+         <assert-deep-eq>{ "encoding":"utf-8", "offset":0 }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-bin-infer-encoding-002">
+      <description>Test case for bin:infer-encoding</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
+      <environment ref="global"/>
+      <test>
+        bin:infer-encoding(bin:hex('EFBBBF 41 42 43'))
+      </test>
+      <result>
+         <assert-deep-eq>{ "encoding":"utf-8", "offset":3 }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-bin-infer-encoding-003">
+      <description>Test case for bin:infer-encoding</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
+      <environment ref="global"/>
+      <test>
+        bin:infer-encoding(bin:hex('FEFF 0041 0042 0043'))
+      </test>
+      <result>
+         <assert-deep-eq>{ "encoding":"utf-16be", "offset":2 }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-bin-infer-encoding-004">
+      <description>Test case for bin:infer-encoding</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
+      <environment ref="global"/>
+      <test>
+        bin:infer-encoding(bin:hex('0041 0042 0043', "utf-16be"))
+      </test>
+      <result>
+         <assert-deep-eq>{ "encoding":"utf-16be", "offset": }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-bin-infer-encoding-005">
+      <description>Test case for bin:infer-encoding</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
+      <environment ref="global"/>
+      <test>
+        bin:infer-encoding(bin:hex('FFFE 4100 4200 4300'))
+      </test>
+      <result>
+         <assert-deep-eq>{ "encoding":"utf-16le", "offset":2 }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-bin-infer-encoding-006">
+      <description>Test case for bin:infer-encoding</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
+      <environment ref="global"/>
+      <test>
+        bin:infer-encoding(bin:hex('FFFE 4100 4200 4300'), 'utf-16')
+      </test>
+      <result>
+         <assert-deep-eq>{ "encoding":"utf-16le", "offset":2 }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-bin-infer-encoding-007">
+      <description>Test case for bin:infer-encoding</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
+      <environment ref="global"/>
+      <test>
+        let $input := bin:hex('FFFE 4100 4200 4300')
+let ${$encoding, $offset} := bin:infer-encoding($input)
+return bin:decode-string($input, $encoding, $offset)
+      </test>
+      <result>
+         <assert-deep-eq>"ABC"</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-bin-decode-string-001">
       <description>Test case for bin:decode-string</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
@@ -504,7 +590,7 @@
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
       <environment ref="global"/>
       <test>
-        bin:decode-string(bin:hex('FEFF 0041 0042 0043'))
+        bin:decode-string(bin:hex('FFFE 4100 4200 4300'))
       </test>
       <result>
          <assert-deep-eq>"ABC"</assert-deep-eq>
@@ -516,18 +602,6 @@
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
       <environment ref="global"/>
       <test>
-        bin:decode-string(bin:hex('FFFE 4100 4200 4300'))
-      </test>
-      <result>
-         <assert-deep-eq>"ABC"</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-bin-decode-string-005">
-      <description>Test case for bin:decode-string</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
-      <environment ref="global"/>
-      <test>
         bin:decode-string(bin:hex('41 42 43'), offset := 1)
       </test>
       <result>
@@ -535,7 +609,7 @@
       </result>
    </test-case>
 
-   <test-case name="fo-test-bin-decode-string-006">
+   <test-case name="fo-test-bin-decode-string-005">
       <description>Test case for bin:decode-string</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
       <environment ref="global"/>
@@ -547,19 +621,7 @@
       </result>
    </test-case>
 
-   <test-case name="fo-test-bin-decode-string-007">
-      <description>Test case for bin:decode-string</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
-      <environment ref="global"/>
-      <test>
-        bin:decode-string(bin:hex('41 42 43 44'), (), 3)
-      </test>
-      <result>
-         <assert-deep-eq>"D"</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-bin-decode-string-008">
+   <test-case name="fo-test-bin-decode-string-006">
       <description>Test case for bin:decode-string</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
       <environment ref="global"/>
@@ -571,24 +633,12 @@
       </result>
    </test-case>
 
-   <test-case name="fo-test-bin-decode-string-009">
+   <test-case name="fo-test-bin-decode-string-007">
       <description>Test case for bin:decode-string</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
       <environment ref="global"/>
       <test>
         bin:decode-string(bin:hex('EFBBBF 41 42 43 44'), (), 3)
-      </test>
-      <result>
-         <assert-deep-eq>"ABCD"</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-bin-decode-string-010">
-      <description>Test case for bin:decode-string</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2025-12-16"/>
-      <environment ref="global"/>
-      <test>
-        bin:decode-string(bin:hex('EFBBBF 41 42 43 44'), 'utf-8', 3)
       </test>
       <result>
          <assert-deep-eq>"ABCD"</assert-deep-eq>
