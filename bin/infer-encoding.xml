@@ -1,0 +1,367 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-infer-encoding" covers-40="PR2282">
+  <description>Tests for the bin:infer-encoding function</description>
+  
+  <environment name="EXPath-binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <param name="empty.bin" select="xs:base64Binary('')"/>
+    <!-- 'Man' in base64 - 3 octets, 4 characters -->
+    <param name="man.base" select="xs:base64Binary('TWFu')"/>
+    <param name="man.octets" select="77,97,110"/>
+  </environment>
+  
+  
+  <dependency type="feature" value="binary"/>
+  
+  
+  <test-case name="bin-infer-encoding-001">
+    <description>infer-encoding on an empty sequence</description>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding((),"utf-8") </test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-002">
+    <description>infer-encoding on empty binary data</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding($empty.bin,"utf-8") </test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-003">
+    <description>infer-encoding with unknown encoding</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding($empty.bin,"NOTutf-8") </test>
+    <result>
+      <error code="Q{http://expath.org/ns/binary}unknown-encoding"/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-004">
+    <description>infer-encoding on non-empty binary data</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding(bin:encode-string("Simple &#xa3; text","utf-8"),"utf-8") </test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-005">
+    <description>infer-encoding on non-empty binary data</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding(xs:base64Binary("QcOqw7HDvEM="),"utf-8") </test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-006">
+    <description>infer-encoding on non-empty binary data, converted from octets</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding(bin:from-octets((65,195,170,195,177,195,188,67)),"utf-8") </test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  
+  
+  <test-case name="bin-infer-encoding-012">
+    <description>infer-encoding with code phasing mismatch in UTF-8</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding(xs:base64Binary("QcOqw7HDvEM="),"utf-8") </test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-013">
+    <description>infer-encoding on non-empty binary data in UTF-16</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding(xs:base64Binary(
+                xs:hexBinary("feff00540068006900730020006900730020005500540046002d00310036")),
+                "utf-16") </test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-16be", "offset":2}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-014">
+    <description>infer-encoding on non-empty binary data in UTF-16 with big-endian
+                BOM</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding(xs:base64Binary(xs:hexBinary("feff011e")),"utf-16") </test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-16be", "offset":2}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-015">
+    <description>infer-encoding on non-empty binary data in UTF-16 with little endian
+                BOM</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding(xs:base64Binary(xs:hexBinary("fffe1e01")),"utf-16") </test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-16le", "offset":2}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-016">
+    <description>infer-encoding on non-empty binary data with default encoding</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> deep-equal(
+                bin:infer-encoding(xs:base64Binary("QcOqw7HDvEM=")), 
+                bin:infer-encoding(xs:base64Binary("QcOqw7HDvEM="),"utf-8")) </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-017">
+    <description>infer-encoding on non-empty binary data in UTF-16, BE, no BOM</description>
+    <created by="Michael Kay" on="2025-02-18"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding(xs:hexBinary("00540068006900730020006900730020005500540046002d00310036"),
+                "utf-16") </test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-16", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-018">
+    <description>infer-encoding on non-empty binary data in UTF-16BE, no BOM</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding(xs:hexBinary("00540068006900730020006900730020005500540046002d00310036"),
+                "utf-16be") </test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-16be", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-019">
+    <description>infer-encoding on non-empty binary data in UTF-16 with little endian
+                encoding, no BOM</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding(xs:hexBinary("1e01"),"utf-16le") </test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-16le", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-020">
+    <description>BOM at offset 0 used when reading from later offset</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding(xs:base64Binary(xs:hexBinary("fffe690069006900")),"utf-16") </test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-16le", "offset":2}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-021">
+    <description>BOM at non-zero offset treated as regular character</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test> bin:infer-encoding(xs:hexBinary("69006900fffe"),"utf-16le") </test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-16le", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-051">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:base64Binary(xs:hexBinary("3132")), "US-ASCII")</test>
+    <result>
+      <assert-deep-eq>{"encoding":"US-ASCII", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-052">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:base64Binary(xs:hexBinary("3132")), "UTF-8")</test>
+    <result>
+      <any-of>
+        <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+        <assert-deep-eq>{"encoding":"UTF-8", "offset":0}</assert-deep-eq>
+      </any-of>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-059">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary("FF"), "UTF-8")</test>
+    <result>
+      <any-of>
+        <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+        <assert-deep-eq>{"encoding":"UTF-8", "offset":0}</assert-deep-eq>
+      </any-of>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-infer-encoding-110">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary('40EFBBBF4142'))</test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-infer-encoding-111">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary('EFBBBF4142'))</test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":3}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-infer-encoding-112">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary('BBBF4142'))</test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-infer-encoding-113">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary('BF4142'))</test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-infer-encoding-114">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary('4142'))</test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-infer-encoding-115">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary('42'))</test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-infer-encoding-116">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary(''))</test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-infer-encoding-117">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary('40EFBBBF4142'), ())</test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+
+
+  <test-case name="bin-infer-encoding-126">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary('40EFBBBF4142'), "utf-8")</test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-infer-encoding-127">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary('40EFBBBF4142'), "utf-8")</test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-8", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  
+  <test-case name="bin-infer-encoding-132">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary('40EFBBBF4142'), "utf-16")</test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-16", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-infer-encoding-138">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary('40EFBBBF4142'), "utf-16be")</test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-16be", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+
+
+  <test-case name="bin-infer-encoding-145">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary('40EFBBBF4142'), "utf-16le")</test>
+    <result>
+      <assert-deep-eq>{"encoding":"utf-16le", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+
+
+  <test-case name="bin-infer-encoding-152">
+    <description>Test for the infer-encoding function.</description>
+    <created by="Michael Kay" on="2025-12-31"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:infer-encoding(xs:hexBinary('40EFBBBF4142'), "iso-8859-1")</test>
+    <result>
+      <assert-deep-eq>{"encoding":"iso-8859-1", "offset":0}</assert-deep-eq>
+    </result>
+  </test-case>
+
+  
+</test-set>
