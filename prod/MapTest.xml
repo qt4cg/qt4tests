@@ -867,6 +867,32 @@ return $m
          <error code="XPTY0004"/>
       </result>
    </test-case>
+   
+   <test-case name="MapTest-093">
+      <description>Map type after a sequence of inserts and removes (testing caching of type information)</description>
+      <created by="Michael Kay" on="2026-01-16"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>
+        let $m1 := map{"x":1, "y":2, "z":3}
+        let $b1 := $m1 instance of map(xs:string, xs:integer)
+        let $m2 := map:put($m1, "w", 4)
+        let $b2 := $m2 instance of map(xs:string, xs:integer)
+        let $m3 := map:remove($m1, "x")
+        let $b3 := $m3 instance of map(xs:string, xs:integer)
+        let $m4 := map:remove($m1, "a")
+        let $b4 := $m4 instance of map(xs:string, xs:integer)
+        let $b5 := $m4 instance of map(xs:string, xs:numeric)
+        let $m6 := map:put($m1, "a", 1.0e1)
+        let $b6 := $m6 instance of map(xs:string, xs:numeric)
+        let $m7 := map:put($m1, "a", true())
+        let $b7 := $m7 instance of map(xs:string, xs:numeric)
+        let $b8 := $m7 instance of map(xs:string, xs:anyAtomicType)
+        return ($b1, $b2, $b3, $b4, $b5, $b6, $b7, $b8)
+      </test>
+      <result>
+         <assert-deep-eq>true(), true(), true(), true(), true(), true(), false(), true()</assert-deep-eq>
+      </result>
+   </test-case>
 
 
 </test-set>
