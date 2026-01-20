@@ -2249,10 +2249,11 @@
     <test-case name="serialize-xhtml-150" covers-40="PR2259">
         <description>canonical serialization parameter: relative URIs not allowed as namespaces</description>
         <created by="Michael Kay" on="2021-04-09"/>
+        <modified by="Gunther Rademacher" on="2026-01-19" change="change my:ns to xmlns:my_ns"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
               let $params := map {"method": "xhtml", "canonical" : true()},
-                  $data := parse-xml("<html xmlns='http://www.w3.org/1999/xhtml' my:ns='local.ns'><body class='bclass' id='abc' bgcolor='black'/></html>")
+                  $data := parse-xml("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:my_ns='local.ns'><body class='bclass' id='abc' bgcolor='black'/></html>")
               return serialize($data, $params)
         ]]></test>
         <result>
@@ -3245,11 +3246,12 @@
     <test-case name="serialize-json-207" covers-40="PR2259">
         <description>canonical serialization parameter: sort order is based on UTF-16 code points</description>
         <created by="Michael Kay" on="2025-12-12"/>
+        <modified by="Gunther Rademacher" on="2026-01-19" change="replace map:items() by map:values()"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
               let $params := map {"method": "json", "canonical" : true()},
                   $data := {char(0x2f804):"2F804", char(42):"*", char(0xFF00):"FF00"}
-              return serialize($data, $params) => parse-json() => map:values()
+              return serialize($data, $params) => parse-json() => map:items()
         ]]></test>
         <result>
             <assert-deep-eq>"*", "2F804", "FF00"</assert-deep-eq>
@@ -3259,6 +3261,7 @@
     <test-case name="serialize-json-208" covers-40="PR2259">
         <description>canonical serialization parameter: example from RFC 8785</description>
         <created by="Michael Kay" on="2025-12-12"/>
+        <modified by="Gunther Rademacher" on="2026-01-19" change="replace map:items() by map:values()"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
               let $params := map {"method": "json", "canonical" : true()},
@@ -3273,7 +3276,7 @@
                              }'),
                   $lex := serialize($data, $params),
                   $data2 := parse-json($lex)
-               return map:values($data2)
+               return map:items($data2)
                   (:          Expected argument order after sorting property strings:
                             
                               "Carriage Return"
