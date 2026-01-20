@@ -869,4 +869,38 @@ return $m
    </test-case>
 
 
+   <test-case name="MapTest-093">
+      <description>Map incremental put with type information</description>
+      <created by="O'Neil Delpratt" on="2026-01-20"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>let $x := map:merge((1 to 20)!map{.:.})
+         return let $p := fold-left(
+         (21 to 26),
+         $x,
+         function($m, $k) {
+         map:put($m, $k, $k)  treat as map(xs:numeric, xs:numeric)})
+         return  map:size($p)</test>
+      <result>
+         <assert-deep-eq>26</assert-deep-eq>
+      </result>
+   </test-case>
+
+
+   <test-case name="MapTest-094">
+      <description>Map incremental map:remove with type information</description>
+      <created by="O'Neil Delpratt" on="2026-01-20"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>let $x := map:merge((1 to 20)!map{.:.})
+         return let $p := fold-left(
+         (5 to 10),
+         $x,
+         function($m, $k) {
+         map:remove($m, $k)  treat as map(xs:numeric, xs:numeric)})
+         return $p?*</test>
+      <result>
+         <assert-deep-eq>1,2 , 3, 4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20</assert-deep-eq>
+      </result>
+   </test-case>
+
+
 </test-set>
