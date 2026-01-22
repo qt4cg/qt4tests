@@ -2961,11 +2961,23 @@
     <test-case name="serialize-json-122" covers="fn-serialize json-output">
         <description>Error - can not serialize NaN, INF, -INF with JSON</description>
         <created by="Debbie Lockett, Saxonica" on="2015-08-20"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <modified by="Christian Gruen" on="2026-01-22" change="Restricted to 3.1"/>
+        <dependency type="spec" value="XP31 XQ31"/>
         <test>let $r := serialize([number('NaN'), number('INF'), number('-INF')],
             map{'method':'json'}) return translate($r,' &#x9;&#xa;&#xd;', '')</test>
         <result>
             <error code="SERE0020"/>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-json-122a" covers="fn-serialize json-output" covers-40="PR2387">
+        <description>Serialization of NaN, INF, -INF with JSON</description>
+        <created by="Christian Gruen" on="2026-01-22"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>let $r := serialize([number('NaN'), number('INF'), number('-INF')],
+            map{'method':'json'}) return translate($r,' &#x9;&#xa;&#xd;', '')</test>
+        <result>
+            <assert-string-value>[null,1e9999,-1e9999]</assert-string-value>
         </result>
     </test-case>
 
