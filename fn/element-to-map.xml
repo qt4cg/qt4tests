@@ -161,12 +161,13 @@
    <test-case name="element-to-map-017">
       <description> Namespaced elements: xsi:type is dropped</description>
       <created by="Michael Kay" on="2024-11-16"/>
+      <modified by="Christian Gruen" on="2026-01-22" change="qtspecs#1948"/>
       <test><![CDATA[element-to-map(parse-xml('<a xmlns="http://a.com/" 
             xsi:type="xs:integer"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:xs="http://www.w3.org/2001/XMLSchema">2</a>')/*)]]></test>
       <result>
-         <assert-deep-eq>{"Q{http://a.com/}a":{"#content":"2"}}</assert-deep-eq>
+         <assert-deep-eq>{"Q{http://a.com/}a":2}</assert-deep-eq>
       </result>
    </test-case>
    
@@ -224,11 +225,12 @@
    <test-case name="element-to-map-023">
       <description> Namespaced elements: attribute-marker is numeric</description>
       <created by="Michael Kay" on="2024-11-16"/>
+      <modified by="Christian Gruen" on="2026-01-22" change="qtspecs#1948"/>
       <test><![CDATA[element-to-map(
          parse-xml('<a xmlns="http://a.com/" b="BBB" z:c="CCC" xmlns:z="http://c.com/"/>')/*,
          {'attribute-marker':93.7})]]></test>
       <result>
-         <error code="XPTY0004"/>
+         <assert-deep-eq>{"Q{http://a.com/}a":{"93.7b":"BBB","93.7Q{http://c.com/}c":"CCC"}}</assert-deep-eq>
       </result>
    </test-case>
    
@@ -1473,6 +1475,7 @@
    <test-case name="element-to-map-401">
       <description> element node - explicit - selects empty layout though not empty; fallback uses record layout</description>
       <created by="Michael Kay" on="2024-11-16"/>
+      <modified by="Christian Gruen" on="2026-01-22" change="qtspecs#1948"/>
       <test><![CDATA[
          element-to-map(parse-xml('<a id="3"><b/></a>')/a, {'plan': {'a': {'layout': 'empty'},
                                                                      '*': {'layout': 'record'},
@@ -1480,7 +1483,7 @@
                                                                      }})
       ]]></test>
       <result>
-         <assert-deep-eq>{"a":{"@id":3, "b":""}}</assert-deep-eq>     
+         <assert-deep-eq>{"a":{"@id":3, "b":{}}}</assert-deep-eq>     
       </result>
    </test-case>
    
@@ -1803,6 +1806,7 @@
    <test-case name="element-to-map-511">
       <description> element node - explicit - selects simple layout though there is mixed content - fallback mixed</description>
       <created by="Michael Kay" on="2024-11-16"/>
+      <modified by="Christian Gruen" on="2026-01-22" change="qtspecs#1948"/>
       <test><![CDATA[
          element-to-map(parse-xml('<a>The <i>short</i> introduction</a>')/a, 
                         {'plan': {'a': {'layout':'simple'},
@@ -1810,7 +1814,7 @@
                                   }})
       ]]></test>
       <result>
-         <assert-deep-eq>{"a":["The ", {"i": "short"}, " introduction"]}</assert-deep-eq> 
+         <assert-deep-eq>{"a":["The ",{"i":["short"]}," introduction"]}</assert-deep-eq> 
       </result>
    </test-case>
    
