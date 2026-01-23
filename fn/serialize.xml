@@ -2378,6 +2378,78 @@
         </result>
     </test-case>
     
+    <test-case name="serialize-html-004" covers-40="PR2372">
+        <description>serialize test - html method - HTML5 fragment - output processing instruction</description>
+        <created by="Michael Kay, Saxonica" on="2026-01-20"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+            let $doc := <html><head/><body><p>Hello World!<?pi data?></p></body></html>
+            let $params := map {
+            "method" : "html",
+            "html-version" : 5,
+            "indent" : false()
+            }       
+            return serialize($doc//body, $params)
+        ]]></test>
+        <result>
+           <assert-string-value><![CDATA[<body><p>Hello World!<!--?pi data?--></p></body>]]></assert-string-value>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-html-005" covers-40="PR2372">
+        <description>serialize test - html method - HTML5 fragment - output processing instruction</description>
+        <created by="Michael Kay, Saxonica" on="2026-01-20"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+            let $doc := <html><head/><body><p>Hello World!<?pi?></p></body></html>
+            let $params := map {
+            "method" : "html",
+            "html-version" : 5,
+            "indent" : false()
+            }       
+            return serialize($doc//body, $params)
+        ]]></test>
+        <result>
+           <assert-string-value><![CDATA[<body><p>Hello World!<!--?pi?--></p></body>]]></assert-string-value>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-html-006" covers-40="PR2372">
+        <description>serialize test - html method - HTML5 fragment - output processing instruction</description>
+        <created by="Michael Kay, Saxonica" on="2026-01-20"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+            let $doc := <html><head/><body><p>Hello World!<?pi data--with--hyphens?></p></body></html>
+            let $params := map {
+            "method" : "html",
+            "html-version" : 5,
+            "indent" : false()
+            }       
+            return serialize($doc//body, $params)
+        ]]></test>
+        <result>
+           <assert-string-value><![CDATA[<body><p>Hello World!<!--?pi data- -with- -hyphens?--></p></body>]]></assert-string-value>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-html-007" covers-40="PR2372">
+        <description>serialize test - html method - HTML5 fragment - output processing instruction</description>
+        <created by="Christian Gruen" on="2026-01-22"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+            let $doc := <html><head/><body><p>Hello World!<?pi -----?></p></body></html>
+            let $params := map {
+            "method" : "html",
+            "html-version" : 5,
+            "indent" : false()
+            }       
+            return serialize($doc//body, $params)
+        ]]></test>
+        <result>
+           <assert-string-value><![CDATA[<body><p>Hello World!<!--?pi - - - - -?--></p></body>]]></assert-string-value>
+        </result>
+    </test-case>
+    
     <!-- XPath 3.1 tests JSON serialization output method -->
     <test-case name="serialize-json-001" covers="fn-serialize json-output">
         <description>serialize test - params supplied as map, json output method, $arg is an array</description>
@@ -2889,11 +2961,23 @@
     <test-case name="serialize-json-122" covers="fn-serialize json-output">
         <description>Error - can not serialize NaN, INF, -INF with JSON</description>
         <created by="Debbie Lockett, Saxonica" on="2015-08-20"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <modified by="Christian Gruen" on="2026-01-22" change="Restricted to 3.1"/>
+        <dependency type="spec" value="XP31 XQ31"/>
         <test>let $r := serialize([number('NaN'), number('INF'), number('-INF')],
             map{'method':'json'}) return translate($r,' &#x9;&#xa;&#xd;', '')</test>
         <result>
             <error code="SERE0020"/>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-json-122a" covers="fn-serialize json-output" covers-40="PR2387">
+        <description>Serialization of NaN, INF, -INF with JSON</description>
+        <created by="Christian Gruen" on="2026-01-22"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>let $r := serialize([number('NaN'), number('INF'), number('-INF')],
+            map{'method':'json'}) return translate($r,' &#x9;&#xa;&#xd;', '')</test>
+        <result>
+            <assert-string-value>[null,1e9999,-1e9999]</assert-string-value>
         </result>
     </test-case>
 
@@ -3682,6 +3766,39 @@
         </test>
         <result>
             <error code="SERE0020"/>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-340" covers-40="PR2387">
+        <description>JSON: NaN</description>
+        <created by="Michael Kay" on="2026-01-20"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize( [number('NaN')], {'method':'json'})
+        </test>
+        <result>
+            <assert-eq>"[null]"</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-341" covers-40="PR2387">
+        <description>JSON: negative infinity</description>
+        <created by="Michael Kay" on="2026-01-20"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize( [number('-INF')], {'method':'json'})
+        </test>
+        <result>
+            <assert-eq>"[-1e9999]"</assert-eq>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-json-342" covers-40="PR2387">
+        <description>JSON: positive infinity</description>
+        <created by="Michael Kay" on="2026-01-20"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize( [number('INF')], {'method':'json'})
+        </test>
+        <result>
+            <assert-eq>"[1e9999]"</assert-eq>
         </result>
     </test-case>
  
