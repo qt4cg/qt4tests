@@ -555,6 +555,30 @@
         </result>
     </test-case>
     
+    <test-case name="map-merge-408">
+        <description>Build map incrementally using map:merge and map:remove</description>
+        <created by="Michael Kay, Saxonica" on="2026-01-23"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <environment ref="map"/>
+        <test>let $m1 := map:merge((100 to 900) ! map{.:true()})
+              return fold-left(map:keys($m1), $m1, fn($map, $key) {
+                  if ($key mod 3 eq 0)
+                  then $map
+                  else if ($key mod 3 eq 1) 
+                  then map:remove($map, $key)
+                  else map:merge(($map, {$key: false()}), {'duplicates':'use-last'})
+              })
+        </test>
+        <result>
+            <all-of>
+                <assert>every $k in 100 to 900 satisfies (if ($k mod 3 eq 1) then not(map:contains($result, $k)) else true())</assert>
+                <assert>every $k in 100 to 900 satisfies (if ($k mod 3 eq 0) then map:get($result, $k) eq true() else true())</assert>
+                <assert>every $k in 100 to 900 satisfies (if ($k mod 3 eq 2) then map:get($result, $k) eq false() else true())</assert>
+                <assert>deep-equal(map:keys($result), sort(map:keys($result)))</assert>
+            </all-of>
+        </result>
+    </test-case>
+    
     <test-case name="map-merge-empty">
         <description>Optional argument: empty sequence</description>
         <created by="Christian Gruen" on="2024-01-16"/>

@@ -72,7 +72,8 @@
    <test-case name="fn-parse-html-008">
       <description>Empty string content with fail-on-error option</description>
       <created by="Michael Kay, Saxonica" on="2025-09-24"/>
-      <test><![CDATA[parse-html("", {"fail-on-error": true()})]]></test>
+      <modified by="Michael Kay, Saxonica" on="2026-01-21" change="omitting the DOCTYPE is an error"/>
+      <test><![CDATA[parse-html("<!DOCTYPE html>", {"fail-on-error": true()})]]></test>
       <result>
          <assert>/Q{http://www.w3.org/1999/xhtml}html</assert>
       </result>
@@ -90,7 +91,11 @@
    <test-case name="fn-parse-html-010">
       <description>Empty binary content with fail-on-error option</description>
       <created by="Michael Kay, Saxonica" on="2025-09-24"/>
-      <test><![CDATA[parse-html(xs:base64Binary(""), {"fail-on-error": true()})]]></test>
+      <modified by="Michael Kay, Saxonica" on="2026-01-22" change="Absent DOCTYPE is an error"/>
+      <test><![CDATA[
+         parse-html(Q{http://expath.org/ns/binary}encode-string("<!DOCTYPE HTML>", "UTF-8"), 
+                    {"fail-on-error": true(), "encoding": "UTF-8"})
+      ]]></test>
       <result>
          <assert>/Q{http://www.w3.org/1999/xhtml}html</assert>
       </result>
@@ -128,11 +133,12 @@
       <created by="Michael Kay, Saxonica" on="2025-09-24"/>
       <test><![CDATA[parse-html("<html><body><p>Hello web!</p></body></html>")]]></test>
       <result>
-         <all-of xmlns:h="http://www.w3.org/1999/xhtml">
-            <assert>/h:html</assert>
-            <assert>/h:html/h:head</assert>
-            <assert>/h:html/h:body</assert>
-            <assert>/h:html/h:body/h:p[. = 'Hello web!']</assert>
+         <all-of>
+            <assert>every(//*, fn { namespace-uri() = 'http://www.w3.org/1999/xhtml'})</assert>
+            <assert>/*:html</assert>
+            <assert>/*:html/*:head</assert>
+            <assert>/*:html/*:body</assert>
+            <assert>/*:html/*:body/*:p[. = 'Hello web!']</assert>
          </all-of>
       </result>
    </test-case>
@@ -162,12 +168,47 @@
       
       `)]]></test>
       <result>
-         <all-of xmlns:h="http://www.w3.org/1999/xhtml">
-            <assert>/h:html</assert>
-            <assert>/h:html/h:head</assert>
-            <assert>/h:html/h:body/h:template</assert>
-            <assert>/h:html/h:body/h:template/h:p = "Smile!"</assert>
+         <all-of>
+            <assert>every(//*, fn { namespace-uri() = 'http://www.w3.org/1999/xhtml'})</assert>
+            <assert>/*:html</assert>
+            <assert>/*:html/*:head</assert>
+            <assert>/*:html/*:body/*:template</assert>
+            <assert>/*:html/*:body/*:template/*:p = "Smile!"</assert>
          </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-html-016">
+      <description>Invalid end tag - fail-on-error = true</description>
+      <created by="Michael Kay, Saxonica" on="2026-01-21"/>
+      <test><![CDATA[parse-html("<!DOCTYPE html><html><body><p>Hello web!</q></body></html>", {'fail-on-error':true()})]]></test>
+      <result>
+         <error code="FODC0011"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-html-017">
+      <description>Invalid end tag - fail-on-error = true</description>
+      <created by="Michael Kay, Saxonica" on="2026-01-21"/>
+      <test><![CDATA[parse-html("<!DOCTYPE html><html><body><p>Hello web!</q></body></html>", {'fail-on-error':false()})]]></test>
+      <result>
+         <all-of>
+            <assert>every(//*, fn { namespace-uri() = 'http://www.w3.org/1999/xhtml'})</assert>
+            <assert>/*:html</assert>
+            <assert>/*:html/*:head</assert>
+            <assert>/*:html/*:body</assert>
+            <assert>/*:html/*:body/*:p[. = 'Hello web!']</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-parse-html-018">
+      <description>Omitting the DOCTYPE is an error</description>
+      <created by="Michael Kay, Saxonica" on="2025-09-24"/>
+      <modified by="Michael Kay, Saxonica" on="2026-01-21" change="omitting the DOCTYPE is an error"/>
+      <test><![CDATA[parse-html("<html><body><p>Text</p></body></html>", {"fail-on-error": true()})]]></test>
+      <result>
+         <error code="FODC0011"/>
       </result>
    </test-case>
 
