@@ -1142,10 +1142,11 @@
    <test-case name="JAxes-300">
       <description> Use type tests - implicit child axis</description>
       <created by="Michael Kay" on="2025-09-01"/>
+      <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {"w": 11e0, "x": 12, "y": 12.1, "z": 12e0}
-         return $map/type(xs:double) =!> jnode-selector()
+         return $map/jnode(*, xs:double) =!> jnode-selector()
       </test>
       <result>
          <assert-deep-eq>"w", "z"</assert-deep-eq>
@@ -1156,9 +1157,10 @@
       <description> Use type tests - explicit child axis</description>
       <created by="Michael Kay" on="2025-09-01"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
+      <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
       <test>
          let $map := {"w": 11e0, "x": 12, "y": 12.1, "z": 12e0}
-         return $map/child::type(xs:double) =!> jnode-selector()
+         return $map/child::jnode(*, xs:double) =!> jnode-selector()
       </test>
       <result>
          <assert-deep-eq>"w", "z"</assert-deep-eq>
@@ -1169,9 +1171,10 @@
       <description> Use type tests - explicit descendant axis</description>
       <created by="Michael Kay" on="2025-09-01"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
+      <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
       <test>
          let $map := {"w": 11e0, "x": 12, "y": 12.1, "z": 12e0, "*": {"w": 15e0}}
-         return $map/descendant::type(xs:double) =!> jnode-selector()
+         return $map/descendant::jnode(*, xs:double) =!> jnode-selector()
       </test>
       <result>
          <assert-deep-eq>"w", "z", "w"</assert-deep-eq>
@@ -1181,10 +1184,11 @@
    <test-case name="JAxes-303">
       <description> Use type tests - // operator</description>
       <created by="Michael Kay" on="2025-09-01"/>
+      <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {"w": 11e0, "x": 12, "y": 12.1, "z": 12e0, "*": {"w": 15e0}}
-         return $map//type(xs:double) =!> jnode-selector()
+         return $map//jnode(*, xs:double) =!> jnode-selector()
       </test>
       <result>
          <assert-deep-eq>"w", "z", "w"</assert-deep-eq>
@@ -1194,10 +1198,11 @@
    <test-case name="JAxes-304">
       <description> Use type test with occurrence indicator</description>
       <created by="Michael Kay" on="2025-09-01"/>
+      <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {"v": (), "w": 11e0, "x": 12, "y": 12.1, "z": 12e0, "*": {"w": (15e0, 16e0)}}
-         return $map//type(xs:double*) =!> jnode-selector()
+         return $map//jnode(*, xs:double*) =!> jnode-selector()
       </test>
       <result>
          <assert-deep-eq>"v", "w", "z", "w"</assert-deep-eq>
@@ -1289,6 +1294,7 @@
    <test-case name="JAxes-315">
       <description> Use record type tests - occurrence indicator</description>
       <created by="Michael Kay" on="2025-09-01"/>
+      <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {"v": (),
@@ -1296,7 +1302,7 @@
                       "x": {"A":12, "B":"B"}, 
                       "y": {"A":12.1, "B":"B"}, 
                       "z": {"A":12e0, "B":"B"}}
-         return $map/child::type(record(A as xs:double, B as xs:string)?) =!> jnode-selector()
+         return $map/child::jnode(*, record(A as xs:double, B as xs:string)?) =!> jnode-selector()
       </test>
       <result>
          <assert-deep-eq>"v", "w", "z"</assert-deep-eq>
@@ -1349,10 +1355,11 @@
    <test-case name="JAxes-322">
       <description> Use type tests - enum</description>
       <created by="Michael Kay" on="2025-09-01"/>
+      <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {"x": "red", "y": "green", "z": "blue"}
-         return $map/type(enum("green", "red")) =!> jnode-selector()
+         return $map/jnode(*, enum("green", "red")) =!> jnode-selector()
       </test>
       <result>
          <assert-deep-eq>"x", "y"</assert-deep-eq>
@@ -1362,10 +1369,11 @@
    <test-case name="JAxes-323">
       <description> Use type tests - enum</description>
       <created by="Michael Kay" on="2025-09-01"/>
+      <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {"x": "red", "y": "green", "z": "blue", "*": ()}
-         return $map/type(enum("green", "red")?) =!> jnode-selector()
+         return $map/jnode(*, enum("green", "red")?) =!> jnode-selector()
       </test>
       <result>
          <assert-deep-eq>"x", "y", "*"</assert-deep-eq>
@@ -1388,11 +1396,12 @@
    <test-case name="JAxes-325">
       <description> Use type tests - array with XNode</description>
       <created by="Michael Kay" on="2025-09-01"/>
+      <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
          let $xml := parse-xml("<doc><p id='a17'/><p id='a18'/></doc>")
          let $array := [$xml//p[@id='a17'], $xml//@id[.='a18']]
-         return $array/type(element(p)) -> jnode-content() -> @id -> string()
+         return $array/jnode(*, element(p)) -> jnode-content() -> @id -> string()
       ]]></test>
       <result>
          <assert-deep-eq>"a17"</assert-deep-eq>
@@ -1402,11 +1411,12 @@
    <test-case name="JAxes-326">
       <description> Use type tests - array with XNode</description>
       <created by="Michael Kay" on="2025-09-01"/>
+      <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
          let $xml := parse-xml("<doc><p id='a17'/><p id='a18'/></doc>")
          let $array := [$xml//p[@id='a17'], $xml//@id[.='a18']]
-         return $array/type(attribute(id)) => string()
+         return $array/jnode(*, attribute(id)) => string()
       ]]></test>
       <result>
          <assert-deep-eq>"a18"</assert-deep-eq>
@@ -1440,12 +1450,13 @@
    </test-case>
    
    <test-case name="JAxes-329">
-      <description> Use type tests - type(item()?)</description>
+      <description> Use type tests - jnode(*, item()?)</description>
       <created by="Michael Kay" on="2025-09-01"/>
+      <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
          let $array := [1, (), xs:date('2002-02-02'), #xml:space, contains#2, (3,4,5)]
-         return count($array/type(item()?))
+         return count($array/jnode(*, item()?))
       ]]></test>
       <result>
          <assert-eq>5</assert-eq>
@@ -1468,10 +1479,11 @@
    <test-case name="JAxes-331">
       <description> Use type tests - child::jnode()</description>
       <created by="Michael Kay" on="2025-09-01"/>
+      <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
          let $array := [1, xs:date('2002-02-02'), #xml:space, contains#2, {}]
-         return count($array/child::jnode(xs:date))
+         return count($array/child::jnode(*, xs:date))
       ]]></test>
       <result>
          <assert-eq>1</assert-eq>
@@ -1505,12 +1517,13 @@
    </test-case>
    
    <test-case name="JAxes-334">
-      <description> Use type tests - child::type(gnode()?)</description>
+      <description> Use type tests - child::jnode(*, gnode()?)</description>
       <created by="Michael Kay" on="2025-09-01"/>
+      <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
          let $array := [1, (), jtree([]), parse-xml("<doc/>"), ([], [])]
-         return count($array/child::type(gnode()?))
+         return count($array/child::jnode(*, gnode()?))
       ]]></test>
       <result>
          <assert-eq>3</assert-eq>
