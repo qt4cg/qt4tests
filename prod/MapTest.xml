@@ -926,6 +926,72 @@ return $m
          <assert-deep-eq>1,2 , 3, 4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20</assert-deep-eq>
       </result>
    </test-case>
+   
+   
+   <test-case name="MapTest-096">
+      <description>Map incremental put with duplicate keys - should fail</description>
+      <created by="O'Neil Delpratt" on="2026-01-20"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>let $m1 := map{1:1, 2:2, 3:3}
+         let $m2 := map{2:1, 3:2, 4:3}
+         let $m3 := map:merge((map:put($m1, 4, 5), $m2), { "duplicates": "reject" })
+      return map:size($m3)</test>
+      <result>
+         <error code="FOJS0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="MapTest-097">
+      <description>Map incremental put with rule to replace duplicate keys</description>
+      <created by="O'Neil Delpratt" on="2026-01-20"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>let $m1 := map{1:1, 2:2, 3:3}
+         let $m2 := map{2:1, 3:2, 4:3}
+         let $m3 := map:merge((map:put($m1, 4, 5), $m2))
+         return map:size($m3)</test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   
+   <test-case name="MapTest-098">
+      <description>Map incremental remove with rule to replace duplicate keys</description>
+      <created by="O'Neil Delpratt" on="2026-01-20"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>let $m1 := map{1:1, 2:2, 3:3}
+         let $m2 := map{2:1, 3:2, 4:3}
+         let $m3 := map:merge((map:remove($m1, 1), $m2))
+         return map:size($m3)</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="MapTest-099">
+      <description>Map incremental remove with rule to replace duplicate keys</description>
+      <created by="O'Neil Delpratt" on="2026-01-20"/>
+      <test>let $m1 := map{1:1, 2:2, 3:3}
+         let $m2 := map{2:1, 3:2, 4:3}
+         let $m3 := map:merge((map:remove($m1, 1), $m2), {"duplicates": "use-last" })
+         return map:size($m3)</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="MapTest-100">
+      <description>Map incremental remove with rule to throw error for duplicate keys</description>
+      <created by="O'Neil Delpratt" on="2026-01-20"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>let $m1 := map{1:1, 2:2, 3:3}
+         let $m2 := map{2:1, 3:2, 4:3}
+         let $m3 := map:merge((map:remove($m1, 1), $m2), { "duplicates": "reject" })
+         return map:size($m3)</test>
+      <result>
+         <error code="FOJS0003"/>
+      </result>
+   </test-case>
 
 
 </test-set>
