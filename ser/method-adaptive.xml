@@ -253,7 +253,8 @@
       <modified by="Christian Gruen" on="2012-02-19" change="regular expression fixed"/>
       <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
       <modified by="Michael Kay" on="2015-11-27" change="Add HOF dependency"/>
-      <dependency type="spec" value="XQ31+"/>
+      <modified by="Michael Kay" on="2026-03-03" change="In 4.0, becomes implementation-defined"/>
+      <dependency type="spec" value="XQ31"/>
       <dependency type="feature" value="higherOrderFunctions"/>
       <test><![CDATA[
  
@@ -265,6 +266,28 @@
       ]]></test>
       <result>
         <serialization-matches>^\(anonymous-function\)#1$</serialization-matches>
+      </result>
+   </test-case>
+  
+  <test-case name="Serialization-adaptive-13a" covers-40="PR2485">
+      <description>Test the adaptive serialization output method - anon function</description>
+      <created by="Andrew Coleman" on="2015-02-11"/>
+      <modified by="Christian Gruen" on="2012-02-19" change="regular expression fixed"/>
+      <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
+      <modified by="Michael Kay" on="2015-11-27" change="Add HOF dependency"/>
+      <modified by="Michael Kay" on="2026-03-03" change="In 4.0, becomes implementation-defined"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test><![CDATA[
+ 
+     	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        
+        function($a) { $a }
+
+      ]]></test>
+      <result>
+        <assert>true()</assert>
       </result>
    </test-case>
 
@@ -578,7 +601,7 @@
       <modified by="Christian Gruen" on="2012-02-19" change="regular expression fixed"/>
       <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
       <modified by="Michael Kay" on="2015-11-27" change="Add HOF dependency"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <dependency type="feature" value="higherOrderFunctions"/>
       <test><![CDATA[
  
@@ -590,6 +613,28 @@
       ]]></test>
       <result>
         <serialization-matches>^\[fn:exists#1,\(anonymous-function\)#1\]$</serialization-matches>
+      </result>
+   </test-case>
+  
+  <test-case name="Serialization-adaptive-26a" covers-40="PR2485" >
+      <description>Test the adaptive serialization output method - array of functions</description>
+      <created by="Andrew Coleman" on="2015-02-11"/>
+      <modified by="Christian Gruen" on="2012-02-19" change="regular expression fixed"/>
+      <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
+      <modified by="Michael Kay" on="2015-11-27" change="Add HOF dependency"/>
+      <modified by="Michael Kay" on="2015-11-27" change="PR2485 makes anonymous functions implementation-defined"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <test><![CDATA[
+ 
+     	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        
+        [fn:exists#1, function($a) { $a }]
+
+      ]]></test>
+      <result>
+        <serialization-matches>^\[fn:exists#1,.+\]$</serialization-matches>
       </result>
    </test-case>
 
@@ -617,7 +662,7 @@
       </result>
    </test-case>
   
-  <test-case name="Serialization-adaptive-27a" covers-40="PR1123">
+  <test-case name="Serialization-adaptive-27a" covers-40="PR1123 PR2485">
     <description>Test the adaptive serialization output method - mixed array</description>
     <created by="Andrew Coleman" on="2015-02-11"/>
     <modified by="Christian Gruen" on="2015-02-19" change="query and regular expression fixed"/>
@@ -634,11 +679,11 @@
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
         
-        [fn:exists#1, 1, <element>content</element>, (), function($a) { $a }, map { "infinity":xs:double("INF") }, "json-string"]
+        [fn:exists#1, 1, <element>content</element>, (), map { "infinity":xs:double("INF") }, "json-string"]
 
       ]]></test>
     <result>
-      <serialization-matches><![CDATA[^\[[(]?fn:exists#1[)]?,[(]?1[)]?,[(]?(<\?xml[^<]+>)?<element>content</element>[)]?,\(\),[(]?\(anonymous-function\)#1[)]?,[(]?\{"infinity":INF[)]?\},[(]?"json-string"[)]?\]$]]></serialization-matches>
+      <serialization-matches><![CDATA[^\[[(]?fn:exists#1[)]?,[(]?1[)]?,[(]?(<\?xml[^<]+>)?<element>content</element>[)]?,\(\),[(]?\{"infinity":INF[)]?\},[(]?"json-string"[)]?\]$]]></serialization-matches>
     </result>
   </test-case>
    
