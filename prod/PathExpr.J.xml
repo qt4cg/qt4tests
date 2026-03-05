@@ -267,9 +267,13 @@
    <test-case name="PathExpr-J-013" covers-40="PR2031">
       <description>Binary lookup when context item is a function but not an array or map</description>
       <created by="Michael Kay" on="2025-07-15"/>
+      <modified by="Christian Gruen" on="2026-03-05" change="alternative error code added"/>
       <test>(floor#1, ceiling#1, round#1, abs#1)[*[1] = 1]</test>
       <result>
-         <error code="XPTY0004"/>
+         <any-of>
+            <error code="XPTY0004"/>
+            <error code="XPTY0019"/>
+         </any-of>
       </result>
    </test-case>
 
@@ -783,9 +787,13 @@
    <test-case name="PathExpr-J-113" covers-40="PR2031">
       <description>Binary lookup when lhs is a function but not an array or map</description>
       <created by="Michael Kay" on="2025-07-15"/>
+      <modified by="Christian Gruen" on="2026-03-05" change="alternative error code added"/>
       <test>(floor#1, ceiling#1, round#1, abs#1)//*[1]</test>
       <result>
-         <error code="XPTY0004"/>
+         <any-of>
+            <error code="XPTY0004"/>
+            <error code="XPTY0019"/>
+         </any-of>
       </result>
    </test-case>
 
@@ -1305,20 +1313,12 @@
       <environment ref="jsonpath"/>
       <test>$m/store/* =!> jvalue() </test>
       <result>
-         <any-of>
-            <all-of>
-               <assert>count($result) = 2</assert>
-               <assert>$result[1] instance of record(color, price)</assert>
-               <assert>$result[2][*[author and price and category]]</assert>
-               <assert>array:size($result[2]) = 4</assert>
-            </all-of>
-            <all-of>
-               <assert>count($result) = 2</assert>
-               <assert>$result[2] instance of record(color, price)</assert>
-               <assert>$result[1][*[author and price and category]]</assert>
-               <assert>array:size($result[1]) = 4</assert>
-            </all-of>
-          </any-of>
+         <all-of>
+            <assert>count($result) = 2</assert>
+            <assert>$result[2] instance of record(color, price)</assert>
+            <assert>exists($result[1][*[author and price and category]])</assert>
+            <assert>array:size($result[1]) = 4</assert>
+         </all-of>
       </result>
    </test-case>
    
@@ -1549,7 +1549,7 @@ $in/descendant::*[Author and Title][Language="German"]/{'Author':?Author, 'Title
       <modified by="Christian Gruen" on="2026-03-05" change="PR2413"/>
       <environment ref="books"/>
       <test>
-$in//jnode(*, record(Author, Title, *))[Language="German"]/following-sibling::*[1]/ISBN-13 => string()
+$in//*[Author and Title][Language="German"]/following-sibling::*[1]/ISBN-13 => string()
       </test>
       <result>
          <assert-deep-eq>"978-0141192093"</assert-deep-eq>
