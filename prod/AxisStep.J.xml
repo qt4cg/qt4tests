@@ -1264,6 +1264,7 @@
       <description> Use record type tests - // operator</description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Michael Kay" on="2026-02-10" change="syntax updated"/>
+      <modified by="Christian Gruen" on="2026-03-05" change="PR2413"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {"w": {"A":11e0, "B":"B"}, 
@@ -1271,7 +1272,7 @@
                       "y": {"A":12.1, "B":"B"}, 
                       "z": {"A":12e0, "B":"B"},
                       "*": {"A":12e0, "B":{"A":12e0, "B":"B"}}}
-         return $map//jnode(*, record(A as xs:double, *)) =!> jkey()
+         return $map//*[jnode(A, xs:double)] =!> jkey()
       </test>
       <result>
          <assert-deep-eq>"w", "z", "*", "B"</assert-deep-eq>
@@ -1282,6 +1283,7 @@
       <description> Use record type tests - // operator</description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Michael Kay" on="2026-02-10" change="syntax updated"/>
+      <modified by="Christian Gruen" on="2026-03-05" change="PR2413"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {"w": {"A":11e0, "B":"B"}, 
@@ -1289,7 +1291,7 @@
                       "y": {"A":12.1, "B":"B"}, 
                       "z": {"A":12e0, "B":"B"},
                       "*": {"A":12e0, "B":({"A":12e0, "B":"B"}, {"A":22e0, "B":"BB"})}}
-         return $map//jnode(*, record(A as xs:double, *)) =!> jkey()
+         return $map//*[jnode(A, xs:double)][count(B) = 1] =!> jkey()
       </test>
       <result>
          <assert-deep-eq>"w", "z", "*"</assert-deep-eq>
@@ -1393,9 +1395,10 @@
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Michael Kay" on="2026-02-10" change="syntax updated"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
+      <modified by="Christian Gruen" on="2026-03-05" change="PR2413"/>
       <test>
          let $array := [{"x": "red", "y": "green"}, {"x": "pink", "y": "teal"}]
-         return $array/jnode(*, record(x as enum("red"), *))/y => string()
+         return $array/*[jnode(x, enum("red"))]/y => string()
       </test>
       <result>
          <assert-deep-eq>"green"</assert-deep-eq>
@@ -1548,12 +1551,16 @@
       <description> Obsolete syntax </description>
       <created by="Michael Kay" on="2026-02-10"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
+      <modified by="Christian Gruen" on="2026-03-05" change="alternative error code added"/>
       <test><![CDATA[
          let $array := [1, (), jtree([]), parse-xml("<doc/>"), ([], [])]
          return count($array/type(xs:integer))
       ]]></test>
       <result>
-         <error code="XPST0003"/>
+         <any-of>
+            <error code="XPST0003"/>
+            <error code="XPST0017"/>
+         </any-of>
       </result>
    </test-case>
    
