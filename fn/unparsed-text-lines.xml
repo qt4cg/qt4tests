@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="us-ascii"?>
+<?xml version="1.0" encoding="utf-8"?>
 <test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-unparsed-text-lines"
    covers-30="fn-unparsed-text-lines">
    <description>Tests for the unparsed-text-lines() function</description>
@@ -118,6 +118,39 @@
          uri="http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt">
          <description>UTF-8 encoded plain text.</description>
          <created by="Tim Mills" on="2012-01-05"/>
+      </resource>
+   </environment>
+
+   <environment name="unparsed-text-lines-with-not-permitted-character">
+      <static-base-uri uri="http://www.w3.org/fots/unparsed-text-lines/" />
+      <resource file="unparsed-text/text-not-permitted.txt"
+         media-type="text/plain"
+         encoding="utf-8"
+         uri="http://www.w3.org/fots/unparsed-text-lines/text-not-permitted.txt">
+         <description>Text that contains a character that’s not permitted. NULL?</description>
+         <created by="Norm Tovey-Walsh" on="2026-02-17"/>
+      </resource>
+   </environment>
+
+   <environment name="unparsed-text-lines-with-not-permitted-character-longer">
+      <static-base-uri uri="http://www.w3.org/fots/unparsed-text-lines/" />
+      <resource file="unparsed-text/text-not-permitted-long.txt"
+         media-type="text/plain"
+         encoding="utf-8"
+         uri="http://www.w3.org/fots/unparsed-text-lines/text-not-permitted-long.txt">
+         <description>Text that contains a character that’s not permitted. NULL?</description>
+         <created by="Norm Tovey-Walsh" on="2026-02-20"/>
+      </resource>
+   </environment>
+
+   <environment name="unparsed-text-lines-with-unpaired-surrogate">
+      <static-base-uri uri="http://www.w3.org/fots/unparsed-text-lines/" />
+      <resource file="unparsed-text/ends-with-surrogate.bin"
+         media-type="text/plain"
+         encoding="utf-8"
+         uri="http://www.w3.org/fots/unparsed-text-lines/ends-with-surrogate.txt">
+         <description>Text ends with an unpaired surrogate.</description>
+         <created by="Norm Tovey-Walsh" on="2026-02-19"/>
       </resource>
    </environment>
 
@@ -831,6 +864,68 @@
       <test>unparsed-text-lines("text-plain-utf-8.txt", { "normalize-newlines": true() })</test>
       <result>
          <error code="XPTY0004" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-text-lines-fallback-001" covers-40="PR2510">
+      <description>unparsed-text-lines without fallback</description>
+      <created by="Norm Tovey-Walsh" on="2026-02-17"/>
+      <environment ref="unparsed-text-lines-with-not-permitted-character" />
+      <test>unparsed-text-lines("text-not-permitted.txt", { })</test>
+      <result>
+         <error code="FOUT1170" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-text-lines-fallback-002" covers-40="PR2510">
+      <description>unparsed-text-lines with fallback</description>
+      <created by="Norm Tovey-Walsh" on="2026-02-17"/>
+      <modified by="Norm Tovey-Walsh" on="2026-03-11" change="Replaced fallback function with boolean"/>
+      <environment ref="unparsed-text-lines-with-not-permitted-character" />
+      <test>unparsed-text-lines("text-not-permitted.txt", { 'fallback': true() })</test>
+      <result>
+        <assert>starts-with($result[1], "Is &#xfffd; allowed?")</assert>
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-text-lines-fallback-003" covers-40="PR2510">
+      <description>unparsed-text-lines with mulit-character fallback</description>
+      <created by="Norm Tovey-Walsh" on="2026-02-19"/>
+      <modified by="Norm Tovey-Walsh" on="2026-03-11" change="Replaced fallback function with boolean"/>
+      <environment ref="unparsed-text-lines-with-not-permitted-character" />
+      <test>unparsed-text-lines("text-not-permitted.txt", { 'fallback': true() })</test>
+      <result>
+        <assert>starts-with($result[1], "Is � allowed?")</assert>
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-text-lines-fallback-004" covers-40="PR2510">
+      <description>unparsed-text-lines with mulit-character fallback</description>
+      <created by="Norm Tovey-Walsh" on="2026-02-20"/>
+      <environment ref="unparsed-text-lines-with-not-permitted-character-longer" />
+      <test>unparsed-text-lines("text-not-permitted-long.txt", { 'fallback': true() })</test>
+      <result>
+        <assert>starts-with($result[1], "Is � allowed?")</assert>
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-text-lines-fallback-005" covers-40="PR2510">
+      <description>unparsed-text-lines without fallback</description>
+      <created by="Norm Tovey-Walsh" on="2026-02-19"/>
+      <environment ref="unparsed-text-lines-with-unpaired-surrogate"/>
+      <test>unparsed-text-lines("ends-with-surrogate.txt", { })</test>
+      <result>
+         <error code="FOUT1190" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-text-lines-fallback-006" covers-40="PR2510">
+      <description>unparsed-text-lines with fallback</description>
+      <created by="Norm Tovey-Walsh" on="2026-03-10"/>
+      <environment ref="unparsed-text-lines-with-unpaired-surrogate"/>
+      <test>unparsed-text-lines("ends-with-surrogate.txt", { 'fallback': true() })</test>
+      <result>
+        <assert>starts-with($result[1], "This file ends with an unpaired high surrogate: �")</assert>
       </result>
    </test-case>
 

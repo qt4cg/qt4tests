@@ -152,6 +152,39 @@
       </resource>
    </environment>
 
+   <environment name="unparsed-text-with-not-permitted-character">
+      <static-base-uri uri="http://www.w3.org/fots/unparsed-text/" />
+      <resource file="unparsed-text/text-not-permitted.txt"
+         media-type="text/plain"
+         encoding="utf-8"
+         uri="http://www.w3.org/fots/unparsed-text/text-not-permitted.txt">
+         <description>Text that contains a character that’s not permitted. NULL?</description>
+         <created by="Norm Tovey-Walsh" on="2026-02-17"/>
+      </resource>
+   </environment>
+
+   <environment name="unparsed-text-with-not-permitted-character-longer">
+      <static-base-uri uri="http://www.w3.org/fots/unparsed-text/" />
+      <resource file="unparsed-text/text-not-permitted-long.txt"
+         media-type="text/plain"
+         encoding="utf-8"
+         uri="http://www.w3.org/fots/unparsed-text/text-not-permitted-long.txt">
+         <description>Text that contains a character that’s not permitted. NULL?</description>
+         <created by="Norm Tovey-Walsh" on="2026-02-20"/>
+      </resource>
+   </environment>
+
+   <environment name="unparsed-text-with-unpaired-surrogate">
+      <static-base-uri uri="http://www.w3.org/fots/unparsed-text/" />
+      <resource file="unparsed-text/ends-with-surrogate.bin"
+         media-type="text/plain"
+         encoding="utf-8"
+         uri="http://www.w3.org/fots/unparsed-text/ends-with-surrogate.txt">
+         <description>Text ends with an unpaired surrogate.</description>
+         <created by="Norm Tovey-Walsh" on="2026-02-19"/>
+      </resource>
+   </environment>
+
    <test-case name="fn-unparsed-text-001">
       <description>Attempts to evaluate the "unparsed-text" function with no arguments.</description>
       <created by="Tim Mills" on="2011-11-28"/>
@@ -1218,6 +1251,68 @@
             <assert-deep-eq>'ff', 'ff', '84', 'd8', '6c', 'dc'</assert-deep-eq>
             <error code="FOUT1190"/>
          </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-text-fallback-001" covers-40="PR2510">
+      <description>unparsed-text without fallback</description>
+      <created by="Norm Tovey-Walsh" on="2026-02-17"/>
+      <environment ref="unparsed-text-with-not-permitted-character" />
+      <test>unparsed-text("text-not-permitted.txt", { })</test>
+      <result>
+         <error code="FOUT1170" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-text-fallback-002" covers-40="PR2510">
+      <description>unparsed-text with fallback</description>
+      <created by="Norm Tovey-Walsh" on="2026-02-17"/>
+      <modified by="Norm Tovey-Walsh" on="2026-03-11" change="Replaced fallback function with boolean"/>
+      <environment ref="unparsed-text-with-not-permitted-character" />
+      <test>unparsed-text("text-not-permitted.txt", { 'fallback': true() })</test>
+      <result>
+        <assert>starts-with($result, "Is &#xfffd; allowed?")</assert>
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-text-fallback-003" covers-40="PR2510">
+      <description>unparsed-text with mulit-character fallback</description>
+      <created by="Norm Tovey-Walsh" on="2026-02-19"/>
+      <modified by="Norm Tovey-Walsh" on="2026-03-11" change="Replaced fallback function with boolean"/>
+      <environment ref="unparsed-text-with-not-permitted-character" />
+      <test>unparsed-text("text-not-permitted.txt", { 'fallback': true() })</test>
+      <result>
+        <assert>starts-with($result, "Is � allowed?")</assert>
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-text-fallback-004" covers-40="PR2510">
+      <description>unparsed-text with mulit-character fallback</description>
+      <created by="Norm Tovey-Walsh" on="2026-02-20"/>
+      <environment ref="unparsed-text-with-not-permitted-character-longer" />
+      <test>unparsed-text("text-not-permitted-long.txt", { 'fallback': true() })</test>
+      <result>
+        <assert>starts-with($result, "Is � allowed?")</assert>
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-text-fallback-005" covers-40="PR2510">
+      <description>unparsed-text without fallback</description>
+      <created by="Norm Tovey-Walsh" on="2026-02-19"/>
+      <environment ref="unparsed-text-with-unpaired-surrogate"/>
+      <test>unparsed-text("ends-with-surrogate.txt", { })</test>
+      <result>
+         <error code="FOUT1190" />
+      </result>
+   </test-case>
+
+   <test-case name="fn-unparsed-text-fallback-006" covers-40="PR2510">
+      <description>unparsed-text with fallback</description>
+      <created by="Norm Tovey-Walsh" on="2026-03-10"/>
+      <environment ref="unparsed-text-with-unpaired-surrogate"/>
+      <test>unparsed-text("ends-with-surrogate.txt", { 'fallback': true() })</test>
+      <result>
+        <assert>starts-with($result, "This file ends with an unpaired high surrogate: �")</assert>
       </result>
    </test-case>
 
