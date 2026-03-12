@@ -7,18 +7,19 @@
 	<test-case name="fn-parts-of-dateTime-dateTime-with-timezone">
 		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:dateTime, with a timezone</description>
 		<created by="Sheila Thomson" on="2026-02-18"/>
+		<modified by="Michael Kay" on="2026-03-12" change="add check on specific type of result fields"/>
 		<test>fn:parts-of-dateTime(xs:dateTime("1999-05-31T13:20:00-05:00"))</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
 				<assert-type>fn:dateTime-record</assert-type>
-				<assert>$result?"year" eq 1999</assert>
-				<assert>$result?"month" eq 5</assert>
-				<assert>$result?"day" eq 31</assert>
-				<assert>$result?"hours" eq 13</assert>
-				<assert>$result?"minutes" eq 20</assert>
-				<assert>$result?"seconds" eq 0</assert>
-				<assert>$result?"timezone" eq xs:dayTimeDuration("-PT5H")</assert>
+				<assert>$result?year treat as xs:integer eq 1999</assert>
+				<assert>$result?month treat as xs:integer eq 5</assert>
+				<assert>$result?day treat as xs:integer eq 31</assert>
+				<assert>$result?hours treat as xs:integer eq 13</assert>
+				<assert>$result?minutes treat as xs:integer eq 20</assert>
+				<assert>$result?seconds treat as xs:decimal eq 0</assert>
+				<assert>$result?timezone treat as xs:dayTimeDuration eq xs:dayTimeDuration("-PT5H")</assert>
 				<assert>map:size($result) eq 7</assert>
 			</all-of>
 		</result>
@@ -181,6 +182,28 @@
 				<assert>empty($result?"timezone")</assert>
 				<assert>map:size($result) eq 7</assert>
 			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-round-trip">
+		<description>Test round tripping</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>current-dateTime() => fn:parts-of-dateTime() => build-dateTime() => atomic-equal(current-dateTime())</test>
+		<result>
+			<assert-true/>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-round-trip-altered">
+		<description>Test round tripping and alteration</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>current-dateTime() 
+			   => fn:parts-of-dateTime()
+			   => map:remove("timezone")
+			   => build-dateTime() 
+			   => atomic-equal(current-dateTime() => adjust-dateTime-to-timezone(()))</test>
+		<result>
+			<assert-true/>
 		</result>
 	</test-case>
 

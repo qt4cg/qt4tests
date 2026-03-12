@@ -17,10 +17,36 @@
 		</result>
 	</test-case>
 	
+	<test-case name="fn-build-dateTime-dateTime-with-timezone-from-map">
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:dateTime, with a timezone</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>fn:build-dateTime({"year":1999, "month":5, "day":31, "hours":13, "minutes":20, "seconds":0, "timezone": xs:duration("-PT5H")))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:dateTimeStamp</assert-type>
+				<assert-string-value>1999-05-31T13:20:00-05:00</assert-string-value>
+			</all-of>
+		</result>
+	</test-case>
+	
 	<test-case name="fn-build-dateTime-without-timezone">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:dateTime, without a timezone value.</description>
 		<created by="Sheila Thomson" on="2026-02-21"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(2000), xs:integer(6), xs:integer(12), xs:integer(13), xs:integer(20), xs:decimal(0), ()))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:dateTime</assert-type>
+				<assert-string-value>2000-06-12T13:20:00</assert-string-value>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-build-dateTime-without-timezone-from-map">
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:dateTime, without a timezone value.</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>fn:build-dateTime({"year":1999, "month":5, "day":31, "hours":13, "minutes":20, "seconds":0})</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -134,6 +160,32 @@
 		</result>
 	</test-case>
 	
+	<test-case name="fn-build-dateTime-time-high-precision">
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:time, where the seconds may need truncation.</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>fn:build-dateTime({"hours":23, "minutes":59, "seconds":59.999999999999999999999)</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:time</assert-type>
+				<assert>string($result) => starts-with("23:59:59.999")</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-build-dateTime-negative zero">
+		<description>Evaluates fn:build-dateTime when the minutes and seconds are negative zero as doubles.</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>fn:build-dateTime({"hours":23, "minutes":-0.0e0, "seconds":-0.0e0)</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:time</assert-type>
+				<assert>string($result) => starts-with("23:59:59.999")</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
 	<test-case name="fn-build-dateTime-gYear-with-timezone">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gYear, with a timezone</description>
 		<created by="Sheila Thomson" on="2026-02-18"/>
@@ -147,10 +199,36 @@
 		</result>
 	</test-case>
 	
+	<test-case name="fn-build-dateTime-gYear-with-timezone-from-map">
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gYear, with a timezone</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>fn:build-dateTime({"year":2007, "timezone": xs:dayTimeDuration("-PT2H")})</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:gYear</assert-type>
+				<assert-string-value>2007-02:00</assert-string-value>
+			</all-of>
+		</result>
+	</test-case>
+	
 	<test-case name="fn-build-dateTime-gYear-without-timezone">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gYear, without a timezone</description>
 		<created by="Sheila Thomson" on="2026-02-18"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(2007), (), (), (), (), (), ()))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:gYear</assert-type>
+				<assert-string-value>2007</assert-string-value>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-build-dateTime-gYear-without-timezone-from-map">
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gYear, without a timezone</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>fn:build-dateTime({"year":2007})</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -260,6 +338,19 @@
 				<assert-count>1</assert-count>
 				<assert-type>xs:gDay</assert-type>
 				<assert-string-value>---08</assert-string-value>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-build-dateTime-gDay-coercion-from-xs:double">
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gDay, without a timezone</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>fn:build-dateTime({"day": 3.1e1})</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:gDay</assert-type>
+				<assert-string-value>---31</assert-string-value>
 			</all-of>
 		</result>
 	</test-case>
@@ -492,6 +583,42 @@
 		</result>
 	</test-case>
 	
+	<test-case name="fn-build-dateTime-time-invalid-hours">
+		<description>Evaluates fn:build-dateTime when hours=24.</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>fn:build-dateTime({"hours":24, "minutes":0, "seconds":0})</test>
+		<result>
+			<error code="FODT0005" />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-build-dateTime-time-fractional-hours">
+		<description>Evaluates fn:build-dateTime when hours is fractional.</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>fn:build-dateTime({"hours":8.5, "minutes":0, "seconds":0})</test>
+		<result>
+			<error code="FOTY0004" />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-build-dateTime-time-infinite-hours">
+		<description>Evaluates fn:build-dateTime when hours is infinity.</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>fn:build-dateTime({"hours":number("INF"), "minutes":0, "seconds":0})</test>
+		<result>
+			<error code="FOTY0004" />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-build-dateTime-time-NaN">
+		<description>Evaluates fn:build-dateTime when the minutes and seconds are NaN as doubles.</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>fn:build-dateTime({"hours":23, "minutes":number('NaN'), "seconds":number('NaN')})</test>
+		<result>
+			<error code="FOTY0004"/>
+		</result>
+	</test-case>
+	
 	<test-case name="fn-build-dateTime-time-missing-minutes">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input would represent an xs:time but is missing the minutes component.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
@@ -525,6 +652,20 @@
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1970), xs:integer(1), xs:integer(1), (), xs:integer(0), (), ()))</test>
 		<result>
 			<error code="FODT0005" />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-build-dateTime-from-current-dateTime">
+		<description>Evaluates fn:build-dateTime applied to modified result of parts-of-dateTime</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>current-dateTime() 
+			   => parts-of-dateTime() 
+			   => map:put('timezone':())
+			   => fn:build-dateTime()
+			   => timezone-from-dateTime()
+		</test>
+		<result>
+			<assert-empty/>
 		</result>
 	</test-case>
 	
