@@ -3875,7 +3875,16 @@
     
     <test-case name="serialize-canonical-1" covers="fn-serialize">
         <description>Simple test for canonical serialization of XML. This example is taken from 
-            https://www.w3.org/TR/2008/REC-xml-c14n11-20080502/ section 3.1.</description>
+            https://www.w3.org/TR/2008/REC-xml-c14n11-20080502/ section 3.1. Demonstrates:
+            
+            Loss of XML declaration
+            Loss of DTD
+            Normalization of whitespace outside of document element (first character of both 
+            canonical forms is '&lt;'; single line breaks separate PIs and comments outside of document element)
+            Loss of whitespace between PITarget and its data
+            Retention of whitespace inside PI data
+            Comment removal from uncommented canonical form, including delimiter for comments outside document 
+            element (the last character in both canonical forms is '&gt;')</description>
         <created by="Joel Kalvesmaki" on="2025-12-15"/>
         <environment>        
             <source role="." file="serialize/serialize-canonical-1-src.xml">
@@ -3897,7 +3906,12 @@
 
     <test-case name="serialize-canonical-2" covers="fn-serialize">
         <description>Simple test for canonical serialization of XML. This example is taken from 
-            https://www.w3.org/TR/2008/REC-xml-c14n11-20080502/ section 3.2.</description>
+            https://www.w3.org/TR/2008/REC-xml-c14n11-20080502/ section 3.2. Demonstrates:
+            
+            Retain all whitespace between consecutive start tags, clean or dirty
+            Retain all whitespace between consecutive end tags, clean or dirty
+            Retain all whitespace between end tag/start tag pair, clean or dirty
+            Retain all whitespace in character content, clean or dirty</description>
         <created by="Joel Kalvesmaki" on="2025-12-15"/>
         <environment>        
             <source role="." file="serialize/serialize-canonical-2-src.xml">
@@ -3910,6 +3924,257 @@
             eq unparsed-text("serialize/serialize-canonical-2-src.xml", options := {'normalize-newlines': true()})</test>
         <result>
             <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-canonical-3" covers="fn-serialize">
+        <description>Simple test for canonical serialization of XML. This example is taken from 
+            https://www.w3.org/TR/2008/REC-xml-c14n11-20080502/ section 3.3. Demonstrates:
+            
+            Empty element conversion to start-end tag pair
+            Normalization of whitespace in start and end tags
+            Relative order of namespace and attribute axes
+            Lexicographic ordering of namespace and attribute axes
+            Retention of namespace prefixes from original document
+            Elimination of superfluous namespace declarations
+            Addition of default attribute
+            Note: Some start tags in the canonical form are very long, but each start tag in this 
+            example is entirely on a single line.
+            
+            Note: In e5, b:attr precedes a:attr because the primary key is namespace URI not 
+            namespace prefix, and attr2 precedes b:attr because the default namespace is not applied 
+            to unqualified attributes (so the namespace URI for attr2 is empty).</description>
+        <created by="Joel Kalvesmaki" on="2025-03-16"/>
+        <environment>        
+            <source role="." file="serialize/serialize-canonical-3-src.xml">
+                <description>File to be serialized</description>
+                <created by="Joel Kalvesmaki" on="2026-03-16"/>
+            </source>
+        </environment>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(., map {'method' : 'xml', 'canonical' : xs:untypedAtomic('true') })</test>
+        <result>
+            <assert-string-value><![CDATA[<doc>
+   <e1></e1>
+   <e2></e2>
+   <e3 id="elem3" name="elem3"></e3>
+   <e4 id="elem4" name="elem4"></e4>
+   <e5 xmlns="http://example.org" xmlns:a="http://www.w3.org" xmlns:b="http://www.ietf.org" attr="I'm" attr2="all" b:attr="sorted" a:attr="out"></e5>
+   <e6 xmlns:a="http://www.w3.org">
+      <e7 xmlns="http://www.ietf.org">
+         <e8 xmlns="">
+            <e9 xmlns:a="http://www.ietf.org" attr="default"></e9>
+         </e8>
+      </e7>
+   </e6>
+</doc>]]></assert-string-value>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-canonical-4" covers="fn-serialize">
+        <description>Simple test for canonical serialization of XML. This example is taken from 
+            https://www.w3.org/TR/2008/REC-xml-c14n11-20080502/ section 3.4. Demonstrates:
+            
+            Character reference replacement
+            Attribute value delimiters set to quotation marks (double quotes)
+            Attribute value normalization
+            CDATA section replacement
+            Encoding of special characters as character references in attribute values (&amp;, &lt;, 
+            &quot;, &#xD;, &#xA;, &#x9;)
+            Encoding of special characters as character references in text (&amp;, &lt;, &gt;, &#xD;)
+            Note: The last element, normId, is well-formed but violates a validity constraint for 
+            attributes of type ID. For testing canonical XML implementations based on validating 
+            processors, remove the line containing this element from the input and canonical form. 
+            In general, XML consumers should be discouraged from using this feature of XML.
+            
+            Note: Whitespace character references other than &#x20; are not affected by attribute value 
+            normalization [XML].
+            
+            Note: In the canonical form, the value of the attribute named attr in the element norm begins 
+            with a space, an apostrophe (single quote), then four spaces before the first character reference.
+            
+            Note: The expr attribute of the second compute element contains no line breaks.</description>
+        <created by="Joel Kalvesmaki" on="2025-03-16"/>
+        <environment>        
+            <source role="." file="serialize/serialize-canonical-4-src.xml">
+                <description>File to be serialized</description>
+                <created by="Joel Kalvesmaki" on="2026-03-16"/>
+            </source>
+        </environment>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(., map {'method' : 'xml', 'canonical' : xs:untypedAtomic('true') })</test>
+        <result>
+            <assert-string-value><![CDATA[<doc>
+   <text>First line&#xD;
+Second line</text>
+   <value>2</value>
+   <compute>value&gt;"0" &amp;&amp; value&lt;"10" ?"valid":"error"</compute>
+   <compute expr="value>&quot;0&quot; &amp;&amp; value&lt;&quot;10&quot; ?&quot;valid&quot;:&quot;error&quot;">valid</compute>
+   <norm attr=" '    &#xD;&#xA;&#x9;   ' "></norm>
+   <normNames attr="A &#xD;&#xA;&#x9; B"></normNames>
+   <normId id="' &#xD;&#xA;&#x9; '"></normId>
+</doc>]]></assert-string-value>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-canonical-5" covers="fn-serialize">
+        <description>Simple test for canonical serialization of XML. This example is taken from 
+            https://www.w3.org/TR/2008/REC-xml-c14n11-20080502/ section 3.5, except that the
+            final comment node has been deleted (but not the text node between the root element
+            and the comment node).
+            
+            Demonstrates:
+            
+            Internal parsed entity reference replacement
+            External parsed entity reference replacement (including whitespace outside elements and PIs)
+            External unparsed entity reference</description>
+        <created by="Joel Kalvesmaki" on="2025-03-16"/>
+        <environment>        
+            <source role="." file="serialize/serialize-canonical-5-src.xml">
+                <description>File to be serialized</description>
+                <created by="Joel Kalvesmaki" on="2026-03-16"/>
+            </source>
+        </environment>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(., map {'method' : 'xml', 'canonical' : xs:untypedAtomic('true') })</test>
+        <result>
+            <assert-string-value><![CDATA[<doc attrExtEnt="entExt">
+   Hello, world!
+</doc>]]></assert-string-value>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-canonical-6" covers="fn-serialize">
+        <description>Simple test for canonical serialization of XML. This example is taken from 
+            https://www.w3.org/TR/2008/REC-xml-c14n11-20080502/ section 3.6.
+            
+            Demonstrates:
+            
+            Effect of transcoding from a sample encoding to UTF-8
+        
+            Note: The content of the doc element is NOT the string #xC2#xA9 but rather the two 
+            octets whose hexadecimal values are C2 and A9, which is the UTF-8 encoding of the 
+            UCS codepoint for the copyright sign (©).</description>
+        <created by="Joel Kalvesmaki" on="2025-03-16"/>
+        <environment>        
+            <source role="." file="serialize/serialize-canonical-6-src.xml">
+                <description>File to be serialized</description>
+                <created by="Joel Kalvesmaki" on="2026-03-16"/>
+            </source>
+        </environment>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(., map {'method' : 'xml', 'canonical' : xs:untypedAtomic('true') })</test>
+        <result>
+            <assert-string-value><![CDATA[<doc>#xC2#xA9</doc>]]></assert-string-value>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-canonical-7" covers="fn-serialize">
+        <description>Simple test for canonical serialization of XML. This example is taken from 
+            https://www.w3.org/TR/2008/REC-xml-c14n11-20080502/ section 3.7.
+            
+            Demonstrates:
+            
+            Empty default namespace propagation from omitted parent element
+            Propagation of attributes in the xml namespace in document subsets
+            Persistence of omitted namespace declarations in descendants
+            
+            Note: The canonical form contains no line delimiters.</description>
+        <created by="Joel Kalvesmaki" on="2025-03-16"/>
+        <environment>        
+            <source role="." file="serialize/serialize-canonical-6-src.xml">
+                <description>File to be serialized</description>
+                <created by="Joel Kalvesmaki" on="2026-03-16"/>
+            </source>
+        </environment>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(., map {'method' : 'xml', 'canonical' : xs:untypedAtomic('true') })</test>
+        <result>
+            <assert-string-value><![CDATA[<doc>#xC2#xA9</doc>]]></assert-string-value>
+        </result>
+    </test-case>
+    
+    <test-case name="serialize-canonical-7" covers="fn-serialize">
+        <description>Remove dot segments algorithm for xml:base attribute. In this test, I have
+            collected everything from appendix A in https://www.w3.org/TR/2008/REC-xml-c14n11-20080502 and
+            set the 64 items in the left-hand column as values of @xml:base in uniquely named elements. See
+            section 2.4 on the Remove Dot Segments algorithm.</description>
+        <created by="Joel Kalvesmaki" on="2025-03-16"/>
+        <environment>
+            <source role="." file="serialize/serialize-canonical-7-src.xml">
+                <description>File to be serialized</description>
+                <created by="Joel Kalvesmaki" on="2026-03-16"/>
+            </source>
+        </environment>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(., map {'method' : 'xml', 'canonical' : xs:untypedAtomic('true') })</test>
+        <result>
+            <assert-string-value><![CDATA[<doc>
+        <a xml:base="pseudo-netpath/seg/file.ext"></a>
+        <b xml:base="pseudo-netpath/seg/file.ext"></b>
+        <c xml:base="yes/pseudo-netpath/seg/file.ext"></c>
+        <d xml:base="yes"></d>
+        <e xml:base="yes/"></e>
+        <f xml:base="yes/"></f>
+        <g xml:base="../../../"></g>
+        <h xml:base="../"></h>
+        <i></i>
+        <j></j>
+        <k xml:base="/a/g"></k>
+        <l xml:base="mid/6"></l>
+        <m xml:base="../../../"></m>
+        <n xml:base="../"></n>
+        <o xml:base="..yes/..yes"></o>
+        <p xml:base="..yes/..yes/"></p>
+        <q xml:base="../../"></q>
+        <r xml:base="../../../"></r>
+        <s></s>
+        <t></t>
+        <u></u>
+        <v xml:base="/"></v>
+        <w xml:base="../../"></w>
+        <x xml:base="../../"></x>
+        <y xml:base="yes/"></y>
+        <z xml:base="yes/"></z>
+        <aa xml:base="yes/"></aa>
+        <bb xml:base="yes/yes/"></bb>
+        <cc xml:base="yes/yes"></cc>
+        <dd xml:base="yes/yes/"></dd>
+        <ee xml:base="/"></ee>
+        <ff xml:base="/yes/"></ff>
+        <gg xml:base="/yes/"></gg>
+        <hh xml:base="/yes/"></hh>
+        <ii xml:base="../../"></ii>
+        <jj xml:base="../../"></jj>
+        <kk xml:base="..yes/"></kk>
+        <ll xml:base="..yes/"></ll>
+        <mm xml:base="..yes/"></mm>
+        <nn xml:base="..yes/..yes/"></nn>
+        <oo xml:base="/"></oo>
+        <pp xml:base="/..yes/"></pp>
+        <qq xml:base="/..yes/"></qq>
+        <rr xml:base="/..yes/"></rr>
+        <ss xml:base="/"></ss>
+        <tt xml:base="/"></tt>
+        <uu xml:base="/"></uu>
+        <vv xml:base="/"></vv>
+        <ww xml:base="/"></ww>
+        <xx xml:base="/"></xx>
+        <yy xml:base="/"></yy>
+        <zz xml:base="/"></zz>
+        <aaa xml:base="/"></aaa>
+        <bbb xml:base="/"></bbb>
+        <ccc xml:base="/"></ccc>
+        <ddd xml:base="/"></ddd>
+        <eee xml:base="/"></eee>
+        <fff xml:base="/"></fff>
+        <ggg xml:base="/"></ggg>
+        <hhh></hhh>
+        <iii></iii>
+        <jjj></jjj>
+        <kkk xml:base="../"></kkk>
+        <lll xml:base="../"></lll>
+</doc>]]></assert-string-value>
         </result>
     </test-case>
     
