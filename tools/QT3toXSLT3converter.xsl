@@ -168,6 +168,38 @@
             <xsl:sequence select="file:copy(concat($main-dir, 'misc/BuiltInKeywords.xml'), concat($xslt-dir, 'misc/BuiltInKeywords/BuiltInKeywords.xml'))"/>
             <xsl:sequence select="file:copy(concat($main-dir, 'misc/JSONTestSuite/test_parsing/y_number.json'), concat($xslt-dir, 'misc/BuiltInKeywords/JSONTestSuite/test_parsing/y_number.json'))"/>
             
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-csv/bom-none.csv'), concat($xslt-dir, 'fn/csv-doc/parse-csv/bom-none.csv'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-csv/bom-utf8.csv'), concat($xslt-dir, 'fn/csv-doc/parse-csv/bom-utf8.csv'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-csv/bom-utf16le.csv'), concat($xslt-dir, 'fn/csv-doc/parse-csv/bom-utf16le.csv'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-csv/bom-utf16be.csv'), concat($xslt-dir, 'fn/csv-doc/parse-csv/bom-utf16be.csv'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'docs/bib-with-internal-dtd.xml'), concat($xslt-dir, 'fn/docs/bib-with-internal-dtd.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'docs/bib.xml'), concat($xslt-dir, 'fn/docs/bib.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'docs/bib-with-external-dtd.xml'), concat($xslt-dir, 'fn/docs/bib-with-external-dtd.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'docs/bib.dtd'), concat($xslt-dir, 'fn/docs/bib.dtd'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'docs/bib-with-xinclude.xml'), concat($xslt-dir, 'fn/docs/bib-with-xinclude.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'docs/bib-extra.xml'), concat($xslt-dir, 'fn/docs/bib-extra.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'docs/bib-with-schema-location.xml'), concat($xslt-dir, 'fn/docs/bib-with-schema-location.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'docs/bib.xsd'), concat($xslt-dir, 'fn/docs/bib.xsd'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'misc/HtmlTestSuite/files/test-0000.html'), concat($xslt-dir, 'fn/misc/HtmlTestSuite/files/test-0000.html'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-html/bulgarian.html'), concat($xslt-dir, 'fn/html-doc/parse-html/bulgarian.html'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-html/bad.html'), concat($xslt-dir, 'fn/html-doc/parse-html/bad.html'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-json/bom-none.json'), concat($xslt-dir, 'fn/json-doc/parse-json/bom-none.json'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-json/bom-utf8.json'), concat($xslt-dir, 'fn/json-doc/parse-json/bom-utf8.json'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-json/bom-utf16le.json'), concat($xslt-dir, 'fn/json-doc/parse-json/bom-utf16le.json'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-json/bom-utf16be.json'), concat($xslt-dir, 'fn/json-doc/parse-json/bom-utf16be.json'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/id/iddtd2.dtd'), concat($xslt-dir, 'fn/parse-xml/id/iddtd2.dtd'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-csv/bom-none.csv'), concat($xslt-dir, 'fn/unparsed-text/parse-csv/bom-none.csv'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-csv/bom-utf8.csv'), concat($xslt-dir, 'fn/unparsed-text/parse-csv/bom-utf8.csv'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-csv/bom-utf16le.csv'), concat($xslt-dir, 'fn/unparsed-text/parse-csv/bom-utf16le.csv'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-csv/bom-utf16be.csv'), concat($xslt-dir, 'fn/unparsed-text/parse-csv/bom-utf16be.csv'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/unparsed-text/text-plain-utf-8.txt'), concat($xslt-dir, 'fn/unparsed-binary/unparsed-text/text-plain-utf-8.txt'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/unparsed-text/non-xml-character.txt'), concat($xslt-dir, 'fn/unparsed-binary/unparsed-text/non-xml-character.txt'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/unparsed-text/invalid-xml.xml'), concat($xslt-dir, 'fn/unparsed-binary/unparsed-text/invalid-xml.xml'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/unparsed-text/invalid-xml.xml'), concat($xslt-dir, 'fn/unparsed-binary/unparsed-text/non-xml-character.txt'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'prod/ModuleImport/module1-lib.xq'), concat($xslt-dir, 'prod/ModuleImport/module1-lib.xq'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'prod/ModuleImport/module2-lib.xq'), concat($xslt-dir, 'prod/ModuleImport/module2-lib.xq'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'file/sandpit/'), concat($xslt-dir, 'file/file/sandpit/'))"/>
+            
             <xsl:sequence select="file:copy(concat($xslt-src-dir, 'tests/misc/catalog/catalog-001.xsl'), concat($xslt-dir, 'catalog/xslt3-catalog/catalog-001.xsl'))"/>
             <xsl:sequence select="file:copy(concat($main-dir, 'tools/xslt3-catalog-schema.xsd'), concat($xslt-dir, 'catalog/xslt3-catalog/catalog-schema.xsd'))"/>
             <!--<xsl:sequence select="file:copy(concat($xslt-src-dir, 'admin/catalog-schema.xsd'), concat($xslt-dir, 'catalog/xslt3-catalog/catalog-schema.xsd'))"/>-->
@@ -182,8 +214,9 @@
     <xsl:template match="fots:catalog/fots:test-set[@name = $test-set or $test-set='*']" priority="8">
         <xsl:variable name="testSetFile" select="concat($main-dir,@file)"/>
         <xsl:variable name="testSetName" select="@name"/>
+        <xsl:variable name="testSetOutputLocation" select="concat($xslt-dir, replace(@file, '/', concat('/', substring-after(@name, '-'), '/_')))"/>
         
-        <xsl:result-document href="{$xslt-dir}{replace(@file, '/', concat('/', substring-after(@name, '-'), '/_'))}"
+        <xsl:result-document href="{$testSetOutputLocation}"
             _validation="{$OUTPUT_VALIDATION}" method="xml">
             <xsl:comment expand-text="yes">Generated by Qt3toXSLT3converter.xsl at {current-dateTime()}</xsl:comment>
             <test-set xmlns="http://www.w3.org/2012/10/xslt-test-catalog" name="{$testSetName}">
@@ -191,7 +224,7 @@
                 <xsl:variable name="targetUri" select="document-uri($target)"/>
                 <xsl:variable name="target" select="saxon:discard-document($target)" use-when="function-available('saxon:discard-document', 1)"/>
                 <xsl:variable name="targetTestSet" select="$target/fots:test-set"/>
-                <xsl:message use-when="true()">Processing <xsl:value-of select="$targetUri"/></xsl:message>
+                <xsl:message use-when="true()">Processing <xsl:value-of select="$targetTestSet/@name"/></xsl:message>
                 <xsl:apply-templates select="$targetTestSet/fots:environment" mode="rename"/>
                 <xsl:if test="$targetTestSet/fots:dependency">
                     <dependencies>
@@ -199,7 +232,7 @@
                     </dependencies>
                 </xsl:if>                
                 <xsl:apply-templates select="$targetTestSet/fots:test-case">
-                    <xsl:with-param name="testSetFile" select="$testSetFile"/>
+                    <xsl:with-param name="testSetOutputLocation" select="$testSetOutputLocation"/>
                     <xsl:with-param name="testSetDependency"
                         select="$targetTestSet/fots:dependency[@type='spec']"/>
                     <xsl:with-param name="tsEnvironments"
@@ -296,6 +329,7 @@
     <xsl:template match="fots:dependency[@type='feature'][@value='olson-timezone']" mode="rename"/>
     <xsl:template match="fots:dependency[@type='feature'][@value='arbitraryPrecisionDecimal']"
         mode="rename"/> <!-- arbitraryPrecisionDecimal added in QT3 op/same-key 2016-06 -->
+    <xsl:template match="fots:dependency[@type='feature'][@value='binary']" mode="rename"/>
     <xsl:template match="fots:dependency[@type='feature'][@value='simple-uca-fallback']"
         mode="rename">
         <feature xmlns="http://www.w3.org/2012/10/xslt-test-catalog" value="simple-uca-fallback"/>
@@ -376,7 +410,7 @@
     
     <xsl:template match="fots:source | fots:resource | fots:module" mode="rename">
         <xsl:element name="{if (local-name() = 'module') then 'resource' else local-name()}" namespace="http://www.w3.org/2012/10/xslt-test-catalog">
-            <xsl:copy-of select="@* except @file"/>
+            <xsl:copy-of select="@* except (@file,@dtd)"/>
             <xsl:if test="@file">
                 <xsl:attribute name="file" select="if (ancestor::fots:catalog) then @file else concat('../', @file)"/>
             </xsl:if>           
@@ -421,7 +455,7 @@
     <xsl:template match="fots:test-case">
         <xsl:param name="testSetDependency" as="element(fots:dependency)*"/>
         <xsl:param name="tsEnvironments" as="element(fots:environment)*"/>
-        <xsl:param name="testSetFile"/>
+        <xsl:param name="testSetOutputLocation" as="xs:string"/>
         
         <xsl:variable name="test" select="fots:test" use-when="not($unfolded)"/>
         <xsl:variable name="test" select="fots:from-xqueryx(.)" use-when="$unfolded"/>
@@ -507,11 +541,14 @@
 
             <xsl:variable name="version"
                 select="if($specDependency and $specDependency[matches(@value, 'XT20|XP20')]) then xs:string('2.0') else xs:string('3.0')"/>
+            
+            <xsl:variable name="testCaseOutputLocation"
+                select="concat(substring-before($testSetOutputLocation, '/_'), '/', $name, '.xsl')"/>
  
  
             <!-- Create an xslt file which contains a specific test-case                        -->
             <xsl:result-document
-                href="{$xslt-dir}{replace(../@name, '^([a-zA-Z0-9]+)-', '$1/')}/{$name}.xsl"
+                href="{$testCaseOutputLocation}"
                 omit-xml-declaration="yes" indent="yes" validation="strip" method="xml">
                 
                 <xsl:comment expand-text="yes">Generated by Qt3toXSLT3converter.xsl at {current-dateTime()}</xsl:comment>
@@ -802,13 +839,24 @@
 
     <xsl:template match="fots:assert">
         <xsl:variable name="assertion" select="."/>
+        <xsl:variable name="result-ref" select="contains(string($assertion), '$result')"/>
+        <xsl:variable name="expath-file" select="contains(string($assertion), 'Q{http://expath.org/ns/file}')"/>
         <x:choose>
-            <x:when test="{$assertion}">
-                <ok/>
-            </x:when>
+            <xsl:choose>
+                <xsl:when test="$result-ref or $expath-file">
+                    <x:when test="{$assertion}">
+                        <ok/>
+                    </x:when>
+                </xsl:when>
+                <xsl:otherwise>
+                    <x:when test="$result ! ({$assertion})">
+                        <ok/>
+                    </x:when>
+                </xsl:otherwise>
+            </xsl:choose>
             <x:otherwise>
                 <!--<fail assertion="assert {$assertion}"><x:value-of select="serialize($result)"/></fail>-->
-                <fail assertion="assert"><x:value-of select="serialize($result)"/></fail> 
+                <fail assertion="assert"><x:value-of select="serialize($result, map{{'method':'adaptive'}})"/></fail> 
             </x:otherwise>
         </x:choose>
     </xsl:template>
@@ -876,7 +924,7 @@
     
     <xsl:function name="fots:isTypeError" as="xs:boolean">
         <xsl:param name="assertion" as="element()"/>
-        <xsl:sequence select="matches($assertion/@code, '..TY....') or $assertion/@code=('FORG0006', 'XPDY0002')"/>
+        <xsl:sequence select="matches($assertion/@code, '..TY....') or $assertion/@code=('FORG0006', 'XPDY0002', 'FORG0001', 'XPDY0050')"/>
     </xsl:function>
     
     

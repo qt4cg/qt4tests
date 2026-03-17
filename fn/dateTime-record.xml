@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<?xml-model href="../catalog-schema.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-dateTime-record">
+	<description>Tests for fn:dateTime-record, a built-in named record type.</description>
+	<link type="spec" document="https://qt4cg.org/specifications/xpath-functions-40/Overview.html" idref="dateTime-record"/>
+
+	<test-case name="fn-dateTime-record-empty-record">
+		<description>Creates a dateTime-record with the value of each field set to the empty sequence.</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record((), (), (), (), (), (), ())</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>empty($result?"year")</assert>
+				<assert>empty($result?"month")</assert>
+				<assert>empty($result?"day")</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>			
+			</all-of>
+		</result>
+	</test-case>
+
+	<test-case name="fn-dateTime-record-dateTime-with-timezone">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:dateTime, with a timezone.</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record(xs:integer(1999), xs:integer(5), xs:integer(31), xs:integer(13), xs:integer(20), xs:decimal(0), xs:dayTimeDuration("-PT5H"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>$result?"year" eq 1999</assert>
+				<assert>$result?"month" eq 5</assert>
+				<assert>$result?"day" eq 31</assert>
+				<assert>$result?"hours" eq 13</assert>
+				<assert>$result?"minutes" eq 20</assert>
+				<assert>$result?"seconds" eq 0</assert>
+				<assert>$result?"timezone" eq xs:dayTimeDuration("-PT5H")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-dateTime-without-timezone">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:dateTime without a timezone value.</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record(xs:integer(2000), xs:integer(6), xs:integer(12), xs:integer(13), xs:integer(20), xs:decimal(0), ())</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>$result?"year" eq 2000</assert>
+				<assert>$result?"month" eq 06</assert>
+				<assert>$result?"day" eq 12</assert>
+				<assert>$result?"hours" eq 13</assert>
+				<assert>$result?"minutes" eq 20</assert>
+				<assert>$result?"seconds" eq 0</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-date">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:date</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<modified by="Christian Gruen" on="2026-03-13" change="duplicate test removed"/>
+		<test>fn:dateTime-record(xs:integer(2026), xs:integer(2), xs:integer(21), (), (), (), ())</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>$result?"year" eq 2026</assert>
+				<assert>$result?"month" eq 2</assert>
+				<assert>$result?"day" eq 21</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-time">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:time</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record((), (), (), xs:integer(13), xs:integer(30), xs:decimal(04.2678), ())</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>empty($result?"year")</assert>
+				<assert>empty($result?"month")</assert>
+				<assert>empty($result?"day")</assert>
+				<assert>$result?"hours" eq 13</assert>
+				<assert>$result?"minutes" eq 30</assert>
+				<assert>$result?"seconds" eq 4.2678</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-gYear">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:gYear</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record(xs:integer(2007), (), (), (), (), (), ())</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>$result?"year" eq 2007</assert>
+				<assert>empty($result?"month")</assert>
+				<assert>empty($result?"day")</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-gYearMonth">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:gYearMonth</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record(xs:integer(2007), xs:integer(5), (), (), (), (), ())</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>$result?"year" eq 2007</assert>
+				<assert>$result?"month" eq 05</assert>
+				<assert>empty($result?"day")</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-gMonth">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:gMonth</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record((), xs:integer(10), (), (), (), (), ())</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>empty($result?"year")</assert>
+				<assert>$result?"month" eq 10</assert>
+				<assert>empty($result?"day")</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-gMonthDay">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:gMonthDay</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record((), xs:integer(10), xs:integer(8), (), (), (), ())</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>empty($result?"year")</assert>
+				<assert>$result?"month" eq 10</assert>
+				<assert>$result?"day" eq 8</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-gDay">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:gDay</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record((), (), xs:integer(8), (), (), (), ())</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>empty($result?"year")</assert>
+				<assert>empty($result?"month")</assert>
+				<assert>$result?"day" eq 8</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-dayTimeDuration">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:dayTimeDuration for a timezone.</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record((), (), (), (), (), (), xs:dayTimeDuration("PT6H"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>empty($result?"year")</assert>
+				<assert>empty($result?"month")</assert>
+				<assert>empty($result?"day")</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>$result?"timezone" eq xs:dayTimeDuration("PT6H")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-empty-sequence">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the sole argument supplied is fn:empty-sequence</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record(())</test>
+		<result>
+			<assert>empty($result)</assert>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-zero-args">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when no argument is supplied</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record()</test>
+		<result>
+			<error code="XPST0017" />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-multiple-args">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when too many arguments are supplied.</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record((), (), (), (), (), (), (), ())</test>
+		<result>
+			<error code="XPST0017" />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-string">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when one of the arguments supplied is a string, which is not one of the expected datatypes.</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:dateTime-record((), (), (), (), (), (), xs:string("UTC"))</test>
+		<result>
+			<error code="XPTY0004" />
+		</result>
+	</test-case>
+	
+</test-set>

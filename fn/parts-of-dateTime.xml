@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<?xml-model href="../catalog-schema.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-parts-of-dateTime">
+	<description>Tests for the parts-of-datetime() function</description>
+	<link type="spec" document="https://qt4cg.org/specifications/xpath-functions-40/Overview.html" idref="func-parts-of-dateTime"/>
+
+	<test-case name="fn-parts-of-dateTime-dateTime-with-timezone">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:dateTime, with a timezone</description>
+		<created by="Sheila Thomson" on="2026-02-18"/>
+		<modified by="Michael Kay" on="2026-03-12" change="add check on specific type of result fields"/>
+		<test>fn:parts-of-dateTime(xs:dateTime("1999-05-31T13:20:00-05:00"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>$result?year treat as xs:integer eq 1999</assert>
+				<assert>$result?month treat as xs:integer eq 5</assert>
+				<assert>$result?day treat as xs:integer eq 31</assert>
+				<assert>$result?hours treat as xs:integer eq 13</assert>
+				<assert>$result?minutes treat as xs:integer eq 20</assert>
+				<assert>$result?seconds treat as xs:decimal eq 0</assert>
+				<assert>$result?timezone treat as xs:dayTimeDuration eq xs:dayTimeDuration("-PT5H")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-without-timezone">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:dateTime, without a timezone value.</description>
+		<created by="Sheila Thomson" on="2026-02-21"/>
+		<test>fn:parts-of-dateTime(xs:dateTime("2000-06-12T13:20:00Z"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>$result?"year" eq 2000</assert>
+				<assert>$result?"month" eq 06</assert>
+				<assert>$result?"day" eq 12</assert>
+				<assert>$result?"hours" eq 13</assert>
+				<assert>$result?"minutes" eq 20</assert>
+				<assert>$result?"seconds" eq 0</assert>
+				<assert>$result?"timezone" eq xs:dayTimeDuration("PT0S")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-date">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:date</description>
+		<created by="Sheila Thomson" on="2026-02-18"/>
+		<test>fn:parts-of-dateTime(xs:date("2026-02-21"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>$result?"year" eq 2026</assert>
+				<assert>$result?"month" eq 2</assert>
+				<assert>$result?"day" eq 21</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-time">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:time</description>
+		<created by="Sheila Thomson" on="2026-02-18"/>
+		<test>fn:parts-of-dateTime(xs:time("13:30:04.2678"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>empty($result?"year")</assert>
+				<assert>empty($result?"month")</assert>
+				<assert>empty($result?"day")</assert>
+				<assert>$result?"hours" eq 13</assert>
+				<assert>$result?"minutes" eq 30</assert>
+				<assert>$result?"seconds" eq 4.2678</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-gYear">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:gYear</description>
+		<created by="Sheila Thomson" on="2026-02-18"/>
+		<test>fn:parts-of-dateTime(xs:gYear("2007"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>$result?"year" eq 2007</assert>
+				<assert>empty($result?"month")</assert>
+				<assert>empty($result?"day")</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-gYearMonth">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:gYearMonth</description>
+		<created by="Sheila Thomson" on="2026-02-18"/>
+		<test>fn:parts-of-dateTime(xs:gYearMonth("2007-05Z"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>$result?"year" eq 2007</assert>
+				<assert>$result?"month" eq 05</assert>
+				<assert>empty($result?"day")</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>$result?"timezone" eq xs:dayTimeDuration("PT0S")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-gMonth">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:gMonth</description>
+		<created by="Sheila Thomson" on="2026-02-18"/>
+		<test>fn:parts-of-dateTime(xs:gMonth("--10"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>empty($result?"year")</assert>
+				<assert>$result?"month" eq 10</assert>
+				<assert>empty($result?"day")</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-gMonthDay">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:gMonthDay</description>
+		<created by="Sheila Thomson" on="2026-02-18"/>
+		<test>fn:parts-of-dateTime(xs:gMonthDay("--10-08"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>empty($result?"year")</assert>
+				<assert>$result?"month" eq 10</assert>
+				<assert>$result?"day" eq 8</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-gDay">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:gDay</description>
+		<created by="Sheila Thomson" on="2026-02-18"/>
+		<test>fn:parts-of-dateTime(xs:gDay("---08"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>empty($result?"year")</assert>
+				<assert>empty($result?"month")</assert>
+				<assert>$result?"day" eq 8</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 7</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-round-trip">
+		<description>Test round tripping</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>current-dateTime() => fn:parts-of-dateTime() => build-dateTime() => atomic-equal(current-dateTime())</test>
+		<result>
+			<assert-true/>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-round-trip-altered">
+		<description>Test round tripping and alteration</description>
+		<created by="Michael Kay" on="2026-03-12"/>
+		<test>current-dateTime() 
+			   => fn:parts-of-dateTime()
+			   => map:remove("timezone")
+			   => build-dateTime() 
+			   => atomic-equal(current-dateTime() => adjust-dateTime-to-timezone(()))</test>
+		<result>
+			<assert-true/>
+		</result>
+	</test-case>
+
+	<test-case name="fn-parts-of-dateTime-dayTimeDuration">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:dayTimeDuration, which is not a valid datatype for the input value, even though it's the datatype used when the timezone is stored in the record.</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:parts-of-dateTime(xs:dayTimeDuration("-PT5H"))</test>
+		<result>
+			<error code="XPTY0004" />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-empty-sequence">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is fn:empty-sequence</description>
+		<created by="Sheila Thomson" on="2026-02-18"/>
+		<test>fn:parts-of-dateTime(())</test>
+		<result>
+			<all-of>
+				<assert>empty($result)</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-zero-args">
+		<description>Evaluates fn:parts-of-dateTime when no argument is supplied</description>
+		<created by="Sheila Thomson" on="2026-02-18"/>
+		<test>fn:parts-of-dateTime()</test>
+		<result>
+			<error code="XPST0017" />
+		</result>
+	</test-case>
+			
+	<test-case name="fn-parts-of-dateTime-multiple-args">
+		<description>Evaluates fn:parts-of-dateTime when more than one xs:date is supplied</description>
+		<created by="Sheila Thomson" on="2026-02-18"/>
+		<test>fn:parts-of-dateTime(xs:date("1941-10-08"), xs:time("13:30:04.2678"))</test>
+		<result>
+			<error code="XPST0017" />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-parts-of-dateTime-string">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is a string, which is not one of the expected datatypes.</description>
+		<created by="Sheila Thomson" on="2026-02-24"/>
+		<test>fn:parts-of-dateTime("today")</test>
+		<result>
+			<error code="XPTY0004" />
+		</result>
+	</test-case>
+	
+</test-set>

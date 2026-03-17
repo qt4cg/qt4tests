@@ -126,6 +126,7 @@
                         <xs:element ref="collection" />
                         <xs:element ref="static-base-uri" />
                         <xs:element ref="collation" />
+                        <xs:element ref="sandpit" />
                     </xs:choice>
                     <xs:attributeGroup ref="nameAttr" />
                     <xs:attributeGroup ref="refAttr" />
@@ -218,6 +219,32 @@
              </xs:attribute>
         </xs:complexType>
     </xs:element>
+
+    <xs:element name="sandpit">
+        <xs:annotation>
+            <xs:documentation>
+                <div>
+                    <h3>sandpit</h3>
+                    <p>An element which defines a “sandpit”, a set of files that the tests can modify.</p>
+                    <p>The <code>path</code> attribute must point to an existing
+                    directory. The semantics of the <code>sandpit</code> are
+                    that the test driver copies that path to a temporary,
+                    writable location on disk. That location is made the current
+                    working directory before running the tests. After the tests
+                    have been run, the temporary sandpit should be deleted.</p>
+                </div> 
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="path" type="xs:string">
+               <xs:annotation>
+                    <xs:documentation>
+                        <p>Identifies the location of files to be copied to the sandpit.</p>
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
     
     <xs:element name="decimal-format">
         <xs:annotation>
@@ -296,9 +323,9 @@
                         The test expression may or may not include a declaration of the variable (so it can be
                         executed if appropriate using XPath). The "declared" attribute will be present with the
                         value "true" if the variable is declared in the query prolog. The test driver can add a declaration of the
-                        variable to the query prolog if required. If the test expression includes the string
+                        variable to the query prolog if required. <!--If the test expression includes the string
                         "(:%VARDECL%:)" then the variable declaration should be added to replace this string;
-                        if it does not include this string, the variable declaration can be added at the start.
+                        if it does not include this string, the variable declaration can be added at the start.-->
                     </p>
                 </div> 
             </xs:documentation>
@@ -526,8 +553,24 @@
                 <xs:attributeGroup ref="fileAttr" />
                 <xs:attributeGroup ref="uriAttr" />
                 <xs:attributeGroup ref="validationAttr" />
-                <xs:attribute name="mutable" type="xs:boolean" use="optional"/>
+                <xs:attribute name="mutable" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>
+                            <p>Marks the document as mutable, that is, subject to XQuery update.</p>
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 <xs:attribute name="declared" type="xs:boolean" use="optional"/>
+                <xs:attribute name="dtd" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>
+                            <p>Indicates that the document has a DTD which typically must be processed for tests to succeed:
+                            the DTD might contain definitions of parsed or unparsed entities (internal or external) and it
+                            might identify attributes as being of type ID or IDREF. Default is false, though not all tests
+                            requiring a DTD are currently marked as such.</p>
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 
            
             </xs:extension>
