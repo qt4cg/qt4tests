@@ -913,7 +913,6 @@
   <test-case name="EXPath-file-copy-006">
     <description>file:copy used to copy a source file to a target file, target directory does not exist (Saxon bug 5577</description>
     <created by="Michael Kay" on="2022-06-22"/>
-    <modified by="Christian Gruen" on="2026-02-09" change="raise error, target directory must exist"/>
     <environment ref="EXPath-file"/>
     <test>
       if (file:exists("dirsource")) then file:delete("dirsource", true()) else (),
@@ -923,7 +922,13 @@
       file:copy("dirsource/london.txt", "dirtarget/new-london.txt")
     </test>
     <result>
-      <error code="Q{http://expath.org/ns/file}no-dir"/>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}exists("dirtarget/new-london.txt")</assert>
+        <assert>Q{http://expath.org/ns/file}read-text("dirtarget/new-london.txt") eq
+          "london"</assert>
+        <assert>Q{http://expath.org/ns/file}exists("dirsource/london.txt")</assert>
+      </all-of>
     </result>
   </test-case>
 
