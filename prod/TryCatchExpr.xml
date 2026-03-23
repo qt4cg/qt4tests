@@ -2114,13 +2114,14 @@
       Tests that 'finally' clause is actually executed on failure (by throwing an error if it is)
     </description>
     <created by="Michael Kay" on="2025-04-20"/>
+    <modified by="Michael Kay" on="2026-03-23" change="avoid static type error"/>
     <dependency type="spec" value="XQ40+"/>
     <test><![CDATA[
       let $zero := count(current-date()[. lt xs:date('1900-01-01')])
       return 
         try {
           try { string(current-date()) cast as xs:integer } 
-          finally {10 div $zero}
+          finally {(10 div $zero)[. = $zero]}
         } 
         catch err:FORG0001 {"wrong"}
         catch err:FOAR0001 {"right"}
