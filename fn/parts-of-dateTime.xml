@@ -25,9 +25,9 @@
 		</result>
 	</test-case>
 	
-	<test-case name="fn-parts-of-dateTime-without-timezone">
-		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:dateTime, without a timezone value.</description>
-		<created by="Sheila Thomson" on="2026-02-21"/>
+	<test-case name="fn-parts-of-dateTime-with-timezone-utc-z">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:dateTime, with UTC timezone represented as 'Z'.</description>
+		<created by="Sheila Thomson" on="2026-03-19"/>
 		<test>fn:parts-of-dateTime(xs:dateTime("2000-06-12T13:20:00Z"))</test>
 		<result>
 			<all-of>
@@ -45,9 +45,31 @@
 		</result>
 	</test-case>
 	
+	<test-case name="fn-parts-of-dateTime-without-timezone">
+		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:dateTime, without a timezone value.</description>
+		<created by="Sheila Thomson" on="2026-02-21"/>
+		<modified by="Sheila Thomson" on="2026-03-19" change="removed trailing 'Z' from input; expected size reduced to 6 and timezone now expected empty"/>
+		<test>fn:parts-of-dateTime(xs:dateTime("2000-06-12T13:20:00"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>$result?"year" eq 2000</assert>
+				<assert>$result?"month" eq 06</assert>
+				<assert>$result?"day" eq 12</assert>
+				<assert>$result?"hours" eq 13</assert>
+				<assert>$result?"minutes" eq 20</assert>
+				<assert>$result?"seconds" eq 0</assert>
+				<assert>empty($result?"timezone")</assert>
+				<assert>map:size($result) eq 6</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
 	<test-case name="fn-parts-of-dateTime-date">
 		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:date</description>
 		<created by="Sheila Thomson" on="2026-02-18"/>
+		<modified by="Sheila Thomson" on="2026-03-19" change="expected size reduced to 3 and timezone now expected empty"/>
 		<test>fn:parts-of-dateTime(xs:date("2026-02-21"))</test>
 		<result>
 			<all-of>
@@ -60,7 +82,7 @@
 				<assert>empty($result?"minutes")</assert>
 				<assert>empty($result?"seconds")</assert>
 				<assert>empty($result?"timezone")</assert>
-				<assert>map:size($result) eq 7</assert>
+				<assert>map:size($result) eq 3</assert>
 			</all-of>
 		</result>
 	</test-case>
@@ -68,6 +90,7 @@
 	<test-case name="fn-parts-of-dateTime-time">
 		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:time</description>
 		<created by="Sheila Thomson" on="2026-02-18"/>
+		<modified by="Sheila Thomson" on="2026-03-19" change="expected size reduced to 3"/>
 		<test>fn:parts-of-dateTime(xs:time("13:30:04.2678"))</test>
 		<result>
 			<all-of>
@@ -80,7 +103,7 @@
 				<assert>$result?"minutes" eq 30</assert>
 				<assert>$result?"seconds" eq 4.2678</assert>
 				<assert>empty($result?"timezone")</assert>
-				<assert>map:size($result) eq 7</assert>
+				<assert>map:size($result) eq 3</assert>
 			</all-of>
 		</result>
 	</test-case>
@@ -88,6 +111,7 @@
 	<test-case name="fn-parts-of-dateTime-gYear">
 		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:gYear</description>
 		<created by="Sheila Thomson" on="2026-02-18"/>
+		<modified by="Sheila Thomson" on="2026-03-19" change="expected size reduced to 1"/>
 		<test>fn:parts-of-dateTime(xs:gYear("2007"))</test>
 		<result>
 			<all-of>
@@ -100,7 +124,7 @@
 				<assert>empty($result?"minutes")</assert>
 				<assert>empty($result?"seconds")</assert>
 				<assert>empty($result?"timezone")</assert>
-				<assert>map:size($result) eq 7</assert>
+				<assert>map:size($result) eq 1</assert>
 			</all-of>
 		</result>
 	</test-case>
@@ -108,6 +132,7 @@
 	<test-case name="fn-parts-of-dateTime-gYearMonth">
 		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:gYearMonth</description>
 		<created by="Sheila Thomson" on="2026-02-18"/>
+		<modified by="Sheila Thomson" on="2026-03-19" change="expected size reduced to 3"/>
 		<test>fn:parts-of-dateTime(xs:gYearMonth("2007-05Z"))</test>
 		<result>
 			<all-of>
@@ -120,7 +145,7 @@
 				<assert>empty($result?"minutes")</assert>
 				<assert>empty($result?"seconds")</assert>
 				<assert>$result?"timezone" eq xs:dayTimeDuration("PT0S")</assert>
-				<assert>map:size($result) eq 7</assert>
+				<assert>map:size($result) eq 3</assert>
 			</all-of>
 		</result>
 	</test-case>
@@ -128,6 +153,7 @@
 	<test-case name="fn-parts-of-dateTime-gMonth">
 		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:gMonth</description>
 		<created by="Sheila Thomson" on="2026-02-18"/>
+		<modified by="Sheila Thomson" on="2026-03-19" change="expected size reduced to 1"/>
 		<test>fn:parts-of-dateTime(xs:gMonth("--10"))</test>
 		<result>
 			<all-of>
@@ -140,7 +166,7 @@
 				<assert>empty($result?"minutes")</assert>
 				<assert>empty($result?"seconds")</assert>
 				<assert>empty($result?"timezone")</assert>
-				<assert>map:size($result) eq 7</assert>
+				<assert>map:size($result) eq 1</assert>
 			</all-of>
 		</result>
 	</test-case>
@@ -148,6 +174,7 @@
 	<test-case name="fn-parts-of-dateTime-gMonthDay">
 		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:gMonthDay</description>
 		<created by="Sheila Thomson" on="2026-02-18"/>
+		<modified by="Sheila Thomson" on="2026-03-19" change="expected size reduced to 2"/>
 		<test>fn:parts-of-dateTime(xs:gMonthDay("--10-08"))</test>
 		<result>
 			<all-of>
@@ -160,7 +187,7 @@
 				<assert>empty($result?"minutes")</assert>
 				<assert>empty($result?"seconds")</assert>
 				<assert>empty($result?"timezone")</assert>
-				<assert>map:size($result) eq 7</assert>
+				<assert>map:size($result) eq 2</assert>
 			</all-of>
 		</result>
 	</test-case>
@@ -168,6 +195,7 @@
 	<test-case name="fn-parts-of-dateTime-gDay">
 		<description>Evaluates fn:parts-of-dateTime when the sole argument supplied is an xs:gDay</description>
 		<created by="Sheila Thomson" on="2026-02-18"/>
+		<modified by="Sheila Thomson" on="2026-03-19" change="expected size reduced to 1"/>
 		<test>fn:parts-of-dateTime(xs:gDay("---08"))</test>
 		<result>
 			<all-of>
@@ -180,7 +208,7 @@
 				<assert>empty($result?"minutes")</assert>
 				<assert>empty($result?"seconds")</assert>
 				<assert>empty($result?"timezone")</assert>
-				<assert>map:size($result) eq 7</assert>
+				<assert>map:size($result) eq 1</assert>
 			</all-of>
 		</result>
 	</test-case>
