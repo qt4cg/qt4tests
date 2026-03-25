@@ -17,10 +17,24 @@
 		</result>
 	</test-case>
 	
-	<test-case name="fn-build-dateTime-dateTime-with-timezone-from-map">
+	<test-case name="fn-build-dateTime-dateTimeStamp-coercion-from-map">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:dateTime, with a timezone</description>
 		<created by="Michael Kay" on="2026-03-12"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix query syntax"/>
+		<modified by="Sheila Thomson" on="2026-03-20" change="changed xs:duration to xs:dayTimeDuration so only coercion is map and renamed to match; created new test for coercion from xs:duration"/>
+		<test>fn:build-dateTime({"year":1999, "month":5, "day":31, "hours":13, "minutes":20, "seconds":0, "timezone": xs:dayTimeDuration("-PT5H")})</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:dateTimeStamp</assert-type>
+				<assert-string-value>1999-05-31T13:20:00-05:00</assert-string-value>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-build-dateTime-timezone-coercion-from-duration-valid">
+		<description>Evaluates fn:build-dateTime when the timezone is an xs:duration</description>
+		<created by="Sheila Thomson" on="2026-03-20"/>
 		<test>fn:build-dateTime({"year":1999, "month":5, "day":31, "hours":13, "minutes":20, "seconds":0, "timezone": xs:duration("-PT5H")})</test>
 		<result>
 			<all-of>
@@ -28,6 +42,15 @@
 				<assert-type>xs:dateTimeStamp</assert-type>
 				<assert-string-value>1999-05-31T13:20:00-05:00</assert-string-value>
 			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-build-dateTime-timezone-coercion-from-duration-invalid">
+		<description>Evaluates fn:build-dateTime when the timezone is an xs:duration greater than 840 minutes</description>
+		<created by="Sheila Thomson" on="2026-03-20"/>
+		<test>fn:build-dateTime({"year":1999, "month":5, "day":31, "hours":13, "minutes":20, "seconds":0, "timezone": xs:duration("-P1DT5H")0})</test>
+		<result>
+			<error code="FODT0006"/>
 		</result>
 	</test-case>
 	
