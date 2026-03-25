@@ -214,10 +214,11 @@
 		</result>
 	</test-case>
 	
-	<test-case name="fn-dateTime-record-dayTimeDuration">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:dayTimeDuration for a timezone.</description>
+	<test-case name="fn-dateTime-record-timezone-dayTimeDuration">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied represent a timezone, expressed as an xs:dayTimeDuration.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix expected result"/>
+		<modified by="Sheila Thomson" on="2026-03-20" change="renamed"/>
 		<test>fn:dateTime-record((), (), (), (), (), (), xs:dayTimeDuration("PT6H"))</test>
 		<result>
 			<all-of>
@@ -230,6 +231,46 @@
 				<assert>empty($result?"minutes")</assert>
 				<assert>empty($result?"seconds")</assert>
 				<assert>$result?"timezone" eq xs:dayTimeDuration("PT6H")</assert>
+				<assert>map:size($result) eq 1</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-timezone-coercion-from-duration-valid">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied represent a valid timezone, but needs to be coerced from an xs:duration to an xs:dayTimeDuration.</description>
+		<created by="Sheila Thomson" on="2026-03-24"/>
+		<test>fn:dateTime-record((), (), (), (), (), (), xs:duration("PT6H"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>empty($result?"year")</assert>
+				<assert>empty($result?"month")</assert>
+				<assert>empty($result?"day")</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>$result?"timezone" eq xs:dayTimeDuration("PT6H")</assert>
+				<assert>map:size($result) eq 1</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-dateTime-record-timezone-coercion-from-duration-invalid">
+		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied represent an invalid timezone (> 840 min), expressed as an xs:duration instead of xs:dayTimeDuration. Record should be created, as no validation required.</description>
+		<created by="Sheila Thomson" on="2026-03-24"/>
+		<test>fn:dateTime-record((), (), (), (), (), (), xs:duration("P1DT6H"))</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>fn:dateTime-record</assert-type>
+				<assert>empty($result?"year")</assert>
+				<assert>empty($result?"month")</assert>
+				<assert>empty($result?"day")</assert>
+				<assert>empty($result?"hours")</assert>
+				<assert>empty($result?"minutes")</assert>
+				<assert>empty($result?"seconds")</assert>
+				<assert>$result?"timezone" eq xs:dayTimeDuration("PT108000S")</assert>
 				<assert>map:size($result) eq 1</assert>
 			</all-of>
 		</result>
