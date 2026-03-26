@@ -87,29 +87,80 @@
             <assert-true/>
         </result>
     </test-case>
+    
     <test-case name="parse-xml-008">
         <description>parse-xml test - with external DTD</description>
         <created by="Michael Kay" on="2013-01-07"/>        
         <environment name="empty"/>
+        <dependency type="spec" value="XP30 XP31 XQ30 XQ31"></dependency>
         <test><![CDATA[parse-xml("<!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>")]]></test>
         <result>
             <assert-xml><![CDATA[<a>foo</a>]]></assert-xml>
         </result>
     </test-case>
+    
+    <test-case name="parse-xml-008a" covers-40="PR2213">
+        <description>parse-xml test - with external DTD - 4.0 trusted</description>
+        <created by="Michael Kay" on="2013-01-07"/>        
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"></dependency>
+        <test><![CDATA[parse-xml("<!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>", {'trusted':true()})]]></test>
+        <result>
+            <assert-xml><![CDATA[<a>foo</a>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-008b" covers-40="PR2213">
+        <description>parse-xml test - with external DTD - 4.0 untrusted</description>
+        <created by="Michael Kay" on="2013-01-07"/>        
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"></dependency>
+        <test><![CDATA[parse-xml("<!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>", {'trusted':false()})]]></test>
+        <result>
+            <error code="FODC0016"/>
+        </result>
+    </test-case>
+    
     <test-case name="parse-xml-009">
         <description>parse-xml test - with XML declaration and external DTD</description>
         <created by="Michael Kay" on="2013-01-07"/>        
         <environment name="empty"/>
+        <dependency type="spec" value="XP30 XP31 XQ30 XQ31"/>
         <test><![CDATA[parse-xml("<?xml version='1.0' encoding='iso-8859-1'?><!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>")]]></test>
         <result>
             <assert-xml><![CDATA[<a>foo</a>]]></assert-xml>
         </result>
     </test-case>
+    
+    <test-case name="parse-xml-009a" covers-40="PR2213">
+        <description>parse-xml test - with XML declaration and external DTD - trusted</description>
+        <created by="Michael Kay" on="2026-03-25"/>        
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml("<?xml version='1.0' encoding='iso-8859-1'?><!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>",
+                                 { 'trusted' : true() })]]></test>
+        <result>
+            <assert-xml><![CDATA[<a>foo</a>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-009b" covers-40="PR2213">
+        <description>parse-xml test - with XML declaration and external DTD - untrusted</description>
+        <created by="Michael Kay" on="2026-03-25"/>        
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml("<?xml version='1.0' encoding='iso-8859-1'?><!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>")]]></test>
+        <result>
+            <error code="FODC0016"/>
+        </result>
+    </test-case>
+    
     <test-case name="parse-xml-010">
-        <description>parse-xml test - with external entity</description>
+        <description>parse-xml test - with external entity </description>
         <created by="Michael Kay" on="2013-01-07"/>
         <modified by="Michael Kay" on="2013-01-11" change="See bug 20645; changed test to work on both XPath and XQuery"/>        
         <environment name="empty"/>
+        <dependency type="spec" value="XP30 XP31 XQ30 XQ31"/>
         <test><![CDATA[parse-xml("<!DOCTYPE a [<!ELEMENT a (#PCDATA)><!ENTITY foo SYSTEM 'parse-xml/foo.entity'>]><a>" ||
             codepoints-to-string(38) || "foo;</a>")
         ]]></test>
@@ -117,6 +168,35 @@
             <assert-xml><![CDATA[<a><bar>baz</bar></a>]]></assert-xml>
         </result>
     </test-case>
+    
+    <test-case name="parse-xml-010a" covers-40="PR2213">
+        <description>parse-xml test - with external entity - trusted</description>
+        <created by="Michael Kay" on="2026-03-25"/>
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml("<!DOCTYPE a [<!ELEMENT a (#PCDATA)><!ENTITY foo SYSTEM 'parse-xml/foo.entity'>]><a>" ||
+            codepoints-to-string(38) || "foo;</a>", {'trusted':true()})
+        ]]></test>
+        <result>
+            <assert-xml><![CDATA[<a><bar>baz</bar></a>]]></assert-xml>
+        </result>
+    </test-case>
+    
+    <test-case name="parse-xml-010b" covers-40="PR2213">
+        <description>parse-xml test - with external entity - untrusted</description>
+        <created by="Michael Kay" on="2026-03-25"/>
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[parse-xml("<!DOCTYPE a [<!ELEMENT a (#PCDATA)><!ENTITY foo SYSTEM 'parse-xml/foo.entity'>]><a>" ||
+            codepoints-to-string(38) || "foo;</a>", {'trusted':false()})
+        ]]></test>
+        <result>
+            <error code="FODC0016"/>
+        </result>
+    </test-case>
+    
+    
+    
     <test-case name="parse-xml-011">
         <description>parse-xml test - document-uri() of result is absent</description>
         <created by="Michael Kay" on="2013-01-07"/>        
@@ -249,37 +329,37 @@
         </result>
     </test-case>
     
-    <test-case name="parse-xml-412" covers-40="PR1257">
+    <test-case name="parse-xml-412" covers-40="PR1257 PR2213">
         <description>parse-xml test - with DTD validation</description>
         <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml("<!DOCTYPE IDS SYSTEM 'id/iddtd2.dtd'><IDS><E a='x'/><E a='y'/></IDS>", 
-            {'dtd-validation': true()})]]></test>
+            {'dtd-validation': true(), 'trusted': true()})]]></test>
         <result>
             <assert>exists($result//E[@a='x'])</assert>
         </result>
     </test-case>
     
-    <test-case name="parse-xml-413" covers-40="PR1257">
+    <test-case name="parse-xml-413" covers-40="PR1257 PR2213">
         <description>parse-xml test - with DTD validation failure (required attribute missing)</description>
         <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml("<!DOCTYPE IDS SYSTEM 'id/iddtd.dtd'><IDS><E a='x'/><E/></IDS>", 
-            {'dtd-validation': true()})]]></test>
+            {'dtd-validation': true(), 'trusted': true()})]]></test>
         <result>
             <error code="FODC0007"/>
         </result>
     </test-case>
     
-    <test-case name="parse-xml-414" covers-40="PR1257">
+    <test-case name="parse-xml-414" covers-40="PR1257 PR2213">
         <description>parse-xml test - with DTD validation failure (duplicate IDs)</description>
         <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml("<!DOCTYPE IDS SYSTEM 'id/iddtd.dtd'><IDS><E a='x'/><E a='x'/></IDS>", 
-            {'dtd-validation': true()})]]></test>
+            {'dtd-validation': true(), 'trusted': true()})]]></test>
         <result>
             <error code="FODC0007"/>
         </result>
@@ -580,7 +660,8 @@
         <created by="Michael Kay" on="2025-03-26"/>        
         <environment name="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
-        <test><![CDATA[parse-xml(`<!DOCTYPE foo [ <!ENTITY ext SYSTEM 'parse-xml/foo.entity'> ]><foo>&ext;</foo>`)]]></test>
+        <test><![CDATA[parse-xml(`<!DOCTYPE foo [ <!ENTITY ext SYSTEM 'parse-xml/foo.entity'> ]><foo>&ext;</foo>`,
+            {'trusted': true()})]]></test>
         <result>
             <assert-xml><![CDATA[<foo><bar>baz</bar></foo>]]></assert-xml>
         </result>
