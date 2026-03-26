@@ -695,11 +695,11 @@
       </result>
    </test-case>
    
-   <test-case name="fn-doc-40-013" covers-40="PR1910">
-      <description>Options on fn:doc - dtd validation, document valid, external DTD</description>
+   <test-case name="fn-doc-40-013" covers-40="PR1910 PR2213">
+      <description>Options on fn:doc - dtd validation, document valid, external DTD, trusted</description>
       <created by="Michael Kay" on="2025-04-08"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>exists(fn:doc("../docs/bib-with-external-dtd.xml", {'dtd-validation':true()})/*)</test>
+      <test>exists(fn:doc("../docs/bib-with-external-dtd.xml", {'dtd-validation':true(), 'trusted': true()})/*)</test>
       <result>
          <assert-true/>
       </result>
@@ -711,7 +711,7 @@
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>exists(fn:doc("../docs/bib-with-external-dtd.xml", {'dtd-validation':true(), 'trusted': false()})/*)</test>
       <result>
-         <error code="FODC0002"/>
+         <error code="FODC0016"/>
       </result>
    </test-case>
    
@@ -904,11 +904,15 @@
    <test-case name="fn-doc-40-044" covers-40="PR1910">
       <description>Options on fn:doc - stable with xinclude</description>
       <created by="Michael Kay" on="2025-04-08"/>
+      <modified by="Michael Kay" on="2026-03-26" change="add error option for processors without XInclude support"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>fn:doc("../docs/bib-with-xinclude.xml", {'stable':true(), 'xinclude':true()})
+      <test>fn:doc("../docs/bib-with-xinclude.xml", {'stable':true(), 'xinclude':true(), 'trusted':true()})
           is fn:doc("../docs/bib-with-xinclude.xml", {'stable':true(), 'xinclude':false()}) </test>
       <result>
-         <assert-false/>
+         <any-of>
+            <assert-false/>
+            <error code="FODC0013"/>
+         </any-of>
       </result>
    </test-case>
    
@@ -929,10 +933,14 @@
    <test-case name="fn-doc-40-051" covers-40="PR1910">
       <description>Options on fn:doc - xinclude</description>
       <created by="Michael Kay" on="2025-04-08"/>
+      <modified by="Michael Kay" on="2026-03-26" change="add error option for processors without XInclude support"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>fn:doc("../docs/bib-with-xinclude.xml", {'xinclude':true()}) ! count(.//book)</test>
+      <test>fn:doc("../docs/bib-with-xinclude.xml", {'xinclude':true(), 'trusted':true()}) ! count(.//book)</test>
       <result>
-         <assert-eq>5</assert-eq>
+         <any-of>
+            <assert-eq>5</assert-eq>
+            <error code="FODC0013"/>
+         </any-of>         
       </result>
    </test-case>
    
