@@ -27,7 +27,7 @@
 			<all-of>
 				<assert-count>1</assert-count>
 				<assert-type>xs:dateTimeStamp</assert-type>
-				<assert-string-value>1999-05-31T13:20:00-05:00</assert-string-value>
+				<assert-eq>xs:dateTimeStamp("1999-05-31T13:20:00-05:00")</assert-eq>
 			</all-of>
 		</result>
 	</test-case>
@@ -103,6 +103,23 @@
 				<assert-count>1</assert-count>
 				<assert-type>xs:date</assert-type>
 				<assert-string-value>2026-02-26</assert-string-value>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-build-dateTime-date-without-timezone-from-nodes">
+		<description>Evaluates fn:build-dateTime supplying a map containing XML nodes</description>
+		<created by="Michael Kay" on="2026-03-26"/>
+		<dependency type="spec" value="XQ40"/>
+		<test><![CDATA[
+			let $in := <date><year>2026</year><month>3</month><day>26</day></date>
+			return fn:build-dateTime(map:build($in/*, local-name#1))
+	   ]]></test>		
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:date</assert-type>
+				<assert-eq>xs:date('2026-03-26')</assert-eq>
 			</all-of>
 		</result>
 	</test-case>
@@ -256,6 +273,19 @@
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gYear, without a timezone</description>
 		<created by="Michael Kay" on="2026-03-12"/>
 		<test>fn:build-dateTime({"year":2007})</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:gYear</assert-type>
+				<assert-string-value>2007</assert-string-value>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-build-dateTime-gYear-from-map-with-empty-fields">
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gYear, without a timezone</description>
+		<created by="Michael Kay" on="2026-03-26"/>
+		<test>fn:build-dateTime({"year":2007, "month":(), "day":(), "timezone":()})</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -474,6 +504,19 @@
 		</result>
 	</test-case>
 	
+	<test-case name="fn-build-dateTime-year-zero-from-map">
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date during the year zero.</description>
+		<created by="Michael Kay" on="2026-03-26"/>
+		<test>fn:build-dateTime({"year":0, "month":1, "day":1, "timezone":xs:duration("PT0S")})</test>
+		<result>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:date</assert-type>
+				<assert-eq>xs:date("0000-01-01")</assert-eq>
+			</all-of>
+		</result>
+	</test-case>
+	
 	<test-case name="fn-build-dateTime-year-negative">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date with a negative year value.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
@@ -550,6 +593,15 @@
 		</result>
 	</test-case>
 	
+	<test-case name="fn-build-dateTime-too-many-days-feb-leap-year-in-map">
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date with more than 29 days, in February during a leap year.</description>
+		<created by="Michael Kay" on="2026-03-26"/>
+		<test>fn:build-dateTime({"year": 1912, "month":2, "day":30})</test>
+		<result>
+			<error code="FODT0006" />
+		</result>
+	</test-case>
+	
 	<test-case name="fn-build-dateTime-too-few-hours">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:time with fewer than 0 hours.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
@@ -604,10 +656,28 @@
 		</result>
 	</test-case>
 	
+	<test-case name="fn-build-dateTime-too-many-seconds-in-map">
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:time with 60 or more seconds.</description>
+		<created by="Michael Kay" on="2026-03-26"/>
+		<test>fn:build-dateTime({"hours" 12, "minutes":30, "seconds":60}))</test>
+		<result>
+			<error code="FODT0006" />
+		</result>
+	</test-case>
+	
 	<test-case name="fn-build-dateTime-missing-month">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input would represent an xs:dateTime but is missing a month.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1970), (), xs:integer(1), xs:integer(0), xs:integer(0), xs:decimal(0.0), ()))</test>
+		<result>
+			<error code="FODT0005" />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-build-dateTime-missing-month-in-map">
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input would represent an xs:dateTime but is missing a month.</description>
+		<created by="Michael Kay" on="2026-03-26"/>
+		<test>fn:build-dateTime({"year": 1970, "day": 1})</test>
 		<result>
 			<error code="FODT0005" />
 		</result>
@@ -671,6 +741,15 @@
 		</result>
 	</test-case>
 	
+	<test-case name="fn-build-dateTime-time-missing-minutes-in-map">
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input would represent an xs:time but is missing the minutes component.</description>
+		<created by="Michael Kay" on="2026-03-26"/>
+		<test>fn:build-dateTime({"hours":12, "seconds":30})</test>
+		<result>
+			<error code="FODT0005" />
+		</result>
+	</test-case>
+	
 	<test-case name="fn-build-dateTime-time-missing-seconds">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input would represent an xs:time but is missing the seconds component.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
@@ -680,8 +759,18 @@
 		</result>
 	</test-case>
 	
+	<test-case name="fn-build-dateTime-time-missing-seconds-in-map">
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input would represent an xs:time but is missing the seconds component.</description>
+		<created by="Michael Kay" on="2026-03-26"/>
+		<test>fn:build-dateTime({"hours":12, "minutes":30, "timezone": xs:duration("PT0S")})</test>
+		<result>
+			<error code="FODT0005" />
+		</result>
+	</test-case>
+	
 	<test-case name="fn-build-dateTime-time-unexpected-year">
-		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input would represent an xs:time but also includes an incomplete date component.</description>
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input 
+			would represent an xs:time but also includes an incomplete date component.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1970), (), (), xs:integer(0), xs:integer(0), xs:decimal(0.0), ()))</test>
 		<result>
@@ -690,7 +779,8 @@
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-date-unexpected-minutes">
-		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input would represent an xs:time but also includes an incomplete time component.</description>
+		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input 
+			would represent an xs:time but also includes an incomplete time component.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1970), xs:integer(1), xs:integer(1), (), xs:integer(0), (), ()))</test>
 		<result>
