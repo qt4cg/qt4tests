@@ -137,16 +137,16 @@
         <xsl:apply-templates select="fots:test-set"/>
         
         <xsl:if test="true()" use-when="function-available('file:copy', 2)">
-            <xsl:variable name="from" select="concat($main-dir, 'docs')"/>
-            <xsl:variable name="to" select="concat($xslt-dir, 'docs')"/>
+            <xsl:variable name="from" select="concat($main-dir, 'docs/')"/>
+            <xsl:variable name="to" select="$xslt-dir"/>
             <xsl:sequence select="file:copy($from, $to)"/>
             
             <!-- Some ad-hoc copying of files that are needed, but not referenced from their local test-set -->
             
             <xsl:sequence select="file:copy(concat($main-dir, 'fn/id/'), concat($xslt-dir, 'fn/'))"/>
-            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-json/'), concat($xslt-dir, 'fn/parse-json/'))"/> <!-- 'fn/parse-json' -->
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-json/'), concat($xslt-dir, 'fn/parse-json/'))"/>
             <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-json/data004.json'), concat($xslt-dir, 'fn/parse-json/data004.json'))"/>
-            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-xml/'), concat($xslt-dir, 'fn/parse-xml/'))"/> <!-- 'fn/parse-xml' -->
+            <xsl:sequence select="file:copy(concat($main-dir, 'fn/parse-xml/'), concat($xslt-dir, 'fn/parse-xml/'))"/>
             <xsl:sequence select="file:copy(concat($main-dir, 'fn/unparsed-text/text-plain-utf-8-bom-lines-2.txt'), concat($xslt-dir, 'fn/unparsed-text/text-plain-utf-8-bom-lines-2.txt'))"/>
             <xsl:sequence select="file:copy(concat($main-dir, 'fn/unparsed-text/text-plain-utf-8-bom-lines-3.txt'), concat($xslt-dir, 'fn/unparsed-text/text-plain-utf-8-bom-lines-3.txt'))"/>
             <xsl:sequence select="file:copy(concat($main-dir, 'fn/transform/render.xsl'), concat($xslt-dir, 'fn/transform/transform/render.xsl'))"/>
@@ -198,7 +198,7 @@
             <xsl:sequence select="file:copy(concat($main-dir, 'fn/unparsed-text/invalid-xml.xml'), concat($xslt-dir, 'fn/unparsed-binary/unparsed-text/non-xml-character.txt'))"/>
             <xsl:sequence select="file:copy(concat($main-dir, 'prod/ModuleImport/module1-lib.xq'), concat($xslt-dir, 'prod/ModuleImport/module1-lib.xq'))"/>
             <xsl:sequence select="file:copy(concat($main-dir, 'prod/ModuleImport/module2-lib.xq'), concat($xslt-dir, 'prod/ModuleImport/module2-lib.xq'))"/>
-            <xsl:sequence select="file:copy(concat($main-dir, 'file/sandpit/'), concat($xslt-dir, 'file/file/sandpit/'))"/>
+            <xsl:sequence select="file:copy(concat($main-dir, 'file/sandpit/'), concat($xslt-dir, 'file/file/'))"/>
             
             <xsl:sequence select="file:copy(concat($xslt-src-dir, 'tests/misc/catalog/catalog-001.xsl'), concat($xslt-dir, 'catalog/xslt3-catalog/catalog-001.xsl'))"/>
             <xsl:sequence select="file:copy(concat($main-dir, 'tools/xslt3-catalog-schema.xsd'), concat($xslt-dir, 'catalog/xslt3-catalog/catalog-schema.xsd'))"/>
@@ -922,9 +922,11 @@
             ))"/>
     </xsl:function>
     
+    <!-- Include type errors and other errors which can be raised statically or dynamically. -->
     <xsl:function name="fots:isTypeError" as="xs:boolean">
         <xsl:param name="assertion" as="element()"/>
-        <xsl:sequence select="matches($assertion/@code, '..TY....') or $assertion/@code=('FORG0006', 'XPDY0002', 'FORG0001', 'XPDY0050')"/>
+        <xsl:sequence select="matches($assertion/@code, '..TY....') or $assertion/@code=('FORG0006',
+            'XPDY0002', 'FORG0001', 'XPDY0050', 'XQDY0137')"/>
     </xsl:function>
     
     
