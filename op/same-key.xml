@@ -9,6 +9,7 @@
        <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/>
        <modified by="Michael Kay" on="2016-07-28" change="test assumed last duplicate wins"/>
        <modified by="Michael Kay" on="2025-08-29" change="key type is implementation-defined"/>
+       <modified by="Michael Kay" on="2026-04-10" change="avoid 4.0 syntax in assertion"/>
        <environment ref="map" />
        <test>
            map:merge((
@@ -22,11 +23,18 @@
        </test>
        <result>
           <all-of>
-             <assert>map:size($result) eq 3</assert>
-             <assert>count(map:keys($result)) eq 3</assert>
-             <assert>map:keys($result)[deep-equal(.,"abc")] instance of (xs:anyURI|xs:string|xs:untypedAtomic)</assert>
-             <assert>map:keys($result)[deep-equal(.,"xyz")] instance of (xs:string|xs:untypedAtomic)</assert>
-             <assert>$result?abc eq 1</assert>
+              <assert>map:size($result) eq 3</assert>
+              <assert>count(map:keys($result)) eq 3</assert>
+              <any-of>
+                  <assert>map:keys($result)[deep-equal(.,"abc")] instance of xs:anyURI</assert>
+                  <assert>map:keys($result)[deep-equal(.,"abc")] instance of xs:string</assert>
+                  <assert>map:keys($result)[deep-equal(.,"abc")] instance of xs:untypedAtomic</assert>
+              </any-of>
+              <any-of>
+                  <assert>map:keys($result)[deep-equal(.,"xyz")] instance of xs:string</assert>
+                  <assert>map:keys($result)[deep-equal(.,"xyz")] instance of xs:untypedAtomic</assert>
+              </any-of>
+              <assert>$result?abc eq 1</assert>
           </all-of>
        </result>
    </test-case>
@@ -76,6 +84,7 @@
        <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/>
        <modified by="Michael Kay" on="2016-07-28" change="test assumes last duplicate wins"/>
        <modified by="Michael Kay" on="2025-08-29" change="key type is implementation-defined"/>
+       <modified by="Michael Kay" on="2026-04-10" change="avoid 4.0 syntax in assertions"/>
        <environment ref="map" />
        <test>
             map:merge((
@@ -90,7 +99,7 @@
        <result>
           <all-of>
              <assert>map:size($result) eq 3</assert>
-             <assert>map:keys($result) instance of (xs:float|xs:double)+</assert>
+             <assert>every $k in map:keys($result) satisfies $k instance of xs:float or $k instance of xs:double</assert>
              <assert>$result?(xs:double('NaN')) eq 1</assert>
              <assert>$result?(xs:double('INF')) eq 2</assert>
              <assert>$result?(xs:double('-INF')) eq 3</assert>
@@ -104,6 +113,7 @@
        <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/>
        <modified by="Michael Kay" on="2016-07-28" change="test assumed last duplicate wins"/>
        <modified by="Michael Kay" on="2025-08-29" change="key type is implementation-defined"/>
+       <modified by="Michael Kay" on="2026-04-10" change="avoid 4.0 syntax in assertions"/>
        <environment ref="map" />
        <test>
             map:merge((
@@ -118,7 +128,7 @@
        <result>
           <all-of>
              <assert>map:size($result) eq 3</assert>
-             <assert>map:keys($result) instance of (xs:float|xs:double)+</assert>
+             <assert>every $k in map:keys($result) satisfies $k instance of xs:float or $k instance of xs:double</assert>
              <assert>$result?(xs:double('NaN')) eq 1</assert>
              <assert>$result?(xs:double('INF')) eq 2</assert>
              <assert>$result?(xs:double('-INF')) eq 3</assert>
