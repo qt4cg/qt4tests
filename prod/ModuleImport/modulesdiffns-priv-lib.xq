@@ -1,4 +1,4 @@
-xquery version "4.0";
+(:xquery version "4.0";:)
 (:*******************************************************:)
 (: Test: modulesdiffns-priv-lib.xq                       :)
 (: Written By: Michael Kay                               :)
