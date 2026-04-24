@@ -673,6 +673,7 @@
    <test-case name="fn-ceiling-1">
       <description> check dynamic type of fn:ceiling on argument of union of numeric types. </description>
       <created by="Oliver Hallam" on="2010-03-15"/>
+      <modified by="Michael Kay" on="2026-04-22" change="ceiling() of a decimal may legitimately produce an integer"/>
       <test>for $x in (1, xs:decimal(2), xs:float(3), xs:double(4)) return 
            if ((ceiling($x)) instance of xs:integer) then "integer" 
            else if ((ceiling($x)) instance of xs:decimal) then "decimal" 
@@ -681,7 +682,10 @@
            else error()
       </test>
       <result>
-         <assert-deep-eq>"integer", "decimal", "float", "double"</assert-deep-eq>
+         <any-of>
+            <assert-deep-eq>"integer", "decimal", "float", "double"</assert-deep-eq>
+            <assert-deep-eq>"integer", "integer", "float", "double"</assert-deep-eq>
+         </any-of>
       </result>
    </test-case>
 
