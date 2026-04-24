@@ -856,7 +856,7 @@
             </xsl:choose>
             <x:otherwise>
                 <!--<fail assertion="assert {$assertion}"><x:value-of select="serialize($result)"/></fail>-->
-                <fail assertion="assert"><x:value-of select="serialize($result, map{{'method':'adaptive'}})"/></fail> 
+                <fail assertion="assert {$assertion}"><x:value-of select="serialize($result, map{{'method':'adaptive'}})"/></fail> 
             </x:otherwise>
         </x:choose>
     </xsl:template>

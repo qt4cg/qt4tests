@@ -251,6 +251,49 @@
         </result>
     </test-case>
     
+    <test-case name="map-build-019">
+        <description>Build map from JSON. This example was originally in the spec, but was
+        challenged, see issue 2408. It's invalid because `ancestor-or-self::jnode()?name` isn't
+        a PostfixExpr and therefore isn't allowed on the RHS of the "/" operator</description>
+        <created by="Michael Kay, Saxonica" on="2026-04-24"/>
+        <test>
+    let $tree := parse-json('{
+            "type": "package",
+            "name": "org",
+            "content": [
+                { "type": "package",
+                  "name": "xml",
+                  "content": [
+                      { "type": "package",
+                        "name": "sax",
+                        "content": [
+                            { "type": "class",
+                              "name": "Attributes"},
+                            { "type": "class",
+                              "name": "ContentHandler"},
+                            { "type": "class",
+                              "name": "XMLReader"}
+                         ]
+                      }]
+                 }]
+             }')
+             return map:build($tree/descendant-or-self::jnode(*, record(type, name, content?)),
+                              fn{./ancestor-or-self::jnode()?name => string-join(".")},
+                              fn{`{?type} {?name}`})
+                                         map:build(1 to 5, fn{.*2}, fn{.*3}, ())
+        </test>
+        <result>
+            <error code="XPST0003"/>
+            <!--<assert-deep-eq>{   "org":"package org",
+                                "org.xml":"package xml",
+                                "org.xml.sax":"package sax",
+                                "org.xml.sax.Attributes":"class Attributes",
+                                "org.xml.sax.ContentHandler":"class ContentHandler",
+                                "org.xml.sax.XMLReader":"class XMLReader"}
+            </assert-deep-eq>-->
+        </result>
+    </test-case>
+    
     <test-case name="map-build-101">
         <description>Empty sequence, named function reference</description>
         <created by="Christian Gruen" on="2022-08-10"/>
