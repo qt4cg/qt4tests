@@ -50,9 +50,10 @@
 	<test-case name="fn-build-dateTime-timezone-coercion-from-duration-invalid">
 		<description>Evaluates fn:build-dateTime when the timezone is an xs:duration greater than 840 minutes</description>
 		<created by="Sheila Thomson" on="2026-03-20"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FODT0003"/>
 		<test>fn:build-dateTime({"year":1999, "month":5, "day":31, "hours":13, "minutes":20, "seconds":0, "timezone": xs:duration("-P1DT5H")})</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FODT0003"/>
 		</result>
 	</test-case>
 	
@@ -114,7 +115,11 @@
 		<created by="Sheila Thomson" on="2026-04-02"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(-1), xs:integer(7), xs:integer(1), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:date</assert-type>
+				<assert-string-value>-0001-07-01</assert-string-value>
+			</all-of>
 		</result>
 	</test-case>
 	
@@ -125,8 +130,8 @@
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
-				<assert-type>xs:gYearMonth</assert-type>
-				<assert-string-value>0000-07--</assert-string-value>
+				<assert-type>xs:date</assert-type>
+				<assert-string-value>0000-07-01</assert-string-value>
 			</all-of>
 		</result>
 	</test-case>
@@ -134,36 +139,40 @@
 	<test-case name="fn-build-dateTime-date-without-timezone-month-too-high">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date (without a timezone) but the month value is greater than the max number of months in a year</description>
 		<created by="Sheila Thomson" on="2026-04-02"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1), xs:integer(13), xs:integer(1), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-date-without-timezone-month-too-low">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date (without a timezone) but the month value is less than 1</description>
 		<created by="Sheila Thomson" on="2026-04-02"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1), xs:integer(-1), xs:integer(1), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
 		<test-case name="fn-build-dateTime-date-without-timezone-day-too-high">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date (without a timezone) but the day value is greater than the max number of days in any month</description>
 		<created by="Sheila Thomson" on="2026-04-02"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1), xs:integer(1), xs:integer(32), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-date-without-timezone-day-too-low">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date (without a timezone) but the day value is less than 1</description>
 		<created by="Sheila Thomson" on="2026-04-02"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1), xs:integer(1), xs:integer(-1), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
@@ -335,7 +344,11 @@
 		<created by="Sheila Thomson" on="2026-04-02"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(-1), (), (), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:gYear</assert-type>
+				<assert-string-value>-0001</assert-string-value>
+			</all-of>
 		</result>
 	</test-case>
 	
@@ -409,7 +422,11 @@
 		<created by="Sheila Thomson" on="2026-04-02"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(-1), xs:integer(7), (), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<all-of>
+				<assert-count>1</assert-count>
+				<assert-type>xs:gYearMonth</assert-type>
+				<assert-string-value>-0001-07</assert-string-value>
+			</all-of>
 		</result>
 	</test-case>
 	
@@ -421,7 +438,7 @@
 			<all-of>
 				<assert-count>1</assert-count>
 				<assert-type>xs:gYearMonth</assert-type>
-				<assert-string-value>0000-07--</assert-string-value>
+				<assert-string-value>0000-07</assert-string-value>
 			</all-of>
 		</result>
 	</test-case>
@@ -429,18 +446,20 @@
 	<test-case name="fn-build-dateTime-gYearMonth-without-timezone-month-too-high">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gYearMonth (without a timezone) but the month value is greater than the max number of months in a year</description>
 		<created by="Sheila Thomson" on="2026-04-02"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1), xs:integer(13), (), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-gYearMonth-without-timezone-month-too-low">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gYearMonth (without a timezone) but the month value is less than 1</description>
 		<created by="Sheila Thomson" on="2026-04-02"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1), xs:integer(-1), (), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
@@ -473,18 +492,20 @@
 	<test-case name="fn-build-dateTime-gMonth-without-timezone-month-too-high">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gMonth (without a timezone) but the month value is greater than the max number of months in a year</description>
 		<created by="Sheila Thomson" on="2026-04-02"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), xs:integer(13), (), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-gMonth-without-timezone-month-too-low">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gMonth (without a timezone) but the month value is less than 1</description>
 		<created by="Sheila Thomson" on="2026-04-02"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), xs:integer(-1), (), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
@@ -517,36 +538,40 @@
 	<test-case name="fn-build-dateTime-gMonthDay-without-timezone-too-many-days">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gMonthDay (without a timezone) but the day value is greater than the max number of days for any month</description>
 		<created by="Sheila Thomson" on="2026-04-02"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), xs:integer(7), xs:integer(40), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-gMonthDay-without-timezone-too-few-days">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gMonthDay (without a timezone) but the day value is less than 1 day</description>
 		<created by="Sheila Thomson" on="2026-04-02"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), xs:integer(7), xs:integer(-1), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-gMonthDay-without-timezone-month-too-high">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gMonthDay (without a timezone) but the month value is greater than the max number of months in a year</description>
 		<created by="Sheila Thomson" on="2026-04-02"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), xs:integer(13), xs:integer(1), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-gMonthDay-without-timezone-month-too-low">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gMonthDay (without a timezone) but the month value is less than 1</description>
 		<created by="Sheila Thomson" on="2026-04-02"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), xs:integer(-1), xs:integer(1), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
@@ -580,18 +605,20 @@
 	<test-case name="fn-build-dateTime-gDay-without-timezone-too-many-days">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gDay (without a timezone) greater than the max number of days for any month</description>
 		<created by="Sheila Thomson" on="2026-04-01"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), (), xs:integer(40), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-gDay-without-timezone-too-few-days">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:gDay (without a timezone) where the value is less than 1 day</description>
 		<created by="Sheila Thomson" on="2026-04-01"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), (), xs:integer(-1), (), (), (), ()))</test>
 		<result>
-			<error code="FODT0006"/>
+			<error code="FORG0001"/>
 		</result>
 	</test-case>
 	
@@ -731,126 +758,140 @@
 	<test-case name="fn-build-dateTime-too-few-months">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date with fewer than 0 months.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1970), xs:integer(-1), xs:integer(1), xs:integer(0), xs:integer(0), xs:decimal(0.0), ()))</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-too-many-months">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date with more than 12 months.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1970), xs:integer(13), xs:integer(1), xs:integer(0), xs:integer(0), xs:decimal(0.0), ()))</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-too-few-days">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date with fewer than 0 days.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1970), xs:integer(1), xs:integer(-1), xs:integer(0), xs:integer(0), xs:decimal(0.0), ()))</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-too-many-days-usually-31">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date with more than 31 days.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1970), xs:integer(1), xs:integer(32), xs:integer(0), xs:integer(0), xs:decimal(0.0), ()))</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-too-many-days-usually-30">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date with more than 30 days in a month that usually only has 30.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1970), xs:integer(11), xs:integer(31), xs:integer(0), xs:integer(0), xs:decimal(0.0), ()))</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-too-many-days-feb-non-leap-year">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date with more than 28 days, in February when it's not a leap year.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1913), xs:integer(2), xs:integer(29), xs:integer(0), xs:integer(0), xs:decimal(0.0), ()))</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-too-many-days-feb-leap-year">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date with more than 29 days, in February during a leap year.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record(xs:integer(1912), xs:integer(2), xs:integer(30), xs:integer(0), xs:integer(0), xs:decimal(0.0), ()))</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-too-many-days-feb-leap-year-in-map">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:date with more than 29 days, in February during a leap year.</description>
 		<created by="Michael Kay" on="2026-03-26"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime({"year": 1912, "month":2, "day":30})</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-too-few-hours">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:time with fewer than 0 hours.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), (), (), xs:integer(-1), xs:integer(0), xs:decimal(0.0), ()))</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 		
 	<test-case name="fn-build-dateTime-too-many-hours">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:time with more than 24 hours.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), (), (), xs:integer(25), xs:integer(0), xs:decimal(0.0), ()))</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-too-few-minutes">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:time with fewer than 0 minutes.</description>
 		<created by="Sheila Thomson" on="2026-03-03"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), (), (), xs:integer(0), xs:integer(-1), xs:decimal(0.0), ()))</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-too-many-minutes">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:time with more than 59 minutes.</description>
 		<created by="Sheila Thomson" on="2026-03-03"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), (), (), xs:integer(0), xs:integer(61), xs:decimal(0.0), ()))</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-too-few-seconds">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:time with fewer than 0 seconds.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), (), (), xs:integer(0), xs:integer(0), xs:decimal(-1.0), ()))</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
 	<test-case name="fn-build-dateTime-too-many-seconds">
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:time with 60 or more seconds.</description>
 		<created by="Sheila Thomson" on="2026-03-11"/>
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime(fn:dateTime-record((), (), (), xs:integer(0), xs:integer(0), xs:decimal(60.0), ()))</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
@@ -858,9 +899,10 @@
 		<description>Evaluates fn:build-dateTime when the fn:dateTime-record input represents an xs:time with 60 or more seconds.</description>
 		<created by="Michael Kay" on="2026-03-26"/>
 		<modified by="Sheila Thomson" on="2026-04-01" change="added missing colon after hours, deleted extra closing round bracket" />
+		<modified by="Sheila Thomson" on="2026-04-29" change="changed error code to FORG0001"/>
 		<test>fn:build-dateTime({"hours": 12, "minutes":30, "seconds":60})</test>
 		<result>
-			<error code="FODT0006" />
+			<error code="FORG0001" />
 		</result>
 	</test-case>
 	
