@@ -567,6 +567,28 @@
       </result>
    </test-case>
    
+   <test-case name="element-to-map-226" covers-40="PR2666">
+      <description> element node - implicit - simple plus - customize #content key</description>
+      <created by="Michael Kay" on="2026-05-26"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="zz">babel</a>')/a, {'content-key': '%content')
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@id":"zz","%content":"babel"}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-227" covers-40="PR2666">
+      <description> element node - implicit - simple plus - customized content-key causing conflict</description>
+      <created by="Michael Kay" on="2026-05-26"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a id="zz">babel</a>')/a, {'content-key': '@id')
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"a":{"@id":"zz","#@id":"babel"}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
    <test-case name="element-to-map-230">
       <description> element node - implicit - list-plus</description>
       <created by="Michael Kay" on="2024-11-16"/>
@@ -950,6 +972,38 @@
       </result>
    </test-case>
    
+   <test-case name="element-to-map-308" covers-40="PR2666">
+      <description> element node - schema-based - empty content, nilled</description>
+      <created by="Michael Kay" on="2026-05-26"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus list="" xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return element-to-map($in, {'content-key': '.')
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"@list":[], ".": xs:QName("fn:null")}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-309" covers-40="PR2666">
+      <description> element node - schema-based - empty content, nilled, conflicting generated names</description>
+      <created by="Michael Kay" on="2026-05-26"/>
+      <environment ref="specimen"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test><![CDATA[
+         import schema namespace c="http://www.w3.org/XQueryTest/specimen";
+         let $in := validate strict {<c:EmptyPlus list="" xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>}
+         return element-to-map($in, {'content-key': 'list', 'attribute-marker': ''})
+      ]]></test>
+      <result>
+         <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}EmptyPlus":{"list":[], "#list": xs:QName("fn:null")}}</assert-deep-eq> 
+      </result>
+   </test-case>
+   
    <test-case name="element-to-map-310">
       <description> element node - schema-based - simple content, numeric</description>
       <created by="Michael Kay" on="2024-11-16"/>
@@ -1318,14 +1372,14 @@
                                        <c:NumberPlus>2</c:NumberPlus>
                                        <c:DatePlus>1966-07-03</c:DatePlus>
                                      </c:SequencePlus>}
-         return element-to-map($in)
+         return element-to-map($in, {'content-key': '#'})
       ]]></test>
       <result>
          <assert-deep-eq>{"Q{http://www.w3.org/XQueryTest/specimen}SequencePlus":
             [{"@num": 42},
-             {"BooleanPlus": {"#content": true()}},
-             {"NumberPlus": {"#content": 2}},
-             {"DatePlus": {"#content": xs:date("1966-07-03")}}
+             {"BooleanPlus": {"#": true()}},
+             {"NumberPlus": {"#": 2}},
+             {"DatePlus": {"#": xs:date("1966-07-03")}}
             ]}</assert-deep-eq>
       </result>
    </test-case>
