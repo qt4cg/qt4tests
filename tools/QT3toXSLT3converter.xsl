@@ -848,6 +848,11 @@
                         <ok/>
                     </x:when>
                 </xsl:when>
+                <xsl:when test="string($assertion) eq 'true()'">
+                    <x:when test="$result instance of item()*">
+                        <ok/>
+                    </x:when>
+                </xsl:when>
                 <xsl:otherwise>
                     <x:when test="$result ! ({$assertion})">
                         <ok/>
@@ -856,7 +861,9 @@
             </xsl:choose>
             <x:otherwise>
                 <!--<fail assertion="assert {$assertion}"><x:value-of select="serialize($result)"/></fail>-->
-                <fail assertion="assert {$assertion}"><x:value-of select="serialize($result, map{{'method':'adaptive'}})"/></fail> 
+                <xsl:variable name="escaped-assertion" 
+                    select="replace(replace(string($assertion), '\{', '{{'), '\}', '}}')"/>
+                <fail assertion="assert {$escaped-assertion}"><x:value-of select="serialize($result, map{{'method':'adaptive'}})"/></fail> 
             </x:otherwise>
         </x:choose>
     </xsl:template>
