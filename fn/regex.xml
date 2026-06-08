@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-regex" covers-40="PR2611">
+   <description>Tests the fn:regex() function (4.0)</description>
+ 
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="fn-regex-001">
+      <description> Basic test, 1 argument</description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("aaa")</test>
+      <result>
+         <assert-type>fn:compiled-regex-record</assert-type>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-002">
+      <description> Basic test, 1 argument</description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("aaa")</test>
+      <result>
+         <all-of>
+            <assert>$result?pattern = "aaa"</assert>
+            <assert>$result?flags = ""</assert>
+            <assert>exists($result?matches)</assert>
+            <assert>exists($result?tokenize)</assert>
+            <assert>exists($result?replace)</assert>
+            <assert>exists($result?analyze-string)</assert>
+            <assert>exists($result?matching-segments)</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-003">
+      <description> Basic test, 2 arguments</description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("aaa", "i")</test>
+      <result>
+         <assert-type>fn:compiled-regex-record</assert-type>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-004">
+      <description> Basic test, 2 arguments</description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("aaa", "i")</test>
+      <result>
+         <all-of>
+            <assert>$result?pattern = "aaa"</assert>
+            <assert>$result?flags = "i"</assert>
+            <assert>exists($result?matches)</assert>
+            <assert>exists($result?tokenize)</assert>
+            <assert>exists($result?replace)</assert>
+            <assert>exists($result?analyze-string)</assert>
+            <assert>exists($result?matching-segments)</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-005">
+      <description> Basic test, flags supplied as empty</description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("aaa", ())</test>
+      <result>
+         <all-of>
+            <assert>$result?pattern = "aaa"</assert>
+            <assert>$result?flags = ""</assert>
+            <assert>exists($result?matches)</assert>
+            <assert>exists($result?tokenize)</assert>
+            <assert>exists($result?replace)</assert>
+            <assert>exists($result?analyze-string)</assert>
+            <assert>exists($result?matching-segments)</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-006">
+      <description> Empty sequence not accepted</description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex(())</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-007">
+      <description> Unknown function </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("xyz")?MATCHES("xyz")</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-008">
+      <description> Order of keys </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>map:keys(fn:regex("xyz"))</test>
+      <result>
+         <assert-deep-eq>"pattern", "flags", "matches", "tokenize", "replace", "analyze-string", "matching-segments"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-010">
+      <description> matches </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("aaa")?matches("aaa")</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-011">
+      <description> matches </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("aaa")?matches("bbb")</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-012">
+      <description> matches </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("aaa", "i")?matches("AAA")</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-013">
+      <description> matches </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("aaa", "i")?matches("BBB")</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-014">
+      <description> matches - too few arguments</description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("aaa", "i")?matches()</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-015">
+      <description> matches - empty sequence not accepted</description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("aaa", "i")?matches(())</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-016">
+      <description> matches - excess arguments</description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("aaa", "i")?matches("banana", "custard")</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-017">
+      <description> matches - as function item</description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>let $p := fn:regex('2')?matches return (30 to 50)!string()[$p(.)]</test>
+      <result>
+         <assert-deep-eq>'32', '42'</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-020">
+      <description> tokenize </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex(" ")?tokenize("a nice cup of tea")</test>
+      <result>
+         <assert-deep-eq>"a", "nice", "cup", "of", "tea"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-021">
+      <description> tokenize </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("|", "q")?tokenize("a|nice|cup|of|tea")</test>
+      <result>
+         <assert-deep-eq>"a", "nice", "cup", "of", "tea"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-022">
+      <description> tokenize - too few arguments</description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("|", "q")?tokenize()</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-023">
+      <description> tokenize - empty sequence not accepted</description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("|", "q")?tokenize(())</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-024">
+      <description> tokenize - excess arguments </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex(" ")?tokenize("a nice cup of tea", "is to be found next door")</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-030">
+      <description> replace </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("a")?replace("a nice cup of tea", "A")</test>
+      <result>
+         <assert-eq>"A nice cup of teA"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-031">
+      <description> replace </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("(.)-(.)-(.)")?replace("a-b-c", "$1/$2/$3")</test>
+      <result>
+         <assert-eq>"a/b/c"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-032">
+      <description> replace </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("[0-9]+")?replace("2 plus 3 makes 5", format-integer(?, 'w'))</test>
+      <result>
+         <assert-eq>"two plus three makes five"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-033">
+      <description> replace </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("-")?replace("a-b-c", ())</test>
+      <result>
+         <assert-eq>"abc"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-034">
+      <description> replace </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("#([0-9]+)")?replace("#2 plus #3 makes #5", fn($m, $g){format-integer($g[1], 'w')})</test>
+      <result>
+         <assert-eq>"two plus three makes five"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-040">
+      <description> analyze-string </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("custard")?analyze-string("banana")</test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:non-match>banana</fn:non-match></fn:analyze-string-result>]]></assert-xml>        
+      </result>
+   </test-case>
+   
+   <test-case name="fn-regex-041">
+      <description> analyze-string </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex(".+")?analyze-string("banana")</test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:match>banana</fn:match></fn:analyze-string-result>]]></assert-xml>
+      </result>
+   </test-case>
+   
+
+   
+   <test-case name="fn-regex-050">
+      <description> matching-segments (TBA) </description>
+      <created by="Michael Kay" on="2026-06-07"/>
+      <test>fn:regex("a")?matching-segments("a nice cup of tea", "A")</test>
+      <result>
+         <assert-eq>"A nice cup of teA"</assert-eq>
+      </result>
+   </test-case>
+   
+   
+   
+</test-set>
