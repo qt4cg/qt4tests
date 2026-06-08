@@ -359,6 +359,7 @@ together with the numeric-equal operator "ge".
 *******************************************************
 </description>
       <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31 XP20 XP30 XP31"/>
       <test>xs:dayTimeDuration("P3D") div xs:double("-INF") eq xs:dayTimeDuration("PT0S")</test>
       <result>
          <assert-true/>
@@ -374,6 +375,7 @@ together with the numeric-equal operator "ge".
 *******************************************************
 </description>
       <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31 XP20 XP30 XP31"/>
       <test>xs:dayTimeDuration("P3D") div xs:double("INF") eq xs:dayTimeDuration("PT0S")</test>
       <result>
          <assert-true/>
@@ -434,6 +436,7 @@ together with the numeric-equal operator "ge".
 *******************************************************
 </description>
       <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31 XP20 XP30 XP31"/>
       <test>xs:duration("P1Y3M") div 3</test>
       <result>
          <error code="XPTY0004"/>
@@ -773,8 +776,7 @@ together with the numeric-equal operator "ge".
    <test-case name="cbcl-div-014">
       <description> Test behaviour of division operator when presented with an expression with static type duration </description>
       <created by="Oliver Hallam" on="2010-02-26"/>
-      <dependency type="spec" value="XQ10+"/>
-      
+      <dependency type="spec" value="XQ10 XQ30 XQ31 XP20 XP30 XP31"/>      
       <test>declare function local:f($x) { if ($x) then xs:duration("P2M") else xs:yearMonthDuration("P2M") }; local:f(true()) div 2</test>
       <result>
          <error code="XPTY0004"/>
@@ -797,8 +799,7 @@ together with the numeric-equal operator "ge".
    <test-case name="cbcl-div-016">
       <description> Test behaviour of division operator when presented with an expression with static type duration </description>
       <created by="Oliver Hallam" on="2010-02-26"/>
-      <dependency type="spec" value="XQ10+"/>
-      
+      <dependency type="spec" value="XQ10 XQ30 XQ31 XP20 XP30 XP31"/>     
       <test>declare function local:f($x) { if ($x) then xs:duration("P1M") else xs:dayTimeDuration("P1D") }; local:f(true()) div 2</test>
       <result>
          <error code="XPTY0004"/>
@@ -822,6 +823,82 @@ together with the numeric-equal operator "ge".
       <test>xs:dayTimeDuration('P4D') ÷ 0.5</test>
       <result>
          <assert-eq>xs:dayTimeDuration('P8D')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="divide-duration-403" covers-40="PR2628">
+      <description> Applies to xs:duration in 4.0 </description>
+      <created by="Michael Kay" on="2026-05-26"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>      
+      <test>xs:duration('P4D') ÷ 2</test>
+      <result>
+         <assert-eq>xs:duration('P2D')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="divide-duration-404" covers-40="PR2628">
+      <description> Applies to xs:duration in 4.0 </description>
+      <created by="Michael Kay" on="2026-05-26"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>      
+      <test>xs:duration('P4D') ÷ 0.1</test>
+      <result>
+         <assert-eq>xs:duration('P40D')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="divide-duration-405" covers-40="PR2628">
+      <description> Applies to xs:duration in 4.0 </description>
+      <created by="Michael Kay" on="2026-05-26"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>      
+      <test>xs:duration('P6M4D') ÷ 0.1</test>
+      <result>
+         <assert-eq>xs:duration('P60M40D')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="divide-duration-406" covers-40="PR2628">
+      <description> Applies to xs:duration in 4.0 </description>
+      <created by="Michael Kay" on="2026-05-26"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>      
+      <test>xs:duration('P1D') ÷ 8</test>
+      <result>
+         <assert-eq>xs:duration('PT3H')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="divide-duration-407" covers-40="PR2628">
+      <description> Applies to xs:duration in 4.0 </description>
+      <created by="Michael Kay" on="2026-05-26"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>      
+      <test>xs:duration('PT1H') ÷ (1 div 8)</test>
+      <result>
+         <assert-eq>xs:duration('PT8H')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="divide-duration-408" covers-40="PR2628">
+      <description> Result is xs:dayTimeDuration. Relies on decimal division (gives rounding error under 3.1 rules) </description>
+      <created by="Michael Kay" on="2026-05-26"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>      
+      <test>xs:dayTimeDuration('P1D') ÷ 8</test>
+      <result>
+         <all-of>
+            <assert-eq>xs:duration('PT3H')</assert-eq>
+            <assert-type>xs:dayTimeDuration</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="divide-duration-409" covers-40="PR2628">
+      <description> Result is xs:yearMonthDuration </description>
+      <created by="Michael Kay" on="2026-05-26"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>      
+      <test>xs:yearMonthDuration('P1Y6M') ÷ 3</test>
+      <result>
+         <all-of>
+            <assert-eq>xs:duration('P6M')</assert-eq>
+            <assert-type>xs:yearMonthDuration</assert-type>
+         </all-of>
       </result>
    </test-case>
 </test-set>
