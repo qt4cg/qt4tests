@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-matching-segments" covers-40="PR2470">
+   <description>Tests for the matching-segments function</description>
+=
+   <dependency type="spec" value="XP40+ XQ40+"/>      
+
+ 
+
+   <test-case name="matching-segments-001">
+      <description> matching-segments with empty string</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("", "abc")</test>
+      <result>
+         <assert-deep-eq>()</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-002">
+      <description> matching-segments with empty sequence </description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments((), "abc")</test>
+      <result>
+         <assert-deep-eq>()</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-002a">
+      <description> matching-segments with empty sequence </description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>count(matching-segments((), "abc"))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-003">
+      <description> matching-segments with a mix of matching and non-matching strings</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("banana", "a")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"a", "position":2, "groups":{}},
+            {"substring":"a", "position":4, "groups":{}},
+            {"substring":"a", "position":6, "groups":{}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-004">
+      <description> matching-segments with a single non-matching string</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("banana", "custard")</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-005">
+      <description> matching-segments with a single matching string</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("banana", ".+")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"banana", "position":1, "groups":{}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-006">
+      <description> matching-segments with a adjacent matching strings</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("banana", "an")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"an", "position":2, "groups":{}},
+            {"substring":"an", "position":4, "groups":{}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-007">
+      <description> matching-segments with a single captured group</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("banana", "a(n)")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"an", "position":2, "groups":{1: {"group":"n", "position": 3}}},
+            {"substring":"an", "position":4, "groups":{1: {"group":"n", "position": 5}}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-008">
+      <description> matching-segments with nested captured groups</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("banana", "(a(n?))")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"an", "position":2, "groups":{1: {"group":"an", "position": 2}, 2: {"group":"n", "position": 3}}},
+            {"substring":"an", "position":4, "groups":{1: {"group":"an", "position": 4}, 2: {"group":"n", "position": 5}}},
+            {"substring":"a", "position":6, "groups":{1: {"group":"a", "position": 6}, 2: {"group":"", "position": 7}}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-009">
+      <description> matching-segments, groups in alternatives </description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("how now brown cow", "(how)|(now)|(brown)|(cow)")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"how", "position":1, "groups":{1: {"group":"how", "position": 1}}},
+            {"substring":"now", "position":5, "groups":{2: {"group":"now", "position": 5}}},
+            {"substring":"brown", "position":9, "groups":{3: {"group":"brown", "position": 9}}},
+            {"substring":"cow", "position":15, "groups":{4: {"group":"cow", "position": 15}}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-010">
+      <description> matching-segments, with i flag </description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("how now brown cow", "(HOW)|(NOW)|(BROWN)|(COW)", "i")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"how", "position":1, "groups":{1: {"group":"how", "position": 1}}},
+            {"substring":"now", "position":5, "groups":{2: {"group":"now", "position": 5}}},
+            {"substring":"brown", "position":9, "groups":{3: {"group":"brown", "position": 9}}},
+            {"substring":"cow", "position":15, "groups":{4: {"group":"cow", "position": 15}}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-011">
+      <description> matching-segments, with i and x flag </description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("how now brown cow", " (HOW) | (NOW) &#xa;| (BROWN) | (COW) ", "ix")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"how", "position":1, "groups":{1: {"group":"how", "position": 1}}},
+            {"substring":"now", "position":5, "groups":{2: {"group":"now", "position": 5}}},
+            {"substring":"brown", "position":9, "groups":{3: {"group":"brown", "position": 9}}},
+            {"substring":"cow", "position":15, "groups":{4: {"group":"cow", "position": 15}}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-012">
+      <description> matching-segments, with flags set to empty string</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("how now brown cow", "(.*?ow\s+)+", "")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"how now ", "position":1, "groups":{1: {"group":"now ", "position": 5}}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-013">
+      <description> matching-segments, with "s" flag</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>let $in := 
+"Mary had a little lamb,
+its fleece was black as soot,
+and everywhere that Mary went,
+it put its sooty foot."
+            return matching-segments($in, "Mary.*foot", "s")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"Mary had a little lamb,
+its fleece was black as soot,
+and everywhere that Mary went,
+it put its sooty foot", "position":1, "groups":{}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-014">
+      <description> matching-segments, multiple lines without "s" flag </description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>let $in := 
+"Mary had a little lamb,
+its fleece was black as soot,
+and everywhere that Mary went,
+it put its sooty foot."
+            return matching-segments($in, ".+", "")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring": "Mary had a little lamb,", "position": 1, "groups":{}},
+            {"substring": "its fleece was black as soot,", "position": 25, "groups":{}},
+            {"substring": "and everywhere that Mary went,", "position": 55, "groups":{}},
+            {"substring": "it put its sooty foot.", "position": 86, "groups":{}}
+         </assert-deep-eq>        
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-015">
+      <description> matching-segments, multiple lines with "m" flag </description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>let $in := 
+"Mary had a little lamb,
+its fleece was black as soot,
+and everywhere that Mary went,
+it put its sooty foot."
+            return matching-segments($in, "^.+$", "m")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring": "Mary had a little lamb,", "position": 1, "groups":{}},
+            {"substring": "its fleece was black as soot,", "position": 25, "groups":{}},
+            {"substring": "and everywhere that Mary went,", "position": 55, "groups":{}},
+            {"substring": "it put its sooty foot.", "position": 86, "groups":{}}
+         </assert-deep-eq>    
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-016">
+      <description>matching-segments, multiple lines with no flag </description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>let $in := 
+"Mary had a little lamb,
+its fleece was black as soot,
+and everywhere that Mary went,
+it put its sooty foot."
+            return matching-segments($in, "^.+$", "")</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-017">
+      <description> subtle distinction in the positioning of an empty captured group </description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("banana", "(b)(x?)")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring": "b", "position": 1, "groups":{1: {"group": "b", "position": 1}, 
+                                                        2: {"group": "", "position": 2}}}
+         </assert-deep-eq>   
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-017a">
+      <description> No distinction in the positioning of an empty captured group</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("banana", "(b(x?))")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring": "b", "position": 1, "groups":{1: {"group": "b", "position": 1}, 
+                                                        2: {"group": "", "position": 2}}}
+         </assert-deep-eq>   
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-018">
+      <description> non-capturing group indicated by "(?:...)" </description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("banana", "(?:b(an)*a)")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring": "banana", "position": 1, "groups":{1: {"group": "an", "position": 4}}} 
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-019">
+      <description> "q" flag suppresses grouping</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("((banana))", "(banana)", "q")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring": "(banana)", "position": 2, "groups":{}} 
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+  
+   
+   <test-case name="matching-segments-029">
+      <description> Matching groups within repeated clause </description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test><![CDATA[
+         let $data :=
+           <Root>
+             <DATA>/OPDH/FLOWING SOLUTION/SGDE/Number0983713/EKPH/Sample test/some other keys/</DATA>
+             <DATA>/some other keys/afdsf/SGDE/Number0983713/some other keys/PIHSAGA/OPDH/FLOWING SOLUTION/some other keys/No exception/EKPH/Sample test/some other keys/</DATA>
+           </Root>
+         return 
+           $data/DATA!matching-segments(., '(/OPDH/|/EKPH/|/SGDE/|/some other keys/)(.*?)(/OPDH/|/EKPH/|/SGDE/|/some other keys/)((.*?)(/OPDH/|/EKPH/|/SGDE/|/some other keys/))*')
+          
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>$result[1]?groups?1?group = '/OPDH/'</assert>
+            <assert>$result[1]?groups?2?group = 'FLOWING SOLUTION'</assert>
+            <assert>$result[1]?groups?3?group = '/SGDE/'</assert>
+            <assert>$result[1]?groups?4?group = 'Sample test/some other keys/'</assert>
+            <assert>$result[2]?groups?1?group = '/some other keys/'</assert>
+            <assert>$result[2]?groups?2?group = 'afdsf'</assert>
+            <assert>$result[2]?groups?3?group = '/SGDE/'</assert>
+            <assert>$result[2]?groups?4?group = 'Sample test/some other keys/'</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-030">
+      <description> Comment in regular expression [for more tests see fn:replace]</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>fn:matching-segments(concat('Mary', char(13), 'Jones'), 'y#dot#.#dot#J', 'sc')?substring</test>
+      <result>
+         <assert-eq>concat('y', char(13), 'J')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-031">
+      <description>Empty Pattern</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>fn:matching-segments("abc", "")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring": "", "position": 1, "groups":{}},
+            {"substring": "", "position": 2, "groups":{}},
+            {"substring": "", "position": 3, "groups":{}},
+            {"substring": "", "position": 4, "groups":{}}
+         </assert-deep-eq> 
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-032">
+      <description>Captured group in lookahead</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>fn:matching-segments("abcd", ".(?=(.))")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring": "a", "position": 1, "groups":{1: {"group": "b", "position": 2}}},
+            {"substring": "b", "position": 2, "groups":{1: {"group": "c", "position": 3}}},
+            {"substring": "c", "position": 3, "groups":{1: {"group": "d", "position": 4}}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-033">
+      <description>Both ordinary and lookahead captured groups present</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>fn:matching-segments("Chapter 17", "(Chapter|Appendix)\s+(?=(\d+))")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring": "Chapter ", "position": 1, "groups": {1: {"group": "Chapter", "position": 1},
+                                                                2: {"group": "17", "position": 9}} }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-034">
+      <description>Multiple lookahead captured groups present</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>fn:matching-segments("Chapter 17c", "(Chapter|Appendix)\s+(?=(\d+)([a-z])?)")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring": "Chapter ", "position": 1, "groups": {1: {"group": "Chapter", "position": 1},
+                                                                2: {"group": "17", "position": 9},
+                                                                3: {"group": "c", "position": 11} } }
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-035">
+      <description>Zero-length lookahead captured groups present</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>fn:matching-segments("Chapter 17", "(Chapter|Appendix)\s+(?=(\d+)([a-z]?))")</test>
+      <result>
+         <assert-deep-eq>
+            {"substring": "Chapter ", "position": 1, "groups": {1: {"group": "Chapter", "position": 1},
+                                                                2: {"group": "17", "position": 9},
+                                                                3: {"group": "", "position": 11} } }
+         </assert-deep-eq>
+         <!--<assert-xml ignore-prefixes="true"><![CDATA[<matching-segments-result xmlns="http://www.w3.org/2005/xpath-functions">
+   <match><group nr="1">Chapter</group> <lookahead-group nr="2" position="9" value="17"/><lookahead-group nr="3" position="11" value=""/></match>
+   <non-match>17</non-match>
+</matching-segments-result>]]></assert-xml>-->
+      </result>
+   </test-case>
+   
+   
+   
+   <test-case name="matching-segments-901">
+      <description> matching-segments, error, bad regex pattern</description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("abc", ")-(")</test>
+      <result>
+            <error code="FORX0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-902">
+      <description> matching-segments, error, bad flags </description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("abc", "abc", "w")</test>
+      <result>
+            <error code="FORX0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="matching-segments-904">
+      <description> matching-segments, pattern matches a zero-length string </description>
+      <created by="Michael Kay" on="2026-06-08"/>
+      <test>matching-segments("abc", "a|b|c?")</test>
+      <result>
+         <all-of>
+            <assert>$result[1]?substring = 'a'</assert>
+            <assert>$result[2]?substring = 'b'</assert>
+            <assert>$result[3]?substring = 'c'</assert>
+            <assert>$result[4]?substring = ''</assert>
+            <assert>count($result) = 4</assert>
+         </all-of>
+      </result>
+   </test-case>
+</test-set>
