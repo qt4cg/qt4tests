@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-PathExpr.J"
-   covers-40="PR2083">
+   covers-40="PR2083 PR2610">
    <description>
       Originally written as tests for the Binary Deep Lookup operator on maps and arrays in XPath and XQuery 4.0.
       Now converted to use path expressions based on JNodes.
    </description>
    
-   <!-- Note: tests submitted 2025-07-15 although most are not yet working in Saxon -->
 
    <dependency type="spec" value="XP40+ XQ40+"/>
 
@@ -1662,19 +1661,17 @@ every $book in $in//*[Title and ISBN-13] satisfies $book/ISBN-13 follows $book/T
       </result>
    </test-case>
    
-   <test-case name="PathExpr-J-417" covers-40="PR2627">
-      <description>Absolute path: no auto-conversion of maps to jnodes</description>
+   <test-case name="PathExpr-J-417" covers-40="PR2627 PR2610">
+      <description>Absolute path: auto-conversion of maps to jnodes</description>
       <created by="Michael Kay" on="2026-02-27"/>
       <modified by="Christian Gruen" on="2026-03-05" change="alternative error code added"/>
+      <modified by="Michael Kay" on="2026-06-09" change="spec changed by PR2610"/>
       <environment ref="books"/>
       <test>
-         $in -> //Language => distinct-values()
+         $in -> //Language => distinct-values() => sort()
       </test>
       <result>
-         <any-of>
-            <error code="XPTY0004"/>
-            <error code="XPDY0050"/>
-         </any-of>
+         <assert-deep-eq>"English", "German"</assert-deep-eq>
       </result>
    </test-case>
  

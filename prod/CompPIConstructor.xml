@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-CompPIConstructor">
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-CompPIConstructor" covers-40="PR2446">
    <description>Tests for the CompPIConstructor (Computed Processing Instruction Constructor) production</description>
    
    <link type="spec" document="http://www.w3.org/TR/xquery-30/"
@@ -13,11 +13,12 @@
       </source>
    </environment>       
          
-   <dependency type="spec" value="XQ10+"/>      
+   <dependency type="spec" value="XQ10+ XP40+"/>      
 
    <test-case name="Constr-comppi-name-1">
       <description> NCName for computed PI constructor </description>
       <created by="Andreas Behm" on="2005-05-20"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>processing-instruction pi {'text'}</test>
       <result>
          <assert-xml><![CDATA[<?pi text?>]]></assert-xml>
@@ -198,11 +199,24 @@
    <test-case name="Constr-comppi-compname-20">
       <description> xs:anyURI as name </description>
       <created by="Michael Kay" on="2014-08-17"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <test>processing-instruction {('pi'[current-date() lt xs:date('1900-01-01')], xs:anyURI('pi'))} {'text'}</test>
       <result>
          <error code="XPTY0004"/>
       </result>
    </test-case>
+   
+   <test-case name="Constr-comppi-compname-20a" covers-40="PR2665">
+      <description> xs:anyURI as name </description>
+      <created by="Michael Kay" on="2014-08-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>processing-instruction {('pi'[current-date() lt xs:date('1900-01-01')], xs:anyURI('pi'))} {'text'}</test>
+      <result>
+         <assert-xml><![CDATA[<?pi text?>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   
    
    <test-case name="Constr-comppi-compname-21">
       <description> xs:duration as name </description>
@@ -226,6 +240,7 @@
       <description> strip document nodes </description>
       <created by="Andreas Behm" on="2005-05-20"/>
       <environment ref="DupNode"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>processing-instruction pi {., .}</test>
       <result>
          <assert-xml><![CDATA[<?pi texttext texttext?>]]></assert-xml>
@@ -235,6 +250,7 @@
    <test-case name="Constr-comppi-parent-1">
       <description> empty parent </description>
       <created by="Andreas Behm" on="2005-05-20"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>count((processing-instruction pi {()})/..)</test>
       <result>
          <assert-eq>0</assert-eq>
@@ -244,6 +260,7 @@
    <test-case name="Constr-comppi-string-1">
       <description> string value of PI </description>
       <created by="Andreas Behm" on="2005-05-20"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>fn:string(processing-instruction pi {'a', element a {}, 'b'})</test>
       <result>
          <assert-string-value>a  b</assert-string-value>
@@ -253,6 +270,7 @@
    <test-case name="Constr-comppi-data-1">
       <description> typed value of PI </description>
       <created by="Andreas Behm" on="2005-05-20"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>fn:data(processing-instruction pi {'a', element a {}, 'b'})</test>
       <result>
          <assert-string-value>a  b</assert-string-value>
@@ -262,6 +280,7 @@
    <test-case name="Constr-comppi-enclexpr-1">
       <description> enclosed expression in computed processing-instruction node - atomic values </description>
       <created by="Andreas Behm" on="2005-08-17"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>processing-instruction pi {1,'string',3.14,xs:float('1.2345e-2'),xs:dateTime('2002-04-02T12:00:00-01:00')}</test>
       <result>
          <assert-xml><![CDATA[<?pi 1 string 3.14 0.012345 2002-04-02T12:00:00-01:00?>]]></assert-xml>
@@ -281,6 +300,7 @@
    <test-case name="Constr-comppi-enclexpr-3">
       <description> enclosed expression in computed processing-instruction node - empty string </description>
       <created by="Andreas Behm" on="2005-08-17"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>processing-instruction pi {1,'',2}</test>
       <result>
          <assert-xml><![CDATA[<?pi 1  2?>]]></assert-xml>
@@ -301,6 +321,7 @@
       <description> enclosed expression in computed processing-instruction node - nodes </description>
       <created by="Andreas Behm" on="2005-08-17"/>
       <environment ref="DupNode"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>processing-instruction pi {/root}</test>
       <result>
          <assert-xml><![CDATA[<?pi texttext?>]]></assert-xml>
@@ -373,6 +394,7 @@
    <test-case name="Constr-comppi-space-1">
       <description> leading whitespace in PI content </description>
       <created by="Andreas Behm" on="2005-08-17"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>processing-instruction pi {' text'}</test>
       <result>
          <assert-xml><![CDATA[<?pi text?>]]></assert-xml>
@@ -382,6 +404,7 @@
    <test-case name="Constr-comppi-space-2">
       <description> leading whitespace in PI content </description>
       <created by="Andreas Behm" on="2005-08-17"/>
+      <dependency type="spec" value="XQ10+"/>
       <test><![CDATA[processing-instruction pi {'&#x20;&#x0A;&#x0D;&#x09;text'}]]></test>
       <result>
          <assert-xml><![CDATA[<?pi text?>]]></assert-xml>
@@ -391,6 +414,7 @@
    <test-case name="Constr-comppi-space-3">
       <description> leading whitespace in PI content </description>
       <created by="Andreas Behm" on="2005-08-17"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>string-to-codepoints(processing-instruction pi {' text'})</test>
       <result>
          <assert-string-value>116 101 120 116</assert-string-value>
@@ -400,6 +424,7 @@
    <test-case name="Constr-comppi-space-4">
       <description> leading whitespace in PI content </description>
       <created by="Andreas Behm" on="2005-08-17"/>
+      <dependency type="spec" value="XQ10+"/>
       <test><![CDATA[string-to-codepoints(processing-instruction pi {'&#x20;&#x0A;&#x0D;&#x09;text'})]]></test>
       <result>
          <assert-string-value>116 101 120 116</assert-string-value>
@@ -409,6 +434,7 @@
    <test-case name="Constr-comppi-empty-1">
       <description> Empty PI node </description>
       <created by="Andreas Behm" on="2005-08-17"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>processing-instruction pi {()}</test>
       <result>
          <assert-xml><![CDATA[<?pi ?>]]></assert-xml>
@@ -418,6 +444,7 @@
    <test-case name="Constr-comppi-empty-2">
       <description> Empty PI node </description>
       <created by="Andreas Behm" on="2005-08-17"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>processing-instruction pi {''}</test>
       <result>
          <assert-xml><![CDATA[<?pi ?>]]></assert-xml>
@@ -509,6 +536,7 @@
    <test-case name="K2-ComputeConPI-10">
       <description> Data that only is whitespace. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>processing-instruction name {" "} eq ""</test>
       <result>
          <assert-true/>
@@ -518,6 +546,7 @@
    <test-case name="K2-ComputeConPI-11">
       <description> Test the atomized type. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XQ10+"/>
       <test>data(processing-instruction name {"content"}) instance of xs:string</test>
       <result>
          <assert-true/>

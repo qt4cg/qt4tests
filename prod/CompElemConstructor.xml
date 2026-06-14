@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
-          name="prod-CompElemConstructor">
+   name="prod-CompElemConstructor" covers-40="PR2446">
    <description>Tests for the CompElemConstructor (Computed Element Constructor) production</description>
    
    <link type="spec" document="http://www.w3.org/TR/xquery-30/"
@@ -37,11 +37,12 @@
       </source>
    </environment>    
          
-   <dependency type="spec" value="XQ10+"/>          
+   <dependency type="spec" value="XQ10+ XP40+"/>          
 
    <test-case name="Constr-compelem-name-1">
       <description> NCName for computed element constructor </description>
       <created by="Andreas Behm" on="2005-04-20"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element elem {'text'}</test>
       <result>
          <assert-xml><![CDATA[<elem>text</elem>]]></assert-xml>
@@ -51,6 +52,7 @@
    <test-case name="Constr-compelem-name-2">
       <description> QName for computed element constructor </description>
       <created by="Andreas Behm" on="2005-04-20"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>declare namespace foo="http://www.example.com/foo"; element foo:elem {'text'}</test>
       <result>
          <assert-xml><![CDATA[<foo:elem xmlns:foo="http://www.example.com/foo">text</foo:elem>]]></assert-xml>
@@ -60,6 +62,7 @@
    <test-case name="Constr-compelem-name-3">
       <description> QName with undeclared prefix for computed element constructor </description>
       <created by="Andreas Behm" on="2005-04-20"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element foo:elem {'text'}</test>
       <result>
          <error code="XPST0081"/>
@@ -267,7 +270,7 @@
       <description> Expanded QName with braced URI literal for computed element constructor
          (Prompted by Saxon bug 4662 from Christian Gruen) </description>
       <created by="Michael Kay" on="2020-08-01"/>
-      <dependency type="spec" value="XQ30+" />
+      <dependency type="spec" value="XQ30+ XP40+" />
       <test>element {"Q{http://example.com/x}x"} { }</test>
       <result>
          <assert>$result[self::*[local-name()='x' and namespace-uri()='http://example.com/x']]</assert>
@@ -278,7 +281,7 @@
       <description> Expanded QName with braced URI literal for computed element constructor, no namespace
          (Prompted by Saxon bug 4662 from Christian Gruen) </description>
       <created by="Michael Kay" on="2020-08-01"/>
-      <dependency type="spec" value="XQ30+" />
+      <dependency type="spec" value="XQ30+ XP40+" />
       <test>element {"Q{}x"} {}</test>
       <result>
          <assert>$result[self::*[local-name()='x' and namespace-uri()='']]</assert>
@@ -290,7 +293,7 @@
          (Prompted by Saxon bug 4662 from Christian Gruen) </description>
       <created by="Michael Kay" on="2020-08-01"/>
       <modified by="Christian Gruen" on="2020-08-03" change="timezone fix"/>
-      <dependency type="spec" value="XQ30+" />
+      <dependency type="spec" value="XQ30+ XP40+" />
       <test>element {" Q{http://example.com/x}x" || year-from-date(current-date())} { }</test>
       <result>
          <assert>$result[self::*[starts-with(local-name(),'x') and namespace-uri()='http://example.com/x']]</assert>
@@ -302,7 +305,7 @@
          (Prompted by Saxon bug 4662 from Christian Gruen) </description>
       <created by="Michael Kay" on="2020-08-01"/>
       <modified by="Christian Gruen" on="2020-08-03" change="timezone fix"/>
-      <dependency type="spec" value="XQ30+" />
+      <dependency type="spec" value="XQ30+ XP40+" />
       <test>element {" Q{}x" || year-from-date(current-date()) || " "} {}</test>
       <result>
          <assert>$result[self::*[starts-with(local-name(),'x') and namespace-uri()='']]</assert>
@@ -313,16 +316,37 @@
       <description> Lexical QName with whitespace as element name
          (Prompted by Saxon bug 4662 from Christian Gruen) </description>
       <created by="Michael Kay" on="2020-08-01"/>
-      <dependency type="spec" value="XQ30+" />
+      <dependency type="spec" value="XQ30+ XP40+" />
       <test>element {" x" || year-from-date(current-date()) || " "} {}</test>
       <result>
          <assert>$result[self::*[starts-with(local-name(),'x') and namespace-uri()='']]</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="Constr-compelem-compname-25">
+      <description> Attribute name supplied as xs:anyURI </description>
+      <created by="Michael Kay" on="2026-06-11"/>
+      <dependency type="spec" value="XQ30 XQ31" />
+      <test>element { xs:anyURI('abc') } { attribute { xs:anyURI('def')} { 12 } }</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Constr-compelem-compname-26" covers-40="PR2665">
+      <description> Attribute name supplied as xs:anyURI </description>
+      <created by="Michael Kay" on="2026-06-11"/>
+      <dependency type="spec" value="XP40+ XQ40+" />
+      <test>element { xs:anyURI('abc') } { attribute { xs:anyURI('def')} { 12 } }</test>
+      <result>
+         <assert-xml><![CDATA[<abc def="12"/>]]></assert-xml>
       </result>
    </test-case>
 
    <test-case name="Constr-compelem-adjtext-1">
       <description> merge adjacent atomic values to text node </description>
       <created by="Andreas Behm" on="2005-04-20"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>count((element elem {1, 'string', 1,2e3})/text())</test>
       <result>
          <assert-eq>1</assert-eq>
@@ -333,6 +357,7 @@
       <description> merge adjacent atomic values and text nodes to text node </description>
       <created by="Andreas Behm" on="2005-04-20"/>
       <environment ref="DupNode"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>count((element elem {1, //text(), 'string'})/text())</test>
       <result>
          <assert-eq>1</assert-eq>
@@ -352,6 +377,7 @@
    <test-case name="Constr-compelem-nested-1">
       <description> nested computed element constructors </description>
       <created by="Andreas Behm" on="2005-04-20"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element elem {1, element a {2, element b {element c {}, element d {3}}, 4}}</test>
       <result>
          <assert-xml><![CDATA[<elem>1<a>2<b><c/><d>3</d></b>4</a></elem>]]></assert-xml>
@@ -362,6 +388,7 @@
       <description> copy node tree into computed element constructor </description>
       <created by="Andreas Behm" on="2005-04-20"/>
       <environment ref="DupNode"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element elem {}</test>
       <result>
          <assert-xml><![CDATA[<elem/>]]></assert-xml>
@@ -371,6 +398,7 @@
    <test-case name="Constr-compelem-enclexpr-1">
       <description> empty computed element content </description>
       <created by="Andreas Behm" on="2005-04-20"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element elem {}</test>
       <result>
          <assert-xml><![CDATA[<elem/>]]></assert-xml>
@@ -380,6 +408,7 @@
    <test-case name="Constr-compelem-enclexpr-2">
       <description> atomic values in computed element content </description>
       <created by="Andreas Behm" on="2005-04-20"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element elem {1,'a',3.5,4e2}</test>
       <result>
          <assert-xml><![CDATA[<elem>1 a 3.5 400</elem>]]></assert-xml>
@@ -390,6 +419,7 @@
       <description> atomic values and nodes in computed element content </description>
       <created by="Andreas Behm" on="2005-04-20"/>
       <environment ref="DupNode"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element elem {1,//a,2,3,//comment(),4,5,//processing-instruction(),6,7,//text(),8}</test>
       <result>
          <assert-xml><![CDATA[<elem>1<a>text</a><a>text</a>2 3<!--comment--><!--comment-->4 5<?pi content?><?pi content?>6 7texttext8</elem>]]></assert-xml>
@@ -399,6 +429,7 @@
    <test-case name="Constr-compelem-enclexpr-4">
       <description> empty string in element content </description>
       <created by="Andreas Behm" on="2005-04-20"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element elem {1, '', 2}</test>
       <result>
          <assert-xml><![CDATA[<elem>1  2</elem>]]></assert-xml>
@@ -459,6 +490,7 @@
       <description> strip decimal type </description>
       <created by="Andreas Behm" on="2005-04-20"/>
       <environment ref="atomicns"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>declare construction strip; (element elem {xs:decimal((//decimal[1]))}) cast as xs:integer</test>
       <result>
          <error code="FORG0001"/>
@@ -469,6 +501,7 @@
       <description> preserve decimal type </description>
       <created by="Andreas Behm" on="2005-04-20"/>
       <environment ref="atomicns"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>declare construction preserve; (element elem {xs:decimal((//decimal[1]))}) cast as xs:integer</test>
       <result>
          <any-of>
@@ -482,6 +515,7 @@
       <description> strip decimal type in attribute </description>
       <created by="Andreas Behm" on="2005-04-20"/>
       <environment ref="atomicns"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>declare construction strip; (element elem {//*:decimal/@*:attr})/@*:attr cast as xs:integer</test>
       <result>
          <error code="FORG0001"/>
@@ -492,6 +526,7 @@
       <description> preserve decimal type in attribute </description>
       <created by="Andreas Behm" on="2005-04-20"/>
       <environment ref="atomicns"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>declare construction preserve; (element elem {xs:decimal(//*:decimal[1]/@*:attr)}) cast as xs:integer</test>
       <result>
          <any-of>
@@ -505,6 +540,7 @@
    <test-case name="Constr-compelem-baseuri-1">
       <description> base-uri through xml:base attribute </description>
       <created by="Andreas Behm" on="2005-04-20"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>fn:base-uri(element elem {attribute xml:base {"http://www.example.com"}})</test>
       <result>
          <assert-string-value>http://www.example.com</assert-string-value>
@@ -524,6 +560,7 @@
    <test-case name="Constr-compelem-baseuri-3">
       <description> base-uri through declaration </description>
       <created by="Andreas Behm" on="2005-04-20"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>declare base-uri "http://www.example.com"; fn:base-uri(element elem {})</test>
       <result>
          <assert-string-value>http://www.example.com</assert-string-value>
@@ -534,6 +571,7 @@
       <description> strip document nodes </description>
       <created by="Andreas Behm" on="2005-04-20"/>
       <environment ref="DupNode"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element elem {., .}</test>
       <result>
          <assert-xml><![CDATA[<elem><root><child1><a>text</a><!--comment--><?pi content?></child1><child2><a>text</a><!--comment--><?pi content?></child2></root><root><child1><a>text</a><!--comment--><?pi content?></child1><child2><a>text</a><!--comment--><?pi content?></child2></root></elem>]]></assert-xml>
@@ -543,6 +581,7 @@
    <test-case name="Constr-compelem-parent-1">
       <description> empty parent </description>
       <created by="Andreas Behm" on="2005-04-20"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>count((element elem {})/..)</test>
       <result>
          <assert-eq>0</assert-eq>
@@ -552,6 +591,7 @@
    <test-case name="Constr-compelem-string-1">
       <description> string value of element </description>
       <created by="Andreas Behm" on="2005-04-20"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>fn:string(element elem {'a', element a {}, 'b'})</test>
       <result>
          <assert-string-value>ab</assert-string-value>
@@ -561,6 +601,7 @@
    <test-case name="Constr-compelem-data-1">
       <description> typed value of element </description>
       <created by="Andreas Behm" on="2005-04-20"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>fn:data(element elem {'a', element a {}, 'b'})</test>
       <result>
          <assert-string-value>ab</assert-string-value>
@@ -571,6 +612,7 @@
       <description> attribute node following atomic value </description>
       <created by="Andreas Behm" on="2005-04-20"/>
       <environment ref="TopMany"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element elem {1, //west/@mark}</test>
       <result>
          <error code="XQTY0024"/>
@@ -581,6 +623,7 @@
       <description> attribute node following node </description>
       <created by="Andreas Behm" on="2005-04-20"/>
       <environment ref="TopMany"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element elem {element a {}, //west/@mark}</test>
       <result>
          <error code="XQTY0024"/>
@@ -591,6 +634,7 @@
       <description> attributes in content </description>
       <created by="Andreas Behm" on="2005-04-20"/>
       <environment ref="TopMany"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element elem {//west/@mark, //west/@west-attr-1}</test>
       <result>
          <assert-xml><![CDATA[<elem mark="w0" west-attr-1="w1"/>]]></assert-xml>
@@ -601,6 +645,7 @@
       <description> attribute in content with same name </description>
       <created by="Andreas Behm" on="2005-04-20"/>
       <environment ref="TopMany"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element elem {//west/@mark, //center/@mark}</test>
       <result>
          <error code="XQDY0025"/>
@@ -638,7 +683,7 @@
    </test-case>
 
    <test-case name="K2-ComputeConElem-4">
-      <description> An unbound prefix in a lexical QName yields QDY0074. </description>
+      <description> An unbound prefix in a lexical QName yields XQDY0074. </description>
       <created by="Frans Englich" on="2007-11-26"/>
       <test>element {"aPrefix:localName"} {"content"}</test>
       <result>
@@ -658,6 +703,7 @@
    <test-case name="K2-ComputeConElem-6">
       <description> Test the type of the typed value of a computationally constructed element node. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>data(element foo {"dsa"}) instance of xs:untypedAtomic</test>
       <result>
          <assert-true/>
@@ -667,6 +713,7 @@
    <test-case name="K2-ComputeConElem-7">
       <description> Test the data of the typed value of a computationally constructed element node. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>data(element foo {"dsa"})</test>
       <result>
          <assert-string-value>dsa</assert-string-value>
@@ -676,6 +723,7 @@
    <test-case name="K2-ComputeConElem-8">
       <description> Check that a directly constructed element gets the right type. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element e {"content"} instance of element(*, xs:anyType)</test>
       <result>
          <assert-true/>
@@ -687,6 +735,7 @@
       <created by="Frans Englich" on="2007-11-26"/>
       <modified by="Michael Kay" on="2011-07-12" change="added option of returning true. The spec requires xs:anyType, but
         xs:untyped is a subtype of xs:anyType, and processors are allowed to assign a subtype of the type required by the spec."/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element e {"content"} instance of element(*, xs:untyped)</test>
       <result>
          <any-of>
@@ -699,6 +748,7 @@
    <test-case name="K2-ComputeConElem-10">
       <description> Check that a directly constructed element gets the right type(#3). </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>declare construction strip; element e {"content"} instance of element(*, xs:untyped)</test>
       <result>
          <assert-true/>
@@ -708,6 +758,7 @@
    <test-case name="K2-ComputeConElem-11">
       <description> Check that a directly constructed element gets the right type, and that the name test fails. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element e {"content"} instance of element(a, xs:anyType)</test>
       <result>
          <assert-false/>
@@ -717,6 +768,7 @@
    <test-case name="K2-ComputeConElem-12">
       <description> Check that a directly constructed element gets the right type, and that the name test fails(#2). </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>declare construction strip; element e {"content"} instance of element(b, xs:untyped)</test>
       <result>
          <assert-false/>
@@ -726,6 +778,7 @@
    <test-case name="K2-ComputeConElem-13">
       <description> Two simple nested constructors. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <dependency type="spec" value="XQ10+"/> 
       <test>element e {element b{()}}</test>
       <result>
          <assert-xml><![CDATA[<e><b/></e>]]></assert-xml>
@@ -783,7 +836,7 @@
       <description> Allow name to be a QName literal </description>
       <created by="Michael Kay" on="2024-06-11"/>
       <modified by="Gunther Rademacher" on="2025-05-14" change="replace string by QName literal, adapting to new syntax"/>
-      <dependency type="spec" value="XQ40+"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[element #div {}]]></test>
       <result>
          <assert-xml><![CDATA[<div/>]]></assert-xml>
@@ -795,7 +848,7 @@
       <created by="Michael Kay" on="2024-06-11"/>
       <modified by="Gunther Rademacher" on="2025-05-14" change="replace string by QName literal, adapting to new syntax"/>
       <modified by="Gunther Rademacher" on="2025-06-24" change="whitespace now allowed, so replace XPST0003 by by result"/>
-      <dependency type="spec" value="XQ40+"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
       <test><![CDATA[element # Q{}div {}]]></test>
       <result>
          <assert-xml><![CDATA[<div/>]]></assert-xml>
@@ -849,7 +902,7 @@
    <test-case name="K2-ComputeConElem-22" covers-40="PR1989">
       <description> Allow name to be a QName literal </description>
       <created by="Michael Kay" on="2024-06-11"/>
-      <dependency type="spec" value="XQ40+"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
       <test><![CDATA[element #fn:div {}]]></test>
       <result>
          <assert-xml><![CDATA[<fn:div xmlns:fn="http://www.w3.org/2005/xpath-functions"/>]]></assert-xml>
@@ -859,7 +912,7 @@
    <test-case name="K2-ComputeConElem-23" covers-40="PR1989">
       <description> Allow name to be a QName literal </description>
       <created by="Michael Kay" on="2024-06-11"/>
-      <dependency type="spec" value="XQ40+"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
       <test><![CDATA[element #Q{}div {}]]></test>
       <result>
          <assert-xml><![CDATA[<div/>]]></assert-xml>
@@ -869,7 +922,7 @@
    <test-case name="K2-ComputeConElem-24" covers-40="PR1989">
       <description> Allow name to be a QName literal. Prefix is impl'n defined. </description>
       <created by="Michael Kay" on="2024-06-11"/>
-      <dependency type="spec" value="XQ40+"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
       <test><![CDATA[element #Q{http://example.com/}div {}]]></test>
       <result>
          <all-of>
@@ -976,7 +1029,7 @@
    <test-case name="Constr-compelem-eqname-1">
       <description> Constructor with expanded QName, whitespaces</description>
       <created by="Christian Gruen" on="2020-08-04"/>
-      <dependency type="spec" value="XQ30+" />
+      <dependency type="spec" value="XQ30+ XP40+" />
       <test>element { " Q{ }x " } {}</test>
       <result>
          <assert>$result[local-name() = 'x' and namespace-uri() = '']</assert>
@@ -986,7 +1039,7 @@
    <test-case name="Constr-compelem-eqname-2">
       <description> Constructor with expanded QName, whitespaces</description>
       <created by="Christian Gruen" on="2020-08-04"/>
-      <dependency type="spec" value="XQ30+" />
+      <dependency type="spec" value="XQ30+ XP40+" />
       <test>element { " Q{ _   _ }x " } {}</test>
       <result>
          <assert>$result[local-name() = 'x' and namespace-uri() = '_ _']</assert>
@@ -996,7 +1049,7 @@
    <test-case name="Constr-compelem-eqname-3">
       <description> Constructor with expanded QName, whitespaces</description>
       <created by="Christian Gruen" on="2020-08-04"/>
-      <dependency type="spec" value="XQ30+" />
+      <dependency type="spec" value="XQ30+ XP40+" />
       <test>element { " xml:x " } {}</test>
       <result>
          <assert>$result[name() = 'xml:x' and namespace-uri() = 'http://www.w3.org/XML/1998/namespace']</assert>
