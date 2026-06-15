@@ -200,15 +200,33 @@
   </test-case>
   
   <test-case name="try-016">
-    <description>No context item is a dynamic error</description>
+    <description>No context item is a dynamic error (prior to 4.0)</description>
     <created by="Michael Kay" on="2013-04-16"/>
     <environment ref="err"/>
+    <dependency type="spec" value="XQ30 XQ31"/>
     <test>
       declare function local:f() { .+3 };
       try {local:f()} catch err:XPDY0002 {true()}
     </test>
     <result>
       <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="try-016a" covers-40="PR888">
+    <description>No context item is a type error in 4.0, so it can be raised statically</description>
+    <created by="Michael Kay" on="2026-06-15"/>
+    <environment ref="err"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      declare function local:f() { .+3 };
+      try {local:f()} catch err:XPDY0002 {true()}
+    </test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <error code="XPDY0002"/>
+      </any-of>
     </result>
   </test-case>
   
