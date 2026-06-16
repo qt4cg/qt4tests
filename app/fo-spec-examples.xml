@@ -6234,7 +6234,7 @@ return some $k in ("Kikeriki!", "Kikikerikih!!")
       <environment ref="global"/>
       <test>
         let $regex := regex('[0-9]+')
-for $title in "Chapter 1", "Chapter 2", "Chapter 3", "Appendix 12"
+for $title in ("Chapter 1", "Chapter 2", "Chapter 3", "Appendix 12")
 return $regex?replace($title, fn { . + 1 })
       </test>
       <result>
@@ -15880,9 +15880,9 @@ return map:build($titles/title, fn($title) { $title/ix })
             }]
        }]
    }')
-   return map:build($tree/descendant-or-self::jnode(*, record(type, name, content?)),
-                    fn{./ancestor-or-self::jnode()?name =&gt; string-join(".")},
-                    fn{`{?type} {?name}`})
+   return map:build($tree/descendant-or-self::type,
+                    fn{./ancestor-or-self::*?name =&gt; string-join(".")},
+                    fn{`{.} {..?name}`})
             
       </test>
       <result>
