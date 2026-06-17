@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-TraceClause" covers-40="PR2676">
+   <description>Tests for the TraceClause production</description>
+   
+   
+   
+   <dependency type="spec" value="XQ40+"/>
+
+   <test-case name="TraceClause-001">
+      <description> Trace Clause after let </description>
+      <created by="Michael Kay" on="2026-06-17"/>
+      <test>let $x := 3 trace "x = " || $x return $x + 1</test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="TraceClause-002">
+      <description> Trace Clause after for, within a function </description>
+      <created by="Michael Kay" on="2026-06-17"/>
+      <test>
+         declare function local:f($n) {
+           for $i in 1 to $n
+           trace `processing {$i} of {$n}`
+           return $i*$i
+         };
+         local:f(4)
+      </test>
+      <result>
+         <assert-deep-eq>1, 4, 9, 16</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="TraceClause-003">
+      <description> Trace Clause not allowed as initial clause </description>
+      <created by="Michael Kay" on="2026-06-17"/>
+      <test>trace "message" return 42</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="TraceClause-004">
+      <description> Trace Clause repeated </description>
+      <created by="Michael Kay" on="2026-06-17"/>
+      <test>
+         let $x := 3, $y := 4 
+         trace "x = " || $x 
+         trace "y = " || $y 
+         return $x + $y</test>
+      <result>
+         <assert-eq>7</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="TraceClause-005">
+      <description> Trace Clause expression must be an ExprSingle </description>
+      <created by="Michael Kay" on="2026-06-17"/>
+      <test>
+         let $x := 3, $y := 4 
+         trace "x = ",  $x 
+         return $x + $y</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="TraceClause-006">
+      <description> Trace Clause after where </description>
+      <created by="Michael Kay" on="2026-06-17"/>
+      <test>
+         for $i in 1 to 20
+         where $i mod 5 = 0
+         trace `$i = {$i}`
+         return $i + 1
+      </test>
+      <result>
+         <assert-deep-eq>6, 11, 16, 21</assert-deep-eq>
+      </result>
+   </test-case>
+   
+
+ 
+</test-set>
