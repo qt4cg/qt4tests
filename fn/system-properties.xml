@@ -1,49 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-system-properties" covers-40="PR2552">
-   <description>Tests for the fn:system-properties() function (4.0)</description>
+<?xml-model href="../catalog-schema.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-system-properties"
+	covers-40="PR2552">
+	
+	<description>Tests for the fn:system-properties() function (4.0)</description>
 
-   <dependency type="spec" value="XP40+ XQ40+"/>
+	<link type="spec" 
+		document="https://qt4cg.org/specifications/xpath-functions-40/Overview.html"
+		idref="func-system-properties"/>
 
-   <test-case name="system-properties-001">
-      <description>Evaluation of system-properties function.</description>
-      <created by="Christian Gruen" on="2026-10-02"/>
-      <test>system-properties()?#xpath-version</test>
-      <result>
-         <all-of>
-            <assert-type>xs:decimal</assert-type>
-            <assert>$result ge 4.0</assert>
-         </all-of>
-      </result>
-   </test-case>
+	<dependency type="spec" value="XP40+ XQ40+"/>
 
-   <test-case name="system-properties-002">
-      <description>Evaluation of system-properties function.</description>
-      <created by="Christian Gruen" on="2026-10-02"/>
-      <test>system-properties()?#xsd-version</test>
-      <result>
-         <all-of>
-            <assert-type>xs:decimal</assert-type>
-            <assert>$result = (1.0, 1.1)</assert>
-         </all-of>
-      </result>
-   </test-case>
 
-   <test-case name="system-properties-003">
-      <description>Evaluation of system-properties function.</description>
-      <created by="Christian Gruen" on="2026-10-02"/>
-      <test>system-properties()?(#product-name, #product-version)</test>
-      <result>
-         <all-of>
-            <assert-type>xs:string+</assert-type>
-            <assert-count>2</assert-count>
-         </all-of>
-      </result>
-   </test-case>
+	<test-case name="system-properties-001">
+		<description>Check that the XPath version is at least 4.0</description>
+		<created by="Christian Gruen" on="2026-10-02"/>
+		<modified by="Sheila Thomson" on="2026-10-14" change="Replaced generic description."/>
+		<test>system-properties()?#xpath-version</test>
+		<result>
+			<all-of>
+				<assert-type>xs:decimal</assert-type>
+				<assert>$result ge 4.0</assert>
+			</all-of>
+		</result>
+	</test-case>
 
-   <test-case name="system-properties-004">
-      <description>Evaluation of system-properties function.</description>
-      <created by="Christian Gruen" on="2026-10-02"/>
-      <test>
+	<test-case name="system-properties-002">
+		<description>Check that the XSD version is either 1.0 or 1.1</description>
+		<created by="Christian Gruen" on="2026-10-02"/>
+		<modified by="Sheila Thomson" on="2026-10-14" change="Replaced generic description."/>
+		<dependency type="xsd-version" value="1.0"/>
+		<test>system-properties()?#xsd-version</test>
+		<result>
+			<all-of>
+				<assert-type>xs:decimal</assert-type>
+				<assert>$result = (1.0, 1.1)</assert>
+			</all-of>
+		</result>
+	</test-case>
+
+	<test-case name="fn-system-properties-0021">
+		<description>Check that the XSD version is 1.0 when the implementation claims to support 1.0</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<dependency type="xsd-version" value="1.0"/>
+		<test>fn:system-properties()?#xsd-version</test>
+		<result>
+			<all-of>
+				<assert-type>xs:decimal</assert-type>
+				<assert>$result eq 1.0</assert>
+			</all-of>
+		</result>
+	</test-case>
+
+	<test-case name="fn-system-properties-0022">
+		<description>Check that the XSD version is 1.1 when the implementation claims to support 1.1</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<dependency type="xsd-version" value="1.1"/>
+		<test>fn:system-properties()?#xsd-version</test>
+		<result>
+			<all-of>
+				<assert-type>xs:decimal</assert-type>
+				<assert>$result eq 1.1</assert>
+			</all-of>
+		</result>
+	</test-case>
+
+	<test-case name="system-properties-003">
+		<description>Check that the product name is a non-empty string</description>
+		<created by="Christian Gruen" on="2026-10-02"/>
+		<modified by="Sheila Thomson" on="2026-10-14"
+			change="Reduced scope to be specific to product name only"/>
+		<test>fn:system-properties()?#product-name</test>
+		<result>
+			<all-of>
+				<assert-type>xs:string</assert-type>
+				<assert>not(empty($result))</assert>
+			</all-of>
+		</result>
+	</test-case>
+
+
+	<test-case name="fn-system-properties-product-version">
+		<description>Check that the product version is a non-empty string</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<test>fn:system-properties()?#product-version</test>
+		<result>
+			<all-of>
+				<assert-type>xs:string</assert-type>
+				<assert>not(empty($result))</assert>
+			</all-of>
+		</result>
+	</test-case>
+
+
+	<test-case name="system-properties-004">
+		<description>Evaluation of system-properties function.</description>
+		<created by="Christian Gruen" on="2026-10-02"/>
+		<test>
          system-properties()?(
            #schema-aware, #accepts-typed-data, #supports-xinclude,
            #supports-dtd-validation, #supports-dtd-attribute-typing,
@@ -51,18 +104,18 @@
            #supports-binary-library, #supports-file-library
          )
       </test>
-      <result>
-         <all-of>
-            <assert-type>xs:boolean+</assert-type>
-            <assert-count>10</assert-count>
-         </all-of>
-      </result>
-   </test-case>
+		<result>
+			<all-of>
+				<assert-type>xs:boolean+</assert-type>
+				<assert-count>10</assert-count>
+			</all-of>
+		</result>
+	</test-case>
 
-   <test-case name="system-properties-005">
-      <description>Evaluation of system-properties function.</description>
-      <created by="Christian Gruen" on="2026-10-02"/>
-      <test>
+	<test-case name="system-properties-005">
+		<description>Evaluation of system-properties function.</description>
+		<created by="Christian Gruen" on="2026-10-02"/>
+		<test>
          let $required := (
            #xpath-version, #xsd-version, #product-name, #product-version,
            #schema-aware, #accepts-typed-data, #supports-xinclude,
@@ -72,51 +125,63 @@
          )
          return $required[not(map:contains(system-properties(), .))]
       </test>
-      <result>
-         <assert-empty/>
-      </result>
-   </test-case>
+		<result>
+			<assert-empty/>
+		</result>
+	</test-case>
 
-   <test-case name="system-properties-006">
-      <description>Evaluation of system-properties function.</description>
-      <created by="Christian Gruen" on="2026-10-02"/>
-      <test>every $key in map:keys(system-properties()) satisfies $key instance of xs:QName</test>
-      <result>
-         <assert-true/>
-      </result>
-   </test-case>
+	<test-case name="fn-system-properties-no-duplicate-keys">
+		<description>Check there are no duplicates in the key names</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<test>let $all := fn:system-properties() return count($all) eq count(distinct-values($all)) </test>
+		<result>
+			<assert-true/>
+		</result>
+	</test-case>
 
-   <test-case name="system-properties-007">
-      <description>Evaluation of system-properties function.</description>
-      <created by="Christian Gruen" on="2026-10-02"/>
-      <test>system-properties() instance of map(xs:QName, xs:anyAtomicType)</test>
-      <result>
-         <assert-true/>
-      </result>
-   </test-case>
+	<test-case name="system-properties-006">
+		<description>Evaluation of system-properties function.</description>
+		<created by="Christian Gruen" on="2026-10-02"/>
+		<test>every $key in map:keys(system-properties()) satisfies $key instance of xs:QName</test>
+		<result>
+			<assert-true/>
+		</result>
+	</test-case>
 
-   <test-case name="system-properties-008">
-      <description>Evaluation of system-properties function.</description>
-      <created by="Christian Gruen" on="2026-10-02"/>
-      <test>system-properties()?#unknown-property</test>
-      <result>
-         <assert-empty/>
-      </result>
-   </test-case>
+	<test-case name="system-properties-007">
+		<description>Check that the datatypes of the entries in the map match the signature in the spec.</description>
+		<created by="Christian Gruen" on="2026-10-02"/>
+		<modified by="Sheila Thomson" on="2026-10-14" change="Replaced generic description."/>
+		<test>system-properties() instance of map(xs:QName, xs:anyAtomicType)</test>
+		<result>
+			<assert-true/>
+		</result>
+	</test-case>
 
-   <test-case name="system-properties-009">
-      <description>Evaluation of system-properties function.</description>
-      <created by="Christian Gruen" on="2026-10-02"/>
-      <test>deep-equal(system-properties(), system-properties#0())</test>
-      <result>
-         <assert-true/>
-      </result>
-   </test-case>
+	<test-case name="system-properties-008">
+		<description>Evaluation of system-properties function.</description>
+		<created by="Christian Gruen" on="2026-10-02"/>
+		<test>system-properties()?#unknown-property</test>
+		<result>
+			<assert-empty/>
+		</result>
+	</test-case>
 
-   <test-case name="system-properties-010">
-      <description>Evaluation of system-properties function.</description>
-      <created by="Christian Gruen" on="2026-10-02"/>
-      <test>
+	<test-case name="system-properties-009">
+		<description>Check that the function is implemented sufficiently to return something</description>
+		<created by="Christian Gruen" on="2026-10-02"/>
+		<modified by="Sheila Thomson" on="2026-10-14" change="Replaced generic description."/>
+		<test>deep-equal(system-properties(), system-properties#0())</test>
+		<result>
+			<assert-true/>
+		</result>
+	</test-case>
+
+	<test-case name="system-properties-010">
+		<description>Check that the function only returns the properties specified by the specification.</description>
+		<created by="Christian Gruen" on="2026-10-02"/>
+		<modified by="Sheila Thomson" on="2026-10-14" change="Replaced generic description."/>
+		<test>
          let $standard := (
            'xpath-version', 'xsd-version', 'product-name', 'product-version',
            'schema-aware', 'accepts-typed-data', 'supports-xinclude',
@@ -127,18 +192,70 @@
          return map:keys(system-properties())[namespace-uri-from-QName(.) = '']
            [not(local-name-from-QName(.) = $standard)]
       </test>
-      <result>
-         <assert-empty/>
-      </result>
-   </test-case>
+		<result>
+			<assert-empty/>
+		</result>
+	</test-case>
 
-   <test-case name="system-properties-011">
-      <description>Evaluation of system-properties function.</description>
-      <created by="Christian Gruen" on="2026-10-02"/>
-      <test>system-properties(1)</test>
-      <result>
-         <error code="XPST0017"/>
-      </result>
-   </test-case>
-
+	<test-case name="system-properties-011">
+		<description>Check that it has doesn't accept an argument</description>
+		<created by="Christian Gruen" on="2026-10-02"/>
+		<modified by="Sheila Thomson" on="2026-10-14" change="Replaced generic description."/>
+		<test>system-properties(1)</test>
+		<result>
+			<error code="XPST0017"/>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-schema-aware">
+		<description>Check that schema-aware is set to true if the processor supports this feature</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<dependency type="feature" value="schemaImport" satisfied="true" />
+		<test>fn:system-properties()?#schema-aware</test>
+		<result>
+			<assert-true />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-not-schema-aware">
+		<description>Check that schema-aware is set to false if the processor doesn't support this feature</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<dependency type="feature" value="schemaImport" satisfied="false" />
+		<test>fn:system-properties()?#schema-aware</test>
+		<result>
+			<assert-false />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-accepts-typed-data">
+		<description>Check that the schema-aware is set to true if the processor supports this feature</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<dependency type="feature" value="typedData"/>
+		<test>fn:system-properties()?#accepts-typed-data</test>
+		<result>
+			<assert-true />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-accepts-typed-data-false">
+		<description>Check that the schema-aware is set to true if the processor supports this feature</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<dependency type="feature" value="typedData" satisfied="false" />
+		<test>fn:system-properties()?#accepts-typed-data</test>
+		<result>
+			<assert-false />
+		</result>
+	</test-case>
+	
+	
+	<test-case name="fn-system-properties-supports-xinclude">
+		<description>Check that the supports-xinclude is set to true if the processor supports this feature</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<dependency type="feature" value="xinclude"/>
+		<test>fn:system-properties()?#supports-xinclude</test>
+		<result>
+			<assert-true />
+		</result>
+	</test-case>
+	
 </test-set>
