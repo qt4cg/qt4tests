@@ -43,7 +43,6 @@
 	</xd:doc>
 	<xsl:param name="output" select="'one-pager'" as="xs:string" static="true" />
 	
-	
 	<xsl:output method="xml" indent="true" omit-xml-declaration="false" use-when="$output = 'data'" />
 	<xsl:output method="xml" indent="true" omit-xml-declaration="true" use-when="$output = ('type-table', 'type-list', 'defined-type-list', 'feature-list', 'feature-table')" suppress-indentation="p li pre" />
 	<xsl:output method="xhtml" html-version="5" indent="true" omit-xml-declaration="true" use-when="$output = 'one-pager'" />
@@ -201,6 +200,7 @@
 		
 		<xsl:variable name="catalog-schema" select="doc(resolve-uri('catalog-schema.xsd', $catalog-uri))" as="document-node()" />
 		<xsl:variable name="defined-types" select="$catalog-schema/xs:schema/xs:simpleType[@name =  'dependencyEnumType']/descendant::xs:enumeration" as="element()*" />
+
 		<xsl:if test="$output = 'one-pager'">
 			<h2 id="types-defined-list">List of Defined Dependency Types</h2>
 			<div class="intro">
@@ -368,7 +368,6 @@
 		<xsl:variable name="odd-satisfied" select="position() mod 2 != 0" as="xs:boolean" />
 		<xsl:variable name="total-rows-in-this-type" select="ancestor::dependency[1]/count(descendant::satisfied)" as="xs:integer" />
 		<xsl:variable name="total-rows-in-this-value" select="ancestor::value[1]/count(descendant::satisfied)" as="xs:integer" />
-				
 		<xsl:variable name="border-color" select="if ($end-of-type) then 'black' else 'silver'" as="xs:string" />
 		
 		<tr>
@@ -464,5 +463,6 @@
 		
 		<xsl:sequence select="if ($value = () or not(contains($value, ' '))) then $value else string-join(sort(tokenize($value, ' ')), ' ')" />
 	</xsl:function>
+
 		
 </xsl:stylesheet>
