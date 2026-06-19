@@ -31,8 +31,8 @@
 		<xd:desc>
 			<xd:p>Controls what is generated and returned by this stylesheet:</xd:p>
 			<xd:ul>
-				<xd:li><xd:pre>html</xd:pre>: an HTML page containing a table that lists all the variations of <xd:pre>dependency</xd:pre> in use within this test suite (default)</xd:li>
-				<xd:li><xd:pre>type-table</xd:pre>: just the table from the HTML page</xd:li>
+				<xd:li><xd:pre>one-pager</xd:pre>: (default) an HTML page containing the defined-type-list, feature-list and type-table</xd:li>
+				<xd:li><xd:pre>type-table</xd:pre>: a table that lists all the variations of <xd:pre>dependency</xd:pre> in use within this test suite</xd:li>
 				<xd:li><xd:pre>type-list</xd:pre>: a list of the distinct dependency types actually in use</xd:li>
 				<xd:li><xd:pre>defined-type-list</xd:pre>: a list of the permitted dependency types defined in catalog-schema.xsd</xd:li>
 				<xd:li><xd:pre>feature-list</xd:pre>: a list of the distinct values used when <xd:pre>dependency/@type = 'feature'</xd:pre>, sorted alphabetically (case insensitive).</xd:li>
@@ -41,23 +41,25 @@
 			</xd:ul>
 		</xd:desc>
 	</xd:doc>
-	<xsl:param name="output" select="'html'" as="xs:string" static="true" />
+	<xsl:param name="output" select="'one-pager'" as="xs:string" static="true" />
 	
 	
 	<xsl:output method="xml" indent="true" omit-xml-declaration="false" use-when="$output = 'data'" />
 	<xsl:output method="xml" indent="true" omit-xml-declaration="true" use-when="$output = ('type-table', 'type-list', 'defined-type-list', 'feature-list', 'feature-table')" suppress-indentation="p li pre" />
-	<xsl:output method="xhtml" html-version="5" indent="true" omit-xml-declaration="true" use-when="$output = 'html'" />
+	<xsl:output method="xhtml" html-version="5" indent="true" omit-xml-declaration="true" use-when="$output = 'one-pager'" />
 
 
 	<xd:doc scope="component">
-		<xd:desc>Make a note of where the input catalog file is, so it can be used to help resolve other URIs later.</xd:desc>
+		<xd:desc>Make a note of where the input catalog file is, so it can be used to help resolve relative URIs.</xd:desc>
 	</xd:doc>
 	<xsl:variable name="catalog-uri" select="base-uri(/)" as="xs:anyURI" />
+	
+	<xsl:variable name="dependency-meanings" select="doc(resolve-uri('dependency_meanings.xml', $catalog-uri))/*" as="element()" />
 	
 	<xd:doc scope="component">
 		<xd:desc>Generates the outer HTML shell when outputing an HTML page.</xd:desc>
 	</xd:doc>
-	<xsl:template match="/" use-when="$output = 'html'">	
+	<xsl:template match="/" use-when="$output = 'one-pager'">	
 		<html>
 			<head>
 				<title>List of Dependency Values in Use | QT4CG XPath &amp; XQuery Test Suite</title>
@@ -66,8 +68,9 @@
 						border-collapse: collapse;
 					}}
 					th, td {{
-						padding: .25em .5em;
+						padding: 0 .5em;
 						border: 1px solid black;
+						vertical-align: bottom;
 					}}
 					th {{
 						background-color: black;
@@ -93,8 +96,13 @@
 			<body>
 				<div class="titles">
 					<p>QT4CG XPath &amp; XQuery Test Suite</p>
-					<h1>List of Dependency Values in Use</h1>
+					<h1>Dependency Metadata</h1>
 				</div>
+				<ol id="toc">
+					<li><a href="#defined-types-list">List of Defined Dependency Types</a></li>
+					<li><a href="#feature-values-list">List of Feature Dependency Type Values in Use</a></li>
+					<li><a href="#types-in-use-table">Table of Dependency Types and Values In Use</a></li>					
+				</ol>
 				<xsl:apply-templates />
 			</body>
 		</html>				
@@ -114,17 +122,23 @@
 		
 		<xsl:variable name="data" as="document-node()">
 			<xsl:document>
-				<dependencies>					
+				<dependencies>		
+					<xsl:call-template name="provenance-comment" />
 					<xsl:for-each-group select="$occurrences" group-by="@type">
 						<xsl:sort select="fots:count-tests-with-dependency(current-group())" data-type="number" order="descending" />
 						<xsl:sort select="current-grouping-key()" data-type="text" order="ascending" />
 						
-						<dependency type="{current-grouping-key()}">							
+						<xsl:variable name="type-id" select="current-grouping-key()" as="xs:string?" />
+						<dependency type="{$type-id}">						
+							<xsl:copy-of select="$dependency-meanings/dependency[@type = $type-id]/description" />
+							
 							<xsl:for-each-group select="current-group()" group-by="@value">
 								<xsl:sort select="fots:count-tests-with-dependency(current-group())" data-type="number" order="descending" />
 								<xsl:sort select="current-grouping-key()" data-type="text" order="ascending" />
-								
-								<value name="{current-grouping-key()}">																	
+																
+								<value name="{current-grouping-key()}">	
+									<xsl:copy-of select="$dependency-meanings/dependency[@type = $type-id]/value[@name = current-grouping-key()]/description" />
+									
 									<xsl:for-each-group select="current-group()" group-by="if (normalize-space(@satisfied) = '') then 'true' else @satisfied">
 										<xsl:sort select="fots:count-tests-with-dependency(current-group())" data-type="number" order="descending" />
 										<xsl:sort select="current-grouping-key()" data-type="text" order="ascending" />
@@ -144,18 +158,19 @@
 			<xsl:when test="$output = 'data'">
 				<xsl:copy-of select="$data" />
 			</xsl:when>
-			<xsl:when test="$output = 'feature-table'">
-				<xsl:apply-templates select="$data/dependencies/dependency[@type = 'feature']" mode="feature-table" />
-			</xsl:when>
-			<xsl:when test="ends-with($output, '-list')">
-				<xsl:apply-templates select="$data/dependencies" use-when="$output = 'type-list'" mode="type-list" />
-				<xsl:apply-templates select="$data/dependencies" use-when="$output = 'defined-type-list'" mode="defined-type-list">
+			<xsl:otherwise>
+				<!-- Unused in docs but handy if you just want a simple, alphabetical list of the distinct type values in use (will include any types used but not defined in catalog-schema.xsd) -->
+				<xsl:apply-templates select="$data/dependencies" mode="type-list" use-when="$output = 'type-list'" />
+				<!-- Added to guide/running.html, June 2026 -->
+				<xsl:apply-templates select="$data/dependencies" mode="defined-type-list" use-when="$output = ('defined-type-list', 'one-pager')">
 					<xsl:with-param name="data" select="$data" as="document-node()" />
 				</xsl:apply-templates>
-				<xsl:apply-templates select="$data/dependencies/dependency[@type = 'feature']" use-when="$output = 'feature-list'" mode="feature-list" />
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:apply-templates select="$data/dependencies" />
+				<!-- Unused in docs but handy if you just want a simple, alphabetical list of the values in use when dependency/@type = 'feature' -->
+				<xsl:apply-templates select="$data/dependencies/dependency[@type = 'feature']" mode="feature-list" use-when="$output = ('feature-list', 'one-pager')"  />
+				<!-- Replaced the feature-table in guide/running.html, June 2026 -->
+				<xsl:apply-templates select="$data/dependencies" mode="type-table" use-when="$output = ('type-table', 'one-pager')" />
+				<!-- Used in guide/running.html prior to June 2026 (unstyled) -->
+				<xsl:apply-templates select="$data/dependencies/dependency[@type = 'feature']" mode="feature-table" use-when="$output = 'feature-table'" />
 			</xsl:otherwise>
 		</xsl:choose>
 		
@@ -166,13 +181,19 @@
 		<xd:desc>Create a list of all the distinct values of dependency/@type (dependency types actually in use).</xd:desc>
 	</xd:doc>
 	<xsl:template match="/dependencies" mode="type-list">
+		<xsl:if test="$output = 'one-pager'">
+			<h2 id="types-in-use-list">List of Types in Use</h2>
+			<div class="intro">
+				<p>All the distinct values currently found in <code>dependency/@type</code>; sorted alphabetically (case insensitive).</p>
+			</div>
+		</xsl:if>
 		<xsl:choose>
 			<xsl:when test="count(*) = 0">
 				<p><i>None found.</i></p>
 			</xsl:when>
 			<xsl:otherwise>
 				<ul>
-					<xsl:comment> Generated by using tools/dependencies_in_use.xsl to transform catalog.xml with the $output param set to 'type-list' </xsl:comment>
+					<xsl:call-template name="provenance-comment" />
 					<xsl:for-each select="dependency">
 						<xsl:sort select="lower-case(@type)" data-type="text" order="ascending" />
 						<li>{@type}</li>
@@ -192,13 +213,19 @@
 		
 		<xsl:variable name="catalog-schema" select="doc(resolve-uri('catalog-schema.xsd', $catalog-uri))" as="document-node()" />
 		<xsl:variable name="defined-types" select="$catalog-schema/xs:schema/xs:simpleType[@name =  'dependencyEnumType']/descendant::xs:enumeration" as="element()*" />
+		<xsl:if test="$output = 'one-pager'">
+			<h2 id="types-defined-list">List of Defined Dependency Types</h2>
+			<div class="intro">
+				<p>All types defined in <code>qt4tests/catalog-schema.xsd</code>; sorted alphabetically (case-insensitive).</p>
+			</div>
+		</xsl:if>
 		<xsl:choose>
 			<xsl:when test="count($defined-types) = 0">
 				<p><i>None found.</i></p>
 			</xsl:when>
 			<xsl:otherwise>
 				<ul>
-					<xsl:comment> Generated by using tools/dependencies_in_use.xsl to transform catalog.xml with the $output param set to '{$output}' </xsl:comment>
+					<xsl:call-template name="provenance-comment" />
 					<xsl:for-each select="$defined-types/@value">
 						<xsl:sort select="lower-case(.)" data-type="text" order="ascending" />
 						<li>
@@ -216,13 +243,19 @@
 		<xd:desc>Create a list of all the distinct values of dependency[@type = 'feature']/@value.</xd:desc>
 	</xd:doc>
 	<xsl:template match="/dependencies/dependency[@type = 'feature']" mode="feature-list">
+		<xsl:if test="$output = 'one-pager'">
+			<h2 id="feature-values-list">List of Feature Dependency Type Values In Use</h2>
+			<div class="intro">
+				<p>All distinct values in <code>dependency[@type = 'feature']/@value</code>; sorted alphabetically (case insensitive).</p>
+			</div>
+		</xsl:if>
 		<xsl:choose>
 			<xsl:when test="count(*) = 0">
 				<p><i>None found.</i></p>
 			</xsl:when>
 			<xsl:otherwise>
 				<ul>
-					<xsl:comment> Generated by using tools/dependencies_in_use.xsl to transform catalog.xml with the $output param set to 'feature-list' </xsl:comment>
+					<xsl:call-template name="provenance-comment" />
 					<xsl:for-each select="value">
 						<xsl:sort select="lower-case(@name)" data-type="text" order="ascending" />
 						<li>{@name}</li>
@@ -234,17 +267,22 @@
 	
 	
 	<xd:doc scope="component">
-		<xd:desc>Create a table view of all the distinct values of dependency[@type = 'feature']/@value.</xd:desc>
+		<xd:desc>Create an HTML table view of all the distinct values of dependency[@type = 'feature']/@value.</xd:desc>
 	</xd:doc>
 	<xsl:template match="/dependencies/dependency[@type = 'feature']" mode="feature-table">
+		<xsl:if test="$output = 'one-pager'">
+			<h2 id="feature-values-table">Table of Feature Dependency Type Values In Use</h2>
+			<div class="intro">
+				<p>All distinct values in <code>dependency[@type = 'feature']/@value</code>, the number of tests affected and intended effect of the dependency; sorted alphabetically (case insensitive).</p>
+			</div>
+		</xsl:if>
 		<xsl:choose>
 			<xsl:when test="count(*) = 0">
 				<p><i>None found.</i></p>
 			</xsl:when>
-			<xsl:otherwise>
-				<xsl:variable name="dependency-meanings" select="doc(resolve-uri('dependency_meanings.xml', $catalog-uri))/*" as="element()" />
+			<xsl:otherwise>				
 				<table>
-					<xsl:comment> Generated by using tools/dependencies_in_use.xsl to transform catalog.xml with the $output param set to 'feature-table' </xsl:comment>
+					<xsl:call-template name="provenance-comment" />
 					<thead>
 						<tr>
 							<th style="vertical-align: bottom; text-align: left; border-bottom: 1px solid silver;"><p>Feature name</p></th>
@@ -259,7 +297,7 @@
 								<td style="vertical-align: top; text-align: left; border-bottom: 1px solid silver;"><p>{@name}</p></td>
 								<td style="vertical-align: top; text-align: right; padding-right: 1em; border-bottom: 1px solid silver;"><p>{sum(satisfied/@total-tests-affected)}</p></td>
 								<td style="vertical-align: top; text-align: left; border-bottom: 1px solid silver;">
-									<xsl:copy-of select="$dependency-meanings/dependency[@type = 'feature']/value[@name = current()/@name]/description/*" />
+									<xsl:copy-of select="description/*" />
 								</td>
 							</tr>
 						</xsl:for-each>
@@ -273,7 +311,13 @@
 	<xd:doc scope="component">
 		<xd:desc>Create an HTML table view of the dependencies data.</xd:desc>
 	</xd:doc>
-	<xsl:template match="/dependencies">
+	<xsl:template match="/dependencies" mode="type-table">
+		<xsl:if test="$output = 'one-pager'">
+			<h2 id="types-in-use-table">Table of Dependency Types and Values In Use</h2>
+			<div class="intro">
+				<p>All distinct types and values set on <code>dependency</code> elements and whether the dependency must/must not be satisfied; sorted by the number of tests affected, in descending order.</p>
+			</div>
+		</xsl:if>
 		<xsl:choose>
 			<xsl:when test="count(*) = 0">
 				<p><i>None found.</i></p>
@@ -281,29 +325,29 @@
 			<xsl:otherwise>
 				<table>
 					<xsl:attribute name="style" use-when="$output = 'type-table'" select="'border-collapse: collapse;'" />
-					<xsl:comment> Generated by using tools/dependencies_in_use.xsl to transform catalog.xml with the $output param set to '{$output}' </xsl:comment>
+					<xsl:call-template name="provenance-comment" />
 					<thead>
 						<tr>
 							<th class="type">
 								<xsl:attribute name="style" use-when="$output = 'type-table'" select="'padding: .25em .5em; border: 1px solid black; text-align: left; background-color: black; color: white;'" />
-								<xsl:text>Type</xsl:text>
+								<p>Type</p>
 							</th>
 							<th class="value">
 								<xsl:attribute name="style" use-when="$output = 'type-table'" select="'padding: .25em .5em; border: 1px solid black; text-align: left; background-color: black; color: white;'" />
-								<xsl:text>Value</xsl:text>
+								<p>Value</p>
 							</th>
 							<th class="satisfied">
 								<xsl:attribute name="style" use-when="$output = 'type-table'" select="'padding: .25em .5em; border: 1px solid black; text-align: center; background-color: black; color: white;'" />
-								<xsl:text>Satisfied</xsl:text>
+								<p>Satisfied</p>
 							</th>
 							<th class="total-tests">
 								<xsl:attribute name="style" use-when="$output = 'type-table'" select="'padding: .25em .5em; border: 1px solid black; text-align: right; background-color: black; color: white;'" />
-								<xsl:text>Total Tests Affected</xsl:text>
+								<p>Total Tests Affected</p>
 							</th>
 						</tr>
 					</thead>
 					<tbody>
-						<xsl:apply-templates />
+						<xsl:apply-templates select="dependency" mode="#current" />
 					</tbody>
 				</table>		
 			</xsl:otherwise>
@@ -314,9 +358,9 @@
 	<xd:doc scope="component">
 		<xd:desc>Parameterise information about this dependency type that will be used later but is easy to gather now.</xd:desc>
 	</xd:doc>
-	<xsl:template match="dependency">
-		<xsl:apply-templates>
-			<xsl:with-param name="odd-type" select="position() mod 2 != 0" as="xs:boolean" tunnel="true" />			
+	<xsl:template match="dependency" mode="type-table">
+		<xsl:apply-templates select="value" mode="#current">
+			<xsl:with-param name="odd-type" select="position() mod 2 != 0" as="xs:boolean" tunnel="true" />	
 		</xsl:apply-templates>
 	</xsl:template>
 	
@@ -324,8 +368,8 @@
 	<xd:doc scope="component">
 		<xd:desc>Parameterise information about this value that will be used later but is easy to gather now.</xd:desc>
 	</xd:doc>
-	<xsl:template match="value">
-		<xsl:apply-templates>
+	<xsl:template match="value" mode="type-table">
+		<xsl:apply-templates select="satisfied" mode="#current">
 			<xsl:with-param name="odd-value" select="position() mod 2 != 0" as="xs:boolean" tunnel="true" />
 			<xsl:with-param name="start-new-type" select="position() = 1" as="xs:boolean" tunnel="true" />
 		</xsl:apply-templates>
@@ -338,7 +382,7 @@
 		<xd:param name="odd-value">True if the parent <xd:pre>value</xd:pre> element is in an odd position within its parent dependency type; false if it's in an even position.</xd:param>
 		<xd:param name="start-new-type">True if the parent <xd:pre>value</xd:pre> element is the first within its parent dependency type; false if it's not.</xd:param>
 	</xd:doc>
-	<xsl:template match="satisfied">
+	<xsl:template match="satisfied" mode="type-table">
 		<xsl:param name="odd-type" as="xs:boolean" tunnel="true" />
 		<xsl:param name="odd-value" as="xs:boolean" tunnel="true" />
 		<xsl:param name="start-new-type" as="xs:boolean" tunnel="true" />
@@ -371,7 +415,8 @@
 					<xsl:if test="$total-rows-in-this-type > 1">
 						<xsl:attribute name="rowspan" select="$total-rows-in-this-type" />
 					</xsl:if>
-					<xsl:text>{ancestor::dependency/@type}</xsl:text>
+					<h3>{ancestor::dependency[1]/@type}</h3>
+					<xsl:apply-templates select="ancestor::dependency[1]/description" />
 				</td>
 			</xsl:if>
 			<xsl:if test="position() = 1">
@@ -379,12 +424,24 @@
 					<xsl:if test="$total-rows-in-this-value > 1">
 						<xsl:attribute name="rowspan" select="$total-rows-in-this-value" />
 					</xsl:if>
-					<xsl:text>{parent::value/@name}</xsl:text>
+					<h4>{parent::value/@name}</h4>
+					<xsl:apply-templates select="parent::value/description" />
 				</td>
 			</xsl:if>			
 			<td class="satisfied" style="background-color: {$satisfied-bg};{if ($output = 'type-table') then ' padding: .25em .5em; border: 1px solid black; text-align: center;' else ()}">{.}</td>
 			<td class="total-tests" style="background-color: {$satisfied-bg};{if ($output = 'type-table') then ' padding: .25em .5em; border: 1px solid black; text-align: right;' else ()}">{@total-tests-affected}</td>
 		</tr>
+	</xsl:template>
+	
+	
+	<xsl:template match="dependency/description | value/description">
+		<div class="description">
+			<xsl:copy-of select="*" />
+		</div>
+	</xsl:template>
+	
+	<xsl:template name="provenance-comment">
+		<xsl:comment> Generated using tools/dependencies_in_use.xsl to transform catalog.xml with the $output param set to '{$output}' </xsl:comment>
 	</xsl:template>
 		
 	
@@ -410,6 +467,6 @@
 		
 		<xsl:sequence select="count($dependency/fots:get-tests-with-dependency(self::fots:dependency))" />
 	</xsl:function>
-
+	
 		
 </xsl:stylesheet>
