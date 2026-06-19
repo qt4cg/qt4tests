@@ -64,27 +64,6 @@
 			<head>
 				<title>List of Dependency Values in Use | QT4CG XPath &amp; XQuery Test Suite</title>
 				<style>
-					table {{
-						border-collapse: collapse;
-					}}
-					th, td {{
-						padding: 0 .5em;
-						border: 1px solid black;
-						vertical-align: bottom;
-					}}
-					th {{
-						background-color: black;
-						color: white;
-					}}
-					.type, .value {{
-						text-align: left;
-					}}
-					.satisfied {{
-						text-align: center;
-					}}
-					.total-tests {{
-						text-align: right;
-					}}				
 					.titles p {{
 						margin-bottom: 0;
 					}}
@@ -323,27 +302,14 @@
 				<p><i>None found.</i></p>
 			</xsl:when>
 			<xsl:otherwise>
-				<table>
-					<xsl:attribute name="style" use-when="$output = 'type-table'" select="'border-collapse: collapse;'" />
+				<table style="border-collapse: collapse;">
 					<xsl:call-template name="provenance-comment" />
 					<thead>
 						<tr>
-							<th class="type">
-								<xsl:attribute name="style" use-when="$output = 'type-table'" select="'padding: .25em .5em; border: 1px solid black; text-align: left; background-color: black; color: white;'" />
-								<p>Type</p>
-							</th>
-							<th class="value">
-								<xsl:attribute name="style" use-when="$output = 'type-table'" select="'padding: .25em .5em; border: 1px solid black; text-align: left; background-color: black; color: white;'" />
-								<p>Value</p>
-							</th>
-							<th class="satisfied">
-								<xsl:attribute name="style" use-when="$output = 'type-table'" select="'padding: .25em .5em; border: 1px solid black; text-align: center; background-color: black; color: white;'" />
-								<p>Satisfied</p>
-							</th>
-							<th class="total-tests">
-								<xsl:attribute name="style" use-when="$output = 'type-table'" select="'padding: .25em .5em; border: 1px solid black; text-align: right; background-color: black; color: white;'" />
-								<p>Total Tests Affected</p>
-							</th>
+							<th style="padding: 0 1em; border-bottom: 1px solid black; text-align: left; vertical-align: bottom;"><p style="margin: .5em 0;">Type</p></th>
+							<th style="padding: 0 1em; border-bottom: 1px solid black; text-align: left; vertical-align: bottom;"><p style="margin: .5em 0;">Value</p></th>
+							<th style="padding: 0 1em; border-bottom: 1px solid black; text-align: center; vertical-align: bottom;"><p style="margin: .5em 0;">Satisfied</p></th>
+							<th style="padding: 0 1em; border-bottom: 1px solid black; text-align: right; vertical-align: bottom;"><p style="margin: .5em 0;">Total Tests Affected</p></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -371,6 +337,7 @@
 	<xsl:template match="value" mode="type-table">
 		<xsl:apply-templates select="satisfied" mode="#current">
 			<xsl:with-param name="odd-value" select="position() mod 2 != 0" as="xs:boolean" tunnel="true" />
+			<xsl:with-param name="end-of-type" select="position() = last()" as="xs:boolean" tunnel="true" />
 			<xsl:with-param name="start-new-type" select="position() = 1" as="xs:boolean" tunnel="true" />
 		</xsl:apply-templates>
 	</xsl:template>
@@ -385,60 +352,68 @@
 	<xsl:template match="satisfied" mode="type-table">
 		<xsl:param name="odd-type" as="xs:boolean" tunnel="true" />
 		<xsl:param name="odd-value" as="xs:boolean" tunnel="true" />
+		<xsl:param name="end-of-type" as="xs:boolean" tunnel="true" />
 		<xsl:param name="start-new-type" as="xs:boolean" tunnel="true" />
 		
 		<xsl:variable name="odd-satisfied" select="position() mod 2 != 0" as="xs:boolean" />
 		<xsl:variable name="total-rows-in-this-type" select="ancestor::dependency[1]/count(descendant::satisfied)" as="xs:integer" />
 		<xsl:variable name="total-rows-in-this-value" select="ancestor::value[1]/count(descendant::satisfied)" as="xs:integer" />
 				
-		<xsl:variable name="odd-rgb" select="'255, 255, 0'" as="xs:string" />
-		<xsl:variable name="even-rgb" select="'255, 230, 0'" as="xs:string" />
-		
-		<xsl:variable name="type-bg" select="concat('rgba(', if ($odd-type) then $odd-rgb else $even-rgb, ', .65)')" as="xs:string" />
-		<xsl:variable name="value-bg" select="if ($odd-value) then $type-bg else concat('rgba(', if ($odd-type) then $odd-rgb else $even-rgb, ', .3)')" as="xs:string" />
-		<xsl:variable name="satisfied-bg" select="
-			if ($odd-value) 
-			then (
-				if ($odd-satisfied) 
-				then $type-bg
-				else concat('rgba(', if ($odd-type) then $odd-rgb else $even-rgb, ', .5)')
-			)
-			else (
-				if ($odd-satisfied) 
-				then $value-bg 
-				else concat('rgba(', if ($odd-type) then $odd-rgb else $even-rgb, ', .2)')
-			)" as="xs:string" />
+		<xsl:variable name="border-color" select="if ($end-of-type) then 'black' else 'silver'" as="xs:string" />
 		
 		<tr>
 			<xsl:if test="$start-new-type and position() = 1">
-				<td class="type" style="background-color: {$type-bg};{if ($output = 'type-table') then ' padding: .25em .5em; border: 1px solid black; text-align: left;' else ()}">
+				<td style="padding: 0 1em; border-bottom: 1px solid black; text-align: left; vertical-align: top;">
 					<xsl:if test="$total-rows-in-this-type > 1">
 						<xsl:attribute name="rowspan" select="$total-rows-in-this-type" />
 					</xsl:if>
-					<h3>{ancestor::dependency[1]/@type}</h3>
+					<h3 style="margin: .5em 0;">{ancestor::dependency[1]/@type}</h3>
 					<xsl:apply-templates select="ancestor::dependency[1]/description" />
 				</td>
 			</xsl:if>
 			<xsl:if test="position() = 1">
-				<td class="value" style="background-color: {$value-bg};{if ($output = 'type-table') then ' padding: .25em .5em; border: 1px solid black; text-align: left;' else ()}">
+				<td style="padding: 0 1em; border-bottom: 1px solid {$border-color}; text-align: left; vertical-align: top;">
 					<xsl:if test="$total-rows-in-this-value > 1">
 						<xsl:attribute name="rowspan" select="$total-rows-in-this-value" />
 					</xsl:if>
-					<h4>{parent::value/@name}</h4>
+					<h4 style="margin: .5em 0;">{parent::value/@name}</h4>
 					<xsl:apply-templates select="parent::value/description" />
 				</td>
 			</xsl:if>			
-			<td class="satisfied" style="background-color: {$satisfied-bg};{if ($output = 'type-table') then ' padding: .25em .5em; border: 1px solid black; text-align: center;' else ()}">{.}</td>
-			<td class="total-tests" style="background-color: {$satisfied-bg};{if ($output = 'type-table') then ' padding: .25em .5em; border: 1px solid black; text-align: right;' else ()}">{@total-tests-affected}</td>
+			<td style="padding: 0 1em; border-bottom: 1px solid {$border-color}; text-align: center; vertical-align: top;">
+				<p style="margin: .5em 0;">{.}</p>
+			</td>
+			<td style="padding: 0 1em; border-bottom: 1px solid {$border-color}; text-align: right; vertical-align: top;">
+				<p style="margin: .5em 0;">{@total-tests-affected}</p>
+			</td>
 		</tr>
 	</xsl:template>
 	
 	
 	<xsl:template match="dependency/description | value/description">
 		<div class="description">
-			<xsl:copy-of select="*" />
+			<xsl:apply-templates mode="html" />
 		</div>
 	</xsl:template>
+	
+	<xsl:template match="p | li" mode="html" use-when="ends-with($output, '-table')">
+		<xsl:copy>
+			<xsl:attribute name="style" select="'margin: .5em 0;'" />
+			<xsl:apply-templates select="attribute(), node()" mode="#current" />
+		</xsl:copy>
+	</xsl:template>
+	
+	
+	<xsl:template match="node()" mode="html">
+		<xsl:copy>
+			<xsl:apply-templates select="attribute(), node()" mode="#current" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="attribute()" mode="html">
+		<xsl:copy-of select="self::attribute()" />
+	</xsl:template>
+	
 	
 	<xsl:template name="provenance-comment">
 		<xsl:comment> Generated using tools/dependencies_in_use.xsl to transform catalog.xml with the $output param set to '{$output}' </xsl:comment>
