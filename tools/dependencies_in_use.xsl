@@ -416,7 +416,7 @@
 	
 	
 	<xsl:template name="provenance-comment">
-		<xsl:comment> Generated using tools/dependencies_in_use.xsl to transform catalog.xml with the $output param set to '{$output}' </xsl:comment>
+		<xsl:comment> Updated {current-date()} using tools/dependencies_in_use.xsl to transform catalog.xml with the $output param set to '{$output}' </xsl:comment>
 	</xsl:template>
 		
 	
