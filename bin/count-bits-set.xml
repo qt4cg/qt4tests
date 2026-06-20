@@ -1,0 +1,134 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="count-bits-set" covers-40="PR2662">
+  <description>Tests for the bin:count-bits-set function</description>
+  
+  <environment name="EXPath-binary-bitwise">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <namespace prefix="errbin" uri="http://expath.org/ns/binary"/>
+    <param name="empty.bin" select="xs:base64Binary('')"/>
+    <param name="a" select="xs:base64Binary(xs:hexBinary('F00F'))"/>
+    <param name="b" select="xs:base64Binary(xs:hexBinary('0FF0'))"/>
+    <param name="c" select="xs:base64Binary(xs:hexBinary('0FABCD'))"/>
+  </environment>
+  
+  <environment name="binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+  </environment>
+  
+  <dependency type="feature" value="binary"/>
+  <dependency type="spec" value="XP40+ XQ40+"/>
+  
+  <test-case name="count-bits-set-001">
+    <description>count-bits-set on single byte</description>
+    <created by="Michael Kay" on="2026-06-19"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:count-bits-set(bin:hex('FF'))</test>
+    <result>
+      <assert-eq>8</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="count-bits-set-002">
+    <description>count-bits-set on single byte</description>
+    <created by="Michael Kay" on="2026-06-19"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:count-bits-set(bin:hex('0F'))</test>
+    <result>
+      <assert-eq>4</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="count-bits-set-003">
+    <description>count-bits-set on single byte</description>
+    <created by="Michael Kay" on="2026-06-19"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:count-bits-set(bin:hex('80'))</test>
+    <result>
+      <assert-eq>1</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="count-bits-set-004">
+    <description>count-bits-set on empty input</description>
+    <created by="Michael Kay" on="2026-06-19"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:count-bits-set(bin:hex(''))</test>
+    <result>
+      <assert-eq>0</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="count-bits-set-005">
+    <description>count-bits-set on empty sequence</description>
+    <created by="Michael Kay" on="2026-06-19"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:count-bits-set(())</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  
+  <test-case name="count-bits-set-009">
+    <description>count-bits-set on four bytes</description>
+    <created by="Michael Kay" on="2026-06-19"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:count-bits-set(bin:hex('F000F000'))</test>
+    <result>
+      <assert-eq>8</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="count-bits-set-010">
+    <description>count-bits-set on four bytes</description>
+    <created by="Michael Kay" on="2026-06-19"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:count-bits-set(bin:hex('00010001'))</test>
+    <result>
+      <assert-eq>2</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="count-bits-set-011">
+    <description>count-bits-set on four bytes</description>
+    <created by="Michael Kay" on="2026-06-19"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:count-bits-set(bin:hex('03030303'))</test>
+    <result>
+      <assert-eq>8</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="count-bits-set-013">
+    <description>count-bits-set on 32 bytes</description>
+    <created by="Michael Kay" on="2026-06-19"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:count-bits-set(bin:hex('0001_0001_0001_0001_0001_0001_0001_0001_0001_0001_0001_0001_0001_0001_0001_0001'))</test>
+    <result>
+      <assert-eq>16</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="count-bits-set-014">
+    <description>count-bits-set on 32 bytes</description>
+    <created by="Michael Kay" on="2026-06-19"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:count-bits-set(bin:hex('0801_0801_0801_0801_0801_0801_0801_0801_0801_0801_0801_0801_0801_0801_0801_0801'))</test>
+    <result>
+      <assert-eq>32</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="count-bits-set-017">
+    <description>count-bits-set on 4096 bytes</description>
+    <created by="Michael Kay" on="2026-06-19"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test>
+      let $bbb := bin:join(for $i in 1 to 1024 return bin:pack-integer(65537, 4))
+      return bin:count-bits-set($bbb)
+    </test>
+    <result>
+      <assert-eq>2048</assert-eq>
+    </result>
+  </test-case>
+  
+</test-set>

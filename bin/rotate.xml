@@ -1,0 +1,252 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-rotate"  covers-40="PR2662">
+  <description>Tests for the bin:rotate function</description>
+  
+  <environment name="EXPath-binary-bitwise">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+    <namespace prefix="binJAVA" uri="java:org.expath.ns.binary.EXPathBinary"/>
+    <namespace prefix="errbin" uri="http://expath.org/ns/binary"/>
+    <param name="empty.bin" select="xs:base64Binary('')"/>
+    <param name="a" select="xs:base64Binary(xs:hexBinary('F00F'))"/>
+    <param name="b" select="xs:base64Binary(xs:hexBinary('0FF0'))"/>
+    <param name="c" select="xs:base64Binary(xs:hexBinary('0FABCD'))"/>
+  </environment>
+  
+  <environment name="binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+  </environment>
+  
+  <dependency type="feature" value="binary"/>
+  <dependency type="spec" value="XP40+ XQ40+"/>
+  
+  <test-case name="bin-rotate-001">
+    <description>bitwise-rotate on empty sequence</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:rotate((),5) </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-002">
+    <description>bitwise-rotate by 0 bits</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> bin:rotate($a,0) </test>
+    <result>
+      <all-of>
+        <assert-type>xs:base64Binary</assert-type>
+        <assert-eq>xs:base64Binary(xs:hexBinary("F00F"))</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-003">
+    <description>bitwise-rotate left by 1 bit</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate($a,1)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("E01F")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-004">
+    <description>bitwise-rotate left by 4 bits</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate(bin:hex('F00F'), 4)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("00FF")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-005">
+    <description>bitwise-rotate left by 8 bits</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate(bin:hex('F00F'), 8)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("0FF0")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-006">
+    <description>bitwise-rotate left by 9 bits</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate(bin:hex('F00F'), 9)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("1FE0")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-007">
+    <description>bitwise-rotate left by 12 bits</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate(bin:hex('F00F'), 12)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("FF00")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-008">
+    <description>bitwise-rotate left by 16 bits</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate(bin:hex('F00F'), 16)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("F00F")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-009">
+    <description>bitwise-rotate left by 17 bits</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate(bin:hex('F00F'), 17)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("E01F")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-010">
+    <description>bitwise-rotate right by 1 bit</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate(bin:hex('F00F'), -1)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("F807")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-011">
+    <description>bitwise-rotate right by 4 bits</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate(bin:hex('F00F'), -4)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("FF00")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-012">
+    <description>bitwise-rotate right by 8 bits</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate($a,-8)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("0FF0")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-013">
+    <description>bitwise-rotate right by 9 bits</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate($a,-9)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("07F8")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-014">
+    <description>bitwise-rotate right by 12 bits</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate($a,-12)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("00FF")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-015">
+    <description>bitwise-rotate right by 16 bits</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate($a,-16)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("F00F")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-016">
+    <description>bitwise-rotate right by 17 bits</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="EXPath-binary-bitwise"/>
+    <test> xs:hexBinary(bin:rotate($a,-17)) </test>
+    <result>
+      <assert-eq>xs:hexBinary("F807")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-021">
+    <description>Test for the rotate function.</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:rotate((), 1))</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-022">
+    <description>Test for the rotate function.</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:rotate(xs:base64Binary(xs:hexBinary("77")), 0))</test>
+    <result>
+      <assert-eq>xs:hexBinary("77")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-023">
+    <description>Test for the rotate function.</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:rotate(xs:base64Binary(xs:hexBinary("33")), 1))</test>
+    <result>
+      <assert-eq>xs:hexBinary("66")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-024">
+    <description>Test for the rotate function.</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="binary"/>
+    <test>xs:hexBinary(bin:rotate(xs:base64Binary(xs:hexBinary("66")), -1))</test>
+    <result>
+      <assert-eq>xs:hexBinary("33")</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-025">
+    <description>Test for the rotate function.</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="binary"/>
+    <test>
+      let $rot := bin:join((1 to 1000) =!> bin:pack-integer(4)) => bin:rotate(500 * 32)
+      for $i in 0 to 999 return bin:unpack-integer($rot, $i*4, 4)
+    </test>
+    <result>
+      <assert-deep-eq>(501 to 1000, 1 to 500)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="bin-rotate-026">
+    <description>Test for the rotate function.</description>
+    <created by="Michael Kay" on="2026-06-20"/>
+    <environment ref="binary"/>
+    <test>
+      let $rot := bin:join((1 to 1000) =!> bin:pack-integer(4)) => bin:rotate(-500 * 32)
+      for $i in 0 to 999 return bin:unpack-integer($rot, $i*4, 4)
+    </test>
+    <result>
+      <assert-deep-eq>(501 to 1000, 1 to 500)</assert-deep-eq>
+    </result>
+  </test-case>
+  
+ 
+  
+</test-set>
