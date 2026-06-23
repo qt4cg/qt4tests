@@ -164,8 +164,9 @@
       <description>Integer subscript into an array: leading zeroes allowed</description>
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Michael Kay" on="2026-02-27" change="Drop call on jvalue()"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <dependency type="spec" value="XP31+ XQ31+"/>
-      <test>(['a', 'b'], ['c', 'd'])[get(001) eq 'c']</test>
+      <test>(['a', 'b'], ['c', 'd'])[./001 eq 'c']</test>
       <result>
          <assert-deep-eq>['c', 'd']</assert-deep-eq>
       </result>
@@ -213,9 +214,10 @@
       <description>Integer subscript into an array: variable range of subscripts</description>
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Michael Kay" on="2026-02-27" change="Drop call on jvalue()"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <test>
          let $i := (1, 3) 
-         return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[ get($i) = 'b']
+         return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[ ./$i = 'b']
       </test>
       <result>
          <assert-deep-eq>['b', 'c', 'd'], ['e', 'f', 'b']</assert-deep-eq>
@@ -234,9 +236,10 @@
    <test-case name="PathExpr-J-010">
       <description>Variable lookup into an array: no type error</description>
       <created by="Michael Kay" on="2025-07-15"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <test>
          let $d := current-date() 
-         return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[ get($d) = 'b']
+         return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[ ./$d = 'b']
             =!> jvalue()
       </test>
       <result>
@@ -247,7 +250,8 @@
    <test-case name="PathExpr-J-011">
       <description>Binary lookup with no context item</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>let $d := function($x) {$x + ./get(2)} return $d(12)</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>let $d := function($x) {$x + ./2} return $d(12)</test>
       <result>
          <error code="XPDY0002"/>
       </result>
@@ -257,7 +261,8 @@
    <test-case name="PathExpr-J-012" covers-40="PR2627">
       <description>Binary lookup when context item is not an array or map -  error</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(1 to 10)[./get(1) = 3]</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(1 to 10)[./1 = 3]</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -287,7 +292,8 @@
    <test-case name="PathExpr-J-015">
       <description>Result of Binary lookup is atomized</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>([1, [2], [3]], [[2], 2, [4]])[ .//get(1) = 4 ]</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>([1, [2], [3]], [[2], 2, [4]])[ .//1 = 4 ]</test>
       <result>
          <assert-deep-eq>[[2], 2, [4]]</assert-deep-eq>
       </result>
@@ -296,7 +302,8 @@
    <test-case name="PathExpr-J-016">
       <description>No syntactic confusion with place-markers</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[contains(get(1), ?, 'http://www.w3.org/2005/xpath-functions/collation/codepoint')('a')]</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[contains(./1, ?, 'http://www.w3.org/2005/xpath-functions/collation/codepoint')('a')]</test>
       <result>
          <assert-deep-eq>['a', 'b', 'c']</assert-deep-eq>
       </result>
@@ -305,7 +312,8 @@
    <test-case name="PathExpr-J-017">
       <description>No syntactic confusion with place-markers</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[contains(get(1), ?)('a')]</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[contains(./1, ?)('a')]</test>
       <result>
          <assert-deep-eq>['a', 'b', 'c']</assert-deep-eq>
       </result>
@@ -324,7 +332,8 @@
    <test-case name="PathExpr-J-019">
       <description>Decimal literal now allowed in parentheses (coercion rules turn it into an integer)</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[get(1.0) = 'a']</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[./1.0 = 'a']</test>
       <result>
          <assert-deep-eq>['a', 'b', 'c']</assert-deep-eq>
       </result>
@@ -333,11 +342,12 @@
    <test-case name="PathExpr-J-020">
       <description>Subscript is atomized</description>
       <created by="Michael Kay" on="2025-07-15"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="schemaValidation"/>
       <test><![CDATA[
         let $x := (validate type xs:integer {<x>1</x>}, validate type xs:integer {<y>2</y>}) return
-        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[get($x) = 'b']
+        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[./$x = 'b']
       ]]></test>
       <result>
          <assert-deep-eq>(['a', 'b', 'c'], ['b', 'c', 'd'])</assert-deep-eq>
@@ -347,10 +357,11 @@
    <test-case name="PathExpr-J-021">
       <description>Subscript is atomized, and untypedAtomic is NOT converted to xs:integer</description>
       <created by="Michael Kay" on="2025-07-15"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         let $x := (<x>1</x>, <y>2</y>) return
-        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[get(($x, 2)) = 'b']
+        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[./($x, 2) = 'b']
       ]]></test>
       <result>
          <assert-deep-eq>(['a', 'b', 'c'])</assert-deep-eq>
@@ -361,8 +372,9 @@
       <description>Filtering a sequence of arrays produced using //*</description>
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]//*
-               [.//get(1) instance of jnode(*, xs:string)* and .//get(1) = 'a'] =!> jvalue()</test>
+               [.//1 instance of jnode(*, xs:string)* and .//1 = 'a'] =!> jvalue()</test>
       <result>
          <assert-deep-eq>['a', 'b', 'c']</assert-deep-eq>
       </result>
@@ -371,7 +383,8 @@
    <test-case name="PathExpr-J-023">
       <description>Binary lookup on rhs of "!"</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]! * ! get(1)  =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]! * ! ./1  =!> jvalue()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'e'</assert-deep-eq>
       </result>
@@ -380,9 +393,10 @@
    <test-case name="PathExpr-J-024">
       <description>Binary lookup on rhs of "/". Context item is an XNode; no problem.</description>
       <created by="Michael Kay" on="2025-07-15"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
-        let $x := (<x>1</x>, <y>2</y>) return $x / get(1)
+        let $x := (<x>1</x>, <y>2</y>) return $x / 1
       ]]></test>
       <result>
          <assert-empty/>
@@ -392,7 +406,8 @@
    <test-case name="PathExpr-J-025">
       <description>Select nothing from an array</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[exists(get(()))]</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[exists(./())]</test>
       <result>
          <assert-empty/>
       </result>
@@ -410,7 +425,8 @@
    <test-case name="PathExpr-J-041">
       <description>Lookup by number in a map</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[get(2) eq 3]</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[./2 eq 3]</test>
       <result>
          <assert-deep-eq>map{1:2, 2:3, 3:4}</assert-deep-eq>
       </result>
@@ -419,7 +435,8 @@
    <test-case name="PathExpr-J-042">
       <description>Lookup by range of values in a map</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[get(1 to 2) = 3]</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[./(1 to 2) = 3]</test>
       <result>
          <assert-deep-eq>map{1:2, 2:3, 3:4}</assert-deep-eq>
       </result>
@@ -455,7 +472,8 @@
    <test-case name="PathExpr-J-046">
       <description>Select nothing from a map</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[exists(get(()))]</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[exists(./())]</test>
       <result>
          <assert-empty/>
       </result>
@@ -465,7 +483,8 @@
    <test-case name="PathExpr-J-047">
       <description>Multi-step path eliminates duplicates</description>
       <created by="Michael Kay" on="2024-01-06"/>
-      <test>[[["a"],["b"]],[["c"],["d"]]]//get(1)//get(1) =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>[[["a"],["b"]],[["c"],["d"]]]//1//1 =!> jvalue()</test>
       <result>
          <assert-deep-eq>["a"],"a","b","c"</assert-deep-eq>
       </result>
@@ -474,6 +493,7 @@
    <test-case name="PathExpr-J-050">
       <description>Select from a deeper structure</description>
       <created by="Michael Kay" on="2024-01-06"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <test>
          let $data := [
             map{"a": [
@@ -494,7 +514,7 @@
                ]}
           ]
 
-          return $data//get(14) =!> jvalue()
+          return $data//14 =!> jvalue()
       </test>
       <result>
          <assert-deep-eq>"lilac", "vanilla", "magnolia", "grey", "vermillion", "khaki", "silver", "gold"</assert-deep-eq>
@@ -504,6 +524,7 @@
    <test-case name="PathExpr-J-051" covers-40="PR2031">
       <description>Multiple select from a deeper structure</description>
       <created by="Michael Kay" on="2024-01-06"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <test>
          let $data := [
          map{"a": [
@@ -523,8 +544,7 @@
             map{12: "peach", 13: "rust", 14: "gold"}
          ]}
          ]
-
-         return $data//get((24, 14))         =!> jvalue()
+         return $data//(24, 14) =!> jvalue()
       </test>
       <result>
           <assert-deep-eq>"lilac", "vanilla", "magnolia", "grey", "vermillion", "khaki", "silver", "gold"</assert-deep-eq>
@@ -534,6 +554,7 @@
    <test-case name="PathExpr-J-052" covers-40="PR2031">
       <description>Multiple select from a deeper structure with dynamic key</description>
       <created by="Michael Kay" on="2024-01-06"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <test>
          let $data := [
          map{"a": [
@@ -553,8 +574,7 @@
             map{12: "peach", 13: "rust", 14: ["gold", "bronze"]}
          ]}
          ]
-
-         return $data//get((current-date(), 14)) =!> jvalue()          
+         return $data//(current-date(), 14) =!> jvalue()          
 
       </test>
       <result>
@@ -595,6 +615,7 @@
    
    <test-case name="PathExpr-J-054" covers-40="PR2031">
       <description>Select from a deeper structure, multi-step path</description>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <created by="Michael Kay" on="2024-01-06"/>
       <test>
          let $data := [
@@ -615,9 +636,7 @@
             map{12: "peach", 13: "rust", 14: "gold"}
          ]}
          ]
-
-         return $data//a//get(14)  =!> jvalue()          
-
+         return $data//a//14 =!> jvalue()
       </test>
       <result>
          <assert-deep-eq>"lilac", "vanilla", "vermillion", "khaki"</assert-deep-eq>
@@ -628,6 +647,7 @@
       <description>Select from a deeper structure, multi-step path. Note that the result
       eliminates duplicates.</description>
       <created by="Michael Kay" on="2024-01-06"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <test>
          let $data := [
          map{"a": [
@@ -647,7 +667,7 @@
             map{12: "peach", 13: "rust", 14: "gold"}
          ]}
          ]
-         return $data//get(1)//get(14)   =!> jvalue()          
+         return $data//1//14 =!> jvalue()
       </test>
       <result>
          <assert-deep-eq>"lilac", "vanilla", "magnolia", "grey", "vermillion", "silver"</assert-deep-eq>
@@ -657,7 +677,8 @@
    <test-case name="PathExpr-J-101">
       <description>Integer subscript into an array</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(['a', 'b'], ['c', 'd'])/get(1)   =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(['a', 'b'], ['c', 'd'])/1 =!> jvalue()</test>
       <result>
          <any-of>
             <!-- document order of the two top-level arrays is impl-def -->
@@ -670,7 +691,8 @@
    <test-case name="PathExpr-J-102">
       <description>Variable subscript into an array</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>let $i := 1 return (['a', 'b'], ['c', 'd']) // get($i)   =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>let $i := 1 return (['a', 'b'], ['c', 'd']) // $i =!> jvalue()</test>
       <result>
          <any-of>
             <!-- document order of the two top-level arrays is impl-def -->
@@ -683,7 +705,8 @@
    <test-case name="PathExpr-J-103">
       <description>Integer subscript into an array: leading zeroes allowed</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(['a', 'b'], ['c', 'd']) // get(001)   =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(['a', 'b'], ['c', 'd']) // 001 =!> jvalue()</test>
       <result>
          <!-- document order of the two top-level arrays is impl-def -->
          <any-of>
@@ -705,7 +728,8 @@
    <test-case name="PathExpr-J-105">
       <description>Integer subscript into an array: array index too low</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(['a', 'b'], ['c', 'd']) // get(0)</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(['a', 'b'], ['c', 'd']) // 0</test>
       <result>
          <assert-empty/>
       </result>
@@ -714,8 +738,9 @@
    <test-case name="PathExpr-J-106">
       <description>Integer subscript into an array: array index too high</description>
       <created by="Michael Kay" on="2025-07-15"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <dependency type="spec" value="XP31+ XQ31+"/>
-      <test>(['a', 'b'], ['c', 'd'], ['e']) // get(2)   =!> jvalue()</test>
+      <test>(['a', 'b'], ['c', 'd'], ['e']) // 2 =!> jvalue()</test>
       <result>
          <any-of>
             <!-- document order of the two top-level arrays is impl-def -->
@@ -728,7 +753,8 @@
    <test-case name="PathExpr-J-107">
       <description>Integer subscript into an array: range of subscripts</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] / * / get(1 to 2)   =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] / * / (1 to 2)   =!> jvalue()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'b', 'c', 'e', 'f'</assert-deep-eq>
       </result>
@@ -737,7 +763,8 @@
    <test-case name="PathExpr-J-108">
       <description>Integer subscript into an array: variable range of subscripts</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>let $i := (1, 3) return [['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] / * / get($i)   =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>let $i := (1, 3) return [['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] / * / $i  =!> jvalue()</test>
       <result>
          <assert-deep-eq>'a', 'c', 'b', 'd', 'e', 'b'</assert-deep-eq>
       </result>
@@ -755,9 +782,10 @@
    <test-case name="PathExpr-J-110">
       <description>Variable lookup into an array: no type error</description>
       <created by="Michael Kay" on="2025-07-15"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <test>
          let $d := current-date() 
-         return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])//get($d)   
+         return (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])//$d
          =!> jvalue()</test>
       <result>
          <assert-empty/>
@@ -767,7 +795,8 @@
    <test-case name="PathExpr-J-111">
       <description>Binary lookup with no context item</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>let $d := function($x) {$x//get(2)} return $d([12, 13])   =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>let $d := function($x) { $x//2 } return $d([12, 13]) =!> jvalue()</test>
       <result>
          <assert-eq>13</assert-eq>
       </result>
@@ -777,7 +806,8 @@
       <description>Binary lookup when lhs is not an array or map</description>
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Christian Gruen" on="2026-06-23" change="error code"/>
-      <test>(1 to 10)//get(1)</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(1 to 10)//1</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -808,7 +838,8 @@
    <test-case name="PathExpr-J-115">
       <description>Result of Binary lookup is atomized</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>([1, [2], [3]], [[2], 2, [4]])//get(3) = 3</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>([1, [2], [3]], [[2], 2, [4]])//3 = 3</test>
       <result>
          <assert-true/>
       </result>
@@ -817,7 +848,8 @@
    <test-case name="PathExpr-J-116">
       <description>No syntactic confusion with occurrence indicators (syntax error, 'treat as' is not a primary)</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>['a', 'b', 'c'] treat as array(*)? //get(1)</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>['a', 'b', 'c'] treat as array(*)? // 1</test>
       <result>
          <error code="XPST0003"/>
       </result>
@@ -826,7 +858,8 @@
    <test-case name="PathExpr-J-117">
       <description>No syntactic confusion with occurrence indicators</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>['a', 'b', 'c'] treat as array(*) // get(1)</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>['a', 'b', 'c'] treat as array(*) // 1</test>
       <result>
          <error code="XPST0003"/>
       </result>
@@ -844,7 +877,8 @@
    <test-case name="PathExpr-J-119" covers-40="PR2031">
       <description>Decimal literal now allowed in parentheses (coercion rules turn it into an integer)</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]/*/get(1.0)   =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']]/*/1.0 =!> jvalue()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'e'</assert-deep-eq>
       </result>
@@ -853,11 +887,12 @@
    <test-case name="PathExpr-J-120">
       <description>Subscript is atomized</description>
       <created by="Michael Kay" on="2025-07-15"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="schemaValidation"/>
       <test><![CDATA[
         let $x := (validate type xs:integer {<x>1</x>}, validate type xs:integer {<y>2</y>}) return
-        [['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] / * / get($x)   =!> jvalue()
+        [['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] / * / $x =!> jvalue()
       ]]></test>
       <result>
          <assert-deep-eq>'a', 'b', 'b', 'c', 'e', 'f'</assert-deep-eq>
@@ -867,10 +902,11 @@
    <test-case name="PathExpr-J-121">
       <description>Subscript is atomized, but untypedAtomic is not converted to xs:integer</description>
       <created by="Michael Kay" on="2025-07-15"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         let $x := (<x>1</x>, <y>2</y>) return
-        [['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] /*/ get($x!number())   =!> jvalue()
+        [['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] /*/ ($x ! number()) =!> jvalue()
       ]]></test>
       <result>
          <assert-deep-eq>'a', 'b', 'b', 'c', 'e', 'f'</assert-deep-eq>
@@ -889,7 +925,8 @@
    <test-case name="PathExpr-J-123">
       <description>Select nothing from an array</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']) // get(())   =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']) // () =!> jvalue()</test>
       <result>
          <assert-empty/>
       </result>
@@ -907,7 +944,8 @@
    <test-case name="PathExpr-J-141">
       <description>Lookup by number in a map</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4}) // get(2)   =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4}) // 2 =!> jvalue()</test>
       <result>
          <any-of>
             <assert-deep-eq>2, 3</assert-deep-eq>
@@ -919,7 +957,8 @@
    <test-case name="PathExpr-J-142">
       <description>Lookup by range of values in a map</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(map{1:1, 2:2, 3:3},  map{2:3, 3:4, 4:5}) // get(1 to 2)   =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(map{1:1, 2:2, 3:3},  map{2:3, 3:4, 4:5}) // (1 to 2) =!> jvalue()</test>
       <result>
          <any-of>
             <assert-deep-eq>1, 2, 3</assert-deep-eq>
@@ -950,7 +989,8 @@
    <test-case name="PathExpr-J-146">
       <description>Select nothing from a map</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4}) // get(())   =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4}) // () =!> jvalue()</test>
       <result>
          <assert-empty/>
       </result>
@@ -968,7 +1008,8 @@
    <test-case name="PathExpr-J-148">
       <description>Select from empty sequence</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>()// get(12)</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>()// 12</test>
       <result>
          <assert-empty/>
       </result>
@@ -986,7 +1027,8 @@
    <test-case name="PathExpr-J-150">
       <description>Numeric Lookup followed by function call</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>([floor#1, ceiling#1, round#1, abs#1] / get(2))(1.3)</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>([floor#1, ceiling#1, round#1, abs#1] / 2)(1.3)</test>
       <result>
          <assert-eq>2.0</assert-eq>
       </result>
@@ -1004,7 +1046,8 @@
    <test-case name="PathExpr-J-152">
       <description>Parenthesized Lookup followed by function call</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1} // get("c"))(1.3)</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1} // "c")(1.3)</test>
       <result>
          <assert-eq>2.0</assert-eq>
       </result>
@@ -1013,7 +1056,8 @@
    <test-case name="PathExpr-J-153">
       <description>Parenthesized Lookup preceded by predicate</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>(map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1}[1] // get("c"))(1.3)</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>(map{'f':floor#1, 'c':ceiling#1, 'r':round#1, 'a':abs#1}[1] // "c")(1.3)</test>
       <result>
          <assert-eq>2.0</assert-eq>
       </result>
@@ -1049,7 +1093,8 @@
    <test-case name="PathExpr-J-156a">
       <description>Lookup by name in a map; name is a QName</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>map{#xs:decimal :true(), #xs:integer :true(), #xs:polygon :false()} // get(#xs:integer)   =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>map{#xs:decimal :true(), #xs:integer :true(), #xs:polygon :false()} // #xs:integer =!> jvalue()</test>
       <result>
          <assert-true/>
       </result>
@@ -1076,7 +1121,8 @@
    <test-case name="PathExpr-J-159">
       <description>Double lookup into a map of arrays</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>map{'decimal':true(), 'integer':true(), 'polygon':[11,22,33]} // polygon // get(2) =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>map{'decimal':true(), 'integer':true(), 'polygon':[11,22,33]} // polygon // 2 =!> jvalue()</test>
       <result>
          <assert-eq>22</assert-eq>
       </result>
@@ -1112,7 +1158,8 @@
    <test-case name="PathExpr-J-164">
       <description>Decimal literal allowed in parentheses for maps</description>
       <created by="Debbie Lockett" on="2025-07-15"/>
-      <test>(map{1.1:1, 2.2:2, 3.3:3},  map{1.1:2, 2.2:3, 3.3:4}) // get(2.2)  =!> jvalue()</test>
+       <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+     <test>(map{1.1:1, 2.2:2, 3.3:3},  map{1.1:2, 2.2:3, 3.3:4}) // 2.2  =!> jvalue()</test>
       <result>
          <any-of>
             <assert-deep-eq>2, 3</assert-deep-eq>
@@ -1162,7 +1209,8 @@
    <test-case name="PathExpr-J-200">
       <description>Deep Lookup in 2D array</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>[[1,2],[3,4]]//get(1) =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>[[1,2],[3,4]]//1 =!> jvalue()</test>
       <result>
          <assert-deep-eq>[1,2],1,3</assert-deep-eq>
       </result>
@@ -1171,7 +1219,8 @@
    <test-case name="PathExpr-J-201">
       <description>Deep Lookup in 2D array</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>[[1,2],[3,4]]//get(2) =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>[[1,2],[3,4]]//2 =!> jvalue()</test>
       <result>
          <assert-deep-eq>2,[3,4],4</assert-deep-eq>
       </result>
@@ -1180,7 +1229,8 @@
    <test-case name="PathExpr-J-202">
       <description>Deep Lookup in 2D array</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>[[1,2,3],[4,5,6]]//get(3) =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+     <test>[[1,2,3],[4,5,6]]//3 =!> jvalue()</test>
       <result>
          <assert-deep-eq>3,6</assert-deep-eq>
       </result>
@@ -1189,7 +1239,8 @@
    <test-case name="PathExpr-J-203">
       <description>Deep Lookup in 2D array</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>[[1,2,3],[4,5,6],7] // get(3) =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>[[1,2,3],[4,5,6],7] // 3 =!> jvalue()</test>
       <result>
          <assert-deep-eq>3,6,7</assert-deep-eq>
       </result>
@@ -1198,7 +1249,8 @@
    <test-case name="PathExpr-J-204">
       <description>Deep Lookup in 2D array</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>[[1,2,3],[4,5,6],7,8] // get(2) =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>[[1,2,3],[4,5,6],7,8] // 2 =!> jvalue()</test>
       <result>
          <assert-deep-eq>2,[4,5,6],5</assert-deep-eq>
       </result>
@@ -1207,7 +1259,8 @@
    <test-case name="PathExpr-J-205">
       <description>Deep Lookup in 2D array</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>[[(),2,3],[(),5,6],7,8] / descendant-or-self::get(2) =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>[[(),2,3],[(),5,6],7,8] / descendant-or-self::{ 2 } =!> jvalue()</test>
       <result>
          <assert-deep-eq>2,[(),5,6],5</assert-deep-eq>
       </result>
@@ -1216,7 +1269,8 @@
    <test-case name="PathExpr-J-206">
       <description>Deep Lookup in 2D map</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1}} // get(true()) =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1}} // true() =!> jvalue()</test>
       <result>
          <assert-permutation>0,1</assert-permutation>
       </result>
@@ -1225,7 +1279,8 @@
    <test-case name="PathExpr-J-207">
       <description>Deep Lookup in 2D map</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1},'z':3,true():77}// get(true()) =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1},'z':3,true():77}// true() =!> jvalue()</test>
       <result>
          <assert-permutation>0,1,77</assert-permutation>
       </result>
@@ -1234,7 +1289,8 @@
    <test-case name="PathExpr-J-208">
       <description>Deep Lookup in mixed maps and arrays</description>
       <created by="Michael Kay" on="2025-07-15"/>
-      <test>[map{1:'x',2:'y'},['p','q']]// get(1) =!> jvalue()</test>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <test>[map{1:'x',2:'y'},['p','q']]// 1 =!> jvalue()</test>
       <result>
          <assert-permutation>map{1:'x',2:'y'},'x','p'</assert-permutation>
       </result>
@@ -1346,8 +1402,9 @@
    <test-case name="PathExpr-J-305">
       <description>Example from JSONPath spec: the third book's author</description>
       <created by="Michael Kay" on="2025-07-15"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <environment ref="jsonpath"/>
-      <test>$m//book/get(3)/author =!> jvalue()</test>
+      <test>$m//book/3/author =!> jvalue()</test>
       <result>
          <assert-eq>"Herman Melville"</assert-eq>
       </result>
@@ -1357,8 +1414,9 @@
       <description>Example from JSONPath spec: empty result: the third book does not
          have a "publisher" member</description>
       <created by="Michael Kay" on="2025-07-15"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <environment ref="jsonpath"/>
-      <test>$m//book/get(3)/publisher =!> jvalue()</test>
+      <test>$m//book/3/publisher =!> jvalue()</test>
       <result>
          <assert-empty/>
       </result>
@@ -1377,8 +1435,9 @@
    <test-case name="PathExpr-J-308">
       <description>Example from JSONPath spec: the first two books</description>
       <created by="Michael Kay" on="2025-07-15"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <environment ref="jsonpath"/>
-      <test>$m // book / get((1, 2)) =!> jvalue()</test>
+      <test>$m // book / (1, 2) =!> jvalue()</test>
       <result>
          <assert-deep-eq>
             map{"author":"Nigel Rees","price":8.95e0,"category":"reference","title":"Sayings of the Century"},
