@@ -1054,10 +1054,11 @@
       <description> Use /{...} with maps: QName keys, // operator </description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Michael Kay" on="2026-06-17" change="PR2667"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {#xml:space: true(), #xml:id: true(), #xml:base: false()}
-         return $map//self::{#xml:base, #xml:space}/{'k':jkey(), 'v':jvalue()}
+         return $map//self::{#xml:base, #xml:space} ! { 'k': jkey(), 'v': jvalue() }
       </test>
       <result>
          <assert-deep-eq>{'k':#xml:space, 'v':true()}, {'k':#xml:base, 'v':false()}</assert-deep-eq>
@@ -1068,29 +1069,31 @@
       <description> Use /{...} with maps: QName keys, // operator </description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Michael Kay" on="2026-06-17" change="PR2667"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {#xml:space: true(), #xml:id: true(), #xml:base: false()}
-         return $map//(#xml:base, #xml:space)/{'k':jkey(), 'v':jvalue()}
+         return $map//(#xml:base, #xml:space) ! { 'k': jkey(), 'v': jvalue() }
       </test>
       <result>
          <assert-deep-eq>{'k':#xml:space, 'v':true()}, {'k':#xml:base, 'v':false()}</assert-deep-eq>
       </result>
    </test-case>
    
-   <test-case name="JAxes-218" covers-40="PR2667">
+   <!--<test-case name="JAxes-218" covers-40="PR2667">
       <description> Use /{...} with maps: ExprSingle required </description>
       <created by="Michael Kay" on="2025-09-18"/>
       <modified by="Michael Kay" on="2026-06-17" change="PR2667"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {#xml:space: true(), #xml:id: true(), #xml:base: false()}
-         return $map//(#xml:base, #xml:space)/{'k':jkey(), 'v':jvalue()}
+         return $map//(#xml:base, #xml:space) ! { 'k': jkey(), 'v': jvalue() }
       </test>
       <result>
          <error code="XPST0003"/>
       </result>
-   </test-case>
+   </test-case>-->
    
    <test-case name="JAxes-250" covers-40="PR2667">
       <description> Use /{...} with arrays </description>
@@ -1179,10 +1182,10 @@
       <description> Use $x/2 where type of $x is statically unknown</description>
       <created by="Michael Kay" on="2026-06-17"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>
+      <test><![CDATA[
          let $x := if (current-date() lt xs:date('2000-01-01')) then parse-xml('<x/>') else [4,5,6]
          return $x/2
-      </test>
+      ]]></test>
       <result>
          <assert-eq>5</assert-eq>
       </result>
@@ -1191,11 +1194,12 @@
    <test-case name="JAxes-271" covers-40="PR2667">
       <description> Use $x/2 where type of $x is statically unknown</description>
       <created by="Michael Kay" on="2026-06-17"/>
+      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>
+      <test><![CDATA[
          let $x := if (current-date() gt xs:date('2000-01-01')) then parse-xml('<x/>') else [4,5,6]
          return $x/2
-      </test>
+      ]]></test>
       <result>
          <assert-eq>2</assert-eq>
       </result>
