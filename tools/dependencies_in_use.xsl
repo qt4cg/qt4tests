@@ -111,18 +111,27 @@
 						<dependency type="{$type-id}">						
 							<xsl:copy-of select="$dependency-meanings/dependency[@type = $type-id]/description" />
 							
-							<xsl:for-each-group select="current-group()" group-by="@value">
+							<xsl:for-each-group select="current-group()" group-by="fots:sort-value-tokens(@value)">
 								<xsl:sort select="fots:count-tests-with-dependency(current-group())" data-type="number" order="descending" />
 								<xsl:sort select="current-grouping-key()" data-type="text" order="ascending" />
 																
 								<value name="{current-grouping-key()}">	
-									<xsl:copy-of select="$dependency-meanings/dependency[@type = $type-id]/value[@name = current-grouping-key()]/description" />
+									<xsl:copy-of select="$dependency-meanings/dependency[@type = $type-id]/value[fots:sort-value-tokens(@name) = current-grouping-key()]/description" />
 									
 									<xsl:for-each-group select="current-group()" group-by="if (normalize-space(@satisfied) = '') then 'true' else @satisfied">
 										<xsl:sort select="fots:count-tests-with-dependency(current-group())" data-type="number" order="descending" />
 										<xsl:sort select="current-grouping-key()" data-type="text" order="ascending" />
-										
-										<satisfied total-tests-affected="{fots:count-tests-with-dependency(current-group())}">{current-grouping-key()}</satisfied>
+																				
+										<satisfied value="{current-grouping-key()}" total-tests-affected="{fots:count-tests-with-dependency(current-group())}">
+											<permutations>
+												<xsl:for-each-group select="current-group()" group-by="@value">
+													<xsl:sort select="fots:count-tests-with-dependency(current-group())" data-type="number" order="descending" />
+													<xsl:sort select="current-grouping-key()" data-type="text" order="ascending" />
+													
+													<dependency type="{$type-id}" value="{current-grouping-key()}" total-tests-affected="{fots:count-tests-with-dependency(current-group())}" />
+												</xsl:for-each-group>											
+											</permutations>
+										</satisfied>
 										
 									</xsl:for-each-group>									
 								</value>													
@@ -307,7 +316,7 @@
 					<thead>
 						<tr>
 							<th style="padding: 0 1em; border-bottom: 1px solid black; text-align: left; vertical-align: bottom;"><p style="margin: .5em 0;">Type</p></th>
-							<th style="padding: 0 1em; border-bottom: 1px solid black; text-align: left; vertical-align: bottom;"><p style="margin: .5em 0;">Value</p></th>
+							<th style="padding: 0 1em; border-bottom: 1px solid black; text-align: left; vertical-align: bottom;"><p style="margin: .5em 0;">Value<sup>*</sup></p></th>
 							<th style="padding: 0 1em; border-bottom: 1px solid black; text-align: center; vertical-align: bottom;"><p style="margin: .5em 0;">Satisfied</p></th>
 							<th style="padding: 0 1em; border-bottom: 1px solid black; text-align: right; vertical-align: bottom;"><p style="margin: .5em 0;">Total Tests Affected</p></th>
 						</tr>
@@ -316,6 +325,7 @@
 						<xsl:apply-templates select="dependency" mode="#current" />
 					</tbody>
 				</table>		
+				<p style="font-size: small; font-style: italic;"><sup>*</sup> Some values contain a sequence of space-separated tokens. When creating this table, to reduce duplication, the tokens in such sequences have been sorted.  To see a full list of permutations, transform <code>catalog.xml</code> using <code>tools/dependencies_in_use.xsl</code> with the <code>$output</code> parameter set to <code>data</code>.</p>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -381,7 +391,7 @@
 				</td>
 			</xsl:if>			
 			<td style="padding: 0 1em; border-bottom: 1px solid {$border-color}; text-align: center; vertical-align: top;">
-				<p style="margin: .5em 0;">{.}</p>
+				<p style="margin: .5em 0;">{@value}</p>
 			</td>
 			<td style="padding: 0 1em; border-bottom: 1px solid {$border-color}; text-align: right; vertical-align: top;">
 				<p style="margin: .5em 0;">{@total-tests-affected}</p>
@@ -443,5 +453,16 @@
 		<xsl:sequence select="count($dependency/fots:get-tests-with-dependency(self::fots:dependency))" />
 	</xsl:function>
 	
+	
+	<xd:doc scope="component">
+		<xd:desc>Sort the space separated tokens in a value to reduce duplication caused by the tokens being entered in a different order.</xd:desc>
+		<xd:param name="dependency">A sequence of zero to many space separated string tokens.</xd:param>
+		<xd:return>The same tokens, sorted.</xd:return>
+	</xd:doc>
+	<xsl:function name="fots:sort-value-tokens" as="xs:string?">
+		<xsl:param name="value" as="xs:string?" />
+		
+		<xsl:sequence select="if ($value = () or not(contains($value, ' '))) then $value else string-join(sort(tokenize($value, ' ')), ' ')" />
+	</xsl:function>
 		
 </xsl:stylesheet>
