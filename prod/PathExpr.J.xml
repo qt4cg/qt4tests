@@ -358,10 +358,11 @@
       <description>Subscript is explicitly atomized, and untypedAtomic is NOT converted to xs:integer</description>
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <modified by="Michael Kay" on="2026-06-23" change="PR2734"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         let $x := (<x>1</x>, <y>2</y>) return
-        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[./($x, 2) = 'b']
+        (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[child::{$x, 2} = 'b']
       ]]></test>
       <result>
          <assert-deep-eq>(['a', 'b', 'c'])</assert-deep-eq>
@@ -417,6 +418,7 @@
       <description>Type error: LHS (of ./$x) selects JNodes, RHS selects XNodes</description>
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Michael Kay" on="2026-06-24" change="PR2667"/>
+      <modified by="Michael Kay" on="2026-06-23" change="PR2734"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="schemaValidation"/>
       <test><![CDATA[
@@ -424,7 +426,7 @@
         (['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b'])[./$x = 'b']
       ]]></test>
       <result>
-         <error code="XPTY0004"/>
+         <assert-deep-eq>['a', 'b', 'c'], ['b', 'c', 'd']</assert-deep-eq>
       </result>
    </test-case>
 
@@ -451,7 +453,8 @@
       <description>Lookup by range of values in a map</description>
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Michael Kay" on="2026-06-24" change="PR2667"/>
-      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[./(1 to 2) = 3]</test>
+      <modified by="Michael Kay" on="2026-06-23" change="PR2734"/>
+      <test>(map{1:1, 2:2, 3:3},  map{1:2, 2:3, 3:4})[child::{1 to 2} = 3]</test>
       <result>
          <assert-deep-eq>map{1:2, 2:3, 3:4}</assert-deep-eq>
       </result>
@@ -540,6 +543,7 @@
       <description>Multiple select from a deeper structure</description>
       <created by="Michael Kay" on="2024-01-06"/>
       <modified by="Michael Kay" on="2026-06-24" change="PR2667"/>
+      <modified by="Michael Kay" on="2026-06-23" change="PR2734"/>
       <test>
          let $data := [
          map{"a": [
@@ -560,7 +564,7 @@
          ]}
          ]
 
-         return $data//(24, 14)         =!> jvalue()
+         return $data//child::{24, 14} =!> jvalue()
       </test>
       <result>
           <assert-deep-eq>"lilac", "vanilla", "magnolia", "grey", "vermillion", "khaki", "silver", "gold"</assert-deep-eq>
@@ -571,6 +575,7 @@
       <description>Multiple select from a deeper structure with dynamic key</description>
       <created by="Michael Kay" on="2024-01-06"/>
       <modified by="Michael Kay" on="2026-06-24" change="PR2667"/>
+      <modified by="Michael Kay" on="2026-06-23" change="PR2734"/>
       <test>
          let $data := [
          map{"a": [
@@ -591,7 +596,7 @@
          ]}
          ]
 
-         return $data//(current-date(), 14) =!> jvalue()          
+         return $data//child::{current-date(), 14} =!> jvalue()          
 
       </test>
       <result>
@@ -774,7 +779,8 @@
       <description>Integer subscript into an array: range of subscripts</description>
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Michael Kay" on="2026-06-24" change="PR2667"/>
-      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] / * / (1 to 2)   =!> jvalue()</test>
+      <modified by="Michael Kay" on="2026-06-23" change="PR2734"/>
+      <test>[['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] / * / child::{1 to 2}   =!> jvalue()</test>
       <result>
          <assert-deep-eq>'a', 'b', 'b', 'c', 'e', 'f'</assert-deep-eq>
       </result>
@@ -923,10 +929,11 @@
       <description>Subscript is atomized, but untypedAtomic is not converted to xs:integer</description>
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <modified by="Michael Kay" on="2026-06-23" change="PR2734"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         let $x := (<x>1</x>, <y>2</y>) return
-        [['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] /*/ ($x ! number()) =!> jvalue()
+        [['a', 'b', 'c'], ['b', 'c', 'd'], ['e', 'f', 'b']] /*/ child::{$x ! number()} =!> jvalue()
       ]]></test>
       <result>
          <assert-deep-eq>'a', 'b', 'b', 'c', 'e', 'f'</assert-deep-eq>
@@ -978,7 +985,8 @@
       <description>Lookup by range of values in a map</description>
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Michael Kay" on="2026-06-24" change="PR2667"/>
-      <test>(map{1:1, 2:2, 3:3},  map{2:3, 3:4, 4:5}) // (1 to 2)   =!> jvalue()</test>
+      <modified by="Michael Kay" on="2026-06-23" change="PR2734"/>
+      <test>(map{1:1, 2:2, 3:3},  map{2:3, 3:4, 4:5}) // child::{1 to 2}   =!> jvalue()</test>
       <result>
          <any-of>
             <assert-deep-eq>1, 2, 3</assert-deep-eq>
@@ -1290,7 +1298,8 @@
       <description>Deep Lookup in 2D map</description>
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Michael Kay" on="2026-06-24" change="PR2667"/>
-      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1}} // true() =!> jvalue()</test>
+      <modified by="Michael Kay" on="2026-06-23" change="PR2734"/>
+      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1}} // child::{true()} =!> jvalue()</test>
       <result>
          <assert-permutation>0,1</assert-permutation>
       </result>
@@ -1300,7 +1309,8 @@
       <description>Deep Lookup in 2D map</description>
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Michael Kay" on="2026-06-24" change="PR2667"/>
-      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1},'z':3,true():77}// true() =!> jvalue()</test>
+      <modified by="Michael Kay" on="2026-06-23" change="PR2734"/>
+      <test>map{'x':map{true():1,false():0},'y':map{true():0,false():1},'z':3,true():77}// child::{true()} =!> jvalue()</test>
       <result>
          <assert-permutation>0,1,77</assert-permutation>
       </result>
@@ -1457,8 +1467,9 @@
       <description>Example from JSONPath spec: the first two books</description>
       <created by="Michael Kay" on="2025-07-15"/>
       <modified by="Michael Kay" on="2026-06-24" change="PR2667"/>
+      <modified by="Michael Kay" on="2026-06-23" change="PR2734"/>
       <environment ref="jsonpath"/>
-      <test>$m // book / (1, 2) =!> jvalue()</test>
+      <test>$m // book / child::{1, 2} =!> jvalue()</test>
       <result>
          <assert-deep-eq>
             map{"author":"Nigel Rees","price":8.95e0,"category":"reference","title":"Sayings of the Century"},
