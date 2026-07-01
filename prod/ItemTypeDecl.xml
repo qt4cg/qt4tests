@@ -469,7 +469,7 @@
          $temp => string()
       </test>
       <result>
-         <error code="X"/>
+         <error code="XPST0051"/>
       </result>
    </test-case>
    
@@ -542,6 +542,143 @@
          <assert-eq>1</assert-eq>
       </result>
    </test-case>
+   
+   <test-case name="itemTypeDecl-037" covers-40="PR1908">
+      <description>Forward reference in treat as expression</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f($x) {
+             $x treat as local:x-type
+         };   
+         declare type local:x-type as (xs:date | xs:time);
+      	local:f(xs:time('12:00:00')) => string()
+      ]]></test>
+      <result>
+         <assert-eq>'12:00:00'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-038" covers-40="PR1908">
+      <description>Forward reference in instance of expression</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f($x) {
+             $x instance of local:x-type
+         };   
+         declare type local:x-type as (xs:date | xs:time);
+      	local:f(xs:time('12:00:00'))
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-039" covers-40="PR1908">
+      <description>Backward reference in typeswitch expression</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[        
+         declare type local:integer as xs:integer;
+         declare type local:boolean as xs:boolean;
+         declare type local:string as xs:string;
+         declare type local:double as xs:double;
+         declare type local:duration as xs:duration;
+         declare function local:f($x) {
+             typeswitch ($x) {
+               case local:integer | local:double return "N"
+               case local:boolean return "B"
+               case local:duration return "D"
+               default return "?"
+             }
+         };   
+      	local:f(42)
+      ]]></test>
+      <result>
+         <assert-eq>'N'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-040" covers-40="PR1908">
+      <description>Forward reference in typeswitch expression</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f($x) {
+             typeswitch ($x) {
+               case local:integer | local:double return "N"
+               case local:boolean return "B"
+               case local:duration return "D"
+               default return "?"
+             }
+         };   
+         declare type local:integer as xs:integer;
+         declare type local:boolean as xs:boolean;
+         declare type local:string as xs:string;
+         declare type local:double as xs:double;
+         declare type local:duration as xs:duration;
+      	local:f(42)
+      ]]></test>
+      <result>
+         <assert-eq>'N'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-041" covers-40="PR1908">
+      <description>Forward reference in record definition</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f() as record(a as local:integer+, b as local:boolean+) {
+             {'a': 23, 'b': (true(), false())}
+         };   
+         declare type local:integer as xs:integer;
+         declare type local:boolean as xs:boolean;
+         declare type local:string as xs:string;
+         declare type local:double as xs:double;
+         declare type local:duration as xs:duration;
+      	local:f()?a
+      ]]></test>
+      <result>
+         <assert-eq>23</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-042" covers-40="PR1908">
+      <description>Forward reference in JNode type</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f() as jnode(*, record(a as local:integer+, b as local:boolean+))* {
+             [{'a': 32, 'b': true()}, {'a': 23, 'b': (true(), false())}]/child::*
+         };   
+         declare type local:integer as xs:integer;
+         declare type local:boolean as xs:boolean;
+         declare type local:string as xs:string;
+         declare type local:double as xs:double;
+         declare type local:duration as xs:duration;
+      	local:f()?a
+      ]]></test>
+      <result>
+         <assert-deep-eq>32, 23</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-043" covers-40="PR1908">
+      <description>Forward reference in inline function declaration</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f1($s as local:string) as local:boolean {
+             let $f := fn($x as local:string) as local:integer { string-length($x) }
+             return $f($s) eq 4
+         };   
+         declare type local:integer as xs:integer;
+         declare type local:boolean as xs:boolean;
+         declare type local:string as xs:string;
+         declare type local:double as xs:double;
+         declare type local:duration as xs:duration;
+      	local:f1("abcd")
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
    
  
  
