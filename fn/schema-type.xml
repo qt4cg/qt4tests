@@ -57,6 +57,7 @@
   <test-case name="schema-type-003">
     <description>built-in type xs:QName</description>
     <created by="Michael Kay" on="2024-12-02"/>
+    <modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
     <test>schema-type(xs:QName('xs:QName'))</test>
     <result>
       <all-of>
@@ -66,8 +67,7 @@
         <assert>$result ? primitive-type() ? name = xs:QName('xs:QName')</assert>
         <assert><![CDATA[$result ? matches(parse-xml('<a/>')/*/node-name())]]></assert>
         <assert>not($result ? matches(0))</assert>
-        <assert>empty($result ? constructor)</assert>
-        <assert>not(map:contains($result, 'constructor'))</assert>
+        <assert>empty($result?constructor)</assert>
       </all-of>
     </result>
   </test-case>
@@ -75,6 +75,7 @@
   <test-case name="schema-type-004">
     <description>built-in union type xs:numeric</description>
     <created by="Michael Kay" on="2024-12-02"/>
+    <modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
     <test>schema-type(xs:QName('xs:numeric'))</test>
     <result>
       <all-of>
@@ -82,7 +83,7 @@
         <assert>$result ? is-simple</assert>
         <assert>$result ? variety = "union"</assert>
         <assert>$result ? base-type() ? name = xs:QName('xs:anySimpleType')</assert>
-        <assert>not(map:contains($result, 'primitive-type'))</assert>
+        <assert>empty($result?primitive-type)</assert>
         <assert>$result ? matches(22)</assert>
         <assert>$result ? matches(93.7)</assert>
         <assert>$result ? matches(1e-6)</assert>
@@ -99,6 +100,7 @@
   <test-case name="schema-type-005">
     <description>built-in list type xs:ENTITIES</description>
     <created by="Michael Kay" on="2024-12-02"/>
+    <modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
     <test>schema-type(xs:QName('xs:ENTITIES'))</test>
     <result>
       <all-of>
@@ -107,8 +109,8 @@
         <assert>$result ? variety = "list"</assert>
         <assert>$result ? base-type() ? name = xs:QName('xs:anySimpleType')</assert>
         <assert>$result ? members() ? name = xs:QName('xs:ENTITY')</assert>
-        <assert>not(map:contains($result, 'primitive-type'))</assert>
-        <assert>not(map:contains($result, 'matches'))</assert>
+        <assert>empty($result?primitive-type)</assert>
+        <assert>empty($result?matches)</assert>
         <assert>$result ? constructor("abc def") instance of xs:ENTITY*</assert>
         
       </all-of>
@@ -118,6 +120,7 @@
   <test-case name="schema-type-006">
     <description>built-in atomic type xs:anyAtomicType</description>
     <created by="Michael Kay" on="2025-03-15"/>
+    <modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
     <test>schema-type(xs:QName('xs:anyAtomicType'))</test>
     <result>
       <all-of>
@@ -128,9 +131,9 @@
         <assert>$result ? members => empty()</assert>
         <assert>$result ? matches(22)</assert>
         <assert>$result ? matches("twenty-two")</assert>
-        <assert>not(map:contains($result, 'members'))</assert>
-        <assert>not(map:contains($result, 'primitive-type'))</assert>
-        <assert>not(map:contains($result, 'constructor'))</assert>
+        <assert>empty($result?members)</assert>
+        <assert>empty($result?primitive-type)</assert>
+        <assert>empty($result?constructor)</assert>
       </all-of>
     </result>
   </test-case>
@@ -138,6 +141,7 @@
   <test-case name="schema-type-007">
     <description>built-in simple type xs:anySimpleType</description>
     <created by="Michael Kay" on="2025-03-15"/>
+    <modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
     <test>schema-type(xs:QName('xs:anySimpleType'))</test>
     <result>
       <all-of>
@@ -145,9 +149,9 @@
         <assert>$result ? is-simple</assert>
         <assert>$result ? variety => empty()</assert>
         <assert>$result ? base-type() ? name = xs:QName('xs:anyType')</assert>
-        <assert>not(map:contains($result, 'members'))</assert>
-        <assert>not(map:contains($result, 'matches'))</assert>
-        <assert>not(map:contains($result, 'constructor'))</assert>
+        <assert>empty($result?members)</assert>
+        <assert>empty($result?matches)</assert>
+        <assert>empty($result?constructor)</assert>
       </all-of>
     </result>
   </test-case>
@@ -155,6 +159,7 @@
   <test-case name="schema-type-008">
     <description>built-in type xs:anyType</description>
     <created by="Michael Kay" on="2025-03-15"/>
+    <modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
     <test>schema-type(xs:QName('xs:anyType'))</test>
     <result>
       <all-of>
@@ -162,10 +167,10 @@
         <assert>not($result ? is-simple)</assert>
         <assert>$result ? variety = "mixed"</assert>
         <assert>$result ? base-type() => empty()</assert>
-        <assert>not(map:contains($result, 'members'))</assert>
-        <assert>not(map:contains($result, 'primitive-type'))</assert>
-        <assert>not(map:contains($result, 'matches'))</assert>
-        <assert>not(map:contains($result, 'constructor'))</assert>
+        <assert>empty($result?members)</assert>
+        <assert>empty($result?primitive-type)</assert>
+        <assert>empty($result?matches)</assert>
+        <assert>empty($result?constructor)</assert>
       </all-of>
     </result>
   </test-case>
@@ -193,6 +198,7 @@
     <created by="Michael Kay" on="2024-12-02"/>
     <dependency type="feature" value="schemaImport"/>
     <dependency type="spec" value="XQ40+"/>
+    <modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
     <test>
       import schema namespace fn = "http://www.w3.org/2005/xpath-functions";
       schema-type(xs:QName('fn:mapType'))</test>
@@ -202,8 +208,8 @@
         <assert>not($result ? is-simple)</assert>
         <assert>$result ? variety = "element-only"</assert>
         <assert>$result ? base-type() ? name = xs:QName('xs:anyType')</assert>
-        <assert>not(map:contains($result, 'matches'))</assert>
-        <assert>not(map:contains($result, 'constructor'))</assert>
+        <assert>empty($result?matches)</assert>
+        <assert>empty($result?constructor)</assert>
       </all-of>
     </result>
   </test-case>
@@ -213,6 +219,7 @@
     <created by="Michael Kay" on="2024-12-02"/>
     <dependency type="feature" value="schemaImport"/>
     <dependency type="spec" value="XQ40+"/>
+    <modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
     <test>
       import schema namespace fn = "http://www.w3.org/2005/xpath-functions";
       schema-type(xs:QName('fn:nullType'))</test>
@@ -222,8 +229,8 @@
         <assert>not($result ? is-simple)</assert>
         <assert>$result ? variety = "empty"</assert>
         <assert>$result ? base-type() ? name = xs:QName('xs:anyType')</assert>
-        <assert>not(map:contains($result, 'matches'))</assert>
-        <assert>not(map:contains($result, 'constructor'))</assert>
+        <assert>empty($result?matches)</assert>
+        <assert>empty($result?constructor)</assert>
       </all-of>
     </result>
   </test-case>
@@ -233,6 +240,7 @@
     <created by="Michael Kay" on="2024-12-02"/>
     <dependency type="feature" value="schemaImport"/>
     <dependency type="spec" value="XQ40+"/>
+    <modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
     <test>
       import schema namespace fn = "http://www.w3.org/2005/xpath-functions";
       schema-type(xs:QName('fn:stringType'))</test>
@@ -243,8 +251,8 @@
         <assert>$result ? variety = "simple"</assert>
         <assert>$result ? base-type() ? name = xs:QName('xs:string')</assert>
         <assert>$result ? simple-content-type() ? name = xs:QName('xs:string')</assert>
-        <assert>not(map:contains($result, 'matches'))</assert>
-        <assert>not(map:contains($result, 'constructor'))</assert>
+        <assert>empty($result?matches)</assert>
+        <assert>empty($result?constructor)</assert>
       </all-of>
     </result>
   </test-case>
@@ -254,6 +262,7 @@
     <created by="Michael Kay" on="2024-12-02"/>
     <dependency type="feature" value="schemaImport"/>
     <dependency type="spec" value="XQ40+"/>
+    <modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
     <test>
       import schema namespace fn = "http://www.w3.org/2005/xpath-functions";
       schema-type(xs:QName('fn:match-type'))</test>
@@ -264,8 +273,8 @@
         <assert>$result ? variety = "mixed"</assert>
         <assert>$result ? base-type() ? name = xs:QName('xs:anyType')</assert>
         <assert>empty($result ? simple-content-type)</assert>
-        <assert>not(map:contains($result, 'matches'))</assert>
-        <assert>not(map:contains($result, 'constructor'))</assert>
+        <assert>empty($result?matches)</assert>
+        <assert>empty($result?constructor)</assert>
       </all-of>
     </result>
   </test-case>
@@ -275,6 +284,7 @@
     <created by="Michael Kay" on="2024-12-02"/>
     <dependency type="feature" value="schemaImport"/>
     <dependency type="spec" value="XQ40+"/>
+    <modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
     <test>
       import schema namespace fn = "http://www.w3.org/2005/xpath-functions";
       schema-type(xs:QName('fn:stringWithinMapType'))</test>
@@ -285,8 +295,8 @@
         <assert>$result ? variety = "simple"</assert>
         <assert>$result ? base-type() ? name = xs:QName('fn:stringType')</assert>
         <assert>$result ? simple-content-type() ? name = xs:QName('xs:string')</assert>
-        <assert>not(map:contains($result, 'matches'))</assert>
-        <assert>not(map:contains($result, 'constructor'))</assert>
+        <assert>empty($result?matches)</assert>
+        <assert>empty($result?constructor)</assert>
       </all-of>
     </result>
   </test-case>
