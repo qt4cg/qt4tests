@@ -625,24 +625,25 @@
          Reproduce the table in section 9.8.4.6 of the spec (penultimate row)    
       </description>
       <created by="Michael Kay, Saxonica" on="2018-04-25"/>
+      <modified by="Christian Gruen" on="2026-07-02" change="alternative added"/>
       <dependency type="spec" value="XQ30+"/>
       <test><![CDATA[
          <out>{
            let $times := ('-10:00', '-05:00', 'Z', '+05:30', '+13:00') ! xs:time('12:00:00' || .)
-           for $f in ('[ZN]') 
+           for $f in ('[ZN]')
               return <time format="{$f}">{
                  for $t in $times
                  return <s>{format-time($t, $f, (), (), "us")}</s>
-            }</time>   
-         }</out>     
+            }</time>
+         }</out>
       ]]></test>
       <result>
          <!-- Alternative results are possible, feel free to add them -->
          <all-of>
-            <assert>$result/self::out/time/s[1] = ('HST', 'AKT')</assert>
-            <assert>$result/self::out/time/s[2] = ('EST', 'ET')</assert>
-            <assert>$result/self::out/time/s[3] = ('GMT', 'UTC', 'Z')</assert>
-            <assert>$result/self::out/time/s[4] = ('IST', 'IT')</assert>
+            <assert>$result/self::out/time/s[1] = ('HST', 'AKT', '-10:00')</assert>
+            <assert>$result/self::out/time/s[2] = ('EST', 'ET', '-05:00')</assert>
+            <assert>$result/self::out/time/s[3] = ('GMT', 'UTC', 'Z', '+00:00')</assert>
+            <assert>$result/self::out/time/s[4] = ('IST', 'IT', '+05:30')</assert>
             <assert>$result/self::out/time/s[5] = '+13:00'</assert>
          </all-of>
       </result>
