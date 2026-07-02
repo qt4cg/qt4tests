@@ -679,6 +679,52 @@
       </result>
    </test-case>
    
+   <test-case name="itemTypeDecl-044" covers-40="PR1908">
+      <description> Reference public item type with a reference to a private item type in library module </description>
+      <created by="Michael Kay" on="2026-07-02"/>
+      <module uri="http://example.ns/module4" file="ItemTypeDecl/module4.xq"/>
+      <test>
+         import module namespace mod4="http://example.ns/module4"; 
+         { "r1": $mod4:dateNow(),
+           "r2": $mod4:timeNow(),
+           "r3": let $x as mod4:chronoSupplier := current-date#0 return $x(),
+           "r4": let $x as mod4:chronoSupplier := current-time#0 return $x()
+         }  
+      </test>
+      <result>
+         <all-of>
+            <assert>$result?r1 instance of xs:date</assert>
+            <assert>$result?r2 instance of xs:time</assert>
+            <assert>$result?r3 instance of xs:date</assert>
+            <assert>$result?r4 instance of xs:time</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-045" covers-40="PR1908">
+      <description> Private item type in library module has same name as item type in main module</description>
+      <created by="Michael Kay" on="2026-07-02"/>
+      <module uri="http://example.ns/module4" file="ItemTypeDecl/module4.xq"/>
+      <test>
+         import module namespace mod4="http://example.ns/module4";
+         declare %private type mod4:dateSupplier as element(foo);        
+         declare %private type mod4:timeSupplier as element(bar);
+         let $provider as mod4:dateTimeSupplier := $mod4:dateTimeNow
+         let $dt := $provider()
+         let ${$date, $time} := $dt
+         return
+         { "r1": $date() instance of xs:date,
+           "r2": $time() instance of xs:time
+         }  
+      </test>
+      <result>
+         <all-of>
+            <assert>$result?r1</assert>
+            <assert>$result?r2</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
    
  
  
