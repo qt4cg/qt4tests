@@ -16482,13 +16482,11 @@ return (
 
         
         let $options := {
-  "separator": ";",
+  "row-delimiter": "§", 
+  "field-delimiter": ";", 
   "quote-character": "|"
 }
-let $input := string-join(
-  ("|name|;|city|", "|Bob|;|Berlin|", "|Alice|;|Aachen|"),
-  char('\n')
-)
+let $input := "|name|;|city|§|Bob|;|Berlin|§|Alice|;|Aachen|"
 let $result := parse-csv($input, $options)
 return (
   $result =&gt; $display(),
@@ -16520,8 +16518,8 @@ return (
 
         
         let $headers := ("Person", "Location")
-let $options := { "header": $headers }
-let $input := "Alice,Aachen" || char('\n') || "Bob,Berlin" || char('\n')
+let $options := { "header": $headers, "row-delimiter": ";" }
+let $input := "Alice,Aachen;Bob,Berlin;"
 let $parsed-csv := parse-csv($input, $options)
 return (
   $parsed-csv =&gt; $display(), 
@@ -16905,11 +16903,8 @@ return csv-to-arrays(
       <environment ref="global"/>
       <test>
         csv-to-arrays(
-  string-join(
-    ("name;city", "Bob;Berlin", "Alice;Aachen"),
-    char('\n')
-  ),
-  { "separator": ";" }
+  "name;city§Bob;Berlin§Alice;Aachen", 
+  { "row-delimiter": "§", "field-delimiter": ";" }
 )
       </test>
       <result>
