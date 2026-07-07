@@ -808,7 +808,7 @@ file:write(
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-07-07"/>
       <environment ref="global"/>
       <test>
-        count(file:descendants('.')[file:is-directory(.)])
+        count(file:descendants('.')[file:is-dir(.)])
       </test>
       <result>
          <assert-deep-eq>Counts the subdirectories in the .</assert-deep-eq>
@@ -828,6 +828,53 @@ return $file
       </test>
       <result>
          <assert-deep-eq>Returns the paths to all files that have been modified in the last hour.</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-file-descendants-003">
+      <description>Test case for file:descendants</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-07-07"/>
+      <environment ref="global"/>
+      <test>
+        
+file:descendants('.', { 'filter': fn { file:size(.) &gt; 10_000_000 } })
+          
+      </test>
+      <result>
+         <assert-deep-eq>Returns the paths to files that are greater than 10 MB.</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-file-descendants-004">
+      <description>Test case for file:descendants</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-07-07"/>
+      <environment ref="global"/>
+      <test>
+        
+file:descendants('.', { 'depth': 1 })
+          
+      </test>
+      <result>
+         <assert-deep-eq>Returns the entries of the current directory and its
+            immediate subdirectories.</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-file-descendants-005">
+      <description>Test case for file:descendants</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-07-07"/>
+      <environment ref="global"/>
+      <test>
+        
+file:descendants('.', {
+  'filter':  fn($path) { ends-with($path, '.jpg') },
+  'recurse': fn($dir)  { not(contains($dir, 'node_modules')) }
+})
+          
+      </test>
+      <result>
+         <assert-deep-eq>Returns the paths of all JPG files, skipping
+            node_modules directories.</assert-deep-eq>
       </result>
    </test-case>
 
