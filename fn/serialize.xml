@@ -2432,11 +2432,14 @@ Second line</text>
     </test-case>
 
     <test-case name="serialize-xml-canonical-7" covers="fn-serialize">
-        <description>Remove dot segments algorithm for xml:base attribute. In this test, I have
-            collected everything from appendix A in https://www.w3.org/TR/2008/REC-xml-c14n11-20080502 and
-            set the 64 items in the left-hand column as values of @xml:base in uniquely named elements. See
-            section 2.4 on the Remove Dot Segments algorithm.</description>
+        <description>xml:base attributes are not modified when a complete document is serialized. The 64
+            items in the left-hand column of appendix A in https://www.w3.org/TR/2008/REC-xml-c14n11-20080502
+            are set as values of @xml:base in uniquely named elements. As no element is removed from the
+            document, the xml:base fixup described in https://www.w3.org/TR/xml-c14n/#DocSubsets (which
+            applies the Remove Dot Segments algorithm of section 2.4) is not performed, and every xml:base
+            value is retained unchanged.</description>
         <created by="Joel Kalvesmaki" on="2025-03-16"/>
+        <modified by="Christian Gruen" on="2026-07-05" change="PR386"/>
         <environment>
             <source role="." file="serialize/serialize-canonical-7-src.xml">
                 <description>File to be serialized</description>
@@ -2447,69 +2450,69 @@ Second line</text>
         <test>serialize(., map {'method' : 'xml', 'canonical' : xs:untypedAtomic('true') })</test>
         <result>
             <assert-string-value><![CDATA[<doc>
-        <a xml:base="pseudo-netpath/seg/file.ext"></a>
-        <b xml:base="pseudo-netpath/seg/file.ext"></b>
-        <c xml:base="yes/pseudo-netpath/seg/file.ext"></c>
-        <d xml:base="yes"></d>
-        <e xml:base="yes/"></e>
-        <f xml:base="yes/"></f>
-        <g xml:base="../../../"></g>
-        <h xml:base="../"></h>
-        <i></i>
-        <j></j>
-        <k xml:base="/a/g"></k>
-        <l xml:base="mid/6"></l>
-        <m xml:base="../../../"></m>
-        <n xml:base="../"></n>
-        <o xml:base="..yes/..yes"></o>
-        <p xml:base="..yes/..yes/"></p>
-        <q xml:base="../../"></q>
+        <a xml:base="no/.././/pseudo-netpath/seg/file.ext"></a>
+        <b xml:base="no/..//.///pseudo-netpath/seg/file.ext"></b>
+        <c xml:base="yes/no//..//.///pseudo-netpath/seg/file.ext"></c>
+        <d xml:base="no/../yes"></d>
+        <e xml:base="no/../yes/"></e>
+        <f xml:base="no/../yes/no/.."></f>
+        <g xml:base="../../no/../.."></g>
+        <h xml:base="no/../.."></h>
+        <i xml:base="no/.."></i>
+        <j xml:base="no/../"></j>
+        <k xml:base="/a/b/c/./../../g"></k>
+        <l xml:base="mid/content=5/../6"></l>
+        <m xml:base="../../.."></m>
+        <n xml:base="no/../../"></n>
+        <o xml:base="..yes/..no/..no/..no/../../../..yes"></o>
+        <p xml:base="..yes/..no/..no/..no/../../../..yes/"></p>
+        <q xml:base="../.."></q>
         <r xml:base="../../../"></r>
-        <s></s>
-        <t></t>
-        <u></u>
-        <v xml:base="/"></v>
-        <w xml:base="../../"></w>
-        <x xml:base="../../"></x>
-        <y xml:base="yes/"></y>
-        <z xml:base="yes/"></z>
-        <aa xml:base="yes/"></aa>
-        <bb xml:base="yes/yes/"></bb>
-        <cc xml:base="yes/yes"></cc>
-        <dd xml:base="yes/yes/"></dd>
-        <ee xml:base="/"></ee>
-        <ff xml:base="/yes/"></ff>
-        <gg xml:base="/yes/"></gg>
-        <hh xml:base="/yes/"></hh>
-        <ii xml:base="../../"></ii>
-        <jj xml:base="../../"></jj>
-        <kk xml:base="..yes/"></kk>
-        <ll xml:base="..yes/"></ll>
-        <mm xml:base="..yes/"></mm>
-        <nn xml:base="..yes/..yes/"></nn>
-        <oo xml:base="/"></oo>
-        <pp xml:base="/..yes/"></pp>
-        <qq xml:base="/..yes/"></qq>
-        <rr xml:base="/..yes/"></rr>
+        <s xml:base="."></s>
+        <t xml:base="./"></t>
+        <u xml:base="./."></u>
+        <v xml:base="//no/.."></v>
+        <w xml:base="../../no/.."></w>
+        <x xml:base="../../no/../"></x>
+        <y xml:base="yes/no/../"></y>
+        <z xml:base="yes/no/no/../.."></z>
+        <aa xml:base="yes/no/no/no/../../.."></aa>
+        <bb xml:base="yes/no/../yes/no/no/../.."></bb>
+        <cc xml:base="yes/no/no/no/../../../yes"></cc>
+        <dd xml:base="yes/no/no/no/../../../yes/"></dd>
+        <ee xml:base="/no/../"></ee>
+        <ff xml:base="/yes/no/../"></ff>
+        <gg xml:base="/yes/no/no/../.."></gg>
+        <hh xml:base="/yes/no/no/no/../../.."></hh>
+        <ii xml:base="../../..no/.."></ii>
+        <jj xml:base="../../..no/../"></jj>
+        <kk xml:base="..yes/..no/../"></kk>
+        <ll xml:base="..yes/..no/..no/../.."></ll>
+        <mm xml:base="..yes/...no/..no/..no/../../.."></mm>
+        <nn xml:base="..yes/..no/../..yes/..no/..no/../.."></nn>
+        <oo xml:base="/..no/../"></oo>
+        <pp xml:base="/..yes/..no/../"></pp>
+        <qq xml:base="/..yes/..no/..no/../.."></qq>
+        <rr xml:base="/..yes/..no/..no/..no/../../.."></rr>
         <ss xml:base="/"></ss>
-        <tt xml:base="/"></tt>
-        <uu xml:base="/"></uu>
-        <vv xml:base="/"></vv>
-        <ww xml:base="/"></ww>
-        <xx xml:base="/"></xx>
-        <yy xml:base="/"></yy>
-        <zz xml:base="/"></zz>
-        <aaa xml:base="/"></aaa>
-        <bbb xml:base="/"></bbb>
-        <ccc xml:base="/"></ccc>
-        <ddd xml:base="/"></ddd>
-        <eee xml:base="/"></eee>
-        <fff xml:base="/"></fff>
-        <ggg xml:base="/"></ggg>
-        <hhh></hhh>
-        <iii></iii>
-        <jjj></jjj>
-        <kkk xml:base="../"></kkk>
+        <tt xml:base="/."></tt>
+        <uu xml:base="/./"></uu>
+        <vv xml:base="/./."></vv>
+        <ww xml:base="/././"></ww>
+        <xx xml:base="/.."></xx>
+        <yy xml:base="/../.."></yy>
+        <zz xml:base="/../../.."></zz>
+        <aaa xml:base="/../../.."></aaa>
+        <bbb xml:base="//.."></bbb>
+        <ccc xml:base="//..//.."></ccc>
+        <ddd xml:base="//..//..//.."></ddd>
+        <eee xml:base="/./.."></eee>
+        <fff xml:base="/./.././.."></fff>
+        <ggg xml:base="/./.././.././.."></ggg>
+        <hhh xml:base="."></hhh>
+        <iii xml:base="./"></iii>
+        <jjj xml:base="./."></jjj>
+        <kkk xml:base=".."></kkk>
         <lll xml:base="../"></lll>
 </doc>]]></assert-string-value>
         </result>
