@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-ItemTypeDecl"
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-recordTypeDecl"
           covers-40="PR1355">
-   <description>Tests for item type declarations: 4.0 proposal</description>
-   <link type="spec" document="http://www.w3.org/TR/xpath-functions-11/"
-         idref="func-abs"/>
+   <description>Tests for record type declarations: 4.0 proposal</description>
+ 
    
    <environment name="user-defined-types">
       <schema uri="http://www.w3.org/XQueryTest/userDefinedTypes" file="../docs/userdefined.xsd">
@@ -14,70 +13,157 @@
          
    <dependency type="spec" value="XQ40+"/>
       
-   <test-case name="itemTypeDecl-001" covers-40="PR1132">
-      <description>local union type, used in instance of</description>
-      <created by="Michael Kay" on="2023-09-08"/>
-      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+   <test-case name="recordTypeDecl-001">
+      <description>local record type, used in instance of</description>
+      <created by="Michael Kay" on="2026-07-06"/>
       <test><![CDATA[
-         declare type local:int-or-string as (xs:integer | xs:string);
-      	2 instance of local:int-or-string
+         declare record local:R (a, b);
+      	let $r as local:R := {'a':1, 'b':2}
+      	return $r instance of local:R
       ]]></test>
       <result>
          <assert-true/>
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-002" covers-40="PR1132">
-      <description>local union type, used in instance of with occurrence indicator</description>
-      <created by="Michael Kay" on="2023-09-08"/>
-      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+   <test-case name="recordTypeDecl-002">
+      <description>local record type, used in instance of with occurrence indicator</description>
+      <created by="Michael Kay" on="2026-07-06"/>
       <test><![CDATA[
-         declare type local:int-or-string as (xs:integer | xs:string);
-      	(2, "fred") instance of local:int-or-string*
+         declare record local:R ('first name', "last name");
+      	let $r as local:R* := ({'first name':1, 'last name':2}, {'first name':11, 'last name':22})
+      	return $r instance of local:R+
       ]]></test>
       <result>
          <assert-true/>
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-003" covers-40="PR1132">
-      <description>local union type, used in cast as. Issue 163</description>
-      <created by="Michael Kay" on="2023-09-08"/>
-      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+   <test-case name="recordTypeDecl-003">
+      <description>local record type, instance not coerced to type</description>
+      <created by="Michael Kay" on="2026-07-06"/>
       <test><![CDATA[
-         declare type local:int-or-string as (xs:integer | xs:string);
-      	"fred" cast as local:int-or-string
+         declare record local:R (a, b);
+      	let $r := {'a':1, 'b':2}
+      	return $r instance of local:R
       ]]></test>
       <result>
-         <all-of>
-            <assert-type>xs:string</assert-type>
-            <assert-eq>"fred"</assert-eq>
-         </all-of>
+         <assert-false/>
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-004" covers-40="PR1132">
-      <description>local union type, used in cast as. Issue 163</description>
-      <created by="Michael Kay" on="2023-09-08"/>
-      <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
+   <test-case name="recordTypeDecl-004">
+      <description>local record type, invalid syntax</description>
+      <created by="Michael Kay" on="2026-07-06"/>
       <test><![CDATA[
-         declare type local:int-or-string as (xs:integer | xs:string);
-      	"30" cast as local:int-or-string
+         declare record local:R (*);
+      	let $r := {'a':1, 'b':2}
+      	return $r instance of local:R
       ]]></test>
       <result>
-         <all-of>
-            <assert-type>xs:integer</assert-type>
-            <assert-eq>30</assert-eq>
-         </all-of>
+         <assert-false/>
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-005" covers-40="PR1132">
+   <test-case name="recordTypeDecl-005">
+      <description>local record type, initial values</description>
+      <created by="Michael Kay" on="2026-07-06"/>
+      <test><![CDATA[
+         declare record local:R (a := 5, b := 6);
+      	let $r := {'a':1, 'b':2}
+      	return $r instance of local:R
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-005">
+      <description>local record type, declared types plus initial values</description>
+      <created by="Michael Kay" on="2026-07-06"/>
+      <test><![CDATA[
+         declare record local:R (a as xs:integer := 5, b as xs:string := 'xyz');
+      	let $r := {'a':1, 'b':'pqr'}
+      	return $r instance of local:R
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-006">
+      <description>local record type, constructor function</description>
+      <created by="Michael Kay" on="2026-07-06"/>
+      <test><![CDATA[
+         declare record local:R (a as xs:integer := 5, b as xs:string := 'xyz');
+      	let $r := local:R(7, "abba")
+      	return [$r?a, $r?b]
+      ]]></test>
+      <result>
+         <assert-deep-eq>[7, "abba"]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-007">
+      <description>local record type, constructor function with keyword parameters</description>
+      <created by="Michael Kay" on="2026-07-06"/>
+      <test><![CDATA[
+         declare record local:R (a as xs:integer := 5, b as xs:string := 'xyz');
+      	let $r := local:R(b := "saas", a := 42)
+      	return [$r?a, $r?b]
+      ]]></test>
+      <result>
+         <assert-deep-eq>[42, "saas"]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-008">
+      <description>local record type, constructor function with defaulted parameters</description>
+      <created by="Michael Kay" on="2026-07-06"/>
+      <test><![CDATA[
+         declare record local:R (a as xs:integer := 5, b as xs:string := 'xyz');
+      	let $r := local:R(a := 30)
+      	return [$r?a, $r?b]
+      ]]></test>
+      <result>
+         <assert-deep-eq>[30, "xyz"]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-009">
+      <description>local record type, forwards reference to constructor function</description>
+      <created by="Michael Kay" on="2026-07-06"/>
+      <test><![CDATA[        
+      	declare variable $r := local:R(a := 30);
+      	declare record local:R (a as xs:integer := 5, b as xs:string := 'xyz');
+      	return [$r?a, $r?b]
+      ]]></test>
+      <result>
+         <assert-deep-eq>[30, "xyz"]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-010">
+      <description>local record type, forwards reference to constructor function and type</description>
+      <created by="Michael Kay" on="2026-07-06"/>
+      <test><![CDATA[        
+      	declare variable $r := local:R(a := 30);
+      	declare function local:F($x) { $x instance of local:R and $x?a = 30 and $x?b = 'xyz');
+      	declare record local:R (a as xs:integer := 5, b as xs:string := 'xyz');
+      	return local:F($r)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+ <!--   
+   <test-case name="recordTypeDecl-005" covers-40="PR1132">
       <description>local union type, used in treat as</description>
       <created by="Michael Kay" on="2023-09-08"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <test><![CDATA[
-         declare type local:int-or-string as (xs:integer | xs:string);
+         declare record local:int-or-string as (xs:integer | xs:string);
       	"fred" treat as local:int-or-string
       ]]></test>
       <result>
@@ -85,12 +171,12 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-006" covers-40="PR1132">
+   <test-case name="recordTypeDecl-006" covers-40="PR1132">
       <description>local union type, used in variable declaration</description>
       <created by="Michael Kay" on="2023-09-08"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <test><![CDATA[
-         declare type local:int-or-string as (xs:integer | xs:string);
+         declare record local:int-or-string as (xs:integer | xs:string);
       	declare variable $fred as local:int-or-string := 17;
       	$fred
       ]]></test>
@@ -102,7 +188,7 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-007" covers-40="PR1132">
+   <test-case name="recordTypeDecl-007" covers-40="PR1132">
       <description>local union type, used in variable declaration, forwards reference
          (now allowed)</description>
       <created by="Michael Kay" on="2023-09-08"/>
@@ -111,7 +197,7 @@
       <modified by="Michael Kay" on="2026-06-29" change="forward reference is now allowed"/>
       <test><![CDATA[
          declare variable $fred as local:int-or-string := 17;
-         declare type local:int-or-string as (xs:integer | xs:string);     	
+         declare record local:int-or-string as (xs:integer | xs:string);     	
       	$fred
       ]]></test>
       <result>
@@ -119,12 +205,12 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-008" covers-40="PR1132">
+   <test-case name="recordTypeDecl-008" covers-40="PR1132">
       <description>local union type, used as function argument</description>
       <created by="Michael Kay" on="2023-09-08"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <test><![CDATA[
-         declare type local:int-or-string as (xs:integer | xs:string);
+         declare record local:int-or-string as (xs:integer | xs:string);
       	declare function local:increment ($val as local:int-or-string) as xs:integer {
       	    if ($val instance of xs:integer) then $val + 1 else string-length($val) + 1
       	};
@@ -135,12 +221,12 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-009" covers-40="PR1132">
+   <test-case name="recordTypeDecl-009" covers-40="PR1132">
       <description>local union type, used as function result</description>
       <created by="Michael Kay" on="2023-09-08"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <test><![CDATA[
-         declare type local:int-or-string as (xs:integer | xs:string);
+         declare record local:int-or-string as (xs:integer | xs:string);
       	declare function local:show ($val as xs:integer) as local:int-or-string {
       	    if ($val lt 0) then $val else string($val)
       	};
@@ -151,7 +237,7 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-010" covers-40="PR1132">
+   <test-case name="recordTypeDecl-010" covers-40="PR1132">
       <description>local union type, used as function argument, forwards reference</description>
       <created by="Michael Kay" on="2023-09-08"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
@@ -161,7 +247,7 @@
          declare function local:increment ($val as local:int-or-string) as xs:integer {
       	    if ($val instance of xs:integer) then $val + 1 else string-length($val) + 1
       	};
-      	declare type local:int-or-string as (xs:integer | xs:string);
+      	declare record local:int-or-string as (xs:integer | xs:string);
       	(local:increment(17), local:increment("two"))
       ]]></test>
       <result>
@@ -169,12 +255,12 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-011" covers-40="PR1132">
+   <test-case name="recordTypeDecl-011" covers-40="PR1132">
       <description>local union type, used as type of local variable</description>
       <created by="Michael Kay" on="2023-09-08"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <test><![CDATA[
-      	declare type local:int-or-string as (xs:integer | xs:string);
+      	declare record local:int-or-string as (xs:integer | xs:string);
       	let $x as local:int-or-string := 42 return $x + 1
       ]]></test>
       <result>
@@ -182,12 +268,12 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-012" covers-40="PR1132">
+   <test-case name="recordTypeDecl-012" covers-40="PR1132">
       <description>local union type, used as type of local variable, type error</description>
       <created by="Michael Kay" on="2023-09-08"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <test><![CDATA[
-      	declare type local:int-or-string as (xs:integer | xs:string);
+      	declare record local:int-or-string as (xs:integer | xs:string);
       	let $x as local:int-or-string := 8.3 return $x + 1
       ]]></test>
       <result>
@@ -195,12 +281,12 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-013" covers-40="PR1132">
+   <test-case name="recordTypeDecl-013" covers-40="PR1132">
       <description>local union type, used in castable as. Issue 163</description>
       <created by="Michael Kay" on="2023-09-08"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <test><![CDATA[
-         declare type local:int-or-string as (xs:integer | xs:string);
+         declare record local:int-or-string as (xs:integer | xs:string);
       	"fred" castable as local:int-or-string
       ]]></test>
       <result>
@@ -208,7 +294,7 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-014" covers-40="PR1132">
+   <test-case name="recordTypeDecl-014" covers-40="PR1132">
       <description>%public is ignored in main module</description>
       <created by="Michael Kay" on="2023-09-08"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
@@ -221,7 +307,7 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-015" covers-40="PR1132">
+   <test-case name="recordTypeDecl-015" covers-40="PR1132">
       <description>%private is ignored in main module</description>
       <created by="Michael Kay" on="2023-09-08"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
@@ -234,12 +320,12 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-016" covers-40="PR1908">
+   <test-case name="recordTypeDecl-016" covers-40="PR1908">
       <description>Forwards references are allowed</description>
       <created by="Michael Kay" on="2025-03-31"/>
       <test><![CDATA[
          declare variable $cplx as local:complex-number := {'real': 0, 'imag': 1};
-         declare type local:complex-number as map(*);
+         declare record local:complex-number as map(*);
       	`{$cplx?real} + {$cplx?imag}i`
       ]]></test>
       <result>
@@ -247,12 +333,12 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-017" covers-40="PR1908">
+   <test-case name="recordTypeDecl-017" covers-40="PR1908">
       <description>Self-references are not allowed</description>
       <created by="Michael Kay" on="2025-03-31"/>
       <test><![CDATA[
          declare variable $cplx as local:complex-number := {'real': 0, 'imag': 1};
-         declare type local:complex-number as map(xs:string, local:complex-number);
+         declare record local:complex-number as map(xs:string, local:complex-number);
       	`{$cplx?real} + {$cplx?imag}i`
       ]]></test>
       <result>
@@ -260,12 +346,12 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-018" covers-40="PR1908">
+   <test-case name="recordTypeDecl-018" covers-40="PR1908">
       <description>Mutual recursion is not allowed</description>
       <created by="Michael Kay" on="2025-03-31"/>
       <test><![CDATA[
-         declare type local:yin as map(xs:string, local:yan);
-         declare type local:yan as map(xs:string, local:yin);
+         declare record local:yin as map(xs:string, local:yan);
+         declare record local:yan as map(xs:string, local:yin);
       	declare variable $x as local:yin external;
       	$x
       ]]></test>
@@ -274,16 +360,16 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-019" covers-40="PR1908">
+   <test-case name="recordTypeDecl-019" covers-40="PR1908">
       <description>Forwards references are allowed: multiple indirection</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
          declare variable $cplx as local:complex-number := {'real': 0, 'imag': 1};
-         declare type local:complex-number as local:complex-number2;
-         declare type local:complex-number2 as local:complex-number3;
-         declare type local:complex-number3 as local:complex-number4;
-         declare type local:complex-number4 as local:complex-number5;
-         declare type local:complex-number5 as map(*);
+         declare record local:complex-number as local:complex-number2;
+         declare record local:complex-number2 as local:complex-number3;
+         declare record local:complex-number3 as local:complex-number4;
+         declare record local:complex-number4 as local:complex-number5;
+         declare record local:complex-number5 as map(*);
       	`{$cplx?real} + {$cplx?imag}i`
       ]]></test>
       <result>
@@ -291,12 +377,12 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-020" covers-40="PR1908">
+   <test-case name="recordTypeDecl-020" covers-40="PR1908">
       <description>Map key type must be atomic</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
          declare variable $cplx as map(local:key-type, item()*) := {'real': 0, 'imag': 1};
-         declare type local:key-type as element(*);
+         declare record local:key-type as element(*);
       	`{$cplx?real} + {$cplx?imag}i`
       ]]></test>
       <result>
@@ -304,12 +390,12 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-021" covers-40="PR1908">
+   <test-case name="recordTypeDecl-021" covers-40="PR1908">
       <description>Map key type must be atomic</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
          declare variable $cplx as map(local:key-type, item()*) := {'real': 0, 'imag': 1};
-         declare type local:key-type as xs:string;
+         declare record local:key-type as xs:string;
       	`{$cplx?real} + {$cplx?imag}i`
       ]]></test>
       <result>
@@ -317,12 +403,12 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-022" covers-40="PR1908">
+   <test-case name="recordTypeDecl-022" covers-40="PR1908">
       <description>Map key type must be atomic</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
          declare variable $cplx as map(local:key-type, item()*) := {'real': 0, 'imag': 1};
-         declare type local:key-type as enum('real', 'imag');
+         declare record local:key-type as enum('real', 'imag');
       	`{$cplx?real} + {$cplx?imag}i`
       ]]></test>
       <result>
@@ -330,7 +416,7 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-023" covers-40="PR1908">
+   <test-case name="recordTypeDecl-023" covers-40="PR1908">
       <description>Forward reference in let clause</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
@@ -338,7 +424,7 @@
             let $x as local:x-type := xs:date('2026-06-30')
             return string($x)
          };   
-         declare type local:x-type as (xs:date | xs:time);
+         declare record local:x-type as (xs:date | xs:time);
       	local:f()
       ]]></test>
       <result>
@@ -346,7 +432,7 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-024" covers-40="PR1908">
+   <test-case name="recordTypeDecl-024" covers-40="PR1908">
       <description>Forward reference in group by clause</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
@@ -355,7 +441,7 @@
             group by $g as local:group-type+ := $x mod 50
             return count($x)
          };   
-         declare type local:group-type as xs:long;
+         declare record local:group-type as xs:long;
       	local:f() => distinct-values()
       ]]></test>
       <result>
@@ -363,14 +449,14 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-025" covers-40="PR1908">
+   <test-case name="recordTypeDecl-025" covers-40="PR1908">
       <description>Forward reference in cast expression</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
          declare function local:f() {
             '2026-06-30' cast as local:x-type
          };   
-         declare type local:x-type as (xs:date | xs:time);
+         declare record local:x-type as (xs:date | xs:time);
       	local:f()
       ]]></test>
       <result>
@@ -378,14 +464,14 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-026" covers-40="PR1908">
+   <test-case name="recordTypeDecl-026" covers-40="PR1908">
       <description>Forward reference in constructor function</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
          declare function local:f() {
              local:x-type('2026-06-30')
          };   
-         declare type local:x-type as (xs:date | xs:time);
+         declare record local:x-type as (xs:date | xs:time);
       	local:f()
       ]]></test>
       <result>
@@ -393,21 +479,21 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-027" covers-40="PR1908">
+   <test-case name="recordTypeDecl-027" covers-40="PR1908">
       <description>Error, duplicate type names</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[  
-         declare type local:a as (xs:date | xs:time);
-         declare type local:b as (xs:date | xs:time);
-         declare type local:c as (xs:date | xs:time);
-         declare type local:d as (xs:date | xs:time);
-         declare type local:elephant as (xs:date | xs:time);
-         declare type local:f as (xs:date | xs:time);
-         declare type local:g as (xs:date | xs:time);
-         declare type local:h as (xs:date | xs:time);
-         declare type local:i as (xs:date | xs:time);
-         declare type local:j as (xs:date | xs:time);
-         declare type local:elephant as (xs:date | xs:time | xs:dateTime | xs:integer);
+         declare record local:a as (xs:date | xs:time);
+         declare record local:b as (xs:date | xs:time);
+         declare record local:c as (xs:date | xs:time);
+         declare record local:d as (xs:date | xs:time);
+         declare record local:elephant as (xs:date | xs:time);
+         declare record local:f as (xs:date | xs:time);
+         declare record local:g as (xs:date | xs:time);
+         declare record local:h as (xs:date | xs:time);
+         declare record local:i as (xs:date | xs:time);
+         declare record local:j as (xs:date | xs:time);
+         declare record local:elephant as (xs:date | xs:time | xs:dateTime | xs:integer);
       	let $x as local:elephant := trunk(1 to 100) return $x + 1
       ]]></test>
       <result>
@@ -415,14 +501,14 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-028">
+   <test-case name="recordTypeDecl-028">
       <description> Item type references a user-defined type in a schema. </description>
       <created by="Michael Kay" on="2026-06-30"/>
       <environment ref="user-defined-types"/>
       <dependency type="feature" value="schemaImport"/>
       <test>
          import schema namespace myType="http://www.w3.org/XQueryTest/userDefinedTypes";
-         declare type local:Q as myType:QNameBased;
+         declare record local:Q as myType:QNameBased;
          let $var := myType:QNameBased("value1") return $var instance of local:Q
       </test>
       <result>
@@ -430,14 +516,14 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-029" covers-40="PR1908">
+   <test-case name="recordTypeDecl-029" covers-40="PR1908">
       <description>Error, duplicate type names</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <environment ref="user-defined-types"/>
       <dependency type="feature" value="schemaImport"/>
       <test><![CDATA[  
          import schema namespace myType="http://www.w3.org/XQueryTest/userDefinedTypes";
-         declare type myType:QNameBased as xs:QName;
+         declare record myType:QNameBased as xs:QName;
          42
       ]]></test>
       <result>
@@ -445,10 +531,10 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-030" covers-40="PR1908">
+   <test-case name="recordTypeDecl-030" covers-40="PR1908">
       <description> Reference public item type in library module </description>
       <created by="Michael Kay" on="2026-06-30"/>
-      <module uri="http://example.ns/module1" file="ItemTypeDecl/module1.xq"/>
+      <module uri="http://example.ns/module1" file="recordTypeDecl/module1.xq"/>
       <test>
         import module namespace mod1="http://example.ns/module1"; 
         declare variable $temp as mod1:chrono := xs:date('2026-06-30');
@@ -459,10 +545,10 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-031" covers-40="PR1908">
+   <test-case name="recordTypeDecl-031" covers-40="PR1908">
       <description> Reference private item type in library module </description>
       <created by="Michael Kay" on="2026-06-30"/>
-      <module uri="http://example.ns/module1" file="ItemTypeDecl/module1.xq"/>
+      <module uri="http://example.ns/module1" file="recordTypeDecl/module1.xq"/>
       <test>
          import module namespace mod1="http://example.ns/module1"; 
          declare variable $temp as mod1:extended-chrono := xs:date('2026-06-30');
@@ -473,10 +559,10 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-032" covers-40="PR1908">
+   <test-case name="recordTypeDecl-032" covers-40="PR1908">
       <description> item type in library module is both %public and %private </description>
       <created by="Michael Kay" on="2026-06-30"/>
-      <module uri="http://example.ns/module2" file="ItemTypeDecl/module2.xq"/>
+      <module uri="http://example.ns/module2" file="recordTypeDecl/module2.xq"/>
       <test>
          import module namespace mod2="http://example.ns/module2"; 
          declare variable $temp as mod2:extended-chrono := xs:date('2026-06-30');
@@ -487,14 +573,14 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-033" covers-40="PR1908">
+   <test-case name="recordTypeDecl-033" covers-40="PR1908">
       <description> Name clash with public item type in library module </description>
       <created by="Michael Kay" on="2026-06-30"/>
-      <module uri="http://example.ns/module1" file="ItemTypeDecl/module1.xq"/>
+      <module uri="http://example.ns/module1" file="recordTypeDecl/module1.xq"/>
       <test>
          import module namespace mod1="http://example.ns/module1"; 
          declare variable $temp as mod1:chrono := xs:date('2026-06-30');
-         declare type mod1:chrono as xs:integer;
+         declare record mod1:chrono as xs:integer;
          $temp => string()
       </test>
       <result>
@@ -502,10 +588,10 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-034" covers-40="PR1908">
+   <test-case name="recordTypeDecl-034" covers-40="PR1908">
       <description> item type in library module is not in module namespace </description>
       <created by="Michael Kay" on="2026-06-30"/>
-      <module uri="http://example.ns/module3" file="ItemTypeDecl/module3.xq"/>
+      <module uri="http://example.ns/module3" file="recordTypeDecl/module3.xq"/>
       <test>
          import module namespace mod3="http://example.ns/module3"; 
          declare variable $temp as mod3:chrono := xs:date('2026-06-30');
@@ -516,10 +602,10 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-035" covers-40="PR1908">
+   <test-case name="recordTypeDecl-035" covers-40="PR1908">
       <description> Reference implicitly public item type in library module </description>
       <created by="Michael Kay" on="2026-06-30"/>
-      <module uri="http://example.ns/module1" file="ItemTypeDecl/module1.xq"/>
+      <module uri="http://example.ns/module1" file="recordTypeDecl/module1.xq"/>
       <test>
          import module namespace mod1="http://example.ns/module1"; 
          declare variable $temp as mod1:numeric := 42;
@@ -530,10 +616,10 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-036" covers-40="PR1908">
+   <test-case name="recordTypeDecl-036" covers-40="PR1908">
       <description> Reference public variable with a private item type in library module </description>
       <created by="Michael Kay" on="2026-06-30"/>
-      <module uri="http://example.ns/module1" file="ItemTypeDecl/module1.xq"/>
+      <module uri="http://example.ns/module1" file="recordTypeDecl/module1.xq"/>
       <test>
          import module namespace mod1="http://example.ns/module1"; 
          year-from-dateTime($mod1:now) idiv 2000
@@ -543,14 +629,14 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-037" covers-40="PR1908">
+   <test-case name="recordTypeDecl-037" covers-40="PR1908">
       <description>Forward reference in treat as expression</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
          declare function local:f($x) {
              $x treat as local:x-type
          };   
-         declare type local:x-type as (xs:date | xs:time);
+         declare record local:x-type as (xs:date | xs:time);
       	local:f(xs:time('12:00:00')) => string()
       ]]></test>
       <result>
@@ -558,14 +644,14 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-038" covers-40="PR1908">
+   <test-case name="recordTypeDecl-038" covers-40="PR1908">
       <description>Forward reference in instance of expression</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
          declare function local:f($x) {
              $x instance of local:x-type
          };   
-         declare type local:x-type as (xs:date | xs:time);
+         declare record local:x-type as (xs:date | xs:time);
       	local:f(xs:time('12:00:00'))
       ]]></test>
       <result>
@@ -573,15 +659,15 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-039" covers-40="PR1908">
+   <test-case name="recordTypeDecl-039" covers-40="PR1908">
       <description>Backward reference in typeswitch expression</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[        
-         declare type local:integer as xs:integer;
-         declare type local:boolean as xs:boolean;
-         declare type local:string as xs:string;
-         declare type local:double as xs:double;
-         declare type local:duration as xs:duration;
+         declare record local:integer as xs:integer;
+         declare record local:boolean as xs:boolean;
+         declare record local:string as xs:string;
+         declare record local:double as xs:double;
+         declare record local:duration as xs:duration;
          declare function local:f($x) {
              typeswitch ($x) {
                case local:integer | local:double return "N"
@@ -597,7 +683,7 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-040" covers-40="PR1908">
+   <test-case name="recordTypeDecl-040" covers-40="PR1908">
       <description>Forward reference in typeswitch expression</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
@@ -609,11 +695,11 @@
                default return "?"
              }
          };   
-         declare type local:integer as xs:integer;
-         declare type local:boolean as xs:boolean;
-         declare type local:string as xs:string;
-         declare type local:double as xs:double;
-         declare type local:duration as xs:duration;
+         declare record local:integer as xs:integer;
+         declare record local:boolean as xs:boolean;
+         declare record local:string as xs:string;
+         declare record local:double as xs:double;
+         declare record local:duration as xs:duration;
       	local:f(42)
       ]]></test>
       <result>
@@ -621,18 +707,18 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-041" covers-40="PR1908">
+   <test-case name="recordTypeDecl-041" covers-40="PR1908">
       <description>Forward reference in record definition</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
          declare function local:f() as record(a as local:integer+, b as local:boolean+) {
              {'a': 23, 'b': (true(), false())}
          };   
-         declare type local:integer as xs:integer;
-         declare type local:boolean as xs:boolean;
-         declare type local:string as xs:string;
-         declare type local:double as xs:double;
-         declare type local:duration as xs:duration;
+         declare record local:integer as xs:integer;
+         declare record local:boolean as xs:boolean;
+         declare record local:string as xs:string;
+         declare record local:double as xs:double;
+         declare record local:duration as xs:duration;
       	local:f()?a
       ]]></test>
       <result>
@@ -640,18 +726,18 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-042" covers-40="PR1908">
+   <test-case name="recordTypeDecl-042" covers-40="PR1908">
       <description>Forward reference in JNode type</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
          declare function local:f() as jnode(*, record(a as local:integer+, b as local:boolean+))* {
              [{'a': 32, 'b': true()}, {'a': 23, 'b': (true(), false())}]/child::*
          };   
-         declare type local:integer as xs:integer;
-         declare type local:boolean as xs:boolean;
-         declare type local:string as xs:string;
-         declare type local:double as xs:double;
-         declare type local:duration as xs:duration;
+         declare record local:integer as xs:integer;
+         declare record local:boolean as xs:boolean;
+         declare record local:string as xs:string;
+         declare record local:double as xs:double;
+         declare record local:duration as xs:duration;
       	local:f()?a
       ]]></test>
       <result>
@@ -659,7 +745,7 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-043" covers-40="PR1908">
+   <test-case name="recordTypeDecl-043" covers-40="PR1908">
       <description>Forward reference in inline function declaration</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <test><![CDATA[
@@ -667,11 +753,11 @@
              let $f := fn($x as local:string) as local:integer { string-length($x) }
              return $f($s) eq 4
          };   
-         declare type local:integer as xs:integer;
-         declare type local:boolean as xs:boolean;
-         declare type local:string as xs:string;
-         declare type local:double as xs:double;
-         declare type local:duration as xs:duration;
+         declare record local:integer as xs:integer;
+         declare record local:boolean as xs:boolean;
+         declare record local:string as xs:string;
+         declare record local:double as xs:double;
+         declare record local:duration as xs:duration;
       	local:f1("abcd")
       ]]></test>
       <result>
@@ -679,10 +765,10 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-044" covers-40="PR1908">
+   <test-case name="recordTypeDecl-044" covers-40="PR1908">
       <description> Reference public item type with a reference to a private item type in library module </description>
       <created by="Michael Kay" on="2026-07-02"/>
-      <module uri="http://example.ns/module4" file="ItemTypeDecl/module4.xq"/>
+      <module uri="http://example.ns/module4" file="recordTypeDecl/module4.xq"/>
       <test>
          import module namespace mod4="http://example.ns/module4"; 
          { "r1": $mod4:dateNow(),
@@ -701,10 +787,10 @@
       </result>
    </test-case>
    
-   <test-case name="itemTypeDecl-045" covers-40="PR1908">
+   <test-case name="recordTypeDecl-045" covers-40="PR1908">
       <description> Private item type in library module has same name as item type in main module</description>
       <created by="Michael Kay" on="2026-07-02"/>
-      <module uri="http://example.ns/module4" file="ItemTypeDecl/module4.xq"/>
+      <module uri="http://example.ns/module4" file="recordTypeDecl/module4.xq"/>
       <test>
          import module namespace mod4="http://example.ns/module4";
          declare %private type mod4:dateSupplier as element(foo);        
@@ -727,7 +813,7 @@
    
    
  
- 
+ -->
    
  
 
