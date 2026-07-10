@@ -275,6 +275,83 @@ it put its sooty foot."
    
   
    
+   <test-case name="matching-segments-020" covers-40="PR2717">
+      <description>matching-segments with named captured groups.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[matching-segments("banana", "a(?<letter>n)")]]></test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"an", "position":2, "groups":{"letter": {"group":"n", "position": 3}}},
+            {"substring":"an", "position":4, "groups":{"letter": {"group":"n", "position": 5}}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="matching-segments-021" covers-40="PR2717">
+      <description>matching-segments with named captured groups.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[matching-segments("2026-06-25", "(\d{4})-(?<month>\d{2})-(\d{2})")]]></test>
+      <result>
+         <all-of>
+            <assert-deep-eq>
+               {"substring":"2026-06-25", "position":1,
+                "groups":{1: {"group":"2026", "position":1},
+                          "month": {"group":"06", "position":6},
+                          3: {"group":"25", "position":9}}}
+            </assert-deep-eq>
+            <assert>not(map:contains($result?groups, 2))</assert>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="matching-segments-022" covers-40="PR2717">
+      <description>matching-segments with named captured groups.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[map:keys(matching-segments("2026-06-25", "(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})")?groups)]]></test>
+      <result>
+         <assert-deep-eq>("year", "month", "day")</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="matching-segments-023" covers-40="PR2717">
+      <description>matching-segments with named captured groups.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[matching-segments("2026-06-25", "(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})")]]></test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"2026-06-25", "position":1,
+             "groups":{"year": {"group":"2026", "position":1},
+                       "month": {"group":"06", "position":6},
+                       "day": {"group":"25", "position":9}}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="matching-segments-024" covers-40="PR2717">
+      <description>matching-segments with named captured groups.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[matching-segments("how now", "(?<h>how)|(?<n>now)")]]></test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"how", "position":1, "groups":{"h": {"group":"how", "position":1}}},
+            {"substring":"now", "position":5, "groups":{"n": {"group":"now", "position":5}}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="matching-segments-025" covers-40="PR2717">
+      <description>matching-segments with named captured groups.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[matching-segments("Chapter 17", "(?<kind>Chapter|Appendix)\s+(?=(?<num>\d+))")]]></test>
+      <result>
+         <assert-deep-eq>
+            {"substring":"Chapter ", "position":1,
+             "groups":{"kind": {"group":"Chapter", "position":1},
+                       "num": {"group":"17", "position":9}}}
+         </assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="matching-segments-029">
       <description> Matching groups within repeated clause </description>
       <created by="Michael Kay" on="2026-06-08"/>
