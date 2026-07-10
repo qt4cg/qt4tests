@@ -392,5 +392,25 @@
             <assert>$result eq ("caf" || codepoints-to-string(233))</assert>
         </result>
     </test-case>
+
+    <test-case name="parse-xml-fragment-504" covers-40="PR2013">
+        <description>Parse from hexBinary</description>
+        <created by="Christian Gruen" on="2026-07-10"/>
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>
+            (: fragment declared iso-8859-1, but its accented letter is the UTF-8 pair C3 A9;
+               per unparsed-text rules the encoding declaration may or may not be applied :)
+            string(parse-xml-fragment(xs:hexBinary("3C3F786D6C2076657273696F6E3D27312E302720656E636F64696E673D2769736F2D383835392D31273F3E3C613E636166C3A93C2F613E")))
+        </test>
+        <result>
+            <any-of>
+                <!-- declaration applied: bytes read as iso-8859-1 -->
+                <assert>$result eq ("caf" || codepoints-to-string(195) || codepoints-to-string(169))</assert>
+                <!-- declaration skipped: bytes read as UTF-8 -->
+                <assert>$result eq ("caf" || codepoints-to-string(233))</assert>
+            </any-of>
+        </result>
+    </test-case>
     
 </test-set>
