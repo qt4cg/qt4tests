@@ -3120,6 +3120,125 @@
       </result>
    </test-case>
 
-   
+   <test-case name="let-map-024" covers-40="PR2055 PR2766">
+      <description>Deconstruct record.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x, $y } as record(x, y) := { 'x': 1, 'y': 2 } return ($x, $y)</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="let-map-025" covers-40="PR2055 PR2766">
+      <description>Deconstruct record.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x, $z } as record(x, y) := { 'x': 1, 'y': 2 } return ($x, $z)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="let-map-026" covers-40="PR2055 PR2766">
+      <description>Deconstruct record.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record local:point(x as xs:integer, y as xs:integer);
+         let ${ $x, $z } := local:point(1, 2)
+         return ($x, $z)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="let-map-027" covers-40="PR2055 PR2766">
+      <description>Deconstruct record.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x, $z } as record(*) := { 'x': 1, 'y': 2 } return ($x, $z)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="let-map-028" covers-40="PR2055 PR2766">
+      <description>Deconstruct map.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>let ${ $x, $z } as map(xs:string, xs:integer) := { 'x': 1, 'y': 2 } return ($x, $z)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="let-map-029" covers-40="PR2055">
+      <description>Deconstruct record.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record local:point(x as xs:integer, y as xs:integer);
+         for $p in (local:point(1, 2), local:point(3, 4))
+         let ${ $x, $y } := $p
+         where $x gt 1
+         return $x + $y</test>
+      <result>
+         <assert-eq>7</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="let-map-030" covers-40="PR2055">
+      <description>Deconstruct map.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>
+         let ${ $x, $y } := { 'x': 1, 'y': 2 }
+         let ${ $a, $b } := { 'a': $x + $y, 'b': $x * $y }
+         return ($a, $b)</test>
+      <result>
+         <assert-deep-eq>3, 2</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="let-map-031" covers-40="PR2055">
+      <description>Deconstruct map.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>
+         let ${ $x, $y } := { 'x': 1, 'y': { 'a': 2, 'b': 3 } }
+         let ${ $a, $b } := $y
+         return ($x, $a, $b)</test>
+      <result>
+         <assert-deep-eq>1, 2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="let-map-032" covers-40="PR2055">
+      <description>Deconstruct map.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>
+         let ${ $x, $y } := { 'x': [ 1, 2 ], 'y': [ 3, 4 ] }
+         let $[ $a, $b ] := $x
+         return ($a, $b)</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="let-map-033" covers-40="PR2055 PR2766">
+      <description>Deconstruct record.</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record local:point(x as xs:integer, y as xs:integer);
+         for $p in local:point(1, 2)
+         let ${ $x, $z } := $p
+         return ($x, $z)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
 
 </test-set>
