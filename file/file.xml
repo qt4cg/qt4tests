@@ -2921,6 +2921,388 @@
     </result>
   </test-case>
 
+  <!-- file:descendants -->
+
+  <test-case name="EXPath-file-descendants-001" covers-40="PR2649">
+    <description>Descendants of empty directory</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5"),
+      file:descendants("dir5")
+    </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-002" covers-40="PR2649">
+    <description>Descendants of non-empty directory</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/geneva.txt", "geneva"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      file:write-text("dir5/dir6/dir7/oslo.txt", "oslo"),
+      file:descendants("dir5")
+    </test>
+    <result>
+      <assert>deep-equal(
+        sort($result ! substring-after(translate(., "\", "/"), "dir5/")),
+        sort(("berlin.txt", "geneva.txt", "dir6/",
+          "dir6/helsinki.txt", "dir6/dir7/", "dir6/dir7/oslo.txt")))</assert>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-003" covers-40="PR2649">
+    <description>Descendants, path format and trailing separator</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/geneva.txt", "geneva"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      file:write-text("dir5/dir6/dir7/oslo.txt", "oslo"),
+      file:descendants("dir5")
+    </test>
+    <result>
+      <all-of>
+        <assert>count($result) = 6</assert>
+        <assert>every $r in $result satisfies
+          contains($r, "dir5" || Q{http://expath.org/ns/file}dir-separator())</assert>
+        <assert>every $d in $result[Q{http://expath.org/ns/file}is-dir(.)] satisfies
+          ends-with($d, Q{http://expath.org/ns/file}dir-separator())</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-depth-001" covers-40="PR2649">
+    <description>Descendants, depth = 0</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/geneva.txt", "geneva"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      file:write-text("dir5/dir6/dir7/oslo.txt", "oslo"),
+      file:descendants("dir5", { "depth": 0 })
+    </test>
+    <result>
+      <assert>deep-equal(
+        sort($result ! substring-after(translate(., "\", "/"), "dir5/")),
+        sort(("berlin.txt", "geneva.txt", "dir6/")))</assert>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-depth-002" covers-40="PR2649">
+    <description>Descendants, depth = 1</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/geneva.txt", "geneva"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      file:write-text("dir5/dir6/dir7/oslo.txt", "oslo"),
+      file:descendants("dir5", { "depth": 1 })
+    </test>
+    <result>
+      <assert>deep-equal(
+        sort($result ! substring-after(translate(., "\", "/"), "dir5/")),
+        sort(("berlin.txt", "geneva.txt", "dir6/",
+          "dir6/helsinki.txt", "dir6/dir7/")))</assert>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-depth-003" covers-40="PR2649">
+    <description>Descendants, depth = empty sequence</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/geneva.txt", "geneva"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      file:write-text("dir5/dir6/dir7/oslo.txt", "oslo"),
+      file:descendants("dir5", { "depth": () })
+    </test>
+    <result>
+      <assert>deep-equal(
+        sort(file:descendants("dir5", { "depth": () })),
+        sort(file:descendants("dir5")))</assert>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-depth-004" covers-40="PR2649">
+    <description>Descendants, depth exceeds tree height</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/geneva.txt", "geneva"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      file:write-text("dir5/dir6/dir7/oslo.txt", "oslo"),
+      file:descendants("dir5", { "depth": 99 })
+    </test>
+    <result>
+      <assert>deep-equal(
+        sort(file:descendants("dir5", { "depth": 99 })),
+        sort(file:descendants("dir5")))</assert>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-filter-001" covers-40="PR2649">
+    <description>Descendants, filter directories</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/geneva.txt", "geneva"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      file:write-text("dir5/dir6/dir7/oslo.txt", "oslo"),
+      file:descendants("dir5", { "filter": Q{http://expath.org/ns/file}is-dir#1 })
+    </test>
+    <result>
+      <assert>deep-equal(
+        sort($result ! substring-after(translate(., "\", "/"), "dir5/")),
+        sort(("dir6/", "dir6/dir7/")))</assert>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-filter-002" covers-40="PR2649">
+    <description>Descendants, filter by suffix</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/geneva.txt", "geneva"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      file:write-text("dir5/dir6/dir7/oslo.txt", "oslo"),
+      file:descendants("dir5", { "filter": fn($path) { ends-with($path, ".txt") } })
+    </test>
+    <result>
+      <assert>deep-equal(
+        sort($result ! substring-after(translate(., "\", "/"), "dir5/")),
+        sort(("berlin.txt", "geneva.txt",
+          "dir6/helsinki.txt", "dir6/dir7/oslo.txt")))</assert>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-filter-003" covers-40="PR2649">
+    <description>Descendants, filter deep entry</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/geneva.txt", "geneva"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      file:write-text("dir5/dir6/dir7/oslo.txt", "oslo"),
+      file:descendants("dir5", { "filter": fn($path) { contains($path, "oslo") } })
+    </test>
+    <result>
+      <assert>deep-equal(
+        $result ! substring-after(translate(., "\", "/"), "dir5/"),
+        "dir6/dir7/oslo.txt")</assert>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-filter-004" covers-40="PR2649">
+    <description>Descendants, filter returns empty sequence</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/dir6/dir7/oslo.txt", "oslo"),
+      file:descendants("dir5", { "filter": fn($path) { () } })
+    </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-recurse-001" covers-40="PR2649">
+    <description>Descendants, recurse skips subtree</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/geneva.txt", "geneva"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      file:write-text("dir5/dir6/dir7/oslo.txt", "oslo"),
+      file:descendants("dir5",
+        { "recurse": fn($dir) { not(contains(translate($dir, "\", "/"), "dir6/")) } })
+    </test>
+    <result>
+      <assert>deep-equal(
+        sort($result ! substring-after(translate(., "\", "/"), "dir5/")),
+        sort(("berlin.txt", "geneva.txt", "dir6/")))</assert>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-recurse-002" covers-40="PR2649">
+    <description>Descendants, recurse returns false</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/geneva.txt", "geneva"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      file:write-text("dir5/dir6/dir7/oslo.txt", "oslo"),
+      file:descendants("dir5", { "recurse": fn($dir) { false() } })
+    </test>
+    <result>
+      <assert>deep-equal(
+        sort($result ! substring-after(translate(., "\", "/"), "dir5/")),
+        sort(("berlin.txt", "geneva.txt", "dir6/")))</assert>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-recurse-003" covers-40="PR2649">
+    <description>Descendants, recurse returns empty sequence</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      file:descendants("dir5", { "recurse": fn($dir) { () } })
+    </test>
+    <result>
+      <assert>deep-equal(
+        sort($result ! substring-after(translate(., "\", "/"), "dir5/")),
+        sort(("berlin.txt", "dir6/")))</assert>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-combined-001" covers-40="PR2649">
+    <description>Descendants, filter and recurse combined</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/node_modules"),
+      file:create-dir("dir5/images"),
+      file:write-text("dir5/a.jpg", ""),
+      file:write-text("dir5/images/b.jpg", ""),
+      file:write-text("dir5/images/d.txt", ""),
+      file:write-text("dir5/node_modules/c.jpg", ""),
+      file:descendants("dir5", {
+        "filter":  fn($path) { ends-with($path, ".jpg") },
+        "recurse": fn($dir)  { not(contains($dir, "node_modules")) }
+      })
+    </test>
+    <result>
+      <assert>deep-equal(
+        sort($result ! substring-after(translate(., "\", "/"), "dir5/")),
+        sort(("a.jpg", "images/b.jpg")))</assert>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-options-001" covers-40="PR2649">
+    <description>Descendants, empty options map</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6/dir7"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      file:write-text("dir5/dir6/dir7/oslo.txt", "oslo"),
+      deep-equal(sort(file:descendants("dir5", {})), sort(file:descendants("dir5")))
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-options-002" covers-40="PR2649">
+    <description>Descendants, empty options argument</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5/dir6"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+      deep-equal(sort(file:descendants("dir5", ())), sort(file:descendants("dir5")))
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-err-001" covers-40="PR2649">
+    <description>Descendants of non-existent path</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:descendants("dir5/non/existent")
+    </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}not-found"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-descendants-err-002" covers-40="PR2649">
+    <description>Descendants of non-directory path</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      if (file:exists("dir5")) then file:delete("dir5", true()) else (),
+      file:create-dir("dir5"),
+      file:write-text("dir5/berlin.txt", "berlin"),
+      file:descendants("dir5/berlin.txt")
+    </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}no-dir"/>
+    </result>
+  </test-case>
+
   <test-case name="EXPath-file-pathToNative-001">
     <description>Use file:path-to-native on a text file</description>
     <created by="Michael Kay" on="2012-06-11"/>
