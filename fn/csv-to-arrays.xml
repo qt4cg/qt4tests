@@ -381,6 +381,56 @@
     </result>
   </test-case>
   
+  <test-case name="csv-to-arrays-038" covers-40="PR2778">
+    <description>Single comment line</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:csv-to-arrays("# this is a comment", {'comment-marker': '#'})</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-039" covers-40="PR2778">
+    <description>Single comment line</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:csv-to-arrays("# this is a comment" || char(10), {'comment-marker': '#'})</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-040" covers-40="PR2778">
+    <description>Comment followed by data line</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-arrays("# this is a comment" || char(10) || 'one,two,"z"'||char(10), {'comment-marker': '#'})</test>
+    <result>
+      <assert-deep-eq>["one", "two", "z"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-041" covers-40="PR2778">
+    <description>Data row followed by comment line</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-arrays('one,two,"z"'||char(10) || "% this is a comment" || char(10), {'comment-marker': '%'})</test>
+    <result>
+      <assert-deep-eq>["one", "two", "z"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-042" covers-40="PR2778">
+    <description>Multiple adjacent comments</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-arrays("# this is one comment" || char(10) 
+      || "# this is two comment" || char(10) 
+      || "# this is three comment" || char(10) 
+      ||'one,two,"z"'||char(10), {'comment-marker': '#'})</test>
+    <result>
+      <assert-deep-eq>["one", "two", "z"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  
+  
   
   <test-case name="csv-to-arrays-801">
     <description>
@@ -540,11 +590,11 @@
   </test-case>
   
   <test-case name="csv-to-arrays-908">
-    <description>Same delimiter in multiple roles</description>
+    <description>Obsolete option</description>
     <created by="Michael Kay" on="2024-02-26"/>
     <test>fn:csv-to-arrays('one,two', map{'row-delimiter':','})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
   
@@ -567,11 +617,11 @@
   </test-case>
   
   <test-case name="csv-to-arrays-911">
-    <description>Same delimiter in multiple roles</description>
+    <description>Obsolete option</description>
     <created by="Michael Kay" on="2024-02-26"/>
     <test>fn:csv-to-arrays('one,two', map{'separator':';', 'row-delimiter':';'})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
   
@@ -581,6 +631,33 @@
     <test>fn:csv-to-arrays('one,two,"')</test>
     <result>
       <error code="FOCV0001"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-913">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:csv-to-arrays('one,two', map{'comment-marker':'"'})</test>
+    <result>
+      <error code="FOCV0003"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-914">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:csv-to-arrays('one,two', map{'comment-marker':char(10)})</test>
+    <result>
+      <error code="FOCV0003"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-915">
+    <description>Comment marker must be single character</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:csv-to-arrays('one,two', map{'comment-marker':'##'})</test>
+    <result>
+      <error code="FOCV0002"/>
     </result>
   </test-case>
   

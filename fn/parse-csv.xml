@@ -1,4 +1,4 @@
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-parse-csv" covers-40="PR1066">
+co<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-parse-csv" covers-40="PR1066">
   <description>Tests for the fn:parse-csv function</description>
   <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/" idref="func-parse-csv"/>
   <dependency type="spec" value="XP40+ XQ40+"/>
@@ -258,7 +258,7 @@
   </test-case>
   
   <test-case name="parse-csv-021">
-    <description>Row delimiter vertical bar</description>
+    <description>Row delimiter vertical bar - obsolete option</description>
     <created by="Michael Kay" on="2024-03-07"/>
     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
     <test>fn:parse-csv("one,two|three,four", map{'row-delimiter':'|'})</test>
@@ -267,30 +267,23 @@
     </result>
   </test-case>
   
-  <!--<test-case name="parse-csv-022">
-    <description>Reset both delimiters</description>
-    <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one.two|three.four", map{'row-delimiter':'|','separator':'.'})</test>
+  <test-case name="parse-csv-022" covers-40="PR2778">
+    <description>Empty comment</description>
+    <created by="Michael Kay" on="2026-07-14" />
+    <test>fn:parse-csv("one,two|#|three,four" => translate('|', char(10)), map{'comment-marker':'#'})</test>
     <result>
-      <assert>deep-equal($result => map:remove("get"), 
-        map{"columns":(), 
-        "column-index": map{}, 
-        "rows":(["one","two"],["three","four"])})</assert>
+      <assert>deep-equal($result?rows, (["one","two"],["three","four"]))</assert>
     </result>
-  </test-case>-->
+  </test-case>
   
-  <!--<test-case name="parse-csv-023">
-    <description>Alternative row delimiters</description>
-    <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one.two|three.four"||char(10)||"five.six", 
-                           map{'row-delimiter':('|',char(10)),'separator':'.'})</test>
+  <test-case name="parse-csv-023" covers-40="PR2778">
+    <description>Multiple comments</description>
+    <created by="Michael Kay" on="2026-07-14" />
+    <test>fn:parse-csv("one,two|#|#zero|three,four|#" => translate('|', char(10)), map{'comment-marker':'#'})</test>
     <result>
-      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
-          ><rows><row><field>one</field><field>two</field></row
-          ><row><field>three</field><field>four</field></row
-          ><row><field>five</field><field>six</field></row></rows></csv>]]></assert-xml>
+      <assert>deep-equal($result?rows, (["one","two"],["three","four"]))</assert>
     </result>
-  </test-case>-->
+  </test-case>
   
   <test-case name="parse-csv-024">
     <description>Single quotes</description>
@@ -725,6 +718,52 @@
          "rows":(["1","2","3","",""],["14","15","16","",""])})</assert>
      </result>
    </test-case>
+  
+  <test-case name="parse-csv-068" covers-40="PR2778">
+    <description>header:true, comment after header</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:parse-csv("left,right|#data|one,two|three,four" => translate('|', char('\n')),
+      map{'header':true(), 'comment-marker':'#'})</test>
+    <result>
+      <all-of>
+        <assert>deep-equal($result => map:remove("get"), 
+          map{"columns":("left","right"), 
+          "column-index": map{"left":1, "right":2}, 
+          "rows":(["one","two"],["three","four"])})</assert>
+        <assert>?get(1,"left") = "one"</assert>
+        <assert>?get(1,"right") = "two"</assert>
+        <assert>?get(2,"left") = "three"</assert>
+        <assert>?get(2,"right") = "four"</assert>
+        <assert>?get(1,1) = "one"</assert>
+        <assert>?get(1,2) = "two"</assert>
+        <assert>?get(2,1) = "three"</assert>
+        <assert>?get(2,2) = "four"</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-069" covers-40="PR2778">
+    <description>header:true, comment before header</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:parse-csv("#header|left,right|#data|one,two|three,four" => translate('|', char('\n')), 
+      map{'header':true(), 'comment-marker':'#'})</test>
+    <result>
+      <all-of>
+        <assert>deep-equal($result => map:remove("get"), 
+          map{"columns":("left","right"), 
+          "column-index": map{"left":1, "right":2}, 
+          "rows":(["one","two"],["three","four"])})</assert>
+        <assert>?get(1,"left") = "one"</assert>
+        <assert>?get(1,"right") = "two"</assert>
+        <assert>?get(2,"left") = "three"</assert>
+        <assert>?get(2,"right") = "four"</assert>
+        <assert>?get(1,1) = "one"</assert>
+        <assert>?get(1,2) = "two"</assert>
+        <assert>?get(2,1) = "three"</assert>
+        <assert>?get(2,2) = "four"</assert>
+      </all-of>
+    </result>
+  </test-case>
   
   <test-case name="parse-csv-080">
     <description>select-columns</description>
