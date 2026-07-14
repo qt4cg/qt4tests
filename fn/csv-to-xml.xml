@@ -850,7 +850,8 @@
   <test-case name="csv-to-xml-906">
     <description>Separator not a single char</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-xml('one,two', map{'separaator':'||'})</test>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
+    <test>fn:csv-to-xml('one,two', map{'separator':'||'})</test>
     <result>
       <error code="FOCV0002"/>
     </result>
@@ -859,10 +860,12 @@
   <test-case name="csv-to-xml-907">
     <description>Separator not a single string</description>
     <created by="Michael Kay" on="2024-02-26"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:csv-to-xml('one,two', map{'separator':('|','||')})</test>
     <result>
       <any-of>
          <error code="XPTY0004"/>
+         <error code="FOCV0002"/>
       </any-of>
     </result>
   </test-case>
@@ -871,9 +874,10 @@
     <description>Same delimiter in multiple roles</description>
     <created by="Michael Kay" on="2024-02-26"/>
     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - `field-delimiter` is now `separator`"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:csv-to-xml('one,two', map{'separator':char(10)})</test>
     <result>
-      <error code="FOCV0003"/>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"><rows><row><field>one,two</field></row></rows></csv>]]></assert-xml>
     </result>
   </test-case>
   
@@ -881,9 +885,28 @@
     <description>Same delimiter in multiple roles</description>
     <created by="Michael Kay" on="2024-02-26"/>
     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - `field-delimiter` is now `separator`"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:csv-to-xml('one,two', map{'separator':'"'})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-xml-911" covers-40="PR2746">
+    <description>Custom separator and quote character</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:csv-to-xml("a;'b;c'", { 'separator': ';', 'quote-character': "'" })</test>
+    <result>
+      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"><rows><row><field>a</field><field>b;c</field></row></rows></csv>]]></assert-xml>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-xml-912" covers-40="PR2746">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:csv-to-xml('a,b', { 'separator': ';', 'quote-character': ';' })</test>
+    <result>
+      <error code="FOCV0002"/>
     </result>
   </test-case>
   

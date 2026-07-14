@@ -1064,36 +1064,43 @@ co<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-parse-csv
   <test-case name="parse-csv-908">
     <description>Same delimiter in multiple roles</description>
     <created by="Michael Kay" on="2024-03-07"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:parse-csv('one,two', map{'row-delimiter':','})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
   
   <test-case name="parse-csv-909">
     <description>Same delimiter in multiple roles</description>
     <created by="Michael Kay" on="2024-03-07"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:parse-csv('one,two', map{'separator':char(10)})</test>
     <result>
-      <error code="FOCV0003"/>
+      <assert>deep-equal(
+        $result => map:remove("get"),
+        { "columns": (), "column-index": {}, "rows": [ "one,two" ] }
+      )</assert>
     </result>
   </test-case>
   
   <test-case name="parse-csv-910">
     <description>Same delimiter in multiple roles</description>
     <created by="Michael Kay" on="2024-03-07"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:parse-csv('one,two', map{'separator':'"'})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="FOCV0002"/>
     </result>
   </test-case>
   
   <test-case name="parse-csv-911">
     <description>Same delimiter in multiple roles</description>
     <created by="Michael Kay" on="2024-03-07"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:parse-csv('one,two', map{'field-delimiter':';', 'row-delimiter':';'})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
    
@@ -1216,6 +1223,27 @@ co<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-parse-csv
     </test>
     <result>
       <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-921" covers-40="PR2746">
+    <description>Custom separator and quote character</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:parse-csv("a;'b;c'", { 'separator': ';', 'quote-character': "'" })</test>
+    <result>
+      <assert>deep-equal(
+        $result => map:remove("get"),
+        { "columns": (), "column-index": {}, "rows": [ "a", "b;c" ] }
+      )</assert>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-922" covers-40="PR2746">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:parse-csv('a,b', { 'separator': ';', 'quote-character': ';' })</test>
+    <result>
+      <error code="FOCV0002"/>
     </result>
   </test-case>
 </test-set>

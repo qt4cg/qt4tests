@@ -592,6 +592,7 @@
   <test-case name="csv-to-arrays-908">
     <description>Obsolete option</description>
     <created by="Michael Kay" on="2024-02-26"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:csv-to-arrays('one,two', map{'row-delimiter':','})</test>
     <result>
       <error code="XPTY0004"/>
@@ -601,24 +602,27 @@
   <test-case name="csv-to-arrays-909">
     <description>Same delimiter in multiple roles</description>
     <created by="Michael Kay" on="2024-02-26"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:csv-to-arrays('one,two', map{'separator':char(10)})</test>
     <result>
-      <error code="FOCV0003"/>
+      <assert-deep-eq>[ "one,two" ]</assert-deep-eq>
     </result>
   </test-case>
   
   <test-case name="csv-to-arrays-910">
     <description>Same delimiter in multiple roles</description>
     <created by="Michael Kay" on="2024-02-26"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:csv-to-arrays('one,two', map{'separator':'"'})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="FOCV0002"/>
     </result>
   </test-case>
   
   <test-case name="csv-to-arrays-911">
     <description>Obsolete option</description>
     <created by="Michael Kay" on="2024-02-26"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:csv-to-arrays('one,two', map{'separator':';', 'row-delimiter':';'})</test>
     <result>
       <error code="XPTY0004"/>
@@ -631,6 +635,42 @@
     <test>fn:csv-to-arrays('one,two,"')</test>
     <result>
       <error code="FOCV0001"/>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-arrays-913" covers-40="PR2746">
+    <description>Custom separator and quote character</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:csv-to-arrays("a;'b;c'", { 'separator': ';', 'quote-character': "'" })</test>
+    <result>
+      <assert-deep-eq>[ "a", "b;c" ]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-arrays-914" covers-40="PR2746">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:csv-to-arrays('a,b', { 'separator': ';', 'quote-character': ';' })</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-arrays-915" covers-40="PR2746">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:csv-to-arrays('a,b', { 'quote-character': ',' })</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-arrays-916">
+    <description>Quote character not a single char</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:csv-to-arrays('a,b', { 'quote-character': '||' })</test>
+    <result>
+      <error code="FOCV0002"/>
     </result>
   </test-case>
   

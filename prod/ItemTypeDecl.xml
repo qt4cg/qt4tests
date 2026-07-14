@@ -790,11 +790,189 @@
          </all-of>
       </result>
    </test-case>
-   
-   
- 
- 
-   
- 
+
+   <test-case name="itemTypeDecl-051" covers-40="PR2759">
+      <description>Constructor function for an enum type</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:continent as enum('Africa', 'America', 'Asia', 'Australia', 'Europe');
+         local:continent('Africa')
+      ]]></test>
+      <result>
+         <assert-eq>'Africa'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-052" covers-40="PR2759">
+      <description>Constructor function for an enum type, invalid value</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:continent as enum('Africa', 'America', 'Asia', 'Australia', 'Europe');
+         local:continent('Atlantis')
+      ]]></test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-053" covers-40="PR2759">
+      <description>Constructor function for a record type</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:point as record(x as xs:integer, y as xs:integer);
+         let $p := local:point(1, 2)
+         return ($p?x, $p?y)
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-054" covers-40="PR2759">
+      <description>Constructor function for a record type, instance of</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:point as record(x as xs:integer, y as xs:integer);
+         local:point(1, 2) instance of local:point
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-055" covers-40="PR2759">
+      <description>Constructor function for an atomic type</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:count as xs:integer;
+         local:count('42')
+      ]]></test>
+      <result>
+         <assert-eq>42</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-056" covers-40="PR2759">
+      <description>Constructor function for an atomic type, invalid value</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:count as xs:integer;
+         local:count('x')
+      ]]></test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-057" covers-40="PR2759">
+      <description>Constructor function for a union type</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:num as xs:numeric;
+         local:num('1.5') instance of xs:double
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-058" covers-40="PR2759">
+      <description>Constructor function is visible to fn:function-lookup</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:count as xs:integer;
+         function-lookup(xs:QName('local:count'), 1)('42')
+      ]]></test>
+      <result>
+         <assert-eq>42</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-059" covers-40="PR2759">
+      <description>No constructor function for a non-atomic, non-record type</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:e as element(foo);
+         local:e('x')
+      ]]></test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-060" covers-40="PR2759">
+      <description>Constructor function, overlapping arity with a user-defined function</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:foo as xs:integer;
+         declare function local:foo($x) { $x };
+         1
+      ]]></test>
+      <result>
+         <error code="XQST0034"/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-061" covers-40="PR2713">
+      <description>item type in no namespace, used in instance of</description>
+      <created by="Christian Gruen" on="2026-07-14"/>
+      <test><![CDATA[
+         declare type color as enum('red', 'green', 'blue');
+         'red' instance of color
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-062" covers-40="PR2713">
+      <description>item type in no namespace, non-member value</description>
+      <created by="Christian Gruen" on="2026-07-14"/>
+      <test><![CDATA[
+         declare type color as enum('red', 'green', 'blue');
+         'pink' instance of color
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-063" covers-40="PR2713 PR2759">
+      <description>constructor function for an item type in no namespace</description>
+      <created by="Christian Gruen" on="2026-07-14"/>
+      <test><![CDATA[
+         declare type color as enum('red', 'green', 'blue');
+         color('red')
+      ]]></test>
+      <result>
+         <assert-eq>'red'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-064" covers-40="PR2713 PR2759">
+      <description>constructor function in no namespace is found before the default function namespace</description>
+      <created by="Christian Gruen" on="2026-07-14"/>
+      <test><![CDATA[
+         declare type count as xs:integer;
+         count('42')
+      ]]></test>
+      <result>
+         <assert-eq>42</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-065" covers-40="PR2713">
+      <description>default element namespace applies to the declared item type name</description>
+      <created by="Christian Gruen" on="2026-07-14"/>
+      <test><![CDATA[
+         declare default element namespace 'http://example.com/ns';
+         declare namespace e = 'http://example.com/ns';
+         declare type color as enum('red', 'green', 'blue');
+         'red' instance of e:color
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
 
 </test-set>

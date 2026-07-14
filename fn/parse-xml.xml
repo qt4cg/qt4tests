@@ -774,6 +774,62 @@
             <assert-type>document-node(element(*,xs:untyped))</assert-type>
         </result>
     </test-case>
+
+    <test-case name="parse-xml-503" covers-40="PR2013">
+        <description>Parse from hexBinary</description>
+        <created by="Christian Gruen" on="2026-07-10"/>
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>
+            (: element a with text "caf" + U+00E9, encoded as iso-8859-1 and declared as such :)
+            string(parse-xml(xs:hexBinary("3C3F786D6C2076657273696F6E3D27312E302720656E636F64696E673D2769736F2D383835392D31273F3E3C613E636166E93C2F613E")))
+        </test>
+        <result>
+            <assert>$result eq ("caf" || codepoints-to-string(233))</assert>
+        </result>
+    </test-case>
+
+    <test-case name="parse-xml-504" covers-40="PR2013">
+        <description>Parse from hexBinary</description>
+        <created by="Christian Gruen" on="2026-07-10"/>
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>
+            (: element a with text "caf" + U+00E9, encoded as UTF-8 :)
+            string(parse-xml(xs:hexBinary("3C613E636166C3A93C2F613E")))
+        </test>
+        <result>
+            <assert>$result eq ("caf" || codepoints-to-string(233))</assert>
+        </result>
+    </test-case>
+
+    <test-case name="parse-xml-505" covers-40="PR2013">
+        <description>Parse from hexBinary</description>
+        <created by="Christian Gruen" on="2026-07-10"/>
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>
+            (: element a with text "caf" + U+00E9, UTF-16 big-endian with byte-order mark :)
+            string(parse-xml(xs:hexBinary("FEFF003C0061003E00630061006600E9003C002F0061003E")))
+        </test>
+        <result>
+            <assert>$result eq ("caf" || codepoints-to-string(233))</assert>
+        </result>
+    </test-case>
+
+    <test-case name="parse-xml-506" covers-40="PR2013">
+        <description>Parse from hexBinary</description>
+        <created by="Christian Gruen" on="2026-07-10"/>
+        <environment name="empty"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>
+            (: element a with text "caf" + U+00E9, UTF-16 little-endian with byte-order mark :)
+            string(parse-xml(xs:hexBinary("FFFE3C0061003E00630061006600E9003C002F0061003E00")))
+        </test>
+        <result>
+            <assert>$result eq ("caf" || codepoints-to-string(233))</assert>
+        </result>
+    </test-case>
     
 
 </test-set>
