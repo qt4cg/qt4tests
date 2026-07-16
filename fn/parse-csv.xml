@@ -923,13 +923,14 @@
     <description>Explicit headers are not trimmed even when trim-whitespace is true</description>
     <created by="Gunther Rademacher" on="2025-01-03"/>
     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
-    <test>fn:parse-csv(' one,two ," three","four "| 1,2 , 3,4 '  => translate('|', char('\n')), 
+    <modified by="Christian Gruen" on="2026-07-16" change="quoted fields are not trimmed"/>
+    <test>fn:parse-csv(' one,two ," three","four "| 1,2 , 3,4 '  => translate('|', char('\n')),
       map{'header':(' first', 'second ', ' third', 'fourth '), 'trim-whitespace':true()})</test>
     <result>
-      <assert>deep-equal($result => map:remove("get"), 
-        map{"columns":(" first","second ", " third", "fourth "), 
-        "column-index": map{" first":1, "second ":2, " third":3, "fourth ":4}, 
-        "rows":(["one","two","three","four"], ["1", "2", "3", "4"])})</assert>
+      <assert>deep-equal($result => map:remove("get"),
+        map{"columns":(" first","second ", " third", "fourth "),
+        "column-index": map{" first":1, "second ":2, " third":3, "fourth ":4},
+        "rows":(["one","two"," three","four "], ["1", "2", "3", "4"])})</assert>
     </result>
   </test-case>
   
@@ -1072,15 +1073,12 @@
   </test-case>
   
   <test-case name="parse-csv-909">
-    <description>Same delimiter in multiple roles</description>
+    <description>Newline as separator</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
+    <modified by="Christian Gruen" on="2026-07-16" change="PR2746, PR2778 - newline option values raise FOCV0002"/>
     <test>fn:parse-csv('one,two', map{'separator':char(10)})</test>
     <result>
-      <assert>deep-equal(
-        $result => map:remove("get"),
-        { "columns": (), "column-index": {}, "rows": [ "one,two" ] }
-      )</assert>
+      <error code="FOCV0002"/>
     </result>
   </test-case>
   
