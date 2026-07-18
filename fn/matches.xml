@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="us-ascii"?>
+<?xml version="1.0" encoding="utf-8"?>
 <test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-matches">
    <description>Test the fn:matches() function</description>
    <link type="spec" document="http://www.w3.org/TR/xpath-functions-30/"
@@ -595,6 +595,7 @@ defg
    <test-case name="fn-matches-50a" covers-40="PR1856">
       <description>Composite test executing regular expressions from Perl-derived test file: variant for 4.0 </description>
       <created by="Michael Kay" on="2025-03-04"/>
+      <modified by="Michael Kay" on="2026-07-18" change="Subtests 1273 and 1302 use named captured groups"/>
       <environment>
         <source role="." file="matches/perl-tests.xml"/>
       </environment>
@@ -1738,6 +1739,116 @@ defg
       <test>matches("abc123", "#alpha#[a-zA-Z]{3#three#}[0-9]#numeric#{#three#3}", 'c')</test>
       <result>
          <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="matches-40-003" covers-40="PR2793">
+      <description>Match backreference to named capture group</description>
+      <created by="Michael Kay" on="2026-07-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[matches('%true%', '^(?<delim>.).*\k<delim>$')]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="matches-40-004" covers-40="PR2793">
+      <description>Match backreference to named capture group</description>
+      <created by="Michael Kay" on="2026-07-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[matches('%true%ZZZ', '^(?<delim>.).*\k<delim>$')]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="matches-40-905" covers-40="PR2793">
+      <description>Non-ascii captured group name</description>
+      <created by="Michael Kay" on="2026-07-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[matches('%true%', '^(?<123alpha>.).*\k<123alpha>$')]]></test>
+      <result>
+         <error code="FORX0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="matches-40-906" covers-40="PR2793">
+      <description>Non-ascii captured group name</description>
+      <created by="Michael Kay" on="2026-07-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[matches('%true%', '^(?<Σ>.).*\k<Σ>$')]]></test>
+      <result>
+         <error code="FORX0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="matches-40-907" covers-40="PR2793">
+      <description>Empty captured group name</description>
+      <created by="Michael Kay" on="2026-07-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[matches('%true%', '^(?<>.).*\k<>$')]]></test>
+      <result>
+         <error code="FORX0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="matches-40-908" covers-40="PR2793">
+      <description>Unknown captured group name in back-reference</description>
+      <created by="Michael Kay" on="2026-07-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[matches('%true%', '^(?<sigma>.).*\k<SIGMA>$', 'i')]]></test>
+      <result>
+         <error code="FORX0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="matches-40-909" covers-40="PR2793">
+      <description>Duplicate captured group name</description>
+      <created by="Michael Kay" on="2026-07-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[matches('%true%', '^(a|b|c).*\k.*$', 'i')]]></test>
+      <result>
+         <error code="FORX0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="matches-40-910" covers-40="PR2793">
+      <description>Bad group name back-reference</description>
+      <created by="Michael Kay" on="2026-07-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[matches('%true%', '^(?<a>.).*\k<>$')]]></test>
+      <result>
+         <error code="FORX0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="matches-40-911" covers-40="PR2793">
+      <description>Bad group name back-reference</description>
+      <created by="Michael Kay" on="2026-07-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[matches('%true%', '^(?<a>.).*\k')]]></test>
+      <result>
+         <error code="FORX0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="matches-40-912" covers-40="PR2793">
+      <description>Bad group name back-reference</description>
+      <created by="Michael Kay" on="2026-07-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[matches('%true%', '^(?<a>.).*\k<')]]></test>
+      <result>
+         <error code="FORX0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="matches-40-913" covers-40="PR2793">
+      <description>Absent group name </description>
+      <created by="Michael Kay" on="2026-07-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[matches('%true%', '^(?<')]]></test>
+      <result>
+         <error code="FORX0002"/>
       </result>
    </test-case>
 </test-set>
