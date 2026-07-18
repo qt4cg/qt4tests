@@ -487,11 +487,11 @@
     <description>header:true, with gaps</description>
     <created by="Michael Kay" on="2024-02-26"/>
     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - `row-delimiter` is gone"/>
-    <test>fn:csv-to-xml(",|one,two|three,four" => translate('|',char('\n')), 
+    <modified by="Christian Gruen" on="2026-07-16" change="no columns element if all column names are empty"/>
+    <test>fn:csv-to-xml(",|one,two|three,four" => translate('|',char('\n')),
       map{'header':true()})</test>
     <result>
       <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
-          ><columns><column/><column/></columns
           ><rows><row><field>one</field><field>two</field></row
           ><row><field>three</field><field>four</field></row
           ></rows></csv>]]></assert-xml>
@@ -747,13 +747,14 @@
     <description>Explicit headers are not trimmed even when trim-whitespace is true</description>
     <created by="Gunther Rademacher" on="2025-01-03"/>
     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - `row-delimiter` is gone"/>
+    <modified by="Christian Gruen" on="2026-07-16" change="quoted fields are not trimmed"/>
     <test>fn:csv-to-xml(' one,two ," three","four "| 1,2 , 3,4 ' => translate('|',char('\n')),
       map{'header':('   first', 'second   '), 'trim-whitespace':true()})</test>
     <result>
       <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"><columns><column
 	      >   first</column><column>second   </column></columns><rows><row><field column=
-		  "   first">one</field><field column="second   ">two</field><field>three</field><field
-		  >four</field></row><row><field column="   first">1</field><field column="second   "
+		  "   first">one</field><field column="second   ">two</field><field> three</field><field
+		  >four </field></row><row><field column="   first">1</field><field column="second   "
 		  >2</field><field>3</field><field>4</field></row></rows></csv>]]></assert-xml>
     </result>
   </test-case>
@@ -871,11 +872,12 @@
   </test-case>
   
   <test-case name="csv-to-xml-909">
-    <description>Same delimiter in multiple roles</description>
+    <description>Newline as separator</description>
     <created by="Michael Kay" on="2024-02-26"/>
     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - `field-delimiter` is now `separator`"/>
     <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <modified by="Michael Kay" on="2026-07-16" change="PR2778"/>
+    <modified by="Christian Gruen" on="2026-07-16" change="PR2746, PR2778 - newline option values raise FOCV0002"/>
     <test>fn:csv-to-xml('one,two', map{'separator':char(10)})</test>
     <result>
       <error code="FOCV0002"/>
