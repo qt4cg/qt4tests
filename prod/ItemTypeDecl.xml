@@ -974,5 +974,201 @@
          <assert-true/>
       </result>
    </test-case>
+   
+   <test-case name="itemTypeDecl-066" covers-40="PR2759">
+      <description>Constructor function for a record type does type checking</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:integer);
+         	local:info('Paris', 14.2)
+         ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-067" covers-40="PR2759">
+      <description>Constructor function for a record type does type checking</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:integer+);
+         	local:info('Paris', ())
+         ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-068" covers-40="PR2759">
+      <description>Constructor function for a record type does type coercion</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:double);
+         	local:info('Paris', 18)?size
+         ]]></test>
+      <result>
+         <all-of>
+            <assert-eq>18.0e0</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-069" covers-40="PR2759">
+      <description>Constructor function for a record type does type coercion</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:double);
+         	local:info('Paris', [18])?size
+         ]]></test>
+      <result>
+         <all-of>
+            <assert-eq>18.0e0</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-070" covers-40="PR2759">
+      <description>Constructor function conflict with explicit function</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:double);
+            declare function local:info ($n, $s) as xs:string {
+               $n || $s
+            };
+         	local:info('Paris', [18])?size
+         ]]></test>
+      <result>
+         <error code="XQST0034"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-071" covers-40="PR2759">
+      <description>Constructor function conflict with explicit function</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare function local:info ($n, $s) as xs:string {
+               $n || $s
+            };
+            declare type local:info as record(name as xs:string, size as xs:double);
+         	local:info('Paris', [18])?size
+         ]]></test>
+      <result>
+         <error code="XQST0034"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-072" covers-40="PR2759">
+      <description>Name conflict with reserved namespace</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type fn:info as record(name as xs:string, size as xs:double);
+         	23
+         ]]></test>
+      <result>
+         <error code="XQST0045"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-073" covers-40="PR2759">
+      <description>No-namespace record type and function</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type Q{}info as record(name as xs:string, size as xs:double);
+         	Q{}info('Paris', 18)?size
+         ]]></test>
+      <result>
+         <all-of>
+            <assert-eq>18.0e0</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-074" covers-40="PR2759">
+      <description>No-namespace record type and function</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type Q{}info as record(name as xs:string, size as xs:double);
+         	function-name(Q{}info#2)
+         ]]></test>
+      <result>
+         <assert-eq>fn:QName("", "info")</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-075" covers-40="PR2759">
+      <description>instance of named record type</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:double);
+         	local:info#2 instance of function(xs:string, xs:double) as local:info
+         ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-076" covers-40="PR2759">
+      <description>Call constructor function for a record type using keywords</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:double);
+         	local:info(size := 18, name := 'Paris') -> `{?name}:{?size}`
+         ]]></test>
+      <result>
+         <assert-eq>"Paris:18"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-077" covers-40="PR2759">
+      <description>Constructor function for a record type with non-NCName keywords</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type person as record("first name" as xs:string, "last name" as xs:string);
+         	person("Michael", "Kay") -> `{?"first name"} {?"last name"}`
+         ]]></test>
+      <result>
+         <assert-eq>"Michael Kay"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-078" covers-40="PR2759">
+      <description>Constructor function for a record type whose fields have no declared type</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type person as record(first, last);
+         	person("Michael", "Kay") -> `{?first} {?last}`
+         ]]></test>
+      <result>
+         <assert-eq>"Michael Kay"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-079" covers-40="PR2759">
+      <description>Empty string is a permitted field name</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type person as record(first, "", last);
+         	person("Barack", "Hussein", "Obama") -> `{?first} {?""} {?last}`
+         ]]></test>
+      <result>
+         <assert-eq>"Barack Hussein Obama"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-080" covers-40="PR2759">
+      <description>Fields of record type must have distinct names</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type person as record("", "");
+         	person("Michael", "Kay") -> `{?first} {?last}`
+         ]]></test>
+      <result>
+         <error code="XPST0021"/>
+      </result>
+   </test-case>
+
 
 </test-set>
