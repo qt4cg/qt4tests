@@ -4207,4 +4207,127 @@ Second line</text>
         </result>
     </test-case>
 
+    <test-case name="serialize-xml-153" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out><in/></out>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'indent': true(), 'indent-unit': '  ' })
+        ]]></test>
+        <result>
+            <assert><![CDATA[contains($result, '&#xA;  <in/>')]]></assert>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-154" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out><in/></out>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'indent': true(), 'indent-unit': '\t' })
+        ]]></test>
+        <result>
+            <assert><![CDATA[contains($result, '&#xA;&#x9;<in/>')]]></assert>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-155" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out a='1' b='2'/>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'indent': true(), 'indent-attributes': true() })
+        ]]></test>
+        <result>
+            <assert><![CDATA[matches($result, '^<out\s+a=.1.\s+b=.2.\s*/>')]]></assert>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-156" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out>x&#xA;y</out>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'line-ending': '\r\n' })
+        ]]></test>
+        <result>
+            <assert-eq><![CDATA["<out>x&#xD;&#xA;y</out>"]]></assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-157" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out>x&#xA;y</out>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'line-ending': "&#xD;" })
+        ]]></test>
+        <result>
+            <assert-eq><![CDATA["<out>x&#xD;y</out>"]]></assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-158" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out/>"), { 'method': 'xml', 'indent-unit': 4 })
+        ]]></test>
+        <result>
+            <any-of>
+                <!-- wrong type -->
+                <error code="XPTY0004"/>
+                <!-- coerced to a string, the value does not match the allowed pattern -->
+                <error code="SEPM0016"/>
+            </any-of>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-159" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out/>"), { 'method': 'xml', 'indent-unit': 'x' })
+        ]]></test>
+        <result>
+            <error code="SEPM0016"/>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-160" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out/>"), { 'method': 'xml', 'line-ending': 10 })
+        ]]></test>
+        <result>
+            <any-of>
+                <!-- wrong type -->
+                <error code="XPTY0004"/>
+                <!-- coerced to a string, the value does not match the allowed pattern -->
+                <error code="SEPM0016"/>
+            </any-of>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-161" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out/>"), { 'method': 'xml', 'line-ending': '\n\n' })
+        ]]></test>
+        <result>
+            <error code="SEPM0016"/>
+        </result>
+    </test-case>
+
 </test-set>
