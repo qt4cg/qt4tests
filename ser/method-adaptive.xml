@@ -94,7 +94,7 @@
       <description>Test the adaptive serialization output method - atomic value</description>
       <created by="Andrew Coleman" on="2015-02-11"/>
       <modified by="Michael Kay" on="2015-07-18" change="Anchor the assertion regex"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
  
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -104,6 +104,26 @@
       ]]></test>
       <result>
         <serialization-matches>^"simple string"$</serialization-matches>
+      </result>
+   </test-case>
+
+   <test-case name="Serialization-adaptive-05a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - atomic value</description>
+      <created by="Andrew Coleman" on="2015-02-11"/>
+      <modified by="Michael Kay" on="2015-07-18" change="Anchor the assertion regex"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        "simple string"
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^"simple string"$</serialization-matches>
+          <serialization-matches>^'simple string'$</serialization-matches>
+          <serialization-matches>^simple string$</serialization-matches>
+        </any-of>
       </result>
    </test-case>
 
@@ -484,7 +504,7 @@
       <description>Test the adaptive serialization output method - array with numeric INF</description>
       <created by="Andrew Coleman" on="2015-02-11"/>
       <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
  
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -495,6 +515,26 @@
       ]]></test>
       <result>
         <serialization-matches>^\[xs:float\("INF"\),-INF\]$</serialization-matches>
+      </result>
+   </test-case>
+
+   <test-case name="Serialization-adaptive-22a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - array with numeric INF</description>
+      <created by="Andrew Coleman" on="2015-02-11"/>
+      <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+
+        [ xs:float("INF"), xs:double("-INF") ]
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^\[xs:float\("INF"\),-INF\]$</serialization-matches>
+          <serialization-matches>^\[INF,-INF\]$</serialization-matches>
+        </any-of>
       </result>
    </test-case>
 
@@ -517,23 +557,27 @@
       </result>
    </test-case>
   
-  <test-case name="Serialization-adaptive-23a" covers-40="PR1123">
+  <test-case name="Serialization-adaptive-23a" covers-40="PR1123 PR2594">
     <description>Test the adaptive serialization output method - map with numeric INF</description>
     <created by="Andrew Coleman" on="2015-02-11"/>
     <modified by="Christian Gruen" on="2012-02-19" change="query fixed"/>
     <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
     <modified by="Michael Kay" on="2024-03-27" change="Spec change for 4.0"/>
+    <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
     <dependency type="spec" value="XQ40+"/>
     <test><![CDATA[
- 
+
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
-        
+
         map { "infinity": xs:float("INF") }
 
       ]]></test>
     <result>
-      <serialization-matches>^\{"infinity":xs:float\("INF"\)\}</serialization-matches>
+      <any-of>
+        <serialization-matches>^\{"infinity":xs:float\("INF"\)\}$</serialization-matches>
+        <serialization-matches>^\{"infinity":INF\}$</serialization-matches>
+      </any-of>
     </result>
   </test-case>
 
@@ -542,7 +586,7 @@
       <created by="Andrew Coleman" on="2015-02-11"/>
       <modified by="Christian Gruen" on="2012-02-19" change="query fixed"/>
       <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
  
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -553,6 +597,27 @@
       ]]></test>
       <result>
         <serialization-matches>\[xs:float\("NaN"\)\]</serialization-matches>
+      </result>
+   </test-case>
+
+   <test-case name="Serialization-adaptive-24a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - array with NaN</description>
+      <created by="Andrew Coleman" on="2015-02-11"/>
+      <modified by="Christian Gruen" on="2012-02-19" change="query fixed"/>
+      <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+
+        [ xs:float("NaN") ]
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^\[xs:float\("NaN"\)\]$</serialization-matches>
+          <serialization-matches>^\[NaN\]$</serialization-matches>
+        </any-of>
       </result>
    </test-case>
 
@@ -726,7 +791,7 @@
       <description>Test the adaptive serialization output method - sequence with item-separator</description>
       <created by="Michael Kay" on="2015-07-13"/>
       <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
  
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -741,6 +806,28 @@
       </result>
    </test-case>
    
+   <test-case name="Serialization-adaptive-30a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - sequence with item-separator</description>
+      <created by="Michael Kay" on="2015-07-13"/>
+      <modified by="Michael Kay" on="2015-07-18" change="Implement spec change"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        declare option output:item-separator " ";
+
+        "the quick", "brown fox"
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^"the quick" "brown fox"$</serialization-matches>
+          <serialization-matches>^'the quick' 'brown fox'$</serialization-matches>
+          <serialization-matches>^the quick brown fox$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
    <test-case name="Serialization-adaptive-31" >
       <description>Test the adaptive serialization output method - map with duplicate keys</description>
       <created by="Michael Kay" on="2015-07-13"/>
@@ -905,7 +992,7 @@
   <test-case name="Serialization-adaptive-35" >
       <description>Test the adaptive serialization output method - xs:untypedAtomic</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -913,6 +1000,25 @@
       ]]></test>
       <result>
         <serialization-matches>"untypedAtomic"</serialization-matches>
+      </result>
+   </test-case>
+
+  <test-case name="Serialization-adaptive-35a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:untypedAtomic</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:untypedAtomic("untypedAtomic")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^"untypedAtomic"$</serialization-matches>
+          <serialization-matches>^'untypedAtomic'$</serialization-matches>
+          <serialization-matches>^untypedAtomic$</serialization-matches>
+        </any-of>
       </result>
    </test-case>
 
@@ -1021,7 +1127,7 @@
   <test-case name="Serialization-adaptive-43" >
       <description>Test the adaptive serialization output method - xs:float</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1032,10 +1138,28 @@
       </result>
    </test-case>
 
+  <test-case name="Serialization-adaptive-43a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:float</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:float("1e0")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^xs:float\("1"\)$</serialization-matches>
+          <serialization-matches>^1$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-44" >
       <description>Test the adaptive serialization output method - xs:double</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1043,6 +1167,24 @@
       ]]></test>
       <result>
         <serialization-matches>1\.0e0</serialization-matches>
+      </result>
+   </test-case>
+
+  <test-case name="Serialization-adaptive-44a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:double</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:double(1e0)
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^1\.0e0$</serialization-matches>
+          <serialization-matches>^1$</serialization-matches>
+        </any-of>
       </result>
    </test-case>
 
@@ -1320,7 +1462,7 @@
   <test-case name="Serialization-adaptive-64" >
       <description>Test the adaptive serialization output method - xs:string</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1334,10 +1476,29 @@
       </result>
    </test-case>
 
+  <test-case name="Serialization-adaptive-64a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:string</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:string("en")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'en'$</serialization-matches>
+          <serialization-matches>^"en"$</serialization-matches>
+          <serialization-matches>^en$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-65" >
       <description>Test the adaptive serialization output method - xs:normalizedString</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1352,10 +1513,29 @@
    </test-case>
 
 
+  <test-case name="Serialization-adaptive-65a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:normalizedString</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:normalizedString("en")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'en'$</serialization-matches>
+          <serialization-matches>^"en"$</serialization-matches>
+          <serialization-matches>^en$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-66" >
       <description>Test the adaptive serialization output method - xs:token</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1370,10 +1550,29 @@
    </test-case>
 
 
+  <test-case name="Serialization-adaptive-66a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:token</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:token("en")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'en'$</serialization-matches>
+          <serialization-matches>^"en"$</serialization-matches>
+          <serialization-matches>^en$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-67" >
       <description>Test the adaptive serialization output method - xs:language</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1388,10 +1587,29 @@
    </test-case>
 
 
+  <test-case name="Serialization-adaptive-67a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:language</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:language("en")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'en'$</serialization-matches>
+          <serialization-matches>^"en"$</serialization-matches>
+          <serialization-matches>^en$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-68" >
       <description>Test the adaptive serialization output method - xs:NMTOKEN</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1406,10 +1624,29 @@
    </test-case>
 
 
+  <test-case name="Serialization-adaptive-68a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:NMTOKEN</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:NMTOKEN("en")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'en'$</serialization-matches>
+          <serialization-matches>^"en"$</serialization-matches>
+          <serialization-matches>^en$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-69" >
       <description>Test the adaptive serialization output method - xs:Name</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1423,10 +1660,29 @@
       </result>
    </test-case>
 
+  <test-case name="Serialization-adaptive-69a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:Name</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:Name("en")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'en'$</serialization-matches>
+          <serialization-matches>^"en"$</serialization-matches>
+          <serialization-matches>^en$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-70" >
       <description>Test the adaptive serialization output method - xs:NCName</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1441,10 +1697,29 @@
    </test-case>
 
 
+  <test-case name="Serialization-adaptive-70a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:NCName</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:NCName("en")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'en'$</serialization-matches>
+          <serialization-matches>^"en"$</serialization-matches>
+          <serialization-matches>^en$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-71" >
       <description>Test the adaptive serialization output method - xs:ID</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1459,10 +1734,29 @@
    </test-case>
 
 
+  <test-case name="Serialization-adaptive-71a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:ID</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:ID("en")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'en'$</serialization-matches>
+          <serialization-matches>^"en"$</serialization-matches>
+          <serialization-matches>^en$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-72" >
       <description>Test the adaptive serialization output method - xs:IDREF</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1476,10 +1770,29 @@
       </result>
    </test-case>
 
+  <test-case name="Serialization-adaptive-72a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:IDREF</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:IDREF("en")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'en'$</serialization-matches>
+          <serialization-matches>^"en"$</serialization-matches>
+          <serialization-matches>^en$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-73" >
       <description>Test the adaptive serialization output method - xs:ENTITY</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1490,6 +1803,25 @@
 	  <serialization-matches>^'en'$</serialization-matches>
 	  <serialization-matches>^"en"$</serialization-matches>
 	</any-of>
+      </result>
+   </test-case>
+
+  <test-case name="Serialization-adaptive-73a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:ENTITY</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:ENTITY("en")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'en'$</serialization-matches>
+          <serialization-matches>^"en"$</serialization-matches>
+          <serialization-matches>^en$</serialization-matches>
+        </any-of>
       </result>
    </test-case>
 
@@ -1541,7 +1873,7 @@
       <description>Test the adaptive serialization output method - xs:anyURI</description>
       <created by="Tim Mills" on="2016-09-13"/>
       <modified by="Michael Kay" on="2016-10-07" change="respond to spec change"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1549,6 +1881,26 @@
       ]]></test>
       <result>
         <serialization-matches>^"http://www.example.org/"$</serialization-matches>
+      </result>
+   </test-case>
+
+  <test-case name="Serialization-adaptive-77a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:anyURI</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Michael Kay" on="2016-10-07" change="respond to spec change"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:anyURI("http://www.example.org/")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^"http://www.example.org/"$</serialization-matches>
+          <serialization-matches>^'http://www.example.org/'$</serialization-matches>
+          <serialization-matches>^http://www.example.org/$</serialization-matches>
+        </any-of>
       </result>
    </test-case>
 
@@ -1566,9 +1918,10 @@
       </result>
    </test-case>
 
-  <test-case name="Serialization-adaptive-78a" covers-40="PR2060">
+  <test-case name="Serialization-adaptive-78a" covers-40="PR2060 PR2594">
       <description>Test the adaptive serialization output method - xs:QName</description>
       <created by="Christian Gruen" on="2025-06-25"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -1576,14 +1929,14 @@
         xs:QName("xs:integer")
       ]]></test>
       <result>
-        <serialization-matches>^#Q\{http://www.w3.org/2001/XMLSchema\}integer$</serialization-matches>
+        <serialization-matches>^#xs:integer$</serialization-matches>
       </result>
    </test-case>
 
   <test-case name="Serialization-adaptive-79" >
       <description>Test the adaptive serialization output method - xs:string escaping</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1597,10 +1950,29 @@
       </result>
    </test-case>
 
+  <test-case name="Serialization-adaptive-79a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:string escaping</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        "'"
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^"'"$</serialization-matches>
+          <serialization-matches>^''''$</serialization-matches>
+          <serialization-matches>^'$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-80" >
       <description>Test the adaptive serialization output method - xs:string escaping</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1614,10 +1986,29 @@
       </result>
    </test-case>
 
+  <test-case name="Serialization-adaptive-80a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:string escaping</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        '"'
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'"'$</serialization-matches>
+          <serialization-matches>^""""$</serialization-matches>
+          <serialization-matches>^"$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-81" >
       <description>Test the adaptive serialization output method - xs:untypedAtomic escaping</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1631,10 +2022,29 @@
       </result>
    </test-case>
 
+  <test-case name="Serialization-adaptive-81a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:untypedAtomic escaping</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:untypedAtomic("'")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^"'"$</serialization-matches>
+          <serialization-matches>^''''$</serialization-matches>
+          <serialization-matches>^'$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-82" >
       <description>Test the adaptive serialization output method - xs:untypedAtomic escaping</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1648,10 +2058,29 @@
       </result>
    </test-case>
 
+  <test-case name="Serialization-adaptive-82a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:untypedAtomic escaping</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:untypedAtomic('"')
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'"'$</serialization-matches>
+          <serialization-matches>^""""$</serialization-matches>
+          <serialization-matches>^"$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-83" >
       <description>Test the adaptive serialization output method - xs:anyURI escaping</description>
       <created by="Tim Mills" on="2016-09-13"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1665,11 +2094,30 @@
       </result>
    </test-case>
 
+  <test-case name="Serialization-adaptive-83a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:anyURI escaping</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:anyURI("'")
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^"'"$</serialization-matches>
+          <serialization-matches>^''''$</serialization-matches>
+          <serialization-matches>^'$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-84" >
       <description>Test the adaptive serialization output method - xs:anyURI escaping</description>
       <created by="Tim Mills" on="2016-09-13"/>
       <modified by="Josh Spiegel" on="2016-10-10" change="Bug 29926"/>
-      <dependency type="spec" value="XQ31+"/>
+      <dependency type="spec" value="XQ31"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1684,10 +2132,31 @@
       </result>
    </test-case>
 
+  <test-case name="Serialization-adaptive-84a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:anyURI escaping</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Josh Spiegel" on="2016-10-10" change="Bug 29926"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:anyURI('"')
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'"'$</serialization-matches>
+          <serialization-matches>^""""$</serialization-matches>
+          <serialization-matches>^"$</serialization-matches>
+          <error code="FORG0001"/>
+        </any-of>
+      </result>
+   </test-case>
+
 <test-case name="Serialization-adaptive-85" >
     <description>Test the adaptive serialization output method - xs:string escaping (Saxon bug 5387)</description>
     <created by="Michael Kay" on="2022-03-12"/>
-    <dependency type="spec" value="XQ31+"/>
+    <dependency type="spec" value="XQ31"/>
     <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1701,10 +2170,29 @@
     </result>
   </test-case>
   
+  <test-case name="Serialization-adaptive-85a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:string escaping (Saxon bug 5387)</description>
+      <created by="Michael Kay" on="2022-03-12"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        '""'
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^'""'$</serialization-matches>
+          <serialization-matches>^""""""$</serialization-matches>
+          <serialization-matches>^""$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-86" >
     <description>Test the adaptive serialization output method - xs:string escaping (Saxon bug 5387)</description>
     <created by="Michael Kay" on="2022-03-12"/>
-    <dependency type="spec" value="XQ31+"/>
+    <dependency type="spec" value="XQ31"/>
     <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1718,10 +2206,29 @@
     </result>
   </test-case>
   
+  <test-case name="Serialization-adaptive-86a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:string escaping (Saxon bug 5387)</description>
+      <created by="Michael Kay" on="2022-03-12"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        "''"
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^"''"$</serialization-matches>
+          <serialization-matches>^''''''$</serialization-matches>
+          <serialization-matches>^''$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-87" >
     <description>Test the adaptive serialization output method - xs:string escaping (Saxon bug 5387)</description>
     <created by="Michael Kay" on="2022-03-12"/>
-    <dependency type="spec" value="XQ31+"/>
+    <dependency type="spec" value="XQ31"/>
     <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "adaptive";
@@ -1735,6 +2242,25 @@
     </result>
   </test-case>
   
+  <test-case name="Serialization-adaptive-87a" covers-40="PR2594">
+      <description>Test the adaptive serialization output method - xs:string escaping (Saxon bug 5387)</description>
+      <created by="Michael Kay" on="2022-03-12"/>
+      <modified by="Christian Gruen" on="2026-07-21" change="PR2594"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        "'""'"
+      ]]></test>
+      <result>
+        <any-of>
+          <serialization-matches>^"'""'"$</serialization-matches>
+          <serialization-matches>^'''"'''$</serialization-matches>
+          <serialization-matches>^'"'$</serialization-matches>
+        </any-of>
+      </result>
+   </test-case>
+
   <test-case name="Serialization-adaptive-88" >
     <description>Test the adaptive serialization output method - attribute node -escaping - Saxon bug 5603</description>
     <created by="Michael Kay" on="2022-07-13"/>
