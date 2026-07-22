@@ -1967,7 +1967,8 @@
         <modified by="Debbie Lockett" on="2015-08-12" change="Edited dependency to XQuery only"/>
         <modified by="Tim Mills" on="2016-08-09" change="Bug 29740"/>
         <modified by="Tim Mills" on="2016-09-07" change="Bug 29740"/>
-        <dependency type="spec" value="XQ31+"/>
+        <modified by="Christian Gruen" on="2026-07-22" change="PR1501"/>
+        <dependency type="spec" value="XQ31"/>
         <test><![CDATA[  
                let $options := map {
                   'use-character-maps' : map {
@@ -1983,12 +1984,32 @@
 	      <error code="XPTY0004" />
         </result>
     </test-case>
+    <test-case name="serialize-xml-140a" covers="fn-serialize" covers-40="PR1501">
+        <description>Character mappings and option parameter conventions.</description>
+        <created by="Christian Gruen" on="2026-07-22"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+               let $options := map {
+                  'use-character-maps' : map {
+                     'x' : xs:untypedAtomic('j'),
+                     'm' : <e>so</e>,
+                     'l' : 'n'
+                  }
+               }
+               return
+                  serialize(<e>[xml]</e>, $options)
+        ]]></test>
+        <result>
+            <assert>parse-xml($result)/e/string() eq "[json]"</assert>
+        </result>
+    </test-case>
     <test-case name="serialize-xml-140b" covers="fn-serialize">
         <description>Character mappings and option parameter conventions. Rules are not recursive
             for map value supplied for use-character-maps (required xs:string, element given)</description>
         <created by="Debbie Lockett" on="2019-11-19"/>
         <modified by="Debbie Lockett" on="2020-07-09" change="Source should be XML 1.0"/>
         <modified by="Benito van der Zander" on="2020-09-24" change="test depends on 3.1 spec"/>
+        <modified by="Christian Gruen" on="2026-07-22" change="PR1501"/>
         <environment>        
             <source role="." file="serialize/serialize-xml-138-src.xml">
                 <description>File to be serialized</description>
@@ -1999,10 +2020,29 @@
                 <created by="Debbie Lockett, Saxonica" on="2019-11-19"/>
             </source>
         </environment>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP31 XQ31"/>
         <test>serialize(., map {'use-character-maps' : map {'x': xs:untypedAtomic('j'), 'm':$e/e, 'l':'n'}})</test>
         <result>
             <error code="XPTY0004" />
+        </result>
+    </test-case>
+    <test-case name="serialize-xml-140c" covers="fn-serialize" covers-40="PR1501">
+        <description>Character mappings and option parameter conventions.</description>
+        <created by="Christian Gruen" on="2026-07-22"/>
+        <environment>
+            <source role="." file="serialize/serialize-xml-138-src.xml">
+                <description>File to be serialized</description>
+                <created by="Debbie Lockett, Saxonica" on="2019-11-19"/>
+            </source>
+            <source role="$e" file="serialize/serialize-xml-140-src.xml">
+                <description>File to be serialized</description>
+                <created by="Debbie Lockett, Saxonica" on="2019-11-19"/>
+            </source>
+        </environment>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(., map {'use-character-maps' : map {'x': xs:untypedAtomic('j'), 'm':$e/e, 'l':'n'}})</test>
+        <result>
+            <assert>parse-xml($result)/e/string() eq "json"</assert>
         </result>
     </test-case>
       
