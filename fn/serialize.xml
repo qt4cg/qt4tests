@@ -1967,7 +1967,8 @@
         <modified by="Debbie Lockett" on="2015-08-12" change="Edited dependency to XQuery only"/>
         <modified by="Tim Mills" on="2016-08-09" change="Bug 29740"/>
         <modified by="Tim Mills" on="2016-09-07" change="Bug 29740"/>
-        <dependency type="spec" value="XQ31+"/>
+        <modified by="Christian Gruen" on="2026-07-22" change="PR1501"/>
+        <dependency type="spec" value="XQ31"/>
         <test><![CDATA[  
                let $options := map {
                   'use-character-maps' : map {
@@ -1983,12 +1984,32 @@
 	      <error code="XPTY0004" />
         </result>
     </test-case>
+    <test-case name="serialize-xml-140a" covers="fn-serialize" covers-40="PR1501">
+        <description>Character mappings and option parameter conventions.</description>
+        <created by="Christian Gruen" on="2026-07-22"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+               let $options := map {
+                  'use-character-maps' : map {
+                     'x' : xs:untypedAtomic('j'),
+                     'm' : <e>so</e>,
+                     'l' : 'n'
+                  }
+               }
+               return
+                  serialize(<e>[xml]</e>, $options)
+        ]]></test>
+        <result>
+            <assert>parse-xml($result)/e/string() eq "[json]"</assert>
+        </result>
+    </test-case>
     <test-case name="serialize-xml-140b" covers="fn-serialize">
         <description>Character mappings and option parameter conventions. Rules are not recursive
             for map value supplied for use-character-maps (required xs:string, element given)</description>
         <created by="Debbie Lockett" on="2019-11-19"/>
         <modified by="Debbie Lockett" on="2020-07-09" change="Source should be XML 1.0"/>
         <modified by="Benito van der Zander" on="2020-09-24" change="test depends on 3.1 spec"/>
+        <modified by="Christian Gruen" on="2026-07-22" change="PR1501"/>
         <environment>        
             <source role="." file="serialize/serialize-xml-138-src.xml">
                 <description>File to be serialized</description>
@@ -1999,10 +2020,29 @@
                 <created by="Debbie Lockett, Saxonica" on="2019-11-19"/>
             </source>
         </environment>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP31 XQ31"/>
         <test>serialize(., map {'use-character-maps' : map {'x': xs:untypedAtomic('j'), 'm':$e/e, 'l':'n'}})</test>
         <result>
             <error code="XPTY0004" />
+        </result>
+    </test-case>
+    <test-case name="serialize-xml-140c" covers="fn-serialize" covers-40="PR1501">
+        <description>Character mappings and option parameter conventions.</description>
+        <created by="Christian Gruen" on="2026-07-22"/>
+        <environment>
+            <source role="." file="serialize/serialize-xml-138-src.xml">
+                <description>File to be serialized</description>
+                <created by="Debbie Lockett, Saxonica" on="2019-11-19"/>
+            </source>
+            <source role="$e" file="serialize/serialize-xml-140-src.xml">
+                <description>File to be serialized</description>
+                <created by="Debbie Lockett, Saxonica" on="2019-11-19"/>
+            </source>
+        </environment>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(., map {'use-character-maps' : map {'x': xs:untypedAtomic('j'), 'm':$e/e, 'l':'n'}})</test>
+        <result>
+            <assert>parse-xml($result)/e/string() eq "json"</assert>
         </result>
     </test-case>
       
@@ -2086,7 +2126,7 @@
     <test-case name="serialize-xml-143" covers="fn-serialize">
         <description>omit-xml-declaration inconsistent with standalone</description>
         <created by="Michael Kay" on="2024-09-27"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
             serialize(
                 parse-xml('<a/>'), 
@@ -2102,7 +2142,7 @@
     <test-case name="serialize-xml-144" covers="fn-serialize">
         <description>omit-xml-declaration inconsistent with standalone</description>
         <created by="Michael Kay" on="2024-09-27"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
             serialize(
                 parse-xml('<a/>'), 
@@ -2118,7 +2158,7 @@
     <test-case name="serialize-xml-145" covers="fn-serialize">
         <description>omit-xml-declaration (which defaults to true) is inconsistent with standalone</description>
         <created by="Michael Kay" on="2024-09-27"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
             serialize(
                 parse-xml('<a/>'), 
@@ -2133,7 +2173,7 @@
     <test-case name="serialize-xml-146" covers="fn-serialize">
         <description>omit-xml-declaration inconsistent with version/doctype-system</description>
         <created by="Michael Kay" on="2024-09-27"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
             serialize(
                 parse-xml('<a/>'), 
@@ -2150,7 +2190,7 @@
     <test-case name="serialize-xml-147" covers="fn-serialize">
         <description>omit-xml-declaration (defaulting to true) inconsistent with version/doctype-system</description>
         <created by="Michael Kay" on="2024-09-27"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
             serialize(
                 parse-xml('<a/>'), 
@@ -4204,6 +4244,129 @@ Second line</text>
         <test>serialize({'a':1, 'v':2, 'r':5, 'h':7}, map{'method':'adaptive'})</test>
         <result>
             <assert-eq>'{"a":1,"v":2,"r":5,"h":7}'</assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-153" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out><in/></out>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'indent': true(), 'indent-unit': '  ' })
+        ]]></test>
+        <result>
+            <assert><![CDATA[contains($result, '&#xA;  <in/>')]]></assert>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-154" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out><in/></out>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'indent': true(), 'indent-unit': '\t' })
+        ]]></test>
+        <result>
+            <assert><![CDATA[contains($result, '&#xA;&#x9;<in/>')]]></assert>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-155" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out a='1' b='2'/>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'indent': true(), 'indent-attributes': true() })
+        ]]></test>
+        <result>
+            <assert><![CDATA[matches($result, '^<out\s+a=.1.\s+b=.2.\s*/>')]]></assert>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-156" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out>x&#xA;y</out>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'line-ending': '\r\n' })
+        ]]></test>
+        <result>
+            <assert-eq><![CDATA["<out>x&#xD;&#xA;y</out>"]]></assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-157" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out>x&#xA;y</out>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'line-ending': "&#xD;" })
+        ]]></test>
+        <result>
+            <assert-eq><![CDATA["<out>x&#xD;y</out>"]]></assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-158" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out/>"), { 'method': 'xml', 'indent-unit': 4 })
+        ]]></test>
+        <result>
+            <any-of>
+                <!-- wrong type -->
+                <error code="XPTY0004"/>
+                <!-- coerced to a string, the value does not match the allowed pattern -->
+                <error code="SEPM0016"/>
+            </any-of>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-159" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out/>"), { 'method': 'xml', 'indent-unit': 'x' })
+        ]]></test>
+        <result>
+            <error code="SEPM0016"/>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-160" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out/>"), { 'method': 'xml', 'line-ending': 10 })
+        ]]></test>
+        <result>
+            <any-of>
+                <!-- wrong type -->
+                <error code="XPTY0004"/>
+                <!-- coerced to a string, the value does not match the allowed pattern -->
+                <error code="SEPM0016"/>
+            </any-of>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-161" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out/>"), { 'method': 'xml', 'line-ending': '\n\n' })
+        ]]></test>
+        <result>
+            <error code="SEPM0016"/>
         </result>
     </test-case>
 
