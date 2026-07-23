@@ -313,6 +313,41 @@ return (
         </result>
     </test-case>
     
+    <test-case name="fold-left-022">
+        <description>Optimization opportunity for early exit</description>
+        <created by="Michael Kay" on="2026-07-20"/>
+        <environment ref="empty"/>
+        <test>fold-left(1 to 100000000, 0, function($count, $item){if ($count gt 100) then $count else $count+1}) gt 100</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="fold-left-023">
+        <description>Optimization opportunity for early exit</description>
+        <created by="Michael Kay" on="2026-07-20"/>
+        <environment ref="empty"/>
+        <test>fold-left(1 to 100000000, 0, function($sum, $item){if ($sum gt 1000) then $sum else $sum + $item}) eq 1035</test>
+        <result>
+            <assert-true/>
+        </result>
+    </test-case>
+    
+    <test-case name="fold-left-024">
+        <description>Optimization opportunity for early exit</description>
+        <created by="Michael Kay" on="2026-07-20"/>
+        <environment ref="empty"/>
+        <dependency type="spec" value="XQ30+"/>
+        <test><![CDATA[
+            let $doc := document { 
+                <doc> {replicate(<a/>, 1000), <b/>, replicate(<a/>, 1000) }</doc>
+            } return   
+            fold-left($doc/doc/*, (), function($leading, $item){if ($leading/self::b) then $leading else ($leading, $item)}) => count()
+        ]]></test>
+        <result>
+            <assert-eq>1001</assert-eq>
+        </result>
+    </test-case>
     
     
       
