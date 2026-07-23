@@ -993,10 +993,11 @@ abracadabra", "\n","with")</test>
       <description>Convert coordinates (taken from spec)</description>
       <created by="Christian Gruen" on="2022-08-17"/>
       <modified by="Michael Kay" on="2025-03-26" change="combine replacement and action args"/>
+      <modified by="Michael Kay" on="2026-07-19" change="2nd argument of callback is now a map"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
         fn:replace("57°43′30″", "([0-9]+)°([0-9]+)′([0-9]+)″", function($s, $g) {
-          string(number($g[1]) + number($g[2]) div 60 + number($g[3]) div 3600) || '°'
+          string(number($g?1) + number($g?2) div 60 + number($g?3) div 3600) || '°'
         })
       ]]></test>
       <result>
@@ -1007,10 +1008,11 @@ abracadabra", "\n","with")</test>
       <description>Duplicate string prefixes</description>
       <created by="Christian Gruen" on="2022-08-17"/>
       <modified by="Michael Kay" on="2025-03-26" change="combine replacement and action args"/>
+      <modified by="Michael Kay" on="2026-07-19" change="2nd argument of callback is now a map"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
         fn:replace("A1 B234", "([A-Z]+)([0-9]+)", function($s, $g) {
-          string-join(characters($g[2]) ! ($g[1] || .))
+          string-join(characters($g?2) ! ($g?1 || .))
         })
       ]]></test>
       <result>
@@ -1021,10 +1023,11 @@ abracadabra", "\n","with")</test>
       <description>Remove strings, based on parenthesized number</description>
       <created by="Christian Gruen" on="2022-08-17"/>
       <modified by="Michael Kay" on="2025-03-26" change="combine replacement and action args"/>
+      <modified by="Michael Kay" on="2026-07-19" change="2nd argument of callback is now a map"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
         fn:replace("A(0)B(1)C(0)D(9)", "(.)\((\d)\)", function($s, $g) {
-          $g[1][$g[2] != '0']
+          $g?1[$g?2 != '0']
         })
       ]]></test>
       <result>
@@ -1035,9 +1038,10 @@ abracadabra", "\n","with")</test>
       <description>Named function reference: Chop first characters</description>
       <created by="Christian Gruen" on="2022-08-17"/>
       <modified by="Michael Kay" on="2025-03-26" change="combine replacement and action args"/>
+      <modified by="Michael Kay" on="2026-07-19" change="2nd argument of callback is now a map"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
-        fn:replace("chop first character ", "(.).*? ", substring-after#2)
+        fn:replace("chop first character ", "(.).*? ", fn($s, $g){substring-after($s, $g?1)})
       ]]></test>
       <result>
          <assert-string-value>hop irst haracter </assert-string-value>
@@ -1047,9 +1051,10 @@ abracadabra", "\n","with")</test>
       <description>Partial function application: Chop second character from each match</description>
       <created by="Christian Gruen" on="2022-08-17"/>
       <modified by="Michael Kay" on="2025-03-26" change="combine replacement and action args"/>
+      <modified by="Michael Kay" on="2026-07-19" change="2nd argument of callback is now a map"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
-        fn:replace("12345678", ".(.)", replace(?, ?, ''))
+        fn:replace("12345678", ".(.)", fn($s, $g){replace($s, $g?1, '')})
       ]]></test>
       <result>
          <assert-string-value>1357</assert-string-value>
@@ -1059,9 +1064,10 @@ abracadabra", "\n","with")</test>
       <description>Named function references: Return head or tail of match group</description>
       <created by="Christian Gruen" on="2022-08-17"/>
       <modified by="Michael Kay" on="2025-03-26" change="combine replacement and action args"/>
+      <modified by="Michael Kay" on="2026-07-19" change="2nd argument of callback is now a map"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
-        for $function in (head#1, tail#1)
+        for $function in (map:get(?, 1), map:get(?, 2))
         return fn:replace("1234", "(.)(.)", function($s, $g) { $function($g) })
       ]]></test>
       <result>
@@ -1072,10 +1078,12 @@ abracadabra", "\n","with")</test>
       <description>Named function references: Return substrings</description>
       <created by="Christian Gruen" on="2022-08-17"/>
       <modified by="Michael Kay" on="2025-03-26" change="combine replacement and action args"/>
+      <modified by="Michael Kay" on="2026-07-19" change="2nd argument of callback is now a map"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
         for $function in (substring-before#2, substring-after#2)
-        return fn:replace("1234", ".(..)", $function)
+        let $f2 := function($s, $g){$function($s, $g?1)}
+        return fn:replace("1234", ".(..)", $f2)
       ]]></test>
       <result>
          <assert-deep-eq>'14', '4'</assert-deep-eq>
@@ -1086,12 +1094,13 @@ abracadabra", "\n","with")</test>
       <created by="Christian Gruen" on="2022-08-17"/>
       <modified by="Michael Kay" on="2023-11-18" change="Use XPath syntax"/>
       <modified by="Michael Kay" on="2025-03-26" change="combine replacement and action args"/>
+      <modified by="Michael Kay" on="2026-07-19" change="2nd argument of callback is now a map"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
         for $before in (true(), false()) return
         let $name := 'fn:substring-' || (if($before) then 'before' else 'after')
         let $function := function-lookup(xs:QName($name), 2)
-        return fn:replace("1234", ".(..)", $function)
+        return fn:replace("1234", ".(..)", fn($s, $g) {$function($s, $g?1)})
       ]]></test>
       <result>
          <assert-deep-eq>'14', '4'</assert-deep-eq>
@@ -1114,8 +1123,9 @@ abracadabra", "\n","with")</test>
       <created by="Christian Gruen" on="2022-08-17"/>
       <modified by="Michael Kay" on="2023-10-30" change="result is a string not a boolean"/>
       <modified by="Michael Kay" on="2025-03-26" change="combine replacement and action args"/>
+      <modified by="Michael Kay" on="2026-07-19" change="2nd argument of callback is now a map"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test><![CDATA[fn:replace("X", ".", contains#2)]]></test>
+      <test><![CDATA[fn:replace("X", ".", fn($s, $g) {contains($s, $g?1)})]]></test>
       <result>
          <assert-eq>"true"</assert-eq>
       </result>
@@ -1128,6 +1138,26 @@ abracadabra", "\n","with")</test>
       <test>replace("alphabet", "a", "X", ())</test>
       <result>
          <assert-eq>"XlphXbet"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-replace-117" covers-40="PR1897">
+      <description>Arity-1 callback</description>
+      <created by="Michael Kay" on="2026-07-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:replace("X", ".", lower-case#1)</test>
+      <result>
+         <assert-eq>"x"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-replace-118" covers-40="PR1897">
+      <description>Arity-0 callback</description>
+      <created by="Michael Kay" on="2026-07-19"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:replace("XYZ", "[XYZ]", fn(){'[*]'})</test>
+      <result>
+         <assert-eq>"[*][*][*]"</assert-eq>
       </result>
    </test-case>
 
@@ -1806,13 +1836,33 @@ abracadabra", "\n", fn{"with"})</test>
       </result>
    </test-case>
    
-   <test-case name="fn-replace-340" covers-40="PR2793">
+   <test-case name="fn-replace-319" covers-40="PR2793">
       <description>Replace named capture groups</description>
       <created by="Michael Kay" on="2026-07-17"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[replace('2026-07-17', '(?<year>....)-(?<month>..)-(?<day>..)', '$<day>/$<month>/$<year>')]]></test>
       <result>
          <assert-string-value>17/07/2026</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-replace-320" covers-40="PR2793">
+      <description>Use named capture groups in callback</description>
+      <created by="Michael Kay" on="2026-07-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('17/7/2026', '(?<day>.+)/(?<month>.+)/(?<year>....)', fn($s, $g){$g -> `{?year}-{?month}-{?day}`})]]></test>
+      <result>
+         <assert-string-value>2026-7-17</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-replace-321" covers-40="PR2793">
+      <description>Replace named capture groups using a callback function</description>
+      <created by="Michael Kay" on="2026-07-17"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('2026/7/17', '(?<year>.+)/(?<month>.+)/(?<day>.+)', fn($s, $g){ build-dateTime($g) })]]></test>
+      <result>
+         <assert-string-value>2026-07-17</assert-string-value>
       </result>
    </test-case>
 

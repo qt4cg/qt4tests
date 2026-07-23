@@ -459,6 +459,30 @@
       </result>
    </test-case>
    
+   <test-case name="fn-filter-027">
+      <description>Callback is an inline function with a closure</description>
+      <created by="Michael Kay" on="2026-07-21"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>
+         for $i in (1000, 2000)
+         let $x := year-from-date(current-date()) idiv $i
+         return fn:filter(10 to 20, fn($it as xs:integer) as xs:boolean {$it - 10 gt $x} )</test>
+      <result>
+         <assert-deep-eq>(13 to 20, 12 to 20)</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-filter-028">
+      <description>Callback doesn't accept arbitrary items</description>
+      <created by="Michael Kay" on="2026-07-21"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>
+         fn:filter(1 to 1000, fn($it as xs:byte) as xs:boolean {$it lt 20} )</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
    <test-case name="fn-filter-401" covers-40="PR254">
       <description>Supply a callback with fewer arguments than expected</description>
       <created by="Michael Kay" on="2023-05-20"/>

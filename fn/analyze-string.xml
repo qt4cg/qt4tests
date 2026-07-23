@@ -514,6 +514,43 @@ it put its sooty foot.</fn:non-match></fn:analyze-string-result>]]></assert-xml>
       </result>
    </test-case>
    
+   <test-case name="analyzeString-038" covers-40="PR2793">
+      <description> analyze-string, named groups</description>
+      <created by="Michael Kay" on="2026-07-18"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[analyze-string("how now brown cow", "(?<g1>brown)")]]></test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"
+            ><fn:non-match>how now </fn:non-match
+            ><fn:match><fn:group nr="1" name="g1">brown</fn:group></fn:match
+            ><fn:non-match> cow</fn:non-match></fn:analyze-string-result>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="analyzeString-039" covers-40="PR2793">
+      <description> analyze-string, named groups</description>
+      <created by="Michael Kay" on="2026-07-18"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[analyze-string("how now brown cow", "(?:(?<g1>how)|(?<g2>now)|(?<g3>brown)|(?<g4>cow))+")]]></test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:match><fn:group nr="1" name="g1">how</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr="2" name="g2">now</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr="3" name="g3">brown</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr="4" name="g4">cow</fn:group></fn:match></fn:analyze-string-result>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="analyzeString-040" covers-40="PR2793">
+      <description> analyze-string, lookahead named group</description>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[fn:analyze-string("abcd", ".(?=(?<plusone>.))")]]></test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions">
+   <match>a<lookahead-group nr="1" name="plusone" position="2" value="b"/></match>
+   <match>b<lookahead-group nr="1" name="plusone" position="3" value="c"/></match>
+   <match>c<lookahead-group nr="1" name="plusone" position="4" value="d"/></match>
+   <non-match>d</non-match>
+</analyze-string-result>]]></assert-xml>
+      </result>
+   </test-case>
+   
    <test-case name="analyzeString-901">
       <description> analyze-string, error, bad regex pattern</description>
       <created by="Michael Kay" on="2009-10-18"/>
