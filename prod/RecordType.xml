@@ -4,12 +4,23 @@
          
    <dependency type="spec" value="XP40+ XQ40+"/>
       
-   <test-case name="RecordType-001">
+   <test-case name="RecordType-001" covers-40="PR2566">
       <description>instance of test, no declared types</description>
       <created by="Michael Kay" on="2020-11-29"/>
-      <test>map{"x":3, "y":4} instance of record(x, y)</test>
+      <modified by="Michael Kay" on="2026-07-24" change="PR2566"/>
+      <test>let $m as record(x, y) := map{"x":3, "y":4} return $m instance of record(x, y)</test>
       <result>
          <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="RecordType-001a" covers-40="PR2566">
+      <description>instance of test, no declared types</description>
+      <created by="Michael Kay" on="2020-11-29"/>
+      <modified by="Michael Kay" on="2026-07-24" change="PR2566"/>
+      <test>map{"x":3, "y":4} instance of record(x, y)</test>
+      <result>
+         <assert-false/>
       </result>
    </test-case>
    
@@ -74,11 +85,13 @@
       </result>
    </test-case>
    
-   <test-case name="RecordType-005">
+   <test-case name="RecordType-005" covers-40="PR2566">
       <description>Fields in record type may be empty</description>
       <created by="Michael Kay" on="2020-11-29"/>
+      <modified by="Michael Kay" on="2026-07-24" change="PR2566"/>
       <test>
-         map{"name":"xyz", "value":()} instance of record(name as xs:string, value as item()?)
+         let $m as record(name as xs:string, value as item()?) := map{"name":"xyz", "value":()} 
+         return $m instance of record(name as xs:string, value as item()?)
       </test>
       <result>
          <assert-true/>
@@ -108,12 +121,14 @@
       </result>
    </test-case>
    
-   <test-case name="RecordType-008">
+   <test-case name="RecordType-008" covers-40="PR2566">
       <description>Fields in record type may be omitted if the field is emptiable</description>
       <created by="Michael Kay" on="2020-11-29"/>
       <modified by="Michael Kay" on="2026-07-07" change="optional fields were dropped"/>
+      <modified by="Michael Kay" on="2026-07-24" change="PR2566"/>
       <test>
-         map{"name":"xyz"} instance of record(name as item()*, value as item()?)
+         let $m as record(name as item()*, value as item()?) := map{"name":"xyz"} 
+         return $m instance of record(name as item()*, value as item()?)
       </test>
       <result>
          <assert-true/>
@@ -248,13 +263,14 @@
       </result>
    </test-case>
    
-   <test-case name="RecordType-103" covers-40="PR2413">
+   <test-case name="RecordType-103" covers-40="PR2413 PR2566">
       <description>record(*) is now allowed</description>
       <created by="Michael Kay" on="2023-09-19"/>
+      <modified by="Michael Kay" on="2026-07-24" change="PR2566"/>
       <dependency type="spec" value="XQ40+"/>
       <modified by="Christian Gruen" on="2026-07-02" change="PR2413"/>
       <test>
-         map{} instance of record(*)
+         let $m as record() := map{} return $m instance of record(*)
       </test>
       <result>
          <assert-true/>
@@ -264,25 +280,27 @@
    <test-case name="RecordType-104" covers-40="PR2413">
       <description>record(*) is now allowed</description>
       <created by="Michael Kay" on="2023-09-19"/>
+      <modified by="Michael Kay" on="2026-07-24" change="PR2566"/>
       <dependency type="spec" value="XQ40+"/>
       <modified by="Christian Gruen" on="2026-07-02" change="PR2413"/>
       <test>
-         map{'a': 22} instance of record(*)
+         let $m as record(a) := map{'a': 22} instance of record(*)
       </test>
       <result>
          <assert-true/>
       </result>
    </test-case>
    
-   <test-case name="RecordType-105" covers-40="PR1577">
+   <test-case name="RecordType-105" covers-40="PR1577 PR2566">
       <description>record() is now allowed</description>
       <created by="Michael Kay" on="2023-09-19"/>
+      <modified by="Michael Kay" on="2026-07-24" change="PR2566"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
          map{} instance of record()
       </test>
       <result>
-         <assert-true/>
+         <assert-false/>
       </result>
    </test-case>
    
