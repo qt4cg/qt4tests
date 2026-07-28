@@ -713,4 +713,19 @@
       <assert-deep-eq>5, 4, 3, 2, 1</assert-deep-eq>
     </result>
   </test-case>
+  
+  <test-case name="slice-185" covers-40="PR2800">
+    <description>Optimization opportunity</description>
+    <created by="Michael Kay" on="2026-07-28"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      let $in := <doc> {
+         for $i in 1 to 10000 return <a nr="{$i}"/>
+      } </doc>
+      return ($in/*[last()]/preceding-sibling-or-self::* => slice(step := -1, end := -5)) ! number(@nr)
+      ]]></test>
+    <result>
+      <assert-deep-eq>10000, 9999, 9998, 9997, 9996</assert-deep-eq>
+    </result>
+  </test-case>
 </test-set>

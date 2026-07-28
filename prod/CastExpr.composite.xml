@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-CastExpr.composite" covers-40="PR2777">
+   <description>Tests for the CastExpr production: cast expressions casting to sequences, arrays, maps, and record types</description>
+   
+ 
+   <dependency type="spec" value="XP40+ XQ40+"/>      
+
+   <test-case name="cast-sequence-001">
+      <description>Casting a sequence</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>(1 to 5) cast as xs:string*</test>
+      <result>
+         <assert-deep-eq>("1", "2", "3", "4", "5")</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-sequence-002">
+      <description>Casting a sequence</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>("1", "2", "3", "4", "5") cast as xs:integer+</test>
+      <result>
+         <assert-deep-eq>1 to 5</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-sequence-901">
+      <description>Casting a sequence</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>(1 to 5) cast as xs:string</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-sequence-902">
+      <description>Casting a sequence</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>("2026-07-07", "2026-07-08", "12:20:00Z") cast as xs:date*</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-001">
+      <description>Casting an array</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>[1, 2, 3, 4, 5] cast as array(xs:string)</test>
+      <result>
+         <assert-deep-eq>["1", "2", "3", "4", "5"]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-002">
+      <description>Casting an array</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>["1", "2", "3", "4", "5"] cast as array(xs:integer)</test>
+      <result>
+         <assert-deep-eq>1 to 5</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-003">
+      <description>Casting an array of sequences</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>[(1, 2), (3, 4, 5)] cast as array(xs:string+)</test>
+      <result>
+         <assert-deep-eq>[("1", "2"), ("3", "4", "5")]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-004">
+      <description>Casting a sequence of arrays</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>([1, 2], [3, 4]) cast as array(xs:string)+</test>
+      <result>
+         <assert-deep-eq>["1", "2"], ["3", "4"]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-005">
+      <description>Casting an array containing a function</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>([1, 2], [3, 4, fn:not#1]) cast as array(xs:string|function(*))+</test>
+      <result>
+         <assert-deep-eq>["1", "2"], ["3", "4", fn:not#1]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-901">
+      <description>Casting an array</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>(1 to 5) cast as array(xs:string)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-902">
+      <description>Casting a sequence</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>["2026-07-07", "2026-07-08", "12:20:00Z"] cast as array(xs:date)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-903">
+      <description>Casting an array containing a function</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>([1, 2], [3, 4, fn:not#1]) cast as array(xs:string|(function(xs:date) as xs:time))+</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-001">
+      <description>Casting a map</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"x": 1, "y": 2} cast as map(xs:string, xs:string)</test>
+      <result>
+         <assert-deep-eq>{"x": "1", "y": "2"}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-002">
+      <description>Casting a map</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"10": 1, "11": 2} cast as map(xs:integer, xs:integer)</test>
+      <result>
+         <assert-deep-eq>{10: 1, 11: 2}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-003">
+      <description>Casting a map</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"10": "1", "11": "2"} cast as map(xs:integer, xs:integer)</test>
+      <result>
+         <assert-deep-eq>{10: 1, 11: 2}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-004">
+      <description>Casting a map containing arrays</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"10": ["1"], "11": ["2"]} cast as map(xs:integer, array(xs:integer))</test>
+      <result>
+         <assert-deep-eq>{10: [1], 11: [2]}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-901">
+      <description>Casting a map fails with duplicates</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{12: "a", "12": "b} cast as map(xs:string, xs:string)</test>
+      <result>
+         <error code="XPDY9999"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-902">
+      <description>Casting a map to an array fails</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{12: "a", "12": "b} cast as array(xs:string)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-001">
+      <description>Casting a map to a record type</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"x": 1, "y": 2} cast as record(x as xs:integer, y as xs:integer)</test>
+      <result>
+         <all-of>
+            <assert-deep-eq>{"x": 1, "y": 2}</assert-deep-eq>
+            <assert-type>record(x as xs:integer, y as xs:integer)</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-002">
+      <description>Casting a map to a record type</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"x": 1, "y": 2, "z": 3} cast as record(x as xs:integer, y as xs:integer)</test>
+      <result>
+         <all-of>
+            <assert-deep-eq>{"x": 1, "y": 2}</assert-deep-eq>
+            <assert-type>record(x as xs:integer, y as xs:integer)</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-003">
+      <description>Casting a map to a record type</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"y": 2, "z": 3} cast as record(x as xs:integer?, y as xs:integer?)</test>
+      <result>
+         <all-of>
+            <assert-deep-eq>{"x": (), "y": 2}</assert-deep-eq>
+            <assert-type>record(x as xs:integer?, y as xs:integer?)</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+
+</test-set>
