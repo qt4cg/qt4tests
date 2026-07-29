@@ -35,9 +35,10 @@
    <test-case name="cast-sequence-902">
       <description>Casting a sequence</description>
       <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="error code fixed"/>
       <test>("2026-07-07", "2026-07-08", "12:20:00Z") cast as xs:date*</test>
       <result>
-         <error code="XPTY0004"/>
+         <error code="FORG0001"/>
       </result>
    </test-case>
    
@@ -53,9 +54,10 @@
    <test-case name="cast-array-002">
       <description>Casting an array</description>
       <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="typo"/>
       <test>["1", "2", "3", "4", "5"] cast as array(xs:integer)</test>
       <result>
-         <assert-deep-eq>1 to 5</assert-deep-eq>
+         <assert-deep-eq>[1, 2, 3, 4, 5]</assert-deep-eq>
       </result>
    </test-case>
    
@@ -80,7 +82,8 @@
    <test-case name="cast-array-005">
       <description>Casting an array containing a function</description>
       <created by="Michael Kay" on="2026-07-28"/>
-      <test>([1, 2], [3, 4, fn:not#1]) cast as array(xs:string|function(*))+</test>
+      <modified by="Christian Gruen" on="2026-07-29" change="syntax fixed"/>
+      <test>(["1", "2"], ["3", "4", fn:not#1]) cast as array((xs:string | function(*)))+</test>
       <result>
          <assert-deep-eq>["1", "2"], ["3", "4", fn:not#1]</assert-deep-eq>
       </result>
@@ -98,18 +101,20 @@
    <test-case name="cast-array-902">
       <description>Casting a sequence</description>
       <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="error code fixed"/>
       <test>["2026-07-07", "2026-07-08", "12:20:00Z"] cast as array(xs:date)</test>
       <result>
-         <error code="XPTY0004"/>
+         <error code="FORG0001"/>
       </result>
    </test-case>
    
    <test-case name="cast-array-903">
       <description>Casting an array containing a function</description>
       <created by="Michael Kay" on="2026-07-28"/>
-      <test>([1, 2], [3, 4, fn:not#1]) cast as array(xs:string|(function(xs:date) as xs:time))+</test>
+      <modified by="Christian Gruen" on="2026-07-29" change="corrected syntax and error code"/>
+      <test>([1, 2], [3, 4, fn:not#1]) cast as array((xs:string | (function(xs:date) as xs:time)))+</test>
       <result>
-         <error code="XPTY0004"/>
+         <error code="XPTY0155"/>
       </result>
    </test-case>
    
@@ -152,16 +157,18 @@
    <test-case name="cast-map-901">
       <description>Casting a map fails with duplicates</description>
       <created by="Michael Kay" on="2026-07-28"/>
-      <test>{12: "a", "12": "b} cast as map(xs:string, xs:string)</test>
+      <modified by="Christian Gruen" on="2026-07-29" change="query and error code fixed"/>
+      <test>{12: "a", "12": "b"} cast as map(xs:string, xs:string)</test>
       <result>
-         <error code="XPDY9999"/>
+         <error code="XQDY0137"/>
       </result>
    </test-case>
    
    <test-case name="cast-map-902">
       <description>Casting a map to an array fails</description>
       <created by="Michael Kay" on="2026-07-28"/>
-      <test>{12: "a", "12": "b} cast as array(xs:string)</test>
+      <modified by="Christian Gruen" on="2026-07-29" change="typo"/>
+      <test>{12: "a", "12": "b"} cast as array(xs:string)</test>
       <result>
          <error code="XPTY0004"/>
       </result>
