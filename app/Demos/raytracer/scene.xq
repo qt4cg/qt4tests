@@ -1,6 +1,6 @@
 module namespace scene="http://www.xqsharp.com/raytracer/scene";
 
-import module namespace vector="http://www.xqsharp.com/raytracer/vector";
+import module namespace vector="http://www.xqsharp.com/raytracer/vector" at "vector.xq";
 
 declare function scene:calculate-basis($camera as element())
 {

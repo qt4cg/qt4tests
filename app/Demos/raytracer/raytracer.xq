@@ -1,9 +1,9 @@
 module namespace raytracer="http://www.xqsharp.com/raytracer";
 
-import module namespace vector="http://www.xqsharp.com/raytracer/vector";
-import module namespace shapes="http://www.xqsharp.com/raytracer/shapes";
-import module namespace materials="http://www.xqsharp.com/raytracer/materials";
-import module namespace math="http://www.xqsharp.com/raytracer/math";
+import module namespace vector="http://www.xqsharp.com/raytracer/vector" at "vector.xq";
+import module namespace shapes="http://www.xqsharp.com/raytracer/shapes" at "shapes.xq";
+import module namespace materials="http://www.xqsharp.com/raytracer/materials" at "materials.xq";
+import module namespace math="http://www.xqsharp.com/raytracer/math" at "math.xq";
 
 (:~
  : Returns the color of a pixel in the ray-traced image.

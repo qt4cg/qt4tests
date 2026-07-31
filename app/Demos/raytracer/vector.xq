@@ -1,5 +1,5 @@
 module namespace vector="http://www.xqsharp.com/raytracer/vector";
-import module namespace math="http://www.xqsharp.com/raytracer/math";
+import module namespace math="http://www.xqsharp.com/raytracer/math" at "math.xq";
 
 declare function vector:add($v1 as xs:double*, $v2 as xs:double*) as xs:double*
 {
@@ -47,7 +47,7 @@ declare function vector:length($v as xs:double*) as xs:double?
 declare function vector:normalize($v as xs:double*) as xs:double*
 {
   let $length := vector:length($v)
-  return for $x in $v 
+  return for $x in $v
          return $x div $length
 };
 

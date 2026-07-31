@@ -1,7 +1,7 @@
 module namespace shapes="http://www.xqsharp.com/raytracer/shapes";
 
-import module namespace vector="http://www.xqsharp.com/raytracer/vector";
-import module namespace math="http://www.xqsharp.com/raytracer/math";
+import module namespace vector="http://www.xqsharp.com/raytracer/vector" at "vector.xq";
+import module namespace math="http://www.xqsharp.com/raytracer/math" at "math.xq";
 
 declare function shapes:intersect($start as xs:double*, 
                                   $dir as xs:double*,
