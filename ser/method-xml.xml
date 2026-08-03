@@ -1089,5 +1089,109 @@
       <serialization-matches><![CDATA[^<out a=['"]1['"]>\r\n\t<in/>\r\n</out>]]></serialization-matches>
     </result>
   </test-case>
+  
+  <test-case name="Serialization-xml-21" covers-40="PR2719">
+    <description>Test the XML serialization parameters: newlines in comments with indent=no</description>
+    <created by="Michael Kay" on="2026-08-03"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "xml";
+      declare option output:omit-xml-declaration "yes";
+      declare option output:indent "no";
+      declare option output:line-ending "\r\n";
+      <out>{comment { "abc" || char('\n') || "def" }}</out>
+    ]]></test>
+    <result>
+        <serialization-matches flags="i"><![CDATA[^<out><!--abc\r\ndef--></out>]]></serialization-matches>
+    </result>
+  </test-case>
+  
+  <test-case name="Serialization-xml-22" covers-40="PR2719">
+    <description>Test the XML serialization parameters: newlines in comments with indent=yes</description>
+    <created by="Michael Kay" on="2026-08-03"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "xml";
+      declare option output:omit-xml-declaration "yes";
+      declare option output:indent "yes";
+      declare option output:line-ending "\r\n";
+      <out>{comment { "abc" || char('\n') || "def" }}</out>
+    ]]></test>
+    <result>
+      <serialization-matches flags="i"><![CDATA[<out>(\r\n[ \t]*)?<!--abc\r\ndef-->(\r\n)?</out>]]></serialization-matches>
+    </result>
+  </test-case>
+  
+  <test-case name="Serialization-xml-23" covers-40="PR2719">
+    <description>Test the XML serialization parameters: newlines in PIs with indent=no</description>
+    <created by="Michael Kay" on="2026-08-03"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "xml";
+      declare option output:omit-xml-declaration "yes";
+      declare option output:indent "no";
+      declare option output:line-ending "\r\n";
+      <out>{processing-instruction #PI { "abc" || char('\n') || "def" }}</out>
+    ]]></test>
+    <result>
+      <serialization-matches flags="i"><![CDATA[^<out><\?PI abc\r\ndef\?></out>]]></serialization-matches>
+    </result>
+  </test-case>
+  
+  <test-case name="Serialization-xml-24" covers-40="PR2719">
+    <description>Test the XML serialization parameters: newlines in PIs with indent=yes</description>
+    <created by="Michael Kay" on="2026-08-03"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "xml";
+      declare option output:omit-xml-declaration "yes";
+      declare option output:indent "yes";
+      declare option output:line-ending "\r\n";
+      <out>{processing-instruction #PI { "abc" || char('\n') || "def" }}</out>
+    ]]></test>
+    <result>
+      <serialization-matches><![CDATA[<\?PI abc\r\ndef\?>]]></serialization-matches>
+    </result>
+  </test-case>
+  
+  <test-case name="Serialization-xml-25" covers-40="PR2719">
+    <description>Test the XML serialization parameters: line-ending interaction with item-separator</description>
+    <created by="Michael Kay" on="2026-08-03"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "xml";
+      declare option output:omit-xml-declaration "yes";
+      declare option output:indent "no";
+      declare option output:item-separator "&#x0a;";
+      declare option output:line-ending "\r\n";
+      ( <one/>, <two/>, <three/> )
+    ]]></test>
+    <result>
+      <serialization-matches><![CDATA[<one/>\r\n<two/>\r\n<three/>]]></serialization-matches>
+    </result>
+  </test-case>
+  
+  <test-case name="Serialization-xml-26" covers-40="PR2719">
+    <description>Test the XML serialization parameters: line-ending interaction with item-separator</description>
+    <created by="Michael Kay" on="2026-08-03"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "xml";
+      declare option output:omit-xml-declaration "yes";
+      declare option output:indent "no";
+      declare option output:item-separator "&#x0d;&#x0a;";
+      declare option output:line-ending "\r\n";
+      ( <one/>, <two/>, <three/> )
+    ]]></test>
+    <result>
+      <serialization-matches><![CDATA[<one/>&#x0*[dD];\r\n<two/>&#x0*[dD];\r\n<three/>]]></serialization-matches>
+    </result>
+  </test-case>
 
 </test-set>
