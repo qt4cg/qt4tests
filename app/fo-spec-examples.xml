@@ -5747,6 +5747,42 @@ Tak, tak, tak! - da kommen sie.
       </result>
    </test-case>
 
+   <test-case name="fo-test-fn-matches-009">
+      <description>Test case for fn:matches</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-11"/>
+      <environment ref="global"/>
+      <test>
+        matches("abcabc", "(abc)\1")
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-matches-010">
+      <description>Test case for fn:matches</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-11"/>
+      <environment ref="global"/>
+      <test>
+        matches("abcabc", "(?&lt;x&gt;abc)\k&lt;x&gt;")
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-matches-011">
+      <description>Test case for fn:matches</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-11"/>
+      <environment ref="global"/>
+      <test>
+        matches("abcabd", "(?&lt;x&gt;abc)\k&lt;x&gt;")
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-fn-replace-001">
       <description>Test case for fn:replace</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-11"/>
@@ -5916,12 +5952,44 @@ Tak, tak, tak! - da kommen sie.
   "57°43′30″",
   "([0-9]+)°([0-9]+)′([0-9]+)″",
   fn($s, $groups) {
-    string($groups[1] + $groups[2] ÷ 60 + $groups[3] ÷ 3600) || '°'
+    string($groups?1 + $groups?2 ÷ 60 + $groups?3 ÷ 3600) || '°'
   }
 )
       </test>
       <result>
          <assert-deep-eq>"57.725°"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-replace-015">
+      <description>Test case for fn:replace</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-11"/>
+      <environment ref="global"/>
+      <test>
+        replace(
+  "2026-06-25",
+  "(?&lt;year&gt;\d{4})-(?&lt;month&gt;\d{2})-(?&lt;day&gt;\d{2})",
+  "$&lt;day&gt;/$&lt;month&gt;/$&lt;year&gt;"
+)
+      </test>
+      <result>
+         <assert-deep-eq>"25/06/2026"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-replace-016">
+      <description>Test case for fn:replace</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-11"/>
+      <environment ref="global"/>
+      <test>
+        replace(
+  "42 plus 7",
+  "(?&lt;first&gt;\d+) plus (?&lt;second&gt;\d+)",
+  fn($s, $groups) { string($groups?first + $groups?second) }
+)
+      </test>
+      <result>
+         <assert-deep-eq>"49"</assert-deep-eq>
       </result>
    </test-case>
 
@@ -6406,6 +6474,20 @@ return $regex?replace($title, fn { . + 1 })
       </test>
       <result>
          <assert-xml ignore-prefixes="true"><![CDATA[<analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions"><match><lookahead-group nr="1" value="There" position="1"/></match><non-match>There </non-match><match><lookahead-group nr="1" value="we" position="7"/></match><non-match>we </non-match><match><lookahead-group nr="1" value="go" position="10"/></match><non-match>go</non-match></analyze-string-result>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-analyze-string-006">
+      <description>Test case for fn:analyze-string</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-11"/>
+      <environment ref="global"/>
+      <test>
+        analyze-string("2026-06-25", "(?&lt;y&gt;\d{4})-(?&lt;m&gt;\d{2})-(?&lt;d&gt;\d{2})")
+      </test>
+      <result>
+         <assert-xml ignore-prefixes="true"><![CDATA[<analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions"><match>
+    <group name="y" nr="1">2026</group>-<group name="m" nr="2">06</group>-<group name="d" nr="3">25</group>
+  </match></analyze-string-result>]]></assert-xml>
       </result>
    </test-case>
 
