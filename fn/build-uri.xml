@@ -623,6 +623,7 @@
     <description>Tests character encoding</description>
     <created by="Norm Tovey-Walsh" on="2023-10-26"/>
     <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Changed encoded characters in the result"/>
+    <modified by="Christian Gruen" on="2026-08-12" change="PR2812"/>
     <test>fn:build-uri(map {'scheme': 'http',
                            "hierarchical": true(),
                            'authority': 'example.com',
@@ -635,7 +636,7 @@
                            "fragment": ` !"#$%&amp;'()*+,-./0123456789:;&lt;=>?`
                          })</test>
     <result>
-      <assert-eq>`http://example.com/%20!"%23$%25&amp;'()*%2B,-.%2F0123456789:;&lt;=>%3F?a=%20!"%23$%25%26'()*%2B,-&amp;b=./0123456789:;&lt;%3D>?#%20!"%23$%25&amp;'()*%2B,-./0123456789:;&lt;=>?`</assert-eq>
+      <assert-eq>`http://example.com/%20!"%23$%25&amp;'()*+,-.%2F0123456789:;&lt;=>%3F?a=%20!"%23$%25%26'()*%2B,-&amp;b=./0123456789:;&lt;%3D>?#%20!"%23$%25&amp;'()*+,-./0123456789:;&lt;=>?`</assert-eq>
     </result>
   </test-case>
 
@@ -695,6 +696,56 @@
                          }]]>)</test>
     <result>
       <assert-eq>`http://example.com/🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿?a=🤷 ¡¢£¤ǌ&amp;b=†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿#🤷 ¡¢£¤ǌ†𓇌𓆑🏴󠁧󠁢󠁷󠁬󠁳󠁿`</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-011a" covers-40="PR2812">
+    <description>Tests plus signs in a URI.</description>
+    <created by="Christian Gruen" on="2026-08-12"/>
+    <test>fn:build-uri(map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'path-segments': ('','a+b')
+                         })</test>
+    <result>
+      <assert-eq>"http://example.com/a+b"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-011b" covers-40="PR2812">
+    <description>Tests plus signs in a URI.</description>
+    <created by="Christian Gruen" on="2026-08-12"/>
+    <test>fn:build-uri(map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'path-segments': ('',''),
+                           "query-parameters": map { "c": "d+e" }
+                         })</test>
+    <result>
+      <assert-eq>"http://example.com/?c=d%2Be"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-011c" covers-40="PR2812">
+    <description>Tests plus signs in a URI.</description>
+    <created by="Christian Gruen" on="2026-08-12"/>
+    <test>fn:build-uri(map {'scheme': 'http',
+                           "hierarchical": true(),
+                           'authority': 'example.com',
+                           'path-segments': ('',''),
+                           "fragment": "f+g"
+                         })</test>
+    <result>
+      <assert-eq>"http://example.com/#f+g"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-build-uri-011d" covers-40="PR2812">
+    <description>Tests plus signs in a URI.</description>
+    <created by="Christian Gruen" on="2026-08-12"/>
+    <test>fn:parse-uri("a+b/c") => fn:build-uri()</test>
+    <result>
+      <assert-eq>"a+b/c"</assert-eq>
     </result>
   </test-case>
 

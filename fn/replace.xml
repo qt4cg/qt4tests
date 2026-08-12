@@ -1867,45 +1867,154 @@ abracadabra", "\n", fn{"with"})</test>
    </test-case>
 
 
-   <!--<test-case name="fn-replace-forx0005-01">
-      <description>Both replacement string and action supplied.</description>
-      <created by="Christian Gruen" on="2023-12-10"/>
+   <test-case name="fn-replace-322" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>replace('A', 'A', 'STRING', (), true#0)</test>
+      <test><![CDATA[replace('ab', '(?<x>a)|(?<y>b)', '[$<x>$<y>]')]]></test>
       <result>
-         <error code="FORX0005"/>
-      </result>
-   </test-case>-->
-
-   <!--<test-case name="fn-replace-forx0005-02">
-      <description>Both replacement string and action supplied.</description>
-      <created by="Christian Gruen" on="2023-12-10"/>
-      <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>replace('A', 'A', '', (), true#0)</test>
-      <result>
-         <error code="FORX0005"/>
-      </result>
-   </test-case>-->
-
-   <!--<test-case name="fn-replace-forx0005-03">
-      <description>Both replacement string and action supplied.</description>
-      <created by="Christian Gruen" on="2023-12-10"/>
-      <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>replace('A', 'A', string(current-date()), (), true#0)</test>
-      <result>
-         <error code="FORX0005"/>
-      </result>
-   </test-case>-->
-
-   <!--<test-case name="fn-replace-forx0005-04">
-      <description>Both replacement string and action supplied.</description>
-      <created by="Christian Gruen" on="2023-12-10"/>
-      <dependency type="spec" value="XP40+ XQ40+"/>
-      <test>replace('A', 'A', string(current-date())[. = ''], (), true#0)</test>
-      <result>
-         <assert-string-value>true</assert-string-value>
+         <assert-string-value>[a][b]</assert-string-value>
       </result>
    </test-case>
--->
+
+   <test-case name="fn-replace-323" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('2026-06-25', '(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})', '$3/$2/$1')]]></test>
+      <result>
+         <assert-string-value>25/06/2026</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-replace-324" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('a', '(?<x>a)', '\$<x>')]]></test>
+      <result>
+         <assert-string-value>$&lt;x&gt;</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-replace-325" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('a', 'a', '$<x>', 'q')]]></test>
+      <result>
+         <assert-string-value>$&lt;x&gt;</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-replace-326" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('a nice', '\s(?=(?<nx>.))', '[$<nx>]')]]></test>
+      <result>
+         <assert-string-value>a[n]nice</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-replace-327" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('ab', '(?<x>a)(b)', fn($s, $g) { string-join(map:keys($g) ! string(.), '|') })]]></test>
+      <result>
+         <assert-string-value>x|2</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-replace-328" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('ab', '(?<x>a)|(?<y>b)', fn($s, $g) { '{' || string-join(map:keys($g) ! string(.), ',') || '}' })]]></test>
+      <result>
+         <assert-string-value>{x}{y}</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-replace-329" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('a', '(?<x>a)', fn($s, $g) { string(map:contains($g, 1)) })]]></test>
+      <result>
+         <assert-string-value>false</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-replace-330" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('a', '(a)', fn($s, $g) { string(map:contains($g, 0)) })]]></test>
+      <result>
+         <assert-string-value>false</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-replace-331" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('42 plus 7', '(?<first>\d+) plus (?<second>\d+)', fn($s, $g) { string($g?first + $g?second) })]]></test>
+      <result>
+         <assert-string-value>49</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="fn-replace-332" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('a', '(?<x>a)', '$<x')]]></test>
+      <result>
+         <error code="FORX0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-replace-333" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('a', '(?<x>a)', '$<z>')]]></test>
+      <result>
+         <error code="FORX0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-replace-334" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('a', '(?<x>a)', '$<1x>')]]></test>
+      <result>
+         <error code="FORX0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-replace-335" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('a', '(?<x>a)', '$<>')]]></test>
+      <result>
+         <error code="FORX0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-replace-336" covers-40="PR2793">
+      <description>Named capture groups in fn:replace.</description>
+      <created by="Christian Gruen" on="2026-08-12"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[replace('a', 'a', '$<x>')]]></test>
+      <result>
+         <error code="FORX0004"/>
+      </result>
+   </test-case>
 
 </test-set>

@@ -88,6 +88,7 @@
     <created by="Norm Tovey-Walsh" on="2023-03-09"/>
     <modified by="Norm Tovey-Walsh" on="2024-09-12" change="Added absolute property."/>
     <modified by="Christian Gruen" on="2026-07-02" change="PR2566"/>
+    <modified by="Christian Gruen" on="2026-08-12" change="PR2812"/>
     <test>fn:parse-uri("https://user:password@example.com:443/path/a%2fb/a+b")</test>
     <result>
       <assert-deep-eq>map {'scheme': 'https',
@@ -97,7 +98,7 @@
                            'authority': 'user:password@example.com:443',
                            'port': 443,
                            'host': 'example.com',
-                           'path-segments': ('','path','a/b','a b'),
+                           'path-segments': ('','path','a/b','a+b'),
                            'path': '/path/a%2fb/a+b',
   "userinfo": (),
   "query": (),
@@ -636,10 +637,10 @@ map {
     this one is odd; the tel: scheme uses a literal “+” in the URI.</description>
     <created by="Norm Tovey-Walsh" on="2023-03-10"/>
     <modified by="Christian Gruen" on="2026-07-02" change="PR2566"/>
+    <modified by="Christian Gruen" on="2026-08-12" change="PR2812"/>
     <test>fn:parse-uri("tel:+1-816-555-1212")</test>
     <result>
-      <any-of>
-        <assert-deep-eq>map {
+      <assert-deep-eq>map {
            "uri": "tel:+1-816-555-1212",
            "scheme": "tel",
            "hierarchical": false(),
@@ -655,23 +656,6 @@ map {
   "query-parameters": (),
   "filepath": ()
 }</assert-deep-eq>
-        <assert-deep-eq>map {
-           "uri": "tel:+1-816-555-1212",
-           "scheme": "tel",
-           "hierarchical": false(),
-           "path": "+1-816-555-1212",
-           "path-segments": " 1-816-555-1212",
-  "absolute": (),
-  "authority": (),
-  "userinfo": (),
-  "host": (),
-  "port": (),
-  "query": (),
-  "fragment": (),
-  "query-parameters": (),
-  "filepath": ()
-}</assert-deep-eq>
-      </any-of>
     </result>
   </test-case>
 
@@ -1791,6 +1775,42 @@ map {
   "query-parameters": (),
   "filepath": ()
 }</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-051a" covers-40="PR2812">
+    <description>Tests plus signs in a URI.</description>
+    <created by="Christian Gruen" on="2026-08-12"/>
+    <test>fn:parse-uri("http://example.com/a+b?c=d+e#f+g")?path-segments</test>
+    <result>
+      <assert-deep-eq>"", "a+b"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-051b" covers-40="PR2812">
+    <description>Tests plus signs in a URI.</description>
+    <created by="Christian Gruen" on="2026-08-12"/>
+    <test>fn:parse-uri("http://example.com/a+b?c=d+e#f+g")?query-parameters</test>
+    <result>
+      <assert-deep-eq>map { "c": "d e" }</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-051c" covers-40="PR2812">
+    <description>Tests plus signs in a URI.</description>
+    <created by="Christian Gruen" on="2026-08-12"/>
+    <test>fn:parse-uri("http://example.com/a+b?c=d+e#f+g")?fragment</test>
+    <result>
+      <assert-eq>"f+g"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-parse-uri-051d" covers-40="PR2812">
+    <description>Tests plus signs in a URI.</description>
+    <created by="Christian Gruen" on="2026-08-12"/>
+    <test>fn:parse-uri("http://example.com/?c=d%2Be")?query-parameters</test>
+    <result>
+      <assert-deep-eq>map { "c": "d+e" }</assert-deep-eq>
     </result>
   </test-case>
 
