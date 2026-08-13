@@ -4250,26 +4250,28 @@ Second line</text>
     <test-case name="serialize-xml-153" covers-40="PR2719">
         <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
         <created by="Christian Gruen" on="2026-07-21"/>
+        <created by="Michael Kay" on="2026-08-03" change="Don't use XML character references in XPath string literals"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
             serialize(parse-xml("<out><in/></out>"),
               { 'method': 'xml', 'omit-xml-declaration': true(), 'indent': true(), 'indent-unit': '  ' })
         ]]></test>
         <result>
-            <assert><![CDATA[contains($result, '&#xA;  <in/>')]]></assert>
+            <assert><![CDATA[contains($result, char(10)||'  <in/>')]]></assert>
         </result>
     </test-case>
 
     <test-case name="serialize-xml-154" covers-40="PR2719">
         <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
         <created by="Christian Gruen" on="2026-07-21"/>
+        <created by="Michael Kay" on="2026-08-03" change="Don't use XML character references in XPath string literals"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
             serialize(parse-xml("<out><in/></out>"),
               { 'method': 'xml', 'omit-xml-declaration': true(), 'indent': true(), 'indent-unit': '\t' })
         ]]></test>
         <result>
-            <assert><![CDATA[contains($result, '&#xA;&#x9;<in/>')]]></assert>
+            <assert><![CDATA[contains($result, char(10)||char(9)||'<in/>')]]></assert>
         </result>
     </test-case>
 
@@ -4289,26 +4291,28 @@ Second line</text>
     <test-case name="serialize-xml-156" covers-40="PR2719">
         <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
         <created by="Christian Gruen" on="2026-07-21"/>
+        <created by="Michael Kay" on="2026-08-03" change="Don't use XML character references in XPath string literals"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
-            serialize(parse-xml("<out>x&#xA;y</out>"),
+            serialize(parse-xml("<out>x"||char(10)||"y</out>"),
               { 'method': 'xml', 'omit-xml-declaration': true(), 'line-ending': '\r\n' })
         ]]></test>
         <result>
-            <assert-eq><![CDATA["<out>x&#xD;&#xA;y</out>"]]></assert-eq>
+            <assert-eq><![CDATA["<out>x"||char(13)||char(10)||"y</out>"]]></assert-eq>
         </result>
     </test-case>
 
     <test-case name="serialize-xml-157" covers-40="PR2719">
         <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
         <created by="Christian Gruen" on="2026-07-21"/>
+        <created by="Michael Kay" on="2026-08-03" change="Don't use XML character references in XPath string literals"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
-            serialize(parse-xml("<out>x&#xA;y</out>"),
+            serialize(parse-xml("<out>x"||char(10)||"y</out>"),
               { 'method': 'xml', 'omit-xml-declaration': true(), 'line-ending': "&#xD;" })
         ]]></test>
         <result>
-            <assert-eq><![CDATA["<out>x&#xD;y</out>"]]></assert-eq>
+            <assert-eq><![CDATA["<out>x" || char(13) || "y</out>"]]></assert-eq>
         </result>
     </test-case>
 
