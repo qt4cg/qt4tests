@@ -1368,5 +1368,28 @@
          <assert-false/>
       </result>
    </test-case>
+   
+   <test-case name="xsd-validator-094" covers-40="PR2839">
+      <description> Test returned error details. </description>
+      <created by="Michael Kay" on="2026-08-18"/>
+      <environment ref="simplexsd"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+        import schema namespace simple="http://www.w3.org/XQueryTest/simple";
+        let $doc := parse-xml('<duration xmlns="http://www.w3.org/XQueryTest/simple">sorry, no duration here</duration>',
+                              {'retain-location': true()})
+        return xsd-validator({'schema-location': '../prod/ValidateExpr/simple.xsd'}) 
+                     ($doc) ? error-details
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>exists($result ? message)</assert>
+            <assert>exists($result ? node)</assert>
+            <assert>exists($result ? location)</assert>
+            <assert>$result ? location ? line-number = 1)</assert>
+            <assert>local-name($result ? node) = 'duration'</assert>
+         </all-of>
+      </result>
+   </test-case>
  
 </test-set>
