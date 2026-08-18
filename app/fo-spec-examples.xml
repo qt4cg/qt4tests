@@ -6070,7 +6070,7 @@ Tak, tak, tak! - da kommen sie.
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-18"/>
       <environment ref="global"/>
       <test>
-        fn:tokenize("the end", "\b")
+        tokenize("the end", "\b")
       </test>
       <result>
          <assert-deep-eq>"the", " ", "end"</assert-deep-eq>
@@ -6082,7 +6082,7 @@ Tak, tak, tak! - da kommen sie.
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-18"/>
       <environment ref="global"/>
       <test>
-        fn:tokenize("California", "")
+        tokenize("California", "")
       </test>
       <result>
          <assert-deep-eq>"C", "a", "l", "i", "f", "o", "r", "n", "i", "a"</assert-deep-eq>
@@ -6331,7 +6331,7 @@ Tak, tak, tak! - da kommen sie.
         matching-segments(
   "2026-06-25",
   "(?&lt;year&gt;\d{4})-(?&lt;month&gt;\d{2})-(?&lt;day&gt;\d{2})"
-)/groups/*[2]
+)/groups/*[2] ! jvalue()
       </test>
       <result>
          <assert-deep-eq>{ "group": "06", "position": 6 }</assert-deep-eq>
@@ -6640,7 +6640,7 @@ return $regex?replace($title, fn { . + 1 })
            return 
 
         
-        fn:boolean($abc)
+        boolean($abc)
       </test>
       <result>
          <error code="FORG0006"/>
@@ -6657,7 +6657,7 @@ return $regex?replace($title, fn { . + 1 })
            return 
 
         
-        fn:boolean([])
+        boolean([])
       </test>
       <result>
          <error code="FORG0006"/>
@@ -6705,7 +6705,7 @@ return $regex?replace($title, fn { . + 1 })
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-18"/>
       <environment ref="global"/>
       <test>
-        fn:not(1 to 10)
+        not(1 to 10)
       </test>
       <result>
          <error code="FORG0006"/>
@@ -9899,7 +9899,7 @@ return path($in//a[. = 2])
                   return path($in/*/*[. = 2])
       </test>
       <result>
-         <assert-deep-eq>'/1/xs:date("2026-03-04")'</assert-deep-eq>
+         <assert-deep-eq>'/1/child::{xs:date("2026-03-04")}'</assert-deep-eq>
       </result>
    </test-case>
 
@@ -10116,10 +10116,10 @@ return distinct-ordered-nodes(($x//c, $x//b, $x//a, $x//b)) ! name()
       <environment ref="global"/>
       <test>
         
-let $x := [ 1, "a", true() ]
+let $x := jtree([ 1, "a", true() ])
 return count(distinct-ordered-nodes(
-  ($x/*[1], $x/jnode(*, xs:integer)) 
-)) 
+  ($x/*[1], $x/jnode(*, xs:integer))
+))
                
       </test>
       <result>
@@ -12857,7 +12857,7 @@ return for-each(1 to 10, $mapping otherwise void#0)
            return 
 
         
-        fn:avg(($d1, $seq3))
+        avg(($d1, $seq3))
       </test>
       <result>
          <error code="FORG0006"/>
@@ -13213,7 +13213,7 @@ return for-each(1 to 10, $mapping otherwise void#0)
            return 
 
         
-        fn:sum(($d1, 9E1))
+        sum(($d1, 9E1))
       </test>
       <result>
          <error code="FORG0006"/>
@@ -13455,7 +13455,7 @@ return for-each(1 to 10, $mapping otherwise void#0)
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-18"/>
       <environment ref="global"/>
       <test>
-        system-properties()?#xsl:supports-streaming
+        system-properties()?#Q{http://www.w3.org/1999/XSL/Transform}supports-streaming
       </test>
       <result>
          <assert>true()</assert>
@@ -13593,7 +13593,7 @@ let $schema :=
   &lt;/xs:schema&gt;
 let $validator := xsd-validator({'schema': $schema})
 let $typed-result := $validator(&lt;distance&gt;8.5&lt;/distance&gt;)?typed-node
-return $typed-result instance of element(distance, xs:decimal)
+return data($typed-result) instance of xs:decimal
 
       </test>
       <result>
@@ -16075,8 +16075,8 @@ return map:build($titles/title, fn($title) { $title/ix })
        }]
    }')
    return map:build($tree/descendant-or-self::type,
-                    fn{./ancestor-or-self::jnode(*, map(*))?name =&gt; string-join(".")},
-                    fn{`{.} {..?name}`})
+                    fn{(ancestor-or-self::jnode(*, map(*)))?name =&gt; string-join(".")},
+                    fn{`{.} {(..)?name}`})
             
       </test>
       <result>
@@ -20644,7 +20644,7 @@ return every($dl/*, fn($elem, $pos) {
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-18"/>
       <environment ref="global"/>
       <test>
-        fn:all-different(//employee/@ssn)
+        all-different(//employee/@ssn)
       </test>
       <result>
          <error xmlns:fos="http://www.w3.org/xpath-functions/spec/namespace"
@@ -20658,7 +20658,7 @@ return every($dl/*, fn($elem, $pos) {
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-18"/>
       <environment ref="global"/>
       <test>
-        fn:all-different(* ! fn:node-name())
+        all-different(* ! node-name())
       </test>
       <result>
          <error xmlns:fos="http://www.w3.org/xpath-functions/spec/namespace"
@@ -21556,7 +21556,7 @@ return $result
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-18"/>
       <environment ref="global"/>
       <test>
-        jtree({"a":1, "b":2})/b/preceding-sibling::*/jkey()
+        jtree({"a":1, "b":2})/b/preceding-sibling::* ! jkey()
       </test>
       <result>
          <assert-deep-eq>"a"</assert-deep-eq>
@@ -21568,7 +21568,7 @@ return $result
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-08-18"/>
       <environment ref="global"/>
       <test>
-        jtree({"a":1, "b":2})/b/preceding-sibling::*/jvalue()
+        jtree({"a":1, "b":2})/b/preceding-sibling::* ! jvalue()
       </test>
       <result>
          <assert-deep-eq>1</assert-deep-eq>
