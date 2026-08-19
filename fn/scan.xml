@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-scan" covers-40="PR2824">
+  <description>Tests for the fn:scan function</description>
+
+  <dependency type="feature" value="higherOrderFunctions"/>
+  <dependency type="spec" value="XP40+ XQ40+"/>
+
+  <test-case name="scan-001">
+    <description>Evaluation of the fn:scan function.</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <test>scan((), 0, op('+'))</test>
+    <result>
+      <assert-deep-eq>[0]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="scan-002">
+    <description>Evaluation of the fn:scan function.</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <test>scan(1 to 5, 0, op('+'))</test>
+    <result>
+      <assert-deep-eq>[0], [1], [3], [6], [10], [15]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="scan-003">
+    <description>Evaluation of the fn:scan function.</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <test>scan(1 to 3, (), fn($acc, $item) { $item, $acc })</test>
+    <result>
+      <assert-deep-eq>[()], [1], [(2, 1)], [(3, 2, 1)]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="scan-004">
+    <description>Evaluation of the fn:scan function.</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <test>scan(('a', 'b', 'c'), (), fn($acc, $item, $pos) { $acc, $pos })</test>
+    <result>
+      <assert-deep-eq>[()], [1], [(1, 2)], [(1, 2, 3)]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="scan-005">
+    <description>Evaluation of the fn:scan function.</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <test>tail(scan((150, -60, -40, 300, -25), 0, op('+'))) ! ?*</test>
+    <result>
+      <assert-deep-eq>150, 90, 50, 350, 325</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="scan-006">
+    <description>Evaluation of the fn:scan function.</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <test>tail(scan(('usr', 'local', 'bin'), '', fn($path, $step) { $path || '/' || $step })) ! ?*</test>
+    <result>
+      <assert-deep-eq>'/usr', '/usr/local', '/usr/local/bin'</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="scan-007">
+    <description>Evaluation of the fn:scan function.</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <test>take-while(scan((3, 4, 5, 2), 0, op('+')), fn($total) { $total?* le 7 })</test>
+    <result>
+      <assert-deep-eq>[0], [3], [7]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="scan-008">
+    <description>Evaluation of the fn:scan function.</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <test>foot(scan(1 to 5, 0, op('+')))?* eq fold-left(1 to 5, 0, op('+'))</test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="scan-009">
+    <description>Evaluation of the fn:scan function.</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <test>scan(1 to 3, 0, op('+')) instance of array(*)+</test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="scan-010">
+    <description>Evaluation of the fn:scan function.</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <test>scan(1 to 5, 0, fn($acc, $item, $pos, $extra) { $acc })</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
+  <test-case name="scan-011">
+    <description>Evaluation of the fn:scan function.</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <test>scan(1 to 5, 'a', fn($acc as xs:integer, $item) { $acc + $item })</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+</test-set>
