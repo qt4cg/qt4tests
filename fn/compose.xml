@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-compose" covers-40="PR1883">
+   <description>Tests the fn:tokenize() function</description>
+   
+   <dependency type="spec" value="XP40+ XQ40+"></dependency>
+
+
+   <test-case name="fn-compose-001">
+      <description> Empty sequence </description>
+      <created by="Michael Kay" on="2025-03-16"/>
+      <test>compose(())(42)</test>
+      <result>
+         <assert-eq>42</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-compose-002">
+      <description> Singleton </description>
+      <created by="Michael Kay" on="2025-03-16"/>
+      <test>compose(abs#1)(-42)</test>
+      <result>
+         <assert-eq>42</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-compose-003">
+      <description> Compose two functions </description>
+      <created by="Michael Kay" on="2025-03-16"/>
+      <test>compose((abs#1, round#1))(-18.321)</test>
+      <result>
+         <assert-eq>18</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-compose-004">
+      <description> Variable sequence of functions </description>
+      <created by="Michael Kay" on="2025-03-16"/>
+      <test>compose((1 to 5)!substring(?, 2))("hypotenuse")</test>
+      <result>
+         <assert-eq>"enuse"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-compose-005">
+      <description> Maps as functions </description>
+      <created by="Michael Kay" on="2025-03-16"/>
+      <test>compose(({1:"a", 2:"b"}, {"a":true(), "b":false()}))(2)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-compose-006">
+      <description> Arrays as functions </description>
+      <created by="Michael Kay" on="2025-03-16"/>
+      <test>compose((round#1, [10, 11, 12, 13]))(2.6)</test>
+      <result>
+         <assert-eq>12</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-compose-007">
+      <description> Negation </description>
+      <created by="Michael Kay" on="2025-03-16"/>
+      <test>
+         let $negate := fn($x){compose(($x, fn:not#1))}
+         return ("monday", "tuesday", "wednesday", "thursday") => filter($negate(contains(?, "e")))
+      </test>
+      <result>
+         <assert-deep-eq>"monday", "thursday"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-compose-008">
+      <description> Multiple composition </description>
+      <created by="Michael Kay" on="2025-03-16"/>
+      <test>
+         compose(
+           (compose((tokenize#1, count#1)), 
+            compose((fn{.-1}, format-integer(?, "w")))))
+            ("a nice cup of tea")
+      </test>
+      <result>
+         <assert-eq>"four"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-compose-009">
+      <description> Coercion </description>
+      <created by="Michael Kay" on="2025-03-16"/>
+      <test>
+         compose((xs:untypedAtomic#1, round#1))("2.3")
+      </test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-compose-010">
+      <description> Type error </description>
+      <created by="Michael Kay" on="2025-03-16"/>
+      <test>
+         compose((xs:string#1, round#1))(current-date())
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-compose-011">
+      <description> Function with arity other than 1 </description>
+      <created by="Michael Kay" on="2025-03-16"/>
+      <test>
+         compose((xs:string#1, contains#2))(current-date())
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   
+   
+ 
+</test-set>
