@@ -1252,6 +1252,7 @@
       </all-of>
     </result>
   </test-case>
+  
   <test-case name="EXPath-file-createTempFile-002">
     <description>Create temporary file: in defined location</description>
     <created by="John Lumley" on="2013-11-27"/>
@@ -1270,6 +1271,7 @@
       </all-of>
     </result>
   </test-case>
+  
   <test-case name="EXPath-file-createTempFile-003" covers-40="PR2077">
     <description>Create temporary file: no arguments</description>
     <created by="Christian Gruen" on="2026-07-10"/>
@@ -1282,6 +1284,23 @@
       <all-of>
         <assert-type>xs:string</assert-type>
         <assert>Q{http://expath.org/ns/file}is-file($result)</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-createTempFile-004">
+    <description>Prefix less than 3 chars: allowed in EXPath but not in Java</description>
+    <created by="Michael Kay" on="2026-08-20"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:create-temp-file("Z", ".tmp")
+      </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert>Q{http://expath.org/ns/file}exists($result)</assert>
+        <assert>$result ne
+          Q{http://expath.org/ns/file}create-temp-file("EXPathFile",".tmp")</assert>
       </all-of>
     </result>
   </test-case>
@@ -1349,6 +1368,55 @@
         <assert-type>xs:string</assert-type>
         <assert>Q{http://expath.org/ns/file}is-dir($result)</assert>
         <assert>starts-with(Q{http://expath.org/ns/file}name($result), "prefix")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-createTempDir-005" covers-40="PR2077">
+    <description>Create temporary directory: short prefix [Java requires three chars]</description>
+    <created by="Michael Kay" on="2026-08-20"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:create-temp-dir("K")
+      </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert>Q{http://expath.org/ns/file}is-dir($result)</assert>
+        <assert>starts-with(Q{http://expath.org/ns/file}name($result), "K")</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-createTempDir-006" covers-40="PR2077">
+    <description>Create temporary directory: empty prefix [Java requires three chars]</description>
+    <created by="Michael Kay" on="2026-08-20"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:create-temp-dir("")
+      </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert>Q{http://expath.org/ns/file}is-dir($result)</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-createTempDir-007" covers-40="PR2077">
+    <description>Create temporary directory: suffix only</description>
+    <created by="Michael Kay" on="2026-08-20"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:create-temp-dir((), ".tmp")
+      </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert>Q{http://expath.org/ns/file}is-dir($result)</assert>
       </all-of>
     </result>
   </test-case>
@@ -1899,13 +1967,21 @@
   <test-case name="EXPath-file-listRoots-002" covers-40="PR2077">
     <description>Use file:list-roots: every root is an absolute path</description>
     <created by="Christian Gruen" on="2026-07-10"/>
+    <modified by="Michael Kay" on="2026-08-20" change="add assertions"/>
     <environment ref="EXPath-file"/>
     <dependency type="spec" value="XQ40+ XP40+"/>
     <test>
         file:list-roots()
       </test>
     <result>
-      <assert>every $r in $result satisfies Q{http://expath.org/ns/file}is-absolute($r)</assert>
+      <all-of>
+        <assert>every $r in $result satisfies Q{http://expath.org/ns/file}is-absolute($r)</assert>
+        <assert>all-different($result)</assert>
+        <any-of>
+          <assert-eq>"/"</assert-eq>
+          <assert>every $r in $result satisfies matches($r, "[A-Z]:\\"</assert>
+        </any-of>
+      </all-of>
     </result>
   </test-case>
 
