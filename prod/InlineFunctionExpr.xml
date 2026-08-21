@@ -558,6 +558,44 @@
       </result>
    </test-case>
    
+   <test-case name="inline-fn-038">
+      <description>Inline function contains forward reference to XQuery variables and functions</description>
+      <created by="Michael Kay" on="2026-08-14"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>
+         declare function local:f($x as xs:integer) {
+            let $temp := fn($y) { $var + local:g($y) }
+            return $temp($x + 1)
+         };
+         declare function local:g($x as xs:integer) {
+            $x + 3
+         };
+         declare variable $var := 29;
+         local:f(12)
+      </test>
+      <result>
+         <assert-eq>45</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="inline-fn-039">
+      <description>Inline function contains reference to XQuery variables and functions in a library module</description>
+      <created by="Michael Kay" on="2026-08-14"/>
+      <module uri="http://www.w3.org/inline-fn-039-mod-1" file="InlineFunctionExpr/inline-fn-039-mod-1.xq"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>
+         import module namespace mod-1="http://www.w3.org/inline-fn-039-mod-1"; 
+         declare function local:f($x as xs:integer) {
+            let $temp := fn($y) { $mod-1:var + mod-1:g($y) }
+            return $temp($x + 1)
+         };
+         local:f(12)
+      </test>
+      <result>
+         <assert-eq>45</assert-eq>
+      </result>
+   </test-case>
+   
    <test-case name="inline-fn-050">
       <description>Annotations literals</description>
       <created by="Christian Gruen" on="2023-09-18"/>
