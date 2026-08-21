@@ -92,7 +92,6 @@
 		</result>
 	</test-case>
 
-
 	<test-case name="system-properties-004">
 		<description>Evaluation of system-properties function.</description>
 		<created by="Christian Gruen" on="2026-10-02"/>
@@ -140,8 +139,9 @@
 	</test-case>
 
 	<test-case name="system-properties-006">
-		<description>Evaluation of system-properties function.</description>
+		<description>Check that every key is a QName</description>
 		<created by="Christian Gruen" on="2026-10-02"/>
+		<modified by="Sheila Thomson" on="2026-10-14" change="Replaced generic description."/>
 		<test>every $key in map:keys(system-properties()) satisfies $key instance of xs:QName</test>
 		<result>
 			<assert-true/>
@@ -206,11 +206,11 @@
 			<error code="XPST0017"/>
 		</result>
 	</test-case>
-	
+		
 	<test-case name="fn-system-properties-schema-aware">
-		<description>Check that schema-aware is set to true if the processor supports this feature</description>
+		<description>Check that schema-aware is set to true if the processor offers the ability to add schema components to the static context, using the schema import mechanism.</description>
 		<created by="Sheila Thomson" on="2026-06-11"/>
-		<dependency type="feature" value="schemaImport" satisfied="true" />
+		<dependency type="feature" value="schemaImport"/>
 		<test>fn:system-properties()?#schema-aware</test>
 		<result>
 			<assert-true />
@@ -218,7 +218,7 @@
 	</test-case>
 	
 	<test-case name="fn-system-properties-not-schema-aware">
-		<description>Check that schema-aware is set to false if the processor doesn't support this feature</description>
+		<description>Check that the schema-aware is set to false if the processor doesn't offer the ability to add schema components to the static context, using the schema import mechanism.</description>
 		<created by="Sheila Thomson" on="2026-06-11"/>
 		<dependency type="feature" value="schemaImport" satisfied="false" />
 		<test>fn:system-properties()?#schema-aware</test>
@@ -228,7 +228,7 @@
 	</test-case>
 	
 	<test-case name="fn-system-properties-accepts-typed-data">
-		<description>Check that the schema-aware is set to true if the processor supports this feature</description>
+		<description>Check that accepts-typed-data is set to true if the processor is capable of handling nodes with a type annotation other than xs:untyped and xs:untypedAtomic.</description>
 		<created by="Sheila Thomson" on="2026-06-11"/>
 		<dependency type="feature" value="typedData"/>
 		<test>fn:system-properties()?#accepts-typed-data</test>
@@ -238,7 +238,7 @@
 	</test-case>
 	
 	<test-case name="fn-system-properties-accepts-typed-data-false">
-		<description>Check that the schema-aware is set to true if the processor supports this feature</description>
+		<description>Check that accepts-typed-data is set to false if the processor isn't capable of handling nodes with a type annotation other than xs:untyped and xs:untypedAtomic.</description>
 		<created by="Sheila Thomson" on="2026-06-11"/>
 		<dependency type="feature" value="typedData" satisfied="false" />
 		<test>fn:system-properties()?#accepts-typed-data</test>
@@ -246,15 +246,166 @@
 			<assert-false />
 		</result>
 	</test-case>
-	
-	
+		
 	<test-case name="fn-system-properties-supports-xinclude">
-		<description>Check that the supports-xinclude is set to true if the processor supports this feature</description>
+		<description>Check that supports-xinclude is set to true if the processor supports the xinclude:true() option in calls to fn:doc and fn:parse-xml.</description>
 		<created by="Sheila Thomson" on="2026-06-11"/>
-		<dependency type="feature" value="xinclude"/>
+		<dependency type="feature" value="xinclude-option"/>
 		<test>fn:system-properties()?#supports-xinclude</test>
 		<result>
 			<assert-true />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-xinclude-false">
+		<description>Check that supports-xinclude is set to false if the processor doesn't support the xinclude:true() option in calls to fn:doc and fn:parse-xml.</description>
+		<created by="Sheila Thomson" on="2026-08-21"/>
+		<dependency type="feature" value="xinclude-option" satisfied="false" />
+		<test>fn:system-properties()?#supports-xinclude</test>
+		<result>
+			<assert-false />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-binary-library">
+		<description>Check that supports-binary-library is set to true if the processor includes implementations of the functions defined in the EXPath Binary Module 4.0</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<dependency type="feature" value="binary"/>
+		<test>fn:system-properties()?#supports-binary-library</test>
+		<result>
+			<assert-true />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-binary-library-false">
+		<description>Check that supports-binary-library is set to false if the processor doesn't include implementations of the functions defined in the EXPath Binary Module 4.0</description>
+		<created by="Sheila Thomson" on="2026-08-21"/>
+		<dependency type="feature" value="binary" satisfied="false" />
+		<test>fn:system-properties()?#supports-binary-library</test>
+		<result>
+			<assert-false />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-file-library">
+		<description>Check that supports-file-library is set to true if the processor includes implementations of the functions defined in the EXPath File Module 4.0</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<dependency type="feature" value="expath-file"/>
+		<test>fn:system-properties()?#supports-file-library</test>
+		<result>
+			<assert-true />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-file-library-false">
+		<description>Check that supports-file-library is set to false if the processor doesn't include implementations of the functions defined in the EXPath File Module 4.0</description>
+		<created by="Sheila Thomson" on="2026-08-21"/>
+		<dependency type="feature" value="expath-file" satisfied="false" />
+		<test>fn:system-properties()?#supports-file-library</test>
+		<result>
+			<assert-false />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-dynamic-xslt">
+		<description>Check that supports-dynamic-xslt is set to true if the processor supports use of the fn:transform function.</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<dependency type="feature" value="fn-transform-XSLT"/>
+		<test>fn:system-properties()?#supports-dynamic-xslt</test>
+		<result>
+			<assert-true />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-dynamic-xslt-false">
+		<description>Check that supports-dynamic-xslt is set to false if the processor doesn't support use of the fn:transform function.</description>
+		<created by="Sheila Thomson" on="2026-08-21"/>
+		<dependency type="feature" value="fn-transform-XSLT" satisfied="false" />
+		<test>fn:system-properties()?#supports-dynamic-xslt</test>
+		<result>
+			<assert-false />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-dynamic-xquery">
+		<description>Check that supports-dynamic-xquery is set to true if the processor supports use of the fn:load-xquery-module function.</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<dependency type="feature" value="fn-load-xquery-module"/>
+		<test>fn:system-properties()?#supports-dynamic-xquery</test>
+		<result>
+			<assert-true />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-dynamic-xquery-false">
+		<description>Check that supports-dynamic-xquery is set to false if the processor doesn't support use of the fn:load-xquery-module function.</description>
+		<created by="Sheila Thomson" on="2026-08-21"/>
+		<dependency type="feature" value="fn-load-xquery-module" satisfied="false" />
+		<test>fn:system-properties()?#supports-dynamic-xquery</test>
+		<result>
+			<assert-false />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-dtd">
+		<description>Check that supports-dtd is set to true if the processor FULLY supports validation, entity expansion and attribute typing based on DTD processing during XML parsing.</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<dependency type="feature" value="dtd-validation"/>
+		<dependency type="feature" value="dtd-entity-expansion"/>
+		<dependency type="feature" value="dtd-attribute-typing"/>
+		<test>fn:system-properties()?#supports-dtd</test>
+		<result>
+			<assert-true />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-dtd-no-validation">
+		<description>Check that supports-dtd is set to true if the processor doesn't fully support DTD validation.</description>
+		<created by="Sheila Thomson" on="2026-08-21"/>
+		<dependency type="feature" value="dtd-validation" satisfied="false" />
+		<test>fn:system-properties()?#supports-dtd</test>
+		<result>
+			<assert-false />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-dtd-no-entity-expansion">
+		<description>Check that supports-dtd is set to true if the processor doesn't fully support DTD entity expansion.</description>
+		<created by="Sheila Thomson" on="2026-08-21"/>
+		<dependency type="feature" value="dtd-entity-expansion" satisfied="false" />
+		<test>fn:system-properties()?#supports-dtd</test>
+		<result>
+			<assert-false />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-dtd-no-attribute-typing">
+		<description>Check that supports-dtd is set to true if the processor doesn't fully support attribute typing based on DTD processing during XML parsing.</description>
+		<created by="Sheila Thomson" on="2026-08-21"/>
+		<dependency type="feature" value="dtd-attribute-typing" satisfied="false" />
+		<test>fn:system-properties()?#supports-dtd</test>
+		<result>
+			<assert-false />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-invisible-xml">
+		<description>Check that supports-invisible-xml is set to true if the processor supports use of the fn:invisible-xml function.</description>
+		<created by="Sheila Thomson" on="2026-06-11"/>
+		<dependency type="feature" value="fn-invisible-xml"/>
+		<test>fn:system-properties()?#supports-invisible-xml</test>
+		<result>
+			<assert-true />
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-invisible-xml-false">
+		<description>Check that supports-invisible-xml is set to false if the processor doesn't support use of the fn:invisible-xml function.</description>
+		<created by="Sheila Thomson" on="2026-08-21"/>
+		<dependency type="feature" value="fn-invisible-xml" satisfied="false" />
+		<test>fn:system-properties()?#supports-invisible-xml</test>
+		<result>
+			<assert-false />
 		</result>
 	</test-case>
 	
