@@ -248,7 +248,7 @@
   <test-case name="parse-csv-020">
     <description>Field delimiter semicolon</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one;two"||char(10)||"three;four", map{'field-delimiter':';'})</test>
+    <test>fn:parse-csv("one;two"||char(10)||"three;four", map{'separator':';'})</test>
     <result>
         <assert>deep-equal($result => map:remove("get"), 
           map{"columns":(), 
@@ -258,47 +258,39 @@
   </test-case>
   
   <test-case name="parse-csv-021">
-    <description>Row delimiter vertical bar</description>
+    <description>Row delimiter vertical bar - obsolete option</description>
     <created by="Michael Kay" on="2024-03-07"/>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
     <test>fn:parse-csv("one,two|three,four", map{'row-delimiter':'|'})</test>
     <result>
-      <assert>deep-equal($result => map:remove("get"), 
-        map{"columns":(), 
-        "column-index": map{}, 
-        "rows":(["one","two"],["three","four"])})</assert>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
   
-  <test-case name="parse-csv-022">
-    <description>Reset both delimiters</description>
-    <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one.two|three.four", map{'row-delimiter':'|','field-delimiter':'.'})</test>
+  <test-case name="parse-csv-022" covers-40="PR2778">
+    <description>Empty comment</description>
+    <created by="Michael Kay" on="2026-07-14" />
+    <test>fn:parse-csv("one,two|#|three,four" => translate('|', char(10)), map{'comment-marker':'#'})</test>
     <result>
-      <assert>deep-equal($result => map:remove("get"), 
-        map{"columns":(), 
-        "column-index": map{}, 
-        "rows":(["one","two"],["three","four"])})</assert>
+      <assert>deep-equal($result?rows, (["one","two"],["three","four"]))</assert>
     </result>
   </test-case>
   
-  <!--<test-case name="parse-csv-023">
-    <description>Alternative row delimiters</description>
-    <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one.two|three.four"||char(10)||"five.six", 
-                           map{'row-delimiter':('|',char(10)),'field-delimiter':'.'})</test>
+  <test-case name="parse-csv-023" covers-40="PR2778">
+    <description>Multiple comments</description>
+    <created by="Michael Kay" on="2026-07-14" />
+    <test>fn:parse-csv("one,two|#|#zero|three,four|#" => translate('|', char(10)), map{'comment-marker':'#'})</test>
     <result>
-      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
-          ><rows><row><field>one</field><field>two</field></row
-          ><row><field>three</field><field>four</field></row
-          ><row><field>five</field><field>six</field></row></rows></csv>]]></assert-xml>
+      <assert>deep-equal($result?rows, (["one","two"],["three","four"]))</assert>
     </result>
-  </test-case>-->
+  </test-case>
   
   <test-case name="parse-csv-024">
     <description>Single quotes</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one,'two,2'|three,'four,4'", 
-      map{'row-delimiter':'|','quote-character':"'"})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("one,'two,2'|three,'four,4'" => translate('|', char('\n')), 
+      map{'quote-character':"'"})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -310,8 +302,9 @@
   <test-case name="parse-csv-025">
     <description>Single quotes, escaped</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one,'two,''2'''|three,'four,''4'''", 
-      map{'row-delimiter':'|','quote-character':"'"})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("one,'two,''2'''|three,'four,''4'''" => translate('|', char('\n')), 
+      map{'quote-character':"'"})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -323,8 +316,8 @@
   <test-case name="parse-csv-026">
     <description>Whitespace not trimmed</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one ,two | three, four", 
-      map{'row-delimiter':'|'})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("one ,two | three, four" => translate('|', char('\n')))</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -336,8 +329,9 @@
   <test-case name="parse-csv-027">
     <description>Whitespace explicitly not trimmed</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one ,two | three, four", 
-      map{'row-delimiter':'|', 'trim-whitespace':false()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("one ,two | three, four" => translate('|', char('\n')), 
+      map{'trim-whitespace':false()})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -349,8 +343,9 @@
   <test-case name="parse-csv-028">
     <description>Whitespace trimmed</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one ,two | three, twenty  four ", 
-      map{'row-delimiter':'|', 'trim-whitespace':true()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("one ,two | three, twenty  four "  => translate('|', char('\n')), 
+      map{'trim-whitespace':true()})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -446,8 +441,9 @@
   <test-case name="parse-csv-040">
     <description>header:true</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("left,right|one,two|three,four", 
-      map{'row-delimiter':'|', 'header':true()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("left,right|one,two|three,four" => translate('|', char('\n')), 
+      map{'header':true()})</test>
     <result>
       <all-of>
         <assert>deep-equal($result => map:remove("get"), 
@@ -469,8 +465,9 @@
   <test-case name="parse-csv-041">
     <description>header:explicit</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one,two|three,four", 
-      map{'row-delimiter':'|', 'header':('left','right')})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("one,two|three,four"  => translate('|', char('\n')), 
+      map{'header':('left','right')})</test>
     <result>
       <all-of>
         <assert>deep-equal($result => map:remove("get"), 
@@ -492,8 +489,9 @@
   <test-case name="parse-csv-042">
     <description>header:false</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one,two|three,four", 
-      map{'row-delimiter':'|', 'header':false()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("one,two|three,four"  => translate('|', char('\n')), 
+      map{'header':false()})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -505,8 +503,9 @@
   <test-case name="parse-csv-043">
     <description>header:explicit but incomplete</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one,two|three,four", 
-      map{'row-delimiter':'|', 'header':("left")})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("one,two|three,four"  => translate('|', char('\n')), 
+      map{'header':("left")})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":("left"), 
@@ -518,8 +517,9 @@
   <test-case name="parse-csv-044">
     <description>column-names:explicit but incomplete</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one,two|three,four", 
-      map{'row-delimiter':'|', 'header':('','right')})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("one,two|three,four"  => translate('|', char('\n')), 
+      map{'header':('','right')})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":("","right"), 
@@ -545,8 +545,9 @@
   <test-case name="parse-csv-046">
     <description>header:true, with duplicates</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("left,left|one,two|three,four", 
-      map{'row-delimiter':'|', 'header':true()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("left,left|one,two|three,four"  => translate('|', char('\n')), 
+      map{'header':true()})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":("left","left"), 
@@ -558,8 +559,9 @@
   <test-case name="parse-csv-047">
     <description>header:true, with gaps</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv(",right|one,two|three,four", 
-      map{'row-delimiter':'|', 'header':true()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv(",right|one,two|three,four"  => translate('|', char('\n')), 
+      map{'header':true()})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":("","right"), 
@@ -571,8 +573,9 @@
   <test-case name="parse-csv-048">
     <description>header:true, with gaps</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv(",|one,two|three,four", 
-      map{'row-delimiter':'|', 'header':true()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv(",|one,two|three,four"  => translate('|', char('\n')), 
+      map{'header':true()})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":("",""), 
@@ -584,8 +587,9 @@
   <test-case name="parse-csv-049">
     <description>Header only, no rows</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("left,right", 
-      map{'row-delimiter':'|', 'header':true()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("left,right"  => translate('|', char('\n')), 
+      map{'header':true()})</test>
     <result>
       <all-of>
         <assert>deep-equal($result => map:remove("get"), 
@@ -607,8 +611,9 @@
   <test-case name="parse-csv-060">
     <description>number-of-columns option</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("1,2,3,4,5,6,7,8,9,10|11,12,13,14,15,16,17,18,19,20", 
-      map{'row-delimiter':'|', 'select-columns':1 to 4})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("1,2,3,4,5,6,7,8,9,10|11,12,13,14,15,16,17,18,19,20"  => translate('|', char('\n')), 
+      map{'select-columns':1 to 4})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -620,8 +625,9 @@
   <test-case name="parse-csv-061">
     <description>number-of-columns option, header:true</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("a,b,c,d,e,f,g,h,i|1,2,3,4,5,6,7,8,9,10|11,12,13,14,15,16,17,18,19,20", 
-      map{'row-delimiter':'|', 'select-columns':1 to 4, 'header':true()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("a,b,c,d,e,f,g,h,i|1,2,3,4,5,6,7,8,9,10|11,12,13,14,15,16,17,18,19,20"  => translate('|', char('\n')), 
+      map{'select-columns':1 to 4, 'header':true()})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":("a","b","c","d"), 
@@ -633,8 +639,9 @@
   <test-case name="parse-csv-062">
     <description>trim-rows:true, header:false</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("1,2,3,4|11,12,13,14,15,16,17,18,19,20", 
-      map{'row-delimiter':'|', 'trim-rows':true()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("1,2,3,4|11,12,13,14,15,16,17,18,19,20"  => translate('|', char('\n')), 
+      map{'trim-rows':true()})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -646,8 +653,9 @@
   <test-case name="parse-csv-063">
     <description>trim-rows:true, header:true</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("a,b,c,d|1,2,3,4,5,6,7,8,9,10|11,12,13,14,15,16,17,18,19,20", 
-      map{'row-delimiter':'|', 'trim-rows':true(), 'header':true()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("a,b,c,d|1,2,3,4,5,6,7,8,9,10|11,12,13,14,15,16,17,18,19,20"  => translate('|', char('\n')), 
+      map{'trim-rows':true(), 'header':true()})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":("a","b","c","d"), 
@@ -659,8 +667,9 @@
   <test-case name="parse-csv-064">
     <description>trim-rows:false, header:false</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("1,2,3,4|11,12,13,14,15,16", 
-      map{'row-delimiter':'|', 'trim-rows':false(), 'header':false()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("1,2,3,4|11,12,13,14,15,16"  => translate('|', char('\n')), 
+      map{'trim-rows':false(), 'header':false()})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -672,8 +681,9 @@
    <test-case name="parse-csv-065">
      <description>number-of-columns option causes row padding</description>
      <created by="Michael Kay" on="2024-03-14"/>
-     <test>fn:parse-csv("1,2,3,4,5,6|14,15,16", 
-       map{'row-delimiter':'|', 'select-columns':1 to 4})</test>
+     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+     <test>fn:parse-csv("1,2,3,4,5,6|14,15,16"  => translate('|', char('\n')), 
+       map{'select-columns':1 to 4})</test>
      <result>
        <assert>deep-equal($result => map:remove("get"), 
          map{"columns":(), 
@@ -685,8 +695,9 @@
    <test-case name="parse-csv-066">
      <description>trim-rows option causes row padding</description>
      <created by="Michael Kay" on="2024-03-14"/>
-     <test>fn:parse-csv("1,2,3,4,5,6|14,15,16", 
-       map{'row-delimiter':'|', 'trim-rows':true()})</test>
+     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+     <test>fn:parse-csv("1,2,3,4,5,6|14,15,16"  => translate('|', char('\n')), 
+       map{'trim-rows':true()})</test>
      <result>
        <assert>deep-equal($result => map:remove("get"), 
          map{"columns":(), 
@@ -698,8 +709,8 @@
    <test-case name="parse-csv-067">
      <description>trim-rows option with header causes row padding</description>
      <created by="Michael Kay" on="2024-03-14"/>
-     <test>fn:parse-csv("a,b,c,d,e|1,2,3|14,15,16", 
-       map{'row-delimiter':'|', 'trim-rows':true(), 'header':true()})</test>
+     <test>fn:parse-csv("a,b,c,d,e|1,2,3|14,15,16"  => translate('|', char('\n')), 
+       map{'trim-rows':true(), 'header':true()})</test>
      <result>
        <assert>deep-equal($result => map:remove("get"), 
          map{"columns":("a","b","c","d","e"), 
@@ -708,11 +719,58 @@
      </result>
    </test-case>
   
+  <test-case name="parse-csv-068" covers-40="PR2778">
+    <description>header:true, comment after header</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:parse-csv("left,right|#data|one,two|three,four" => translate('|', char('\n')),
+      map{'header':true(), 'comment-marker':'#'})</test>
+    <result>
+      <all-of>
+        <assert>deep-equal($result => map:remove("get"), 
+          map{"columns":("left","right"), 
+          "column-index": map{"left":1, "right":2}, 
+          "rows":(["one","two"],["three","four"])})</assert>
+        <assert>?get(1,"left") = "one"</assert>
+        <assert>?get(1,"right") = "two"</assert>
+        <assert>?get(2,"left") = "three"</assert>
+        <assert>?get(2,"right") = "four"</assert>
+        <assert>?get(1,1) = "one"</assert>
+        <assert>?get(1,2) = "two"</assert>
+        <assert>?get(2,1) = "three"</assert>
+        <assert>?get(2,2) = "four"</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-069" covers-40="PR2778">
+    <description>header:true, comment before header</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:parse-csv("#header|left,right|#data|one,two|three,four" => translate('|', char('\n')), 
+      map{'header':true(), 'comment-marker':'#'})</test>
+    <result>
+      <all-of>
+        <assert>deep-equal($result => map:remove("get"), 
+          map{"columns":("left","right"), 
+          "column-index": map{"left":1, "right":2}, 
+          "rows":(["one","two"],["three","four"])})</assert>
+        <assert>?get(1,"left") = "one"</assert>
+        <assert>?get(1,"right") = "two"</assert>
+        <assert>?get(2,"left") = "three"</assert>
+        <assert>?get(2,"right") = "four"</assert>
+        <assert>?get(1,1) = "one"</assert>
+        <assert>?get(1,2) = "two"</assert>
+        <assert>?get(2,1) = "three"</assert>
+        <assert>?get(2,2) = "four"</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
   <test-case name="parse-csv-080">
     <description>select-columns</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("1,2,3,4|11,12,13,14", 
-      map{'select-columns':(4,3,2,1), 'row-delimiter':'|'})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("1,2,3,4|11,12,13,14"  => translate('|', char('\n')), 
+      map{'select-columns':(4,3,2,1)})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -724,8 +782,9 @@
   <test-case name="parse-csv-081">
     <description>select-columns</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("1,2,3,4|11,12,13,14", 
-              map{'select-columns':(1,4), 'row-delimiter':'|'})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("1,2,3,4|11,12,13,14"  => translate('|', char('\n')), 
+              map{'select-columns':(1,4)})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -737,8 +796,9 @@
   <test-case name="parse-csv-082">
     <description>select-columns</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("1,2,3,4|11,12,13,14", 
-              map{'select-columns':(1,4,17), 'row-delimiter':'|'})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("1,2,3,4|11,12,13,14"  => translate('|', char('\n')), 
+              map{'select-columns':(1,4,17)})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -750,8 +810,9 @@
   <test-case name="parse-csv-083">
     <description>select-columns</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("1,2,3,4|11,12,13,14", 
-              map{'select-columns':(1,17,4), 'row-delimiter':'|'})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("1,2,3,4|11,12,13,14"  => translate('|', char('\n')), 
+              map{'select-columns':(1,17,4)})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -763,8 +824,9 @@
   <test-case name="parse-csv-084">
     <description>select-columns</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("1,2,3,4|11,12,13,14,15", 
-              map{'select-columns':(1,4,5), 'row-delimiter':'|'})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("1,2,3,4|11,12,13,14,15"  => translate('|', char('\n')), 
+              map{'select-columns':(1,4,5)})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":(), 
@@ -776,8 +838,9 @@
   <test-case name="parse-csv-086">
     <description>select-columns, header:true</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("first,second,third,fourth|1,2,3,4|11,12,13,14", 
-      map{'select-columns':(1,4,3), 'header':true(), 'row-delimiter':'|'})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("first,second,third,fourth|1,2,3,4|11,12,13,14"  => translate('|', char('\n')), 
+      map{'select-columns':(1,4,3), 'header':true()})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":("first","fourth","third"), 
@@ -791,9 +854,9 @@
        Array behaviour.
      </description>
      <created by="Michael Kay" on="2024-03-11"/>
-     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
-       map{'row-delimiter':'|',
-       'select-columns':1 to 3})?rows 
+     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')), 
+       map{'select-columns':1 to 3})?rows 
        => array:join()</test>
      <result>
        <assert-deep-eq>["a","b","c","p","q","r"]</assert-deep-eq>
@@ -805,9 +868,9 @@
        Array behaviour.
      </description>
      <created by="Michael Kay" on="2024-03-11"/>
-     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
-       map{'row-delimiter':'|',
-       'select-columns':2 to 4})?rows 
+     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')), 
+       map{'select-columns':2 to 4})?rows 
        => array:join()</test>
      <result>
        <assert-deep-eq>["b","c","d","q","r","s"]</assert-deep-eq>
@@ -819,9 +882,9 @@
        Array behaviour.
      </description>
      <created by="Michael Kay" on="2024-03-11"/>
-     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
-       map{'row-delimiter':'|',
-       'select-columns':(4,3,2)})?rows 
+     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')), 
+       map{'select-columns':(4,3,2)})?rows 
        => array:join()</test>
      <result>
        <assert-deep-eq>["d","c","b","s","r","q"]</assert-deep-eq>
@@ -831,8 +894,9 @@
   <test-case name="parse-csv-103">
     <description>Extracted headers are always trimmed</description>
     <created by="Gunther Rademacher" on="2025-01-03"/>
-    <test>fn:parse-csv(' one,two ," three","four "| 1,2 , 3,4 ', 
-      map{'row-delimiter':'|', 'header':true()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv(' one,two ," three","four "| 1,2 , 3,4 '  => translate('|', char('\n')), 
+      map{'header':true()})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":("one","two","three","four"), 
@@ -844,8 +908,9 @@
   <test-case name="parse-csv-104">
     <description>Extracted headers are trimmed even when trim-whitespace is false</description>
     <created by="Gunther Rademacher" on="2025-01-03"/>
-    <test>fn:parse-csv(' one,two ," three","four "| 1,2 , 3,4 ', 
-      map{'row-delimiter':'|', 'header':true(), 'trim-whitespace':false()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv(' one,two ," three","four "| 1,2 , 3,4 '  => translate('|', char('\n')), 
+      map{'header':true(), 'trim-whitespace':false()})</test>
     <result>
       <assert>deep-equal($result => map:remove("get"), 
         map{"columns":("one","two","three","four"), 
@@ -857,13 +922,15 @@
   <test-case name="parse-csv-105">
     <description>Explicit headers are not trimmed even when trim-whitespace is true</description>
     <created by="Gunther Rademacher" on="2025-01-03"/>
-    <test>fn:parse-csv(' one,two ," three","four "| 1,2 , 3,4 ', 
-      map{'row-delimiter':'|', 'header':(' first', 'second ', ' third', 'fourth '), 'trim-whitespace':true()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <modified by="Christian Gruen" on="2026-07-16" change="quoted fields are not trimmed"/>
+    <test>fn:parse-csv(' one,two ," three","four "| 1,2 , 3,4 '  => translate('|', char('\n')),
+      map{'header':(' first', 'second ', ' third', 'fourth '), 'trim-whitespace':true()})</test>
     <result>
-      <assert>deep-equal($result => map:remove("get"), 
-        map{"columns":(" first","second ", " third", "fourth "), 
-        "column-index": map{" first":1, "second ":2, " third":3, "fourth ":4}, 
-        "rows":(["one","two","three","four"], ["1", "2", "3", "4"])})</assert>
+      <assert>deep-equal($result => map:remove("get"),
+        map{"columns":(" first","second ", " third", "fourth "),
+        "column-index": map{" first":1, "second ":2, " third":3, "fourth ":4},
+        "rows":(["one","two"," three","four "], ["1", "2", "3", "4"])})</assert>
     </result>
   </test-case>
   
@@ -919,6 +986,15 @@
     </result>
   </test-case>
   
+  <test-case name="parse-csv-110">
+    <description>CR following quoted field</description>
+    <created by="Michael Kay" on="2025-01-15"/>
+    <test>fn:parse-csv('one,two,"three,four"'||char(13)||char(10)||'five,six,"seven,eight"')</test>
+    <result>
+      <assert>deep-equal($result?rows, (["one","two","three,four"],["five","six","seven,eight"]) )</assert>
+    </result>
+  </test-case>
+  
   <test-case name="parse-csv-901">
     <description>Unclosed quotes</description>
     <created by="Michael Kay" on="2024-03-07"/>
@@ -949,7 +1025,7 @@
   <test-case name="parse-csv-904">
     <description>Field delimiter not a single char</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv('one,two', map{'field-delimiter':'::'})</test>
+    <test>fn:parse-csv('one,two', map{'separator':'::'})</test>
     <result>
       <error code="FOCV0002"/>
     </result>
@@ -958,22 +1034,22 @@
   <test-case name="parse-csv-905">
     <description>Field delimiter not a single char</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv('one,two', map{'field-delimiter':''})</test>
+    <test>fn:parse-csv('one,two', map{'separator':''})</test>
     <result>
       <error code="FOCV0002"/>
     </result>
   </test-case>
   
-  <test-case name="parse-csv-906">
+  <!--<test-case name="parse-csv-906">
     <description>Row delimiter not a single char</description>
     <created by="Michael Kay" on="2024-03-07"/>
     <test>fn:parse-csv('one,two', map{'row-delimiter':'||'})</test>
     <result>
       <error code="FOCV0002"/>
     </result>
-  </test-case>
+  </test-case>-->
   
-  <test-case name="parse-csv-907">
+  <!--<test-case name="parse-csv-907">
     <description>Row delimiter not a single string</description>
     <created by="Michael Kay" on="2024-03-07"/>
     <modified by="Gunther Rademacher" on="2025-08-13" change="added alternate error code FOCV0002"/>
@@ -984,50 +1060,54 @@
         <error code="FOCV0002"/>
       </any-of>
     </result>
-  </test-case>
+  </test-case>-->
   
   <test-case name="parse-csv-908">
     <description>Same delimiter in multiple roles</description>
     <created by="Michael Kay" on="2024-03-07"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:parse-csv('one,two', map{'row-delimiter':','})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
   
   <test-case name="parse-csv-909">
-    <description>Same delimiter in multiple roles</description>
+    <description>Newline as separator</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv('one,two', map{'field-delimiter':char(10)})</test>
+    <modified by="Christian Gruen" on="2026-07-16" change="PR2746, PR2778 - newline option values raise FOCV0002"/>
+    <test>fn:parse-csv('one,two', map{'separator':char(10)})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="FOCV0002"/>
     </result>
   </test-case>
   
   <test-case name="parse-csv-910">
     <description>Same delimiter in multiple roles</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv('one,two', map{'field-delimiter':'"'})</test>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
+    <test>fn:parse-csv('one,two', map{'separator':'"'})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="FOCV0002"/>
     </result>
   </test-case>
   
   <test-case name="parse-csv-911">
     <description>Same delimiter in multiple roles</description>
     <created by="Michael Kay" on="2024-03-07"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:parse-csv('one,two', map{'field-delimiter':';', 'row-delimiter':';'})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
    
   <test-case name="parse-csv-912">
      <description>Negative column numbers</description>
      <created by="Michael Kay" on="2024-03-11"/>
-     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
-       map{'row-delimiter':'|',
-           'select-columns':(4,3,-1)})?rows 
+     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')), 
+       map{'select-columns':(4,3,-1)})?rows 
        => array:join()</test>
      <result>
        <error code="XPTY0004"/>
@@ -1037,9 +1117,9 @@
    <test-case name="parse-csv-913">
      <description>Zero column numbers</description>
      <created by="Michael Kay" on="2024-03-11"/>
-     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
-       map{'row-delimiter':'|',
-       'select-columns':(4,3,0)})?rows 
+     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')), 
+       map{'select-columns':(4,3,0)})?rows 
        => array:join()</test>
      <result>
        <error code="XPTY0004"/>
@@ -1050,9 +1130,9 @@
      <description>Negative row number passed to get() function</description>
      <created by="Michael Kay" on="2024-03-11"/>
      <modified by="Christian Gruen" on="2025-03-31" change="errors: more flexibility"/>
-     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
-       map{'row-delimiter':'|',
-           'select-columns':(4,3,1)})?get(-1, 2)</test>
+     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')), 
+       map{'select-columns':(4,3,1)})?get(-1, 2)</test>
      <result>
        <any-of>
          <error code="XPTY0004"/>
@@ -1065,9 +1145,9 @@
      <description>Zero row number passed to get() function</description>
      <created by="Michael Kay" on="2024-03-11"/>
      <modified by="Christian Gruen" on="2025-03-31" change="errors: more flexibility"/>
-     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
-       map{'row-delimiter':'|',
-       'select-columns':(4,3,1)})?get(0, 2)</test>
+     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')), 
+       map{'select-columns':(4,3,1)})?get(0, 2)</test>
      <result>
        <any-of>
          <error code="XPTY0004"/>
@@ -1080,9 +1160,9 @@
      <description>Negative column number passed to get() function</description>
      <created by="Michael Kay" on="2024-03-11"/>
      <modified by="Christian Gruen" on="2025-03-31" change="errors: more flexibility"/>
-     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
-       map{'row-delimiter':'|',
-       'select-columns':(4,3,1)})?get(2, -1)</test>
+     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')), 
+       map{'select-columns':(4,3,1)})?get(2, -1)</test>
      <result>
        <any-of>
          <error code="XPTY0004"/>
@@ -1095,9 +1175,9 @@
      <description>Zero column number passed to get() function</description>
      <created by="Michael Kay" on="2024-03-11"/>
      <modified by="Christian Gruen" on="2025-03-31" change="errors: more flexibility"/>
-     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
-       map{'row-delimiter':'|',
-       'select-columns':(4,3,1)})?get(2, 0)</test>
+     <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+     <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u" => translate('|', char('\n')), 
+       map{'select-columns':(4,3,1)})?get(2, 0)</test>
      <result>
        <any-of>
          <error code="XPTY0004"/>
@@ -1109,8 +1189,9 @@
   <test-case name="parse-csv-918">
     <description>get(): no such field</description>
     <created by="Michael Kay" on="2024-05-11"/>
-    <test>fn:parse-csv("left,right|one,two|three,four", 
-      map{'row-delimiter':'|', 'header':true()})?get(1, "middle")</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("left,right|one,two|three,four" => translate('|', char('\n')), 
+      map{'header':true()})?get(1, "middle")</test>
     <result>
       <error code="FOCV0004"/>
     </result>
@@ -1120,9 +1201,9 @@
     <description>Negative row number passed to get() function</description>
     <created by="Michael Kay" on="2024-05-11"/>
     <modified by="Christian Gruen" on="2025-03-31" change="errors: more flexibility"/>
-    <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u", 
-      map{'row-delimiter':'|',
-      'select-columns':(4,3,1)})?get(-1, 3)</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')), 
+      map{'select-columns':(4,3,1)})?get(-1, 3)</test>
     <result>
        <any-of>
          <error code="XPTY0004"/>
@@ -1134,11 +1215,33 @@
   <test-case name="parse-csv-920">
     <description>header: mistyped as 'column-names' (as per original spec)</description>
     <created by="Michael Kay" on="2024-08-28"/>
-    <test>fn:parse-csv("one,two|three,four", 
-      map{'row-delimiter':'|', 'column-names':('left','right')})
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:parse-csv("one,two|three,four"  => translate('|', char('\n')), 
+      map{'column-names':('left','right')})
     </test>
     <result>
       <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-921" covers-40="PR2746">
+    <description>Custom separator and quote character</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:parse-csv("a;'b;c'", { 'separator': ';', 'quote-character': "'" })</test>
+    <result>
+      <assert>deep-equal(
+        $result => map:remove("get"),
+        { "columns": (), "column-index": {}, "rows": [ "a", "b;c" ] }
+      )</assert>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-922" covers-40="PR2746">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:parse-csv('a,b', { 'separator': ';', 'quote-character': ';' })</test>
+    <result>
+      <error code="FOCV0002"/>
     </result>
   </test-case>
 </test-set>

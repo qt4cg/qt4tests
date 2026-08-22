@@ -209,13 +209,13 @@
   <test-case name="csv-to-arrays-020">
     <description>Field delimiter semicolon</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays("one;two"||char(10)||"three;four", map{'field-delimiter':';'})</test>
+    <test>fn:csv-to-arrays("one;two"||char(10)||"three;four", map{'separator':';'})</test>
     <result>
       <assert-deep-eq>["one","two"],["three","four"]</assert-deep-eq>
     </result>
   </test-case>
   
-  <test-case name="csv-to-arrays-021">
+ <!-- <test-case name="csv-to-arrays-021">
     <description>Row delimiter vertical bar</description>
     <created by="Michael Kay" on="2024-02-26"/>
     <test>fn:csv-to-arrays("one,two|three,four", map{'row-delimiter':'|'})</test>
@@ -223,21 +223,21 @@
       <assert-deep-eq>["one","two"],["three","four"]</assert-deep-eq>
     </result>
   </test-case>
-  
-  <test-case name="csv-to-arrays-022">
+  -->
+  <!--<test-case name="csv-to-arrays-022">
     <description>Reset both delimiters</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays("one.two|three.four", map{'row-delimiter':'|','field-delimiter':'.'})</test>
+    <test>fn:csv-to-arrays("one.two|three.four", map{'row-delimiter':'|','separator':'.'})</test>
     <result>
       <assert-deep-eq>["one","two"],["three","four"]</assert-deep-eq>
     </result>
-  </test-case>
+  </test-case>-->
   
   <test-case name="csv-to-arrays-023">
     <description>Alternative row delimiters</description>
     <created by="Michael Kay" on="2024-02-26"/>
     <test>fn:csv-to-arrays("one.two|three.four"||char(10)||"five.six", 
-                           map{'row-delimiter':('|',char(10)),'field-delimiter':'.'})</test>
+                           map{'row-delimiter':('|',char(10)),'separator':'.'})</test>
     <result>
       <any-of>
          <error code="FOCV0002"/>
@@ -249,8 +249,9 @@
   <test-case name="csv-to-arrays-024">
     <description>Single quotes</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays("one,'two,2'|three,'four,4'", 
-      map{'row-delimiter':'|','quote-character':"'"})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:csv-to-arrays("one,'two,2'|three,'four,4'" => translate('|', char('\n')), 
+      map{'quote-character':"'"})</test>
     <result>
       <assert-deep-eq>["one","two,2"],["three","four,4"]</assert-deep-eq>
     </result>
@@ -259,8 +260,9 @@
   <test-case name="csv-to-arrays-025">
     <description>Single quotes, escaped</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays("one,'two,''2'''|three,'four,''4'''", 
-      map{'row-delimiter':'|','quote-character':"'"})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:csv-to-arrays("one,'two,''2'''|three,'four,''4'''" => translate('|', char('\n')), 
+      map{'quote-character':"'"})</test>
     <result>
       <assert-deep-eq>["one","two,'2'"],["three","four,'4'"]</assert-deep-eq>
     </result>
@@ -269,8 +271,8 @@
   <test-case name="csv-to-arrays-026">
     <description>Whitespace not trimmed</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays("one ,two | three, four", 
-      map{'row-delimiter':'|'})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:csv-to-arrays("one ,two | three, four"  => translate('|', char('\n')))</test>
     <result>
       <assert-deep-eq>["one ","two "],[" three"," four"]</assert-deep-eq>
     </result>
@@ -279,8 +281,9 @@
   <test-case name="csv-to-arrays-027">
     <description>Whitespace explicitly not trimmed</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays("one ,two | three, four", 
-      map{'row-delimiter':'|', 'trim-whitespace':false()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:csv-to-arrays("one ,two | three, four"  => translate('|', char('\n')), 
+      map{'trim-whitespace':false()})</test>
     <result>
       <assert-deep-eq>["one ","two "],[" three"," four"]</assert-deep-eq>
     </result>
@@ -289,8 +292,9 @@
   <test-case name="csv-to-arrays-028">
     <description>Whitespace trimmed</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays("one ,two | three, twenty  four ", 
-      map{'row-delimiter':'|', 'trim-whitespace':true()})</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>fn:csv-to-arrays("one ,two | three, twenty  four " => translate('|', char('\n')), 
+      map{'trim-whitespace':true()})</test>
     <result>
       <assert-deep-eq>["one","two"],["three","twenty  four"]</assert-deep-eq>
     </result>
@@ -377,6 +381,56 @@
     </result>
   </test-case>
   
+  <test-case name="csv-to-arrays-038" covers-40="PR2778">
+    <description>Single comment line</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:csv-to-arrays("# this is a comment", {'comment-marker': '#'})</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-039" covers-40="PR2778">
+    <description>Single comment line</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:csv-to-arrays("# this is a comment" || char(10), {'comment-marker': '#'})</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-040" covers-40="PR2778">
+    <description>Comment followed by data line</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-arrays("# this is a comment" || char(10) || 'one,two,"z"'||char(10), {'comment-marker': '#'})</test>
+    <result>
+      <assert-deep-eq>["one", "two", "z"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-041" covers-40="PR2778">
+    <description>Data row followed by comment line</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-arrays('one,two,"z"'||char(10) || "% this is a comment" || char(10), {'comment-marker': '%'})</test>
+    <result>
+      <assert-deep-eq>["one", "two", "z"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-042" covers-40="PR2778">
+    <description>Multiple adjacent comments</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:csv-to-arrays("# this is one comment" || char(10) 
+      || "# this is two comment" || char(10) 
+      || "# this is three comment" || char(10) 
+      ||'one,two,"z"'||char(10), {'comment-marker': '#'})</test>
+    <result>
+      <assert-deep-eq>["one", "two", "z"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  
+  
   
   <test-case name="csv-to-arrays-801">
     <description>
@@ -385,7 +439,8 @@
       following tests are written to ensure that this array implementation behaves properly.
     </description>
     <created by="Michael Kay" on="2024-03-11"/>
-    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u", map{'row-delimiter':'|'})[1] => array:append("x") </test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')))[1] => array:append("x") </test>
     <result>
       <assert-deep-eq>["a","b","c","d","e","f","x"]</assert-deep-eq>
     </result>
@@ -398,7 +453,8 @@
       following tests are written to ensure that this array implementation behaves properly.
     </description>
     <created by="Michael Kay" on="2024-03-11"/>
-    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u", map{'row-delimiter':'|'})[1] => array:remove(1) </test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')))[1] => array:remove(1) </test>
     <result>
       <assert-deep-eq>["b","c","d","e","f"]</assert-deep-eq>
     </result>
@@ -409,7 +465,8 @@
       Array behaviour.
     </description>
     <created by="Michael Kay" on="2024-03-11"/>
-    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u", map{'row-delimiter':'|'})[1] => array:remove((1,3))</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')))[1] => array:remove((1,3))</test>
     <result>
       <assert-deep-eq>["b","d","e","f"]</assert-deep-eq>
     </result>
@@ -420,7 +477,8 @@
       Array behaviour.
     </description>
     <created by="Michael Kay" on="2024-03-11"/>
-    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u", map{'row-delimiter':'|'})[1] => array:subarray(3,2)</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u" => translate('|', char('\n')))[1] => array:subarray(3,2)</test>
     <result>
       <assert-deep-eq>["c","d"]</assert-deep-eq>
     </result>
@@ -431,7 +489,8 @@
       Array behaviour.
     </description>
     <created by="Michael Kay" on="2024-03-11"/>
-    <test>csv-to-arrays("a,b,c|p,q,r", map{'row-delimiter':'|'}) => array:join()</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>csv-to-arrays("a,b,c|p,q,r" => translate('|', char('\n'))) => array:join()</test>
     <result>
       <assert-deep-eq>["a","b","c","p","q","r"]</assert-deep-eq>
     </result>
@@ -444,7 +503,8 @@
       Array behaviour.
     </description>
     <created by="Michael Kay" on="2024-03-11"/>
-    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u", map{'row-delimiter':'|'})[2] 
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u" => translate('|', char('\n')))[2] 
       => array:put(3,"z")</test>
     <result>
       <assert-deep-eq>["p","q","z","s","t","u"]</assert-deep-eq>
@@ -456,7 +516,8 @@
       Array behaviour.
     </description>
     <created by="Michael Kay" on="2024-03-11"/>
-    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u", map{'row-delimiter':'|'})?3</test>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>csv-to-arrays("a,b,c,d,e,f|p,q,r,s,t,u" => translate('|', char('\n')))?3</test>
     <result>
       <assert-deep-eq>"c","r"</assert-deep-eq>
     </result>
@@ -492,7 +553,7 @@
   <test-case name="csv-to-arrays-904">
     <description>Field delimiter not a single char</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays('one,two', map{'field-delimiter':'::'})</test>
+    <test>fn:csv-to-arrays('one,two', map{'separator':'::'})</test>
     <result>
       <error code="FOCV0002"/>
     </result>
@@ -501,25 +562,25 @@
   <test-case name="csv-to-arrays-905">
     <description>Field delimiter not a single char</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays('one,two', map{'field-delimiter':''})</test>
+    <test>fn:csv-to-arrays('one,two', map{'separator':''})</test>
     <result>
       <error code="FOCV0002"/>
     </result>
   </test-case>
   
   <test-case name="csv-to-arrays-906">
-    <description>Row delimiter not a single char</description>
+    <description>delimiter not a single char</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays('one,two', map{'row-delimiter':'||'})</test>
+    <test>fn:csv-to-arrays('one,two', map{'separator':'||'})</test>
     <result>
       <error code="FOCV0002"/>
     </result>
   </test-case>
   
   <test-case name="csv-to-arrays-907">
-    <description>Row delimiter not a single string</description>
+    <description>delimiter not a single string</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays('one,two', map{'row-delimiter':('|','||')})</test>
+    <test>fn:csv-to-arrays('one,two', map{'separator':('|','||')})</test>
     <result>
       <any-of>
          <error code="FOCV0002"/>
@@ -529,38 +590,44 @@
   </test-case>
   
   <test-case name="csv-to-arrays-908">
-    <description>Same delimiter in multiple roles</description>
+    <description>Obsolete option</description>
     <created by="Michael Kay" on="2024-02-26"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
     <test>fn:csv-to-arrays('one,two', map{'row-delimiter':','})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
   
   <test-case name="csv-to-arrays-909">
-    <description>Same delimiter in multiple roles</description>
+    <description>Newline as separator</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays('one,two', map{'field-delimiter':char(10)})</test>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
+    <modified by="Michael Kay" on="2026-07-16" change="PR2778"/>
+    <modified by="Christian Gruen" on="2026-07-16" change="PR2746, PR2778 - newline option values raise FOCV0002"/>
+    <test>fn:csv-to-arrays('one,two', map{'separator':char(10)})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="FOCV0002"/>
     </result>
   </test-case>
   
   <test-case name="csv-to-arrays-910">
     <description>Same delimiter in multiple roles</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays('one,two', map{'field-delimiter':'"'})</test>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
+    <test>fn:csv-to-arrays('one,two', map{'separator':'"'})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="FOCV0002"/>
     </result>
   </test-case>
   
   <test-case name="csv-to-arrays-911">
-    <description>Same delimiter in multiple roles</description>
+    <description>Obsolete option</description>
     <created by="Michael Kay" on="2024-02-26"/>
-    <test>fn:csv-to-arrays('one,two', map{'field-delimiter':';', 'row-delimiter':';'})</test>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
+    <test>fn:csv-to-arrays('one,two', map{'separator':';', 'row-delimiter':';'})</test>
     <result>
-      <error code="FOCV0003"/>
+      <error code="XPTY0004"/>
     </result>
   </test-case>
   
@@ -570,6 +637,69 @@
     <test>fn:csv-to-arrays('one,two,"')</test>
     <result>
       <error code="FOCV0001"/>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-arrays-913" covers-40="PR2746">
+    <description>Custom separator and quote character</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:csv-to-arrays("a;'b;c'", { 'separator': ';', 'quote-character': "'" })</test>
+    <result>
+      <assert-deep-eq>[ "a", "b;c" ]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-arrays-914" covers-40="PR2746">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:csv-to-arrays('a,b', { 'separator': ';', 'quote-character': ';' })</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-arrays-915" covers-40="PR2746">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:csv-to-arrays('a,b', { 'quote-character': ',' })</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-arrays-916">
+    <description>Quote character not a single char</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:csv-to-arrays('a,b', { 'quote-character': '||' })</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+  
+  <test-case name="csv-to-arrays-917" covers-40="PR2778">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:csv-to-arrays('one,two', map{'comment-marker':'"'})</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-arrays-918" covers-40="PR2778">
+    <description>Comment marker must not be a newline</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:csv-to-arrays('one,two', map{'comment-marker':char(10)})</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="csv-to-arrays-919" covers-40="PR2778">
+    <description>Comment marker must be single character</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:csv-to-arrays('one,two', map{'comment-marker':'##'})</test>
+    <result>
+      <error code="FOCV0002"/>
     </result>
   </test-case>
   

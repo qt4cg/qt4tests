@@ -728,44 +728,48 @@
       </result>
    </test-case>
    
-   <test-case name="path103" covers-40="PR2149">
+   <test-case name="path103" covers-40="PR2149 PR2706">
       <description>Apply to JNodes</description>
       <created by="Michael Kay" on="2025-08-13"/>
       <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
+      <modified by="Christian Gruen" on="2026-07-08" change="PR2706"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>jtree([1,2,[5,6,7]])/jnode(*, array(xs:integer)) => path()</test>
       <result>
-         <assert-string-value>/*[3]</assert-string-value>
+         <assert-string-value>/3</assert-string-value>
       </result>
    </test-case>
    
-   <test-case name="path104" covers-40="PR2149">
+   <test-case name="path104" covers-40="PR2149 PR2706">
       <description>Apply to JNodes</description>
       <created by="Michael Kay" on="2025-08-13"/>
+      <modified by="Christian Gruen" on="2026-07-08" change="PR2706"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>jtree([1,2,{'x':[5,6,7]}])//x => path()</test>
       <result>
-         <assert-string-value>/*[3]/x</assert-string-value>
+         <assert-string-value>/3/x</assert-string-value>
       </result>
    </test-case>
    
-   <test-case name="path105" covers-40="PR2149">
+   <test-case name="path105" covers-40="PR2149 PR2706">
       <description>Apply to JNodes</description>
       <created by="Michael Kay" on="2025-08-13"/>
+      <modified by="Christian Gruen" on="2026-07-08" change="PR2706"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>jtree([1,2,[{'x':[5,6,7]}]])//x => path()</test>
       <result>
-         <assert-string-value>/*[3]/*[1]/x</assert-string-value>
+         <assert-string-value>/3/1/x</assert-string-value>
       </result>
    </test-case>
    
-   <test-case name="path106" covers-40="PR2149">
+   <test-case name="path106" covers-40="PR2149 PR2706">
       <description>Apply to JNodes, with origin</description>
       <created by="Michael Kay" on="2025-08-13"/>
+      <modified by="Christian Gruen" on="2026-07-08" change="PR2706"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>let $in := jtree([1,2,[{'x':[5,6,7]}]]) return path($in//x, {'origin':$in/*[3]})</test>
       <result>
-         <assert-string-value>*[1]/x</assert-string-value>
+         <assert-string-value>1/x</assert-string-value>
       </result>
    </test-case>
    
@@ -779,57 +783,133 @@
       </result>
    </test-case>
    
-   <test-case name="path108" covers-40="PR2149">
+   <test-case name="path108" covers-40="PR2149 PR2667 PR2706">
       <description>Apply to JNodes, with non-NCName key</description>
       <created by="Michael Kay" on="2025-08-13"/>
-      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <modified by="Michael Kay" on="2026-06-24" change="PR2667"/>
+      <modified by="Christian Gruen" on="2026-07-08" change="PR2706"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>jtree([1,2,[{'12x':[5,6,7]}]])//'12x' => path()</test>
       <result>
-         <assert-string-value>/*[3]/*[1]/get("12x")</assert-string-value>
+         <assert-string-value>/3/1/"12x"</assert-string-value>
       </result>
    </test-case>
    
-   <test-case name="path109" covers-40="PR2149">
+   <test-case name="path109" covers-40="PR2149 PR2667 PR2706">
       <description>Apply to JNodes, with integer key</description>
       <created by="Michael Kay" on="2025-08-13"/>
-      <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <modified by="Michael Kay" on="2026-06-24" change="PR2667"/>
+      <modified by="Christian Gruen" on="2026-07-08" change="PR2706"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>jtree([1,2,[{17:[5,6,7]}]])//17 => path()</test>
       <result>
-         <assert-string-value>/*[3]/*[1]/get(17)</assert-string-value>
+         <assert-string-value>/3/1/17</assert-string-value>
       </result>
    </test-case>
    
-   <test-case name="path110" covers-40="PR2149">
+   <test-case name="path110" covers-40="PR2149 PR2706">
       <description>Apply to JNodes, with QName key</description>
       <created by="Michael Kay" on="2025-08-13"/>
+      <modified by="Christian Gruen" on="2026-07-08" change="PR2706"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>jtree([1,2,[{#xml:space:[5,6,7]}]])//xml:space => path()</test>
       <result>
-         <assert-string-value>/*[3]/*[1]/Q{http://www.w3.org/XML/1998/namespace}space</assert-string-value>
+         <assert-string-value>/3/1/#Q{http://www.w3.org/XML/1998/namespace}space</assert-string-value>
       </result>
    </test-case>
    
-   <test-case name="path111" covers-40="PR2149">
+   <test-case name="path111" covers-40="PR2149 PR2706">
       <description>Apply to JNodes, with xs:date key</description>
       <created by="Michael Kay" on="2025-08-13"/>
       <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
+      <modified by="Christian Gruen" on="2026-07-08" change="PR2706"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="added child:: axis"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>jtree([1,2,[{xs:date('1999-12-31'):current-date()}]])//jnode(*, xs:date) => path()</test>
       <result>
-         <assert-string-value>/*[3]/*[1]/get(xs:date("1999-12-31"))</assert-string-value>
+         <assert-string-value>/3/1/child::{xs:date("1999-12-31")}</assert-string-value>
       </result>
    </test-case>
    
-   <test-case name="path112" covers-40="PR2149">
+   <test-case name="path112" covers-40="PR2149 PR2706">
       <description>Apply to JNodes, with boolean key</description>
       <created by="Michael Kay" on="2025-08-13"/>
       <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
+      <modified by="Christian Gruen" on="2026-07-08" change="PR2706"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>jtree([1,2,[{true():false()}]])//jnode(*, xs:boolean) => path()</test>
       <result>
-         <assert-string-value>/*[3]/*[1]/get(true())</assert-string-value>
+         <assert-string-value>/3/1/true()</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path113" covers-40="PR2149 PR2667 PR2706">
+      <description>Apply to JNodes, with non-NCName key including quotation marks</description>
+      <created by="Michael Kay" on="2026-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[{'He said: "don''t"':[5,6,7]}]])//'He said: "don''t"' => path()</test>
+      <result>
+         <assert-string-value>/3/1/"He said: ""don't"""</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path114" covers-40="PR2149 PR2667 PR2706">
+      <description>Apply to JNodes, with untypedAtomic key castable to NCName</description>
+      <created by="Michael Kay" on="2026-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[{xs:untypedAtomic('fred'):[5,6,7]}]])//fred => path()</test>
+      <result>
+         <assert-string-value>/3/1/fred</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path115" covers-40="PR2149 PR2667 PR2706">
+      <description>Apply to JNodes, with xs:anyURI key not castable to NCName</description>
+      <created by="Michael Kay" on="2026-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[{xs:anyURI('http://www.w3.org/'):[5,6,7]}]])//'http://www.w3.org/' => path()</test>
+      <result>
+         <assert-string-value>/3/1/"http://www.w3.org/"</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path116" covers-40="PR2149 PR2667 PR2706">
+      <description>Apply to JNodes, with xs:anyURI key containing quotes</description>
+      <created by="Michael Kay" on="2026-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[{xs:anyURI('http://www.w3.org/?boss="Tim Berners-Lee"'):[5,6,7]}]])//*[jkey(.) instance of xs:anyURI] => path()</test>
+      <result>
+         <assert-string-value>/3/1/"http://www.w3.org/?boss=""Tim Berners-Lee"""</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path117" covers-40="PR2149 PR2667 PR2706">
+      <description>Apply to JNodes, with xs:dayTimeDuration key</description>
+      <created by="Michael Kay" on="2026-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[{xs:dayTimeDuration('PT6H'):[5,6,7]}]])//*[jkey(.) instance of xs:duration] => path()</test>
+      <result>
+         <assert-string-value>/3/1/child::{xs:dayTimeDuration("PT6H")}</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path118" covers-40="PR2149 PR2667 PR2706">
+      <description>Apply to JNodes, with xs:boolean key</description>
+      <created by="Michael Kay" on="2026-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[{true():[5,6,7]}]])/descendant::{true()} => path()</test>
+      <result>
+         <assert-string-value>/3/1/true()</assert-string-value>
+      </result>
+   </test-case>
+   
+   <test-case name="path119" covers-40="PR2149 PR2667 PR2706">
+      <description>Apply to JNodes, with xs:boolean key</description>
+      <created by="Michael Kay" on="2026-08-13"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>jtree([1,2,[{false():[5,6,7]}]])/descendant::{false()} => path()</test>
+      <result>
+         <assert-string-value>/3/1/false()</assert-string-value>
       </result>
    </test-case>
    

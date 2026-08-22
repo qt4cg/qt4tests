@@ -1967,7 +1967,8 @@
         <modified by="Debbie Lockett" on="2015-08-12" change="Edited dependency to XQuery only"/>
         <modified by="Tim Mills" on="2016-08-09" change="Bug 29740"/>
         <modified by="Tim Mills" on="2016-09-07" change="Bug 29740"/>
-        <dependency type="spec" value="XQ31+"/>
+        <modified by="Christian Gruen" on="2026-07-22" change="PR1501"/>
+        <dependency type="spec" value="XQ31"/>
         <test><![CDATA[  
                let $options := map {
                   'use-character-maps' : map {
@@ -1983,12 +1984,32 @@
 	      <error code="XPTY0004" />
         </result>
     </test-case>
+    <test-case name="serialize-xml-140a" covers="fn-serialize" covers-40="PR1501">
+        <description>Character mappings and option parameter conventions.</description>
+        <created by="Christian Gruen" on="2026-07-22"/>
+        <dependency type="spec" value="XQ40+"/>
+        <test><![CDATA[
+               let $options := map {
+                  'use-character-maps' : map {
+                     'x' : xs:untypedAtomic('j'),
+                     'm' : <e>so</e>,
+                     'l' : 'n'
+                  }
+               }
+               return
+                  serialize(<e>[xml]</e>, $options)
+        ]]></test>
+        <result>
+            <assert>parse-xml($result)/e/string() eq "[json]"</assert>
+        </result>
+    </test-case>
     <test-case name="serialize-xml-140b" covers="fn-serialize">
         <description>Character mappings and option parameter conventions. Rules are not recursive
             for map value supplied for use-character-maps (required xs:string, element given)</description>
         <created by="Debbie Lockett" on="2019-11-19"/>
         <modified by="Debbie Lockett" on="2020-07-09" change="Source should be XML 1.0"/>
         <modified by="Benito van der Zander" on="2020-09-24" change="test depends on 3.1 spec"/>
+        <modified by="Christian Gruen" on="2026-07-22" change="PR1501"/>
         <environment>        
             <source role="." file="serialize/serialize-xml-138-src.xml">
                 <description>File to be serialized</description>
@@ -1999,10 +2020,29 @@
                 <created by="Debbie Lockett, Saxonica" on="2019-11-19"/>
             </source>
         </environment>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP31 XQ31"/>
         <test>serialize(., map {'use-character-maps' : map {'x': xs:untypedAtomic('j'), 'm':$e/e, 'l':'n'}})</test>
         <result>
             <error code="XPTY0004" />
+        </result>
+    </test-case>
+    <test-case name="serialize-xml-140c" covers="fn-serialize" covers-40="PR1501">
+        <description>Character mappings and option parameter conventions.</description>
+        <created by="Christian Gruen" on="2026-07-22"/>
+        <environment>
+            <source role="." file="serialize/serialize-xml-138-src.xml">
+                <description>File to be serialized</description>
+                <created by="Debbie Lockett, Saxonica" on="2019-11-19"/>
+            </source>
+            <source role="$e" file="serialize/serialize-xml-140-src.xml">
+                <description>File to be serialized</description>
+                <created by="Debbie Lockett, Saxonica" on="2019-11-19"/>
+            </source>
+        </environment>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(., map {'use-character-maps' : map {'x': xs:untypedAtomic('j'), 'm':$e/e, 'l':'n'}})</test>
+        <result>
+            <assert>parse-xml($result)/e/string() eq "json"</assert>
         </result>
     </test-case>
       
@@ -2086,7 +2126,7 @@
     <test-case name="serialize-xml-143" covers="fn-serialize">
         <description>omit-xml-declaration inconsistent with standalone</description>
         <created by="Michael Kay" on="2024-09-27"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
             serialize(
                 parse-xml('<a/>'), 
@@ -2102,7 +2142,7 @@
     <test-case name="serialize-xml-144" covers="fn-serialize">
         <description>omit-xml-declaration inconsistent with standalone</description>
         <created by="Michael Kay" on="2024-09-27"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
             serialize(
                 parse-xml('<a/>'), 
@@ -2118,7 +2158,7 @@
     <test-case name="serialize-xml-145" covers="fn-serialize">
         <description>omit-xml-declaration (which defaults to true) is inconsistent with standalone</description>
         <created by="Michael Kay" on="2024-09-27"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
             serialize(
                 parse-xml('<a/>'), 
@@ -2133,7 +2173,7 @@
     <test-case name="serialize-xml-146" covers="fn-serialize">
         <description>omit-xml-declaration inconsistent with version/doctype-system</description>
         <created by="Michael Kay" on="2024-09-27"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
             serialize(
                 parse-xml('<a/>'), 
@@ -2150,7 +2190,7 @@
     <test-case name="serialize-xml-147" covers="fn-serialize">
         <description>omit-xml-declaration (defaulting to true) inconsistent with version/doctype-system</description>
         <created by="Michael Kay" on="2024-09-27"/>
-        <dependency type="spec" value="XP31+ XQ31+"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[
             serialize(
                 parse-xml('<a/>'), 
@@ -2303,6 +2343,7 @@
             namespace prefix, and attr2 precedes b:attr because the default namespace is not applied 
             to unqualified attributes (so the namespace URI for attr2 is empty).</description>
         <created by="Joel Kalvesmaki" on="2025-03-16"/>
+        <modified by="Gunther Rademacher" on="2026-06-24" change="fixed indentation in expected result to match input"/>
         <environment>        
             <source role="." file="serialize/serialize-canonical-3-src.xml">
                 <description>File to be serialized</description>
@@ -2313,18 +2354,18 @@
         <test>serialize(., map {'method' : 'xml', 'canonical' : xs:untypedAtomic('true') })</test>
         <result>
             <assert-string-value><![CDATA[<doc>
-   <e1></e1>
-   <e2></e2>
-   <e3 id="elem3" name="elem3"></e3>
-   <e4 id="elem4" name="elem4"></e4>
-   <e5 xmlns="http://example.org" xmlns:a="http://www.w3.org" xmlns:b="http://www.ietf.org" attr="I'm" attr2="all" b:attr="sorted" a:attr="out"></e5>
-   <e6 xmlns:a="http://www.w3.org">
-      <e7 xmlns="http://www.ietf.org">
-         <e8 xmlns="">
-            <e9 xmlns:a="http://www.ietf.org" attr="default"></e9>
-         </e8>
-      </e7>
-   </e6>
+    <e1></e1>
+    <e2></e2>
+    <e3 id="elem3" name="elem3"></e3>
+    <e4 id="elem4" name="elem4"></e4>
+    <e5 xmlns="http://example.org" xmlns:a="http://www.w3.org" xmlns:b="http://www.ietf.org" attr="I'm" attr2="all" b:attr="sorted" a:attr="out"></e5>
+    <e6 xmlns:a="http://www.w3.org">
+        <e7 xmlns="http://www.ietf.org">
+            <e8 xmlns="">
+                <e9 xmlns:a="http://www.ietf.org" attr="default"></e9>
+            </e8>
+        </e7>
+    </e6>
 </doc>]]></assert-string-value>
         </result>
     </test-case>
@@ -2353,6 +2394,7 @@
             
             Note: The expr attribute of the second compute element contains no line breaks.</description>
         <created by="Joel Kalvesmaki" on="2025-03-16"/>
+        <modified by="Gunther Rademacher" on="2026-06-24" change="fixed indentation in expected result to match input"/>
         <environment>        
             <source role="." file="serialize/serialize-canonical-4-src.xml">
                 <description>File to be serialized</description>
@@ -2363,14 +2405,14 @@
         <test>serialize(., map {'method' : 'xml', 'canonical' : xs:untypedAtomic('true') })</test>
         <result>
             <assert-string-value><![CDATA[<doc>
-   <text>First line&#xD;
+    <text>First line&#xD;
 Second line</text>
-   <value>2</value>
-   <compute>value&gt;"0" &amp;&amp; value&lt;"10" ?"valid":"error"</compute>
-   <compute expr="value>&quot;0&quot; &amp;&amp; value&lt;&quot;10&quot; ?&quot;valid&quot;:&quot;error&quot;">valid</compute>
-   <norm attr=" '    &#xD;&#xA;&#x9;   ' "></norm>
-   <normNames attr="A &#xD;&#xA;&#x9; B"></normNames>
-   <normId id="' &#xD;&#xA;&#x9; '"></normId>
+    <value>2</value>
+    <compute>value&gt;"0" &amp;&amp; value&lt;"10" ?"valid":"error"</compute>
+    <compute expr="value>&quot;0&quot; &amp;&amp; value&lt;&quot;10&quot; ?&quot;valid&quot;:&quot;error&quot;">valid</compute>
+    <norm attr=" '    &#xD;&#xA;&#x9;   ' "></norm>
+    <normNames attr="A &#xD;&#xA;&#x9; B"></normNames>
+    <normId id="' &#xD;&#xA;&#x9; '"></normId>
 </doc>]]></assert-string-value>
         </result>
     </test-case>
@@ -2387,6 +2429,7 @@ Second line</text>
             External parsed entity reference replacement (including whitespace outside elements and PIs)
             External unparsed entity reference</description>
         <created by="Joel Kalvesmaki" on="2025-03-16"/>
+        <modified by="Gunther Rademacher" on="2026-06-24" change="fixed indentation in expected result to match input"/>
         <environment>        
             <source role="." file="serialize/serialize-canonical-5-src.xml">
                 <description>File to be serialized</description>
@@ -2397,7 +2440,7 @@ Second line</text>
         <test>serialize(., map {'method' : 'xml', 'canonical' : xs:untypedAtomic('true') })</test>
         <result>
             <assert-string-value><![CDATA[<doc attrExtEnt="entExt">
-   Hello, world!
+    Hello, world!
 </doc>]]></assert-string-value>
         </result>
     </test-case>
@@ -2414,6 +2457,7 @@ Second line</text>
             octets whose hexadecimal values are C2 and A9, which is the UTF-8 encoding of the 
             UCS codepoint for the copyright sign (©).</description>
         <created by="Joel Kalvesmaki" on="2025-03-16"/>
+        <modified by="Gunther Rademacher" on="2026-06-24" change="replaced #xC2#xA9 by ©"/>
         <environment>        
             <source role="." file="serialize/serialize-canonical-6-src.xml">
                 <description>File to be serialized</description>
@@ -2423,42 +2467,19 @@ Second line</text>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test>serialize(., map {'method' : 'xml', 'canonical' : xs:untypedAtomic('true') })</test>
         <result>
-            <assert-string-value><![CDATA[<doc>#xC2#xA9</doc>]]></assert-string-value>
+            <assert-string-value><![CDATA[<doc>©</doc>]]></assert-string-value>
         </result>
     </test-case>
 
-    <test-case name="serialize-xml-canonical-6a" covers="fn-serialize">
-        <description>Simple test for canonical serialization of XML. This example is taken from 
-            https://www.w3.org/TR/2008/REC-xml-c14n11-20080502/ section 3.7.
-            
-            Demonstrates:
-            
-            Empty default namespace propagation from omitted parent element
-            Propagation of attributes in the xml namespace in document subsets
-            Persistence of omitted namespace declarations in descendants
-            
-            Note: The canonical form contains no line delimiters.</description>
-        <created by="Joel Kalvesmaki" on="2025-03-16"/>
-        <modified by="Michael Kay" on="2026-06-09" change="test name changed for uniqueness"/>
-        <environment>        
-            <source role="." file="serialize/serialize-canonical-6-src.xml">
-                <description>File to be serialized</description>
-                <created by="Joel Kalvesmaki" on="2026-03-16"/>
-            </source>
-        </environment>
-        <dependency type="spec" value="XP40+ XQ40+"/>
-        <test>serialize(., map {'method' : 'xml', 'canonical' : xs:untypedAtomic('true') })</test>
-        <result>
-            <assert-string-value><![CDATA[<doc>#xC2#xA9</doc>]]></assert-string-value>
-        </result>
-    </test-case>
-    
     <test-case name="serialize-xml-canonical-7" covers="fn-serialize">
-        <description>Remove dot segments algorithm for xml:base attribute. In this test, I have
-            collected everything from appendix A in https://www.w3.org/TR/2008/REC-xml-c14n11-20080502 and
-            set the 64 items in the left-hand column as values of @xml:base in uniquely named elements. See
-            section 2.4 on the Remove Dot Segments algorithm.</description>
+        <description>xml:base attributes are not modified when a complete document is serialized. The 64
+            items in the left-hand column of appendix A in https://www.w3.org/TR/2008/REC-xml-c14n11-20080502
+            are set as values of @xml:base in uniquely named elements. As no element is removed from the
+            document, the xml:base fixup described in https://www.w3.org/TR/xml-c14n/#DocSubsets (which
+            applies the Remove Dot Segments algorithm of section 2.4) is not performed, and every xml:base
+            value is retained unchanged.</description>
         <created by="Joel Kalvesmaki" on="2025-03-16"/>
+        <modified by="Christian Gruen" on="2026-07-05" change="PR386"/>
         <environment>
             <source role="." file="serialize/serialize-canonical-7-src.xml">
                 <description>File to be serialized</description>
@@ -2469,69 +2490,69 @@ Second line</text>
         <test>serialize(., map {'method' : 'xml', 'canonical' : xs:untypedAtomic('true') })</test>
         <result>
             <assert-string-value><![CDATA[<doc>
-        <a xml:base="pseudo-netpath/seg/file.ext"></a>
-        <b xml:base="pseudo-netpath/seg/file.ext"></b>
-        <c xml:base="yes/pseudo-netpath/seg/file.ext"></c>
-        <d xml:base="yes"></d>
-        <e xml:base="yes/"></e>
-        <f xml:base="yes/"></f>
-        <g xml:base="../../../"></g>
-        <h xml:base="../"></h>
-        <i></i>
-        <j></j>
-        <k xml:base="/a/g"></k>
-        <l xml:base="mid/6"></l>
-        <m xml:base="../../../"></m>
-        <n xml:base="../"></n>
-        <o xml:base="..yes/..yes"></o>
-        <p xml:base="..yes/..yes/"></p>
-        <q xml:base="../../"></q>
+        <a xml:base="no/.././/pseudo-netpath/seg/file.ext"></a>
+        <b xml:base="no/..//.///pseudo-netpath/seg/file.ext"></b>
+        <c xml:base="yes/no//..//.///pseudo-netpath/seg/file.ext"></c>
+        <d xml:base="no/../yes"></d>
+        <e xml:base="no/../yes/"></e>
+        <f xml:base="no/../yes/no/.."></f>
+        <g xml:base="../../no/../.."></g>
+        <h xml:base="no/../.."></h>
+        <i xml:base="no/.."></i>
+        <j xml:base="no/../"></j>
+        <k xml:base="/a/b/c/./../../g"></k>
+        <l xml:base="mid/content=5/../6"></l>
+        <m xml:base="../../.."></m>
+        <n xml:base="no/../../"></n>
+        <o xml:base="..yes/..no/..no/..no/../../../..yes"></o>
+        <p xml:base="..yes/..no/..no/..no/../../../..yes/"></p>
+        <q xml:base="../.."></q>
         <r xml:base="../../../"></r>
-        <s></s>
-        <t></t>
-        <u></u>
-        <v xml:base="/"></v>
-        <w xml:base="../../"></w>
-        <x xml:base="../../"></x>
-        <y xml:base="yes/"></y>
-        <z xml:base="yes/"></z>
-        <aa xml:base="yes/"></aa>
-        <bb xml:base="yes/yes/"></bb>
-        <cc xml:base="yes/yes"></cc>
-        <dd xml:base="yes/yes/"></dd>
-        <ee xml:base="/"></ee>
-        <ff xml:base="/yes/"></ff>
-        <gg xml:base="/yes/"></gg>
-        <hh xml:base="/yes/"></hh>
-        <ii xml:base="../../"></ii>
-        <jj xml:base="../../"></jj>
-        <kk xml:base="..yes/"></kk>
-        <ll xml:base="..yes/"></ll>
-        <mm xml:base="..yes/"></mm>
-        <nn xml:base="..yes/..yes/"></nn>
-        <oo xml:base="/"></oo>
-        <pp xml:base="/..yes/"></pp>
-        <qq xml:base="/..yes/"></qq>
-        <rr xml:base="/..yes/"></rr>
+        <s xml:base="."></s>
+        <t xml:base="./"></t>
+        <u xml:base="./."></u>
+        <v xml:base="//no/.."></v>
+        <w xml:base="../../no/.."></w>
+        <x xml:base="../../no/../"></x>
+        <y xml:base="yes/no/../"></y>
+        <z xml:base="yes/no/no/../.."></z>
+        <aa xml:base="yes/no/no/no/../../.."></aa>
+        <bb xml:base="yes/no/../yes/no/no/../.."></bb>
+        <cc xml:base="yes/no/no/no/../../../yes"></cc>
+        <dd xml:base="yes/no/no/no/../../../yes/"></dd>
+        <ee xml:base="/no/../"></ee>
+        <ff xml:base="/yes/no/../"></ff>
+        <gg xml:base="/yes/no/no/../.."></gg>
+        <hh xml:base="/yes/no/no/no/../../.."></hh>
+        <ii xml:base="../../..no/.."></ii>
+        <jj xml:base="../../..no/../"></jj>
+        <kk xml:base="..yes/..no/../"></kk>
+        <ll xml:base="..yes/..no/..no/../.."></ll>
+        <mm xml:base="..yes/...no/..no/..no/../../.."></mm>
+        <nn xml:base="..yes/..no/../..yes/..no/..no/../.."></nn>
+        <oo xml:base="/..no/../"></oo>
+        <pp xml:base="/..yes/..no/../"></pp>
+        <qq xml:base="/..yes/..no/..no/../.."></qq>
+        <rr xml:base="/..yes/..no/..no/..no/../../.."></rr>
         <ss xml:base="/"></ss>
-        <tt xml:base="/"></tt>
-        <uu xml:base="/"></uu>
-        <vv xml:base="/"></vv>
-        <ww xml:base="/"></ww>
-        <xx xml:base="/"></xx>
-        <yy xml:base="/"></yy>
-        <zz xml:base="/"></zz>
-        <aaa xml:base="/"></aaa>
-        <bbb xml:base="/"></bbb>
-        <ccc xml:base="/"></ccc>
-        <ddd xml:base="/"></ddd>
-        <eee xml:base="/"></eee>
-        <fff xml:base="/"></fff>
-        <ggg xml:base="/"></ggg>
-        <hhh></hhh>
-        <iii></iii>
-        <jjj></jjj>
-        <kkk xml:base="../"></kkk>
+        <tt xml:base="/."></tt>
+        <uu xml:base="/./"></uu>
+        <vv xml:base="/./."></vv>
+        <ww xml:base="/././"></ww>
+        <xx xml:base="/.."></xx>
+        <yy xml:base="/../.."></yy>
+        <zz xml:base="/../../.."></zz>
+        <aaa xml:base="/../../.."></aaa>
+        <bbb xml:base="//.."></bbb>
+        <ccc xml:base="//..//.."></ccc>
+        <ddd xml:base="//..//..//.."></ddd>
+        <eee xml:base="/./.."></eee>
+        <fff xml:base="/./.././.."></fff>
+        <ggg xml:base="/./.././.././.."></ggg>
+        <hhh xml:base="."></hhh>
+        <iii xml:base="./"></iii>
+        <jjj xml:base="./."></jjj>
+        <kkk xml:base=".."></kkk>
         <lll xml:base="../"></lll>
 </doc>]]></assert-string-value>
         </result>
@@ -4223,6 +4244,243 @@ Second line</text>
         <test>serialize({'a':1, 'v':2, 'r':5, 'h':7}, map{'method':'adaptive'})</test>
         <result>
             <assert-eq>'{"a":1,"v":2,"r":5,"h":7}'</assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-153" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <modified by="Michael Kay" on="2026-08-03" change="Don't use XML character references in XPath string literals"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out><in/></out>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'indent': true(), 'indent-unit': '  ' })
+        ]]></test>
+        <result>
+            <assert><![CDATA[contains($result, char(10)||'  <in/>')]]></assert>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-154" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <modified by="Michael Kay" on="2026-08-03" change="Don't use XML character references in XPath string literals"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out><in/></out>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'indent': true(), 'indent-unit': '\t' })
+        ]]></test>
+        <result>
+            <assert><![CDATA[contains($result, char(10)||char(9)||'<in/>')]]></assert>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-155" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out a='1' b='2'/>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'indent': true(), 'indent-attributes': true() })
+        ]]></test>
+        <result>
+            <assert><![CDATA[matches($result, '^<out\s+a=.1.\s+b=.2.\s*/>')]]></assert>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-156" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <modified by="Michael Kay" on="2026-08-03" change="Don't use XML character references in XPath string literals"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out>x"||char(10)||"y</out>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'line-ending': '\r\n' })
+        ]]></test>
+        <result>
+            <assert-eq><![CDATA["<out>x"||char(13)||char(10)||"y</out>"]]></assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-157" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <modified by="Michael Kay" on="2026-08-03" change="Don't use XML character references in XPath string literals"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out>x"||char(10)||"y</out>"),
+              { 'method': 'xml', 'omit-xml-declaration': true(), 'line-ending': "&#xD;" })
+        ]]></test>
+        <result>
+            <assert-eq><![CDATA["<out>x" || char(13) || "y</out>"]]></assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-158" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out/>"), { 'method': 'xml', 'indent-unit': 4 })
+        ]]></test>
+        <result>
+            <any-of>
+                <!-- wrong type -->
+                <error code="XPTY0004"/>
+                <!-- coerced to a string, the value does not match the allowed pattern -->
+                <error code="SEPM0016"/>
+            </any-of>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-159" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out/>"), { 'method': 'xml', 'indent-unit': 'x' })
+        ]]></test>
+        <result>
+            <error code="SEPM0016"/>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-160" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out/>"), { 'method': 'xml', 'line-ending': 10 })
+        ]]></test>
+        <result>
+            <any-of>
+                <!-- wrong type -->
+                <error code="XPTY0004"/>
+                <!-- coerced to a string, the value does not match the allowed pattern -->
+                <error code="SEPM0016"/>
+            </any-of>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-161" covers-40="PR2719">
+        <description>Test the serialization parameters indent-unit, indent-attributes and line-ending</description>
+        <created by="Christian Gruen" on="2026-07-21"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-xml("<out/>"), { 'method': 'xml', 'line-ending': '\n\n' })
+        ]]></test>
+        <result>
+            <error code="SEPM0016"/>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-csv-001" covers-40="PR2794">
+        <description>Test the CSV serialization method</description>
+        <created by="Christian Gruen" on="2026-08-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(([ "a", "b" ], [ "c", "d" ]), { 'method': 'csv' })
+        ]]></test>
+        <result>
+            <assert-eq><![CDATA["a,b&#xA;c,d&#xA;"]]></assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-csv-002" covers-40="PR2794">
+        <description>Test the CSV serialization method</description>
+        <created by="Christian Gruen" on="2026-08-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-csv("a,b&#xA;c,d", { 'header': true() }),
+              { 'method': 'csv', 'csv-header': true() })
+        ]]></test>
+        <result>
+            <assert-eq><![CDATA["a,b&#xA;c,d&#xA;"]]></assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-csv-003" covers-40="PR2794">
+        <description>Test the CSV serialization method</description>
+        <created by="Christian Gruen" on="2026-08-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(parse-csv("a,b&#xA;c,d", { 'header': true() }), { 'method': 'csv' })
+        ]]></test>
+        <result>
+            <assert-eq><![CDATA["c,d&#xA;"]]></assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-csv-004" covers-40="PR2794">
+        <description>Test the CSV serialization method</description>
+        <created by="Christian Gruen" on="2026-08-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize([ "a;b", 'c"d' ],
+              { 'method': 'csv', 'csv-separator': ';', 'csv-quote-character': '"' })
+        ]]></test>
+        <result>
+            <assert-eq><![CDATA['"a;b";"c""d"&#xA;']]></assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-csv-005" covers-40="PR2794">
+        <description>Test the CSV serialization method</description>
+        <created by="Christian Gruen" on="2026-08-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize([ "a" ], { 'method': 'csv', 'use-character-maps': { 'a': 'X' } })
+        ]]></test>
+        <result>
+            <assert-eq><![CDATA["X&#xA;"]]></assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-csv-006" covers-40="PR2794">
+        <description>Test the CSV serialization method</description>
+        <created by="Christian Gruen" on="2026-08-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize([ [ "a" ] ], { 'method': 'csv' })
+        ]]></test>
+        <result>
+            <error code="SERE0025"/>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-csv-007" covers-40="PR2794">
+        <description>Test the CSV serialization method</description>
+        <created by="Christian Gruen" on="2026-08-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize({ 'columns': "a" }, { 'method': 'csv', 'csv-header': true() })
+        ]]></test>
+        <result>
+            <error code="SERE0025"/>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-csv-008" covers-40="PR2794">
+        <description>Test the CSV serialization method</description>
+        <created by="Christian Gruen" on="2026-08-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize([ "a" ], { 'method': 'csv', 'csv-separator': 'ab' })
+        ]]></test>
+        <result>
+            <error code="SEPM0016"/>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-csv-009" covers-40="PR2794">
+        <description>Test the CSV serialization method</description>
+        <created by="Christian Gruen" on="2026-08-12"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize([ "a" ], { 'method': 'csv', 'csv-separator': ',', 'csv-quote-character': ',' })
+        ]]></test>
+        <result>
+            <error code="SEPM0016"/>
         </result>
     </test-case>
 

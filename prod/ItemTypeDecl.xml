@@ -4,6 +4,13 @@
    <description>Tests for item type declarations: 4.0 proposal</description>
    <link type="spec" document="http://www.w3.org/TR/xpath-functions-11/"
          idref="func-abs"/>
+   
+   <environment name="user-defined-types">
+      <schema uri="http://www.w3.org/XQueryTest/userDefinedTypes" file="../docs/userdefined.xsd">
+         <description>A schema user defined types and constructor tests</description>
+         <created by="Anonymous" on="2006-04-03"/>
+      </schema>   
+   </environment>
          
    <dependency type="spec" value="XQ40+"/>
       
@@ -97,17 +104,18 @@
    
    <test-case name="itemTypeDecl-007" covers-40="PR1132">
       <description>local union type, used in variable declaration, forwards reference
-         (not allowed)</description>
+         (now allowed)</description>
       <created by="Michael Kay" on="2023-09-08"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <modified by="Gunther Rademacher" on="2024-08-05" change="change expected error to XPST0051"/>
+      <modified by="Michael Kay" on="2026-06-29" change="forward reference is now allowed"/>
       <test><![CDATA[
          declare variable $fred as local:int-or-string := 17;
          declare type local:int-or-string as (xs:integer | xs:string);     	
       	$fred
       ]]></test>
       <result>
-         <error code="XPST0051"/>
+         <assert-eq>17</assert-eq>
       </result>
    </test-case>
    
@@ -148,6 +156,7 @@
       <created by="Michael Kay" on="2023-09-08"/>
       <modified by="Michael Kay" on="2024-04-10" change="change local union type syntax"/>
       <modified by="Gunther Rademacher" on="2024-08-05" change="change expected error to XPST0051"/>
+      <modified by="Michael Kay" on="2026-06-29" change="forward reference is now allowed"/>
       <test><![CDATA[
          declare function local:increment ($val as local:int-or-string) as xs:integer {
       	    if ($val instance of xs:integer) then $val + 1 else string-length($val) + 1
@@ -156,7 +165,7 @@
       	(local:increment(17), local:increment("two"))
       ]]></test>
       <result>
-         <error code="XPST0051"/>
+         <assert-deep-eq>18, 4</assert-deep-eq>
       </result>
    </test-case>
    
@@ -239,7 +248,7 @@
    </test-case>
    
    <test-case name="itemTypeDecl-017" covers-40="PR1908">
-      <description>Self-references are allowed</description>
+      <description>Self-references are not allowed</description>
       <created by="Michael Kay" on="2025-03-31"/>
       <test><![CDATA[
          declare variable $cplx as local:complex-number := {'real': 0, 'imag': 1};
@@ -265,9 +274,904 @@
       </result>
    </test-case>
    
- 
- 
+   <test-case name="itemTypeDecl-019" covers-40="PR1908">
+      <description>Forwards references are allowed: multiple indirection</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare variable $cplx as local:complex-number := {'real': 0, 'imag': 1};
+         declare type local:complex-number as local:complex-number2;
+         declare type local:complex-number2 as local:complex-number3;
+         declare type local:complex-number3 as local:complex-number4;
+         declare type local:complex-number4 as local:complex-number5;
+         declare type local:complex-number5 as map(*);
+      	`{$cplx?real} + {$cplx?imag}i`
+      ]]></test>
+      <result>
+         <assert-eq>"0 + 1i"</assert-eq>
+      </result>
+   </test-case>
    
- 
+   <test-case name="itemTypeDecl-020" covers-40="PR1908">
+      <description>Map key type must be atomic</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare variable $cplx as map(local:key-type, item()*) := {'real': 0, 'imag': 1};
+         declare type local:key-type as element(*);
+      	`{$cplx?real} + {$cplx?imag}i`
+      ]]></test>
+      <result>
+         <error code="XPST0152"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-021" covers-40="PR1908">
+      <description>Map key type must be atomic</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare variable $cplx as map(local:key-type, item()*) := {'real': 0, 'imag': 1};
+         declare type local:key-type as xs:string;
+      	`{$cplx?real} + {$cplx?imag}i`
+      ]]></test>
+      <result>
+         <assert-eq>"0 + 1i"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-022" covers-40="PR1908">
+      <description>Map key type must be atomic</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare variable $cplx as map(local:key-type, item()*) := {'real': 0, 'imag': 1};
+         declare type local:key-type as enum('real', 'imag');
+      	`{$cplx?real} + {$cplx?imag}i`
+      ]]></test>
+      <result>
+         <assert-eq>"0 + 1i"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-023" covers-40="PR1908">
+      <description>Forward reference in let clause</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f() {
+            let $x as local:x-type := xs:date('2026-06-30')
+            return string($x)
+         };   
+         declare type local:x-type as (xs:date | xs:time);
+      	local:f()
+      ]]></test>
+      <result>
+         <assert-eq>'2026-06-30'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-024" covers-40="PR1908">
+      <description>Forward reference in group by clause</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f() {
+            for $x in 1 to 1000
+            group by $g as local:group-type+ := $x mod 50
+            return count($x)
+         };   
+         declare type local:group-type as xs:long;
+      	local:f() => distinct-values()
+      ]]></test>
+      <result>
+         <assert-eq>20</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-025" covers-40="PR1908">
+      <description>Forward reference in cast expression</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f() {
+            '2026-06-30' cast as local:x-type
+         };   
+         declare type local:x-type as (xs:date | xs:time);
+      	local:f()
+      ]]></test>
+      <result>
+         <assert-eq>xs:date('2026-06-30')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-026" covers-40="PR1908">
+      <description>Forward reference in constructor function</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f() {
+             local:x-type('2026-06-30')
+         };   
+         declare type local:x-type as (xs:date | xs:time);
+      	local:f()
+      ]]></test>
+      <result>
+         <assert-eq>xs:date('2026-06-30')</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-027" covers-40="PR1908">
+      <description>Error, duplicate type names</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[  
+         declare type local:a as (xs:date | xs:time);
+         declare type local:b as (xs:date | xs:time);
+         declare type local:c as (xs:date | xs:time);
+         declare type local:d as (xs:date | xs:time);
+         declare type local:elephant as (xs:date | xs:time);
+         declare type local:f as (xs:date | xs:time);
+         declare type local:g as (xs:date | xs:time);
+         declare type local:h as (xs:date | xs:time);
+         declare type local:i as (xs:date | xs:time);
+         declare type local:j as (xs:date | xs:time);
+         declare type local:elephant as (xs:date | xs:time | xs:dateTime | xs:integer);
+      	let $x as local:elephant := trunk(1 to 100) return $x + 1
+      ]]></test>
+      <result>
+         <error code="XQST0146"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-028">
+      <description> Item type references a user-defined type in a schema. </description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <environment ref="user-defined-types"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test>
+         import schema namespace myType="http://www.w3.org/XQueryTest/userDefinedTypes";
+         declare type local:Q as myType:QNameBased;
+         let $var := myType:QNameBased("value1") return $var instance of local:Q
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-029" covers-40="PR1908">
+      <description>Error, duplicate type names</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <environment ref="user-defined-types"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test><![CDATA[  
+         import schema namespace myType="http://www.w3.org/XQueryTest/userDefinedTypes";
+         declare type myType:QNameBased as xs:QName;
+         42
+      ]]></test>
+      <result>
+         <error code="XQST0146"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-030" covers-40="PR1908">
+      <description> Reference public item type in library module </description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <module uri="http://example.ns/module1" file="ItemTypeDecl/module1.xq"/>
+      <test>
+        import module namespace mod1="http://example.ns/module1"; 
+        declare variable $temp as mod1:chrono := xs:date('2026-06-30');
+        $temp => string()
+      </test>
+      <result>
+         <assert-eq>'2026-06-30'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-031" covers-40="PR1908">
+      <description> Reference private item type in library module </description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <module uri="http://example.ns/module1" file="ItemTypeDecl/module1.xq"/>
+      <test>
+         import module namespace mod1="http://example.ns/module1"; 
+         declare variable $temp as mod1:extended-chrono := xs:date('2026-06-30');
+         $temp => string()
+      </test>
+      <result>
+         <error code="XPST0051"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-032" covers-40="PR1908">
+      <description> item type in library module is both %public and %private </description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <module uri="http://example.ns/module2" file="ItemTypeDecl/module2.xq"/>
+      <test>
+         import module namespace mod2="http://example.ns/module2"; 
+         declare variable $temp as mod2:extended-chrono := xs:date('2026-06-30');
+         $temp => string()
+      </test>
+      <result>
+         <error code="XQST0106"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-033" covers-40="PR1908">
+      <description> Name clash with public item type in library module </description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <module uri="http://example.ns/module1" file="ItemTypeDecl/module1.xq"/>
+      <test>
+         import module namespace mod1="http://example.ns/module1"; 
+         declare variable $temp as mod1:chrono := xs:date('2026-06-30');
+         declare type mod1:chrono as xs:integer;
+         $temp => string()
+      </test>
+      <result>
+         <error code="XQST0146"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-034" covers-40="PR1908">
+      <description> item type in library module is not in module namespace </description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <module uri="http://example.ns/module3" file="ItemTypeDecl/module3.xq"/>
+      <test>
+         import module namespace mod3="http://example.ns/module3"; 
+         declare variable $temp as mod3:chrono := xs:date('2026-06-30');
+         $temp => string()
+      </test>
+      <result>
+         <error code="XQST0048"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-035" covers-40="PR1908">
+      <description> Reference implicitly public item type in library module </description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <module uri="http://example.ns/module1" file="ItemTypeDecl/module1.xq"/>
+      <test>
+         import module namespace mod1="http://example.ns/module1"; 
+         declare variable $temp as mod1:numeric := 42;
+         $temp => string()
+      </test>
+      <result>
+         <assert-eq>'42'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-036" covers-40="PR1908">
+      <description> Reference public variable with a private item type in library module </description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <module uri="http://example.ns/module1" file="ItemTypeDecl/module1.xq"/>
+      <test>
+         import module namespace mod1="http://example.ns/module1"; 
+         year-from-dateTime($mod1:now) idiv 2000
+      </test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-037" covers-40="PR1908">
+      <description>Forward reference in treat as expression</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f($x) {
+             $x treat as local:x-type
+         };   
+         declare type local:x-type as (xs:date | xs:time);
+      	local:f(xs:time('12:00:00')) => string()
+      ]]></test>
+      <result>
+         <assert-eq>'12:00:00'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-038" covers-40="PR1908">
+      <description>Forward reference in instance of expression</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f($x) {
+             $x instance of local:x-type
+         };   
+         declare type local:x-type as (xs:date | xs:time);
+      	local:f(xs:time('12:00:00'))
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-039" covers-40="PR1908">
+      <description>Backward reference in typeswitch expression</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[        
+         declare type local:integer as xs:integer;
+         declare type local:boolean as xs:boolean;
+         declare type local:string as xs:string;
+         declare type local:double as xs:double;
+         declare type local:duration as xs:duration;
+         declare function local:f($x) {
+             typeswitch ($x) {
+               case local:integer | local:double return "N"
+               case local:boolean return "B"
+               case local:duration return "D"
+               default return "?"
+             }
+         };   
+      	local:f(42)
+      ]]></test>
+      <result>
+         <assert-eq>'N'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-040" covers-40="PR1908">
+      <description>Forward reference in typeswitch expression</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f($x) {
+             typeswitch ($x) {
+               case local:integer | local:double return "N"
+               case local:boolean return "B"
+               case local:duration return "D"
+               default return "?"
+             }
+         };   
+         declare type local:integer as xs:integer;
+         declare type local:boolean as xs:boolean;
+         declare type local:string as xs:string;
+         declare type local:double as xs:double;
+         declare type local:duration as xs:duration;
+      	local:f(42)
+      ]]></test>
+      <result>
+         <assert-eq>'N'</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-041" covers-40="PR1908">
+      <description>Forward reference in record definition</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f() as record(a as local:integer+, b as local:boolean+) {
+             {'a': 23, 'b': (true(), false())}
+         };   
+         declare type local:integer as xs:integer;
+         declare type local:boolean as xs:boolean;
+         declare type local:string as xs:string;
+         declare type local:double as xs:double;
+         declare type local:duration as xs:duration;
+      	local:f()?a
+      ]]></test>
+      <result>
+         <assert-eq>23</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-042" covers-40="PR1908 PR2566">
+      <description>Forward reference in JNode type</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="PR2566"/>
+      <test><![CDATA[
+         declare function local:f() as jnode(*, record(a as local:integer+, b as local:boolean+))* {
+             let $p as record(a as local:integer+, b as local:boolean+) := {'a': 32, 'b': true()}
+             let $q as record(a as local:integer+, b as local:boolean+) := {'a': 23, 'b': (true(), false())}
+             return [$p, $q]/child::*
+         };
+         declare type local:integer as xs:integer;
+         declare type local:boolean as xs:boolean;
+         declare type local:string as xs:string;
+         declare type local:double as xs:double;
+         declare type local:duration as xs:duration;
+      	local:f()?a
+      ]]></test>
+      <result>
+         <assert-deep-eq>32, 23</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-043" covers-40="PR1908">
+      <description>Forward reference in inline function declaration</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[
+         declare function local:f1($s as local:string) as local:boolean {
+             let $f := fn($x as local:string) as local:integer { string-length($x) }
+             return $f($s) eq 4
+         };   
+         declare type local:integer as xs:integer;
+         declare type local:boolean as xs:boolean;
+         declare type local:string as xs:string;
+         declare type local:double as xs:double;
+         declare type local:duration as xs:duration;
+      	local:f1("abcd")
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-044" covers-40="PR1908">
+      <description> Reference public item type with a reference to a private item type in library module </description>
+      <created by="Michael Kay" on="2026-07-02"/>
+      <module uri="http://example.ns/module4" file="ItemTypeDecl/module4.xq"/>
+      <test>
+         import module namespace mod4="http://example.ns/module4"; 
+         { "r1": $mod4:dateNow(),
+           "r2": $mod4:timeNow(),
+           "r3": let $x as mod4:chronoSupplier := current-date#0 return $x(),
+           "r4": let $x as mod4:chronoSupplier := current-time#0 return $x()
+         }  
+      </test>
+      <result>
+         <all-of>
+            <assert>$result?r1 instance of xs:date</assert>
+            <assert>$result?r2 instance of xs:time</assert>
+            <assert>$result?r3 instance of xs:date</assert>
+            <assert>$result?r4 instance of xs:time</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-045" covers-40="PR1908">
+      <description> Private item type in library module has same name as item type in main module</description>
+      <created by="Michael Kay" on="2026-07-02"/>
+      <module uri="http://example.ns/module4" file="ItemTypeDecl/module4.xq"/>
+      <test>
+         import module namespace mod4="http://example.ns/module4";
+         declare %private type mod4:dateSupplier as element(foo);        
+         declare %private type mod4:timeSupplier as element(bar);
+         let $provider as mod4:dateTimeSupplier := $mod4:dateTimeNow
+         let $dt := $provider()
+         let ${$date, $time} := $dt
+         return
+         { "r1": $date() instance of xs:date,
+           "r2": $time() instance of xs:time
+         }  
+      </test>
+      <result>
+         <all-of>
+            <assert>$result?r1</assert>
+            <assert>$result?r2</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-046" covers-40="PR2759">
+      <description>Constructor function is created for an atomic type</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[   
+         declare type local:x-type as xs:date;
+      	local:x-type(current-date())
+      ]]></test>
+      <result>
+         <assert-type>xs:date</assert-type>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-047" covers-40="PR2759">
+      <description>Constructor function is created for a generalized atomic type</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[   
+            declare type local:x-type as (xs:date | xs:time);
+         	local:x-type(current-date())
+         ]]></test>
+      <result>
+         <assert-type>xs:date</assert-type>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-048" covers-40="PR2759">
+      <description>Constructor function is created for a generalized atomic type</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[   
+            declare type local:city as enum('London', 'Paris', 'Berlin');
+         	local:city('Paris')
+         ]]></test>
+      <result>
+         <assert-eq>"Paris"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-049" covers-40="PR2759">
+      <description>Constructor function is created for a record type</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:integer);
+         	local:info('Paris', 23)
+         ]]></test>
+      <result>
+         <all-of>
+            <assert>$result?name eq 'Paris'</assert>
+            <assert>$result?size eq 23</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-050" covers-40="PR2759">
+      <description>Constructor function is created for a record type</description>
+      <created by="Michael Kay" on="2026-06-30"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:integer);
+         	local:info(size := 23, name := 'Paris')
+         ]]></test>
+      <result>
+         <all-of>
+            <assert>$result?name eq 'Paris'</assert>
+            <assert>$result?size eq 23</assert>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-051" covers-40="PR2759">
+      <description>Constructor function for an enum type</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:continent as enum('Africa', 'America', 'Asia', 'Australia', 'Europe');
+         local:continent('Africa')
+      ]]></test>
+      <result>
+         <assert-eq>'Africa'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-052" covers-40="PR2759">
+      <description>Constructor function for an enum type, invalid value</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:continent as enum('Africa', 'America', 'Asia', 'Australia', 'Europe');
+         local:continent('Atlantis')
+      ]]></test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-053" covers-40="PR2759">
+      <description>Constructor function for a record type</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:point as record(x as xs:integer, y as xs:integer);
+         let $p := local:point(1, 2)
+         return ($p?x, $p?y)
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-054" covers-40="PR2759">
+      <description>Constructor function for a record type, instance of</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:point as record(x as xs:integer, y as xs:integer);
+         local:point(1, 2) instance of local:point
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-055" covers-40="PR2759">
+      <description>Constructor function for an atomic type</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:count as xs:integer;
+         local:count('42')
+      ]]></test>
+      <result>
+         <assert-eq>42</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-056" covers-40="PR2759">
+      <description>Constructor function for an atomic type, invalid value</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:count as xs:integer;
+         local:count('x')
+      ]]></test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-057" covers-40="PR2759">
+      <description>Constructor function for a union type</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:num as xs:numeric;
+         local:num('1.5') instance of xs:double
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-058" covers-40="PR2759">
+      <description>Constructor function is visible to fn:function-lookup</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:count as xs:integer;
+         function-lookup(xs:QName('local:count'), 1)('42')
+      ]]></test>
+      <result>
+         <assert-eq>42</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-059" covers-40="PR2759">
+      <description>No constructor function for a non-atomic, non-record type</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:e as element(foo);
+         local:e('x')
+      ]]></test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-060" covers-40="PR2759">
+      <description>Constructor function, overlapping arity with a user-defined function</description>
+      <created by="Christian Gruen" on="2026-07-10"/>
+      <test><![CDATA[
+         declare type local:foo as xs:integer;
+         declare function local:foo($x) { $x };
+         1
+      ]]></test>
+      <result>
+         <error code="XQST0034"/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-061" covers-40="PR2713">
+      <description>item type in no namespace, used in instance of</description>
+      <created by="Christian Gruen" on="2026-07-14"/>
+      <test><![CDATA[
+         declare type color as enum('red', 'green', 'blue');
+         'red' instance of color
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-062" covers-40="PR2713">
+      <description>item type in no namespace, non-member value</description>
+      <created by="Christian Gruen" on="2026-07-14"/>
+      <test><![CDATA[
+         declare type color as enum('red', 'green', 'blue');
+         'pink' instance of color
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-063" covers-40="PR2713 PR2759">
+      <description>constructor function for an item type in no namespace</description>
+      <created by="Christian Gruen" on="2026-07-14"/>
+      <test><![CDATA[
+         declare type color as enum('red', 'green', 'blue');
+         color('red')
+      ]]></test>
+      <result>
+         <assert-eq>'red'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-064" covers-40="PR2713 PR2759">
+      <description>constructor function in no namespace is found before the default function namespace</description>
+      <created by="Christian Gruen" on="2026-07-14"/>
+      <test><![CDATA[
+         declare type count as xs:integer;
+         count('42')
+      ]]></test>
+      <result>
+         <assert-eq>42</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="itemTypeDecl-065" covers-40="PR2713">
+      <description>default element namespace applies to the declared item type name</description>
+      <created by="Christian Gruen" on="2026-07-14"/>
+      <test><![CDATA[
+         declare default element namespace 'http://example.com/ns';
+         declare namespace e = 'http://example.com/ns';
+         declare type color as enum('red', 'green', 'blue');
+         'red' instance of e:color
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-066" covers-40="PR2759">
+      <description>Constructor function for a record type does type checking</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:integer);
+         	local:info('Paris', 14.2)
+         ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-067" covers-40="PR2759">
+      <description>Constructor function for a record type does type checking</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:integer+);
+         	local:info('Paris', ())
+         ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-068" covers-40="PR2759">
+      <description>Constructor function for a record type does type coercion</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:double);
+         	local:info('Paris', 18)?size
+         ]]></test>
+      <result>
+         <all-of>
+            <assert-eq>18.0e0</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-069" covers-40="PR2759">
+      <description>Constructor function for a record type does type coercion</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:double);
+         	local:info('Paris', [18])?size
+         ]]></test>
+      <result>
+         <all-of>
+            <assert-eq>18.0e0</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-070" covers-40="PR2759">
+      <description>Constructor function conflict with explicit function</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:double);
+            declare function local:info ($n, $s) as xs:string {
+               $n || $s
+            };
+         	local:info('Paris', [18])?size
+         ]]></test>
+      <result>
+         <error code="XQST0034"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-071" covers-40="PR2759">
+      <description>Constructor function conflict with explicit function</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare function local:info ($n, $s) as xs:string {
+               $n || $s
+            };
+            declare type local:info as record(name as xs:string, size as xs:double);
+         	local:info('Paris', [18])?size
+         ]]></test>
+      <result>
+         <error code="XQST0034"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-072" covers-40="PR2759">
+      <description>Name conflict with reserved namespace</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type fn:info as record(name as xs:string, size as xs:double);
+         	23
+         ]]></test>
+      <result>
+         <error code="XQST0045"/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-073" covers-40="PR2759">
+      <description>No-namespace record type and function</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type Q{}info as record(name as xs:string, size as xs:double);
+         	Q{}info('Paris', 18)?size
+         ]]></test>
+      <result>
+         <all-of>
+            <assert-eq>18.0e0</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-074" covers-40="PR2759">
+      <description>No-namespace record type and function</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type Q{}info as record(name as xs:string, size as xs:double);
+         	function-name(Q{}info#2)
+         ]]></test>
+      <result>
+         <assert-eq>fn:QName("", "info")</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-075" covers-40="PR2759">
+      <description>instance of named record type</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:double);
+         	local:info#2 instance of function(xs:string, xs:double) as local:info
+         ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-076" covers-40="PR2759">
+      <description>Call constructor function for a record type using keywords</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type local:info as record(name as xs:string, size as xs:double);
+         	local:info(size := 18, name := 'Paris') -> `{?name}:{?size}`
+         ]]></test>
+      <result>
+         <assert-eq>"Paris:18"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-077" covers-40="PR2759">
+      <description>Constructor function for a record type with non-NCName keywords</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type person as record("first name" as xs:string, "last name" as xs:string);
+         	person("Michael", "Kay") -> `{?"first name"} {?"last name"}`
+         ]]></test>
+      <result>
+         <assert-eq>"Michael Kay"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-078" covers-40="PR2759">
+      <description>Constructor function for a record type whose fields have no declared type</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type person as record(first, last);
+         	person("Michael", "Kay") -> `{?first} {?last}`
+         ]]></test>
+      <result>
+         <assert-eq>"Michael Kay"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-079" covers-40="PR2759">
+      <description>Empty string is a permitted field name</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type person as record(first, "", last);
+         	person("Barack", "Hussein", "Obama") -> `{?first} {?""} {?last}`
+         ]]></test>
+      <result>
+         <assert-eq>"Barack Hussein Obama"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="itemTypeDecl-080" covers-40="PR2759">
+      <description>Fields of record type must have distinct names</description>
+      <created by="Michael Kay" on="2026-07-20"/>
+      <test><![CDATA[   
+            declare type person as record("", "");
+         	person("Michael", "Kay") -> `{?first} {?last}`
+         ]]></test>
+      <result>
+         <error code="XPST0021"/>
+      </result>
+   </test-case>
+
 
 </test-set>

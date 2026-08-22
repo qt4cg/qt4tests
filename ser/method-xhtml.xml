@@ -1255,4 +1255,119 @@ return [ $html ]
   
   
  
+  <test-case name="Serialization-xhtml-69" covers-40="PR2719">
+    <description>Test the XHTML serialization parameters indent-unit and line-ending</description>
+    <created by="Christian Gruen" on="2026-07-21"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "xhtml";
+      declare option output:omit-xml-declaration "yes";
+      declare option output:indent "yes";
+      declare option output:indent-unit "\t";
+      <out><in>x</in></out>
+    ]]></test>
+    <result>
+      <serialization-matches><![CDATA[^<out>\r?\n\t<in>x</in>]]></serialization-matches>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-xhtml-70" covers-40="PR2719">
+    <description>Test the XHTML serialization parameters indent-unit and line-ending</description>
+    <created by="Christian Gruen" on="2026-07-21"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "xhtml";
+      declare option output:omit-xml-declaration "yes";
+      declare option output:indent "no";
+      declare option output:line-ending "\r\n";
+      <out>{ "x&#xA;y" }</out>
+    ]]></test>
+    <result>
+      <serialization-matches><![CDATA[^<out>x\r\ny</out>]]></serialization-matches>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-xhtml-71" covers-40="PR1977">
+    <description>Test the XHTML output method with HTML5</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "xhtml";
+      declare option output:indent "no";
+      <html xmlns="http://www.w3.org/1999/xhtml"><body><br/><basefont/></body></html>
+    ]]></test>
+    <result>
+      <serialization-matches><![CDATA[<body><br/><basefont></basefont></body>]]></serialization-matches>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-xhtml-72" covers-40="PR1977">
+    <description>Test the XHTML output method with HTML5</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "xhtml";
+      declare option output:indent "no";
+      <html xmlns="http://www.w3.org/1999/xhtml"><body/></html>
+    ]]></test>
+    <result>
+      <serialization-matches><![CDATA[<!DOCTYPE html><html]]></serialization-matches>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-xhtml-73" covers-40="PR2822">
+    <description>Test the XHTML output method with HTML5</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare namespace one = "http://ns.example.com";
+      declare option output:method "xhtml";
+      declare option output:indent "no";
+      <html xmlns="http://www.w3.org/1999/xhtml"><one:h3>x</one:h3></html>
+    ]]></test>
+    <result>
+      <serialization-matches><![CDATA[<one:h3 xmlns:one="http://ns\.example\.com">x</one:h3>]]></serialization-matches>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-xhtml-74" covers-40="PR2822">
+    <description>Test the XHTML output method with HTML5</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare namespace one = "http://ns.example.com";
+      declare option output:method "xhtml";
+      declare option output:indent "no";
+      <one:h3 xmlns:x="http://www.w3.org/1999/xhtml">x</one:h3>
+    ]]></test>
+    <result>
+      <serialization-matches><![CDATA[<one:h3 xmlns:one="http://ns\.example\.com">x</one:h3>]]></serialization-matches>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-xhtml-75" covers-40="PR2822">
+    <description>Test the XHTML output method with HTML5</description>
+    <created by="Christian Gruen" on="2026-08-19"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare namespace one = "http://ns.example.com";
+      declare option output:method "xhtml";
+      declare option output:indent "no";
+      <one:h3 xmlns:x="http://www.w3.org/1999/xhtml" x:id="i">x</one:h3>
+    ]]></test>
+    <result>
+      <all-of>
+        <serialization-matches><![CDATA[xmlns:x="http://www\.w3\.org/1999/xhtml"]]></serialization-matches>
+        <serialization-matches><![CDATA[x:id="i"]]></serialization-matches>
+      </all-of>
+    </result>
+  </test-case>
+
 </test-set>

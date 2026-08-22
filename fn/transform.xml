@@ -877,13 +877,14 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style }
         <description>Transform using xsl:include with relative href, using options stylesheet-text and stylesheet-base-uri</description>
         <created by="Debbie Lockett" on="2015-03-11"/>
         <modified by="Debbie Lockett" on="2022-08-26" change="Remove XQ31+ dependency; use default XQ31+ XP31+"/>
+        <modified by="Christian Gruen" on="2026-07-29" change="PR2213"/>
         <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
         <test><![CDATA[
             let $xsl  :="<xsl:stylesheet version='2.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>
                     <xsl:include href='transform/staticbaseuri.xsl'/>
                     </xsl:stylesheet>"
             return
-            fn:transform(map {"stylesheet-text" : $xsl, "initial-template" : QName('','main'), "stylesheet-base-uri": string(static-base-uri())})?output
+            fn:transform(map {"stylesheet-text" : $xsl, "initial-template" : QName('','main'), "stylesheet-base-uri": string(static-base-uri()), "trusted": true()})?output
             ]]></test>
         <result>
             <assert>contains($result/x,'fn/transform/staticbaseuri.xsl')</assert>
@@ -894,9 +895,10 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style }
         <description>Transform using xsl:include with relative href, using options stylesheet-node and stylesheet-base-uri</description>
         <created by="Debbie Lockett" on="2015-03-11"/>
         <modified by="Abel Braaksma" on="2016-09-22" change="use function-style map lookup"/>
+        <modified by="Christian Gruen" on="2026-07-29" change="PR2213"/>
         <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
         <environment ref="works-mod-local"/>
-        <test>fn:transform(map {"stylesheet-node" : $include, "source-node" : $works, "stylesheet-base-uri": string(base-uri($include))})("output")</test>
+        <test>fn:transform(map {"stylesheet-node" : $include, "source-node" : $works, "stylesheet-base-uri": string(base-uri($include)), "trusted": true()})("output")</test>
         <result>
             <assert>count($result//employee) > 0</assert>
         </result>
@@ -906,9 +908,10 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style }
         <description>Transform using xsl:include with relative href, with static base URI default from option stylesheet-node</description>
         <created by="Debbie Lockett" on="2015-03-11"/>
         <modified by="Abel Braaksma" on="2016-09-22" change="use function-style map lookup"/>
+        <modified by="Christian Gruen" on="2026-07-29" change="PR2213"/>
         <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
         <environment ref="works-mod-local"/>
-        <test>fn:transform(map {"stylesheet-node" : $include, "source-node" : $works})("output")</test>
+        <test>fn:transform(map {"stylesheet-node" : $include, "source-node" : $works, "trusted": true()})("output")</test>
         <result>
             <assert>count($result//employee) > 0</assert>
         </result>
@@ -1419,6 +1422,7 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
         <created by="Debbie Lockett" on="2015-04-13"/>
         <modified by="Abel Braaksma" on="2016-09-22" change="use function-style map lookup"/>
         <modified by="Michael Kay" on="2018-05-21" change="See bug 30209 regarding empty/absent principal result document"/>
+        <modified by="Christian Gruen" on="2026-07-29" change="skip empty result document"/>
         <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
         <environment ref="multiple-result-docs"/>
         <test>fn:transform(map {"stylesheet-node":$multipledocs, "source-node":$sections,
@@ -1430,7 +1434,7 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
                 <assert>contains(string-join(map:keys($result)), 'section1.html')</assert>
                 <assert>some $key in map:keys($result) satisfies ends-with($key,
                     'transform/sandbox/fn-transform-43/section3.html')</assert>
-                <assert><![CDATA[some $key in map:keys($result) satisfies parse-xml($result?($key))//h1 = 'Header for section 2']]></assert>
+                <assert><![CDATA[some $key in map:keys($result)[$result?(.) != ''] satisfies parse-xml($result?($key))//h1 = 'Header for section 2']]></assert>
             </all-of>
         </result>
     </test-case>
@@ -3211,16 +3215,20 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
         </description>
         <created by="Debbie Lockett" on="2015-03-11"/>
         <modified by="Debbie Lockett" on="2022-08-26" change="Remove XQ31+ dependency; use default XQ31+ XP31+"/>
+        <modified by="Christian Gruen" on="2026-07-29" change="PR2213"/>
         <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
         <test><![CDATA[
             let $xsl  :="<xsl:stylesheet version='2.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>
                     <xsl:include href='transform/staticbaseuri.xsl'/>
                     </xsl:stylesheet>"
             return
-            fn:transform(map {"stylesheet-text" : $xsl, "initial-template" : QName('','main')})?output
+            fn:transform(map {"stylesheet-text" : $xsl, "initial-template" : QName('','main'), "trusted": true()})?output
             ]]></test>
         <result>
-            <error code="XTSE0165"/>
+            <any-of>
+                <error code="XTSE0165"/>
+                <assert>exists($result/x)</assert>
+            </any-of>
         </result>
     </test-case>
 
@@ -3230,6 +3238,7 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
         <modified by="Michael Kay" on="2016-11-30" change="No longer an error : bug 30023"/>
         <modified by="Michael Kay" on="2018-09-23" change="As we were saying, this is no longer an error..."/>
         <modified by="Debbie Lockett" on="2022-08-26" change="Remove XQ31+ dependency; use default XQ31+ XP31+"/>
+        <modified by="Christian Gruen" on="2026-07-29" change="PR2213"/>
         <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
         <test><![CDATA[
             let $xsl  :="<xsl:stylesheet version='2.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>
@@ -3237,7 +3246,7 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
                     </xsl:stylesheet>"
             return
             fn:transform(map {"stylesheet-text" : $xsl, "initial-template" : QName('','main'),
-            "stylesheet-base-uri": "transform/include.xsl"
+            "stylesheet-base-uri": "transform/include.xsl", "trusted": true()
             })?output
             ]]></test>
         <result>
@@ -3415,6 +3424,7 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
     <test-case name="fn-transform-err-18">
         <description>Stylesheet params should be supplied as QNames, not strings</description>
         <created by="Michael Kay" on="2018-01-21"/>
+        <modified by="Christian Gruen" on="2026-07-22" change="failed coercion is a type error"/>
         <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
         <environment ref="works-mod-uri2"/>
         <test>let $result := fn:transform(map {"stylesheet-location" : $render, 
@@ -3422,7 +3432,7 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
                                                "stylesheet-params" : map{ "debug": true()}
                                           }) return $result?output</test>
         <result>
-            <error code="FOXT0002"/>
+            <error code="XPTY0004"/>
         </result>
     </test-case>
 

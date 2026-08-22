@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-location" covers-40="PR2839">
+   <description>Tests for the XPath 4.0 fn:location function</description>
+   
+   <test-case name="fn-location-001">
+      <description> Evaluation of the fn:location function with an undefined context node and no argument. </description>
+      <created by="Michael Kay" on="2026-08-18"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+        location()
+      </test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-location-002">
+      <description> Evaluation of the fn:location function applied to an empty sequence. </description>
+      <created by="Michael Kay" on="2026-08-18"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+        location()
+      </test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-location-003">
+      <description> Evaluation of the fn:location function applied to an element supplied as source. </description>
+      <created by="Michael Kay" on="2026-08-18"/>
+      <environment ref="works"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+        location(//employee[4])
+      </test>
+      <result>
+         <any-of>
+            <assert-empty/>
+            <all-of>
+               <assert>ends-with($result?system-id, 'works.xml') or empty($result?system-id)</assert>
+               <assert>empty($result?public-id)</assert>
+               <assert>$result?line-number = 18 or empty($result?line-number)</assert>
+               <assert>$result?column-number = (1 to 13) or empty($result?column-number)</assert>
+            </all-of>
+         </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-location-004">
+      <description> Evaluation of the fn:location function applied to an element obtained using doc(). </description>
+      <created by="Michael Kay" on="2026-08-18"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+        let $works := doc('../docs/works.xml', {'retain-location': true()})
+        return location($works//employee[4])
+      </test>
+      <result>
+         <any-of>
+            <assert-empty/>
+            <all-of>
+               <assert>ends-with($result?system-id, 'works.xml') or empty($result?system-id)</assert>
+               <assert>empty($result?public-id)</assert>
+               <assert>$result?line-number = 18 or empty($result?line-number)</assert>
+               <assert>$result?column-number = (1 to 13) or empty($result?column-number)</assert>
+            </all-of>
+         </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-location-005">
+      <description> Evaluation of the fn:location function applied to an element obtained using parse-xml(). </description>
+      <created by="Michael Kay" on="2026-08-18"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+        let $doc := parse-xml(`<a>{char(10)} <b/>{char(10)} <b/></a>`, {'retain-location': true()})
+        return location($doc//b[2])       
+      ]]></test>
+      <result>
+         <any-of>
+            <assert-empty/>
+            <all-of>
+               <assert>$result?line-number = 3 or empty($result?line-number)</assert>
+               <assert>$result?column-number = (2 to 5) or empty($result?column-number)</assert>
+            </all-of>
+         </any-of>
+      </result>
+   </test-case>
+   
+   
+   
+   
+   
+</test-set>

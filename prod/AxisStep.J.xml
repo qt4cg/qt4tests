@@ -853,7 +853,7 @@
    </test-case>
    
    <test-case name="JAxes-202" covers-40="PR2667">
-      <description> Use /{...} with maps: strings, exlicit child axis, multiple keys </description>
+      <description> Use /{...} with maps: strings, implicit child axis, multiple keys </description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Michael Kay" on="2026-06-17" change="PR2667"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
@@ -1080,20 +1080,73 @@
       </result>
    </test-case>
    
-   <!--<test-case name="JAxes-218" covers-40="PR2667">
-      <description> Use /{...} with maps: ExprSingle required </description>
+   <test-case name="JAxes-218" covers-40="PR2667">
+      <description> Use axis::(...) with maps: enclosed expression required </description>
       <created by="Michael Kay" on="2025-09-18"/>
       <modified by="Michael Kay" on="2026-06-17" change="PR2667"/>
       <modified by="Christian Gruen" on="2026-06-23" change="PR2667"/>
+      <modified by="Christian Gruen" on="2026-07-04" change="PR2667"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {#xml:space: true(), #xml:id: true(), #xml:base: false()}
-         return $map//(#xml:base, #xml:space) ! { 'k': jkey(), 'v': jvalue() }
+         return $map//self::(#xml:base, #xml:space) ! { 'k': jkey(), 'v': jvalue() }
       </test>
       <result>
          <error code="XPST0003"/>
       </result>
-   </test-case>-->
+   </test-case>
+   
+   <test-case name="JAxes-219" covers-40="PR2667 PR2712">
+      <description>Evaluate a dynamic node test with an absent focus.</description>
+      <created by="Christian Gruen" on="2026-07-21"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $map := {"x":1, "y":2, "z":3}
+         return $map/child::{string(.)}
+      </test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-220" covers-40="PR2667 PR2712">
+      <description>Evaluate a dynamic node test with an absent focus.</description>
+      <created by="Christian Gruen" on="2026-07-21"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $map := {"x":1, "y":2, "z":3}
+         return $map/child::{jkey()}
+      </test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-221" covers-40="PR2667 PR2712">
+      <description>Evaluate a dynamic node test with an absent focus.</description>
+      <created by="Christian Gruen" on="2026-07-21"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         parse-xml('<a><b name="b"/><c name="x"/></a>')/*/child::{@name}
+      ]]></test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-222" covers-40="PR2667">
+      <description>Evaluate a dynamic node test with an absent focus.</description>
+      <created by="Christian Gruen" on="2026-07-21"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $map := {"x":1, "y":2, "z":3}
+         for $k in ("x", "z")
+         return $map/child::{$k} =!> jvalue()
+      </test>
+      <result>
+         <assert-deep-eq>1, 3</assert-deep-eq>
+      </result>
+   </test-case>
    
    <test-case name="JAxes-250" covers-40="PR2667">
       <description> Use /{...} with arrays </description>
@@ -1175,6 +1228,45 @@
       </test>
       <result>
          <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-256" covers-40="PR2667 PR2712">
+      <description> Dynamic NodeTest {} is evaluated with an absent focus </description>
+      <created by="Michael Kay" on="2026-07-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $array := ["x", "y", "z", ["a", "b", "c"]]
+         return $array/descendant::{jkey()}
+      </test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-257" covers-40="PR2667 PR2712">
+      <description> Dynamic NodeTest {} is evaluated with an absent focus </description>
+      <created by="Michael Kay" on="2026-07-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $array := ["x", "y", "z", ["a", "b", "c"]]
+         return $array/descendant::{last()}
+      </test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-258" covers-40="PR2667 PR2712">
+      <description> Dynamic NodeTest {} is evaluated with an absent focus </description>
+      <created by="Michael Kay" on="2026-07-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $array := ["x", "y", "z", ["a", "b", "c"]]
+         return $array/descendant::{data()}
+      </test>
+      <result>
+         <error code="XPDY0002"/>
       </result>
    </test-case>
    
@@ -1275,16 +1367,18 @@
       </result>
    </test-case>
    
-   <test-case name="JAxes-310">
+   <test-case name="JAxes-310" covers-40="PR2566">
       <description> Use record type tests - implicit child axis</description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Michael Kay" on="2026-02-10" change="syntax updated"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="PR2566"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
-         let $map := {"w": {"A":11e0, "B":"B"}, 
-                      "x": {"A":12, "B":"B"}, 
-                      "y": {"A":12.1, "B":"B"}, 
-                      "z": {"A":12e0, "B":"B"}}
+         let $w as record(A as xs:double, B as xs:string) := {"A":11e0, "B":"B"}
+         let $x as record(A as xs:integer, B as xs:string) := {"A":12, "B":"B"}
+         let $y as record(A as xs:decimal, B as xs:string) := {"A":12.1, "B":"B"}
+         let $z as record(A as xs:double, B as xs:string) := {"A":12e0, "B":"B"}
+         let $map := {"w": $w, "x": $x, "y": $y, "z": $z}
          return $map/jnode(*, record(A as xs:double, B as xs:string)) =!> jkey()
       </test>
       <result>
@@ -1292,16 +1386,18 @@
       </result>
    </test-case>
    
-   <test-case name="JAxes-311">
+   <test-case name="JAxes-311" covers-40="PR2566">
       <description> Use record type tests - explicit child axis</description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Michael Kay" on="2026-02-10" change="syntax updated"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="PR2566"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
-         let $map := {"w": {"A":11e0, "B":"B"}, 
-                      "x": {"A":12, "B":"B"}, 
-                      "y": {"A":12.1, "B":"B"}, 
-                      "z": {"A":12e0, "B":"B"}}
+         let $w as record(A as xs:double, B as xs:string) := {"A":11e0, "B":"B"}
+         let $x as record(A as xs:integer, B as xs:string) := {"A":12, "B":"B"}
+         let $y as record(A as xs:decimal, B as xs:string) := {"A":12.1, "B":"B"}
+         let $z as record(A as xs:double, B as xs:string) := {"A":12e0, "B":"B"}
+         let $map := {"w": $w, "x": $x, "y": $y, "z": $z}
          return $map/child::jnode(*, record(A as xs:double, B as xs:string)) =!> jkey()
       </test>
       <result>
@@ -1309,16 +1405,18 @@
       </result>
    </test-case>
    
-   <test-case name="JAxes-312">
+   <test-case name="JAxes-312" covers-40="PR2566">
       <description> Use record type tests - explicit descendant axis</description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Michael Kay" on="2026-02-10" change="syntax updated"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="PR2566"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
-         let $map := {"w": {"A":11e0, "B":"B"}, 
-                      "x": {"A":12, "B":"B"}, 
-                      "y": {"A":12.1, "B":"B"}, 
-                      "z": {"A":12e0, "B":"B"}}
+         let $w as record(A as xs:double, B as xs:string) := {"A":11e0, "B":"B"}
+         let $x as record(A as xs:integer, B as xs:string) := {"A":12, "B":"B"}
+         let $y as record(A as xs:decimal, B as xs:string) := {"A":12.1, "B":"B"}
+         let $z as record(A as xs:double, B as xs:string) := {"A":12e0, "B":"B"}
+         let $map := {"w": $w, "x": $x, "y": $y, "z": $z}
          return $map/descendant::jnode(*, record(A as xs:double, B as xs:string)) =!> jkey()
       </test>
       <result>
@@ -1364,17 +1462,18 @@
       </result>
    </test-case>
    
-   <test-case name="JAxes-315">
+   <test-case name="JAxes-315" covers-40="PR2566">
       <description> Use record type tests - occurrence indicator</description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="PR2566"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
-         let $map := {"v": (),
-                      "w": {"A":11e0, "B":"B"}, 
-                      "x": {"A":12, "B":"B"}, 
-                      "y": {"A":12.1, "B":"B"}, 
-                      "z": {"A":12e0, "B":"B"}}
+         let $w as record(A as xs:double, B as xs:string) := {"A":11e0, "B":"B"}
+         let $x as record(A as xs:integer, B as xs:string) := {"A":12, "B":"B"}
+         let $y as record(A as xs:decimal, B as xs:string) := {"A":12.1, "B":"B"}
+         let $z as record(A as xs:double, B as xs:string) := {"A":12e0, "B":"B"}
+         let $map := {"v": (), "w": $w, "x": $x, "y": $y, "z": $z}
          return $map/child::jnode(*, record(A as xs:double, B as xs:string)?) =!> jkey()
       </test>
       <result>

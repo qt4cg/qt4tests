@@ -188,12 +188,19 @@
         <created by="Michael Kay, Saxonica" on="2023-12-05"/>
         <modified by="Christian Gruen" on="2024-03-18" change="collation declaration added"/>
         <modified by="Michael Kay" on="2025-10-28" change="result of (0.2) = (2.0e-1) is now false"/>
+        <modified by="Christian Gruen" on="2026-07-21" change="values are rendered without adaptive serialization, which is partly implementation-defined"/>
         <dependency type="spec" value="XQ40+"/>
         <test><![CDATA[
             declare default collation 'http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive';
             let $a := [(), 12, (1,2), 12,   0.2,   number('NaN'), 0e0,  "A", <e>A</e>, <e>12</e>, xs:time('12:00:00Z'), adjust-time-to-timezone(xs:time('13:00:00'))]
             let $b := [(), (), (2,3), 12e0, 0.2e0, number('NaN'), -0e0, "a", "A", 12, xs:time('13:00:00+01:00'), xs:time('13:00:00')]
-            let $str := fn($mem){`({serialize($mem, map{'method':'adaptive'})})`}
+            let $str := fn($mem){`({string-join($mem ! (typeswitch(.)
+              case node() return serialize(., map{'omit-xml-declaration':true()})
+              case xs:string return `"{.}"`
+              case xs:boolean return `{.}()`
+              case xs:double return `xs:double("{.}")`
+              case xs:time return `xs:time("{.}")`
+              default return string(.)), ' ')})`}
             for $comp in (["=", op('=')], ["eq", op('eq')], ["DE", deep-equal#2], ["AE", atomic-equal#2])
             return array:for-each-pair($a, $b, fn($a, $b) {
                try {
@@ -207,11 +214,11 @@
             <all-of>
                 <assert>$result[1] = "() = () : (false())"</assert>
                 <assert>$result[2] = "(12) = () : (false())"</assert>
-                <assert>normalize-space($result[3]) = normalize-space("(1 2) = (2 3) : (true())")</assert>
-                <assert>$result[4] = "(12) = (1.2e1) : (true())"</assert>
-                <assert>$result[5] = "(0.2) = (2.0e-1) : (false())"</assert>
-                <assert>$result[6] = "(NaN) = (NaN) : (false())"</assert>
-                <assert>$result[7] = "(0.0e0) = (-0.0e0) : (true())"</assert>
+                <assert>$result[3] = "(1 2) = (2 3) : (true())"</assert>
+                <assert>$result[4] = "(12) = (xs:double(""12"")) : (true())"</assert>
+                <assert>$result[5] = "(0.2) = (xs:double(""0.2"")) : (false())"</assert>
+                <assert>$result[6] = "(xs:double(""NaN"")) = (xs:double(""NaN"")) : (false())"</assert>
+                <assert>$result[7] = "(xs:double(""0"")) = (xs:double(""-0"")) : (true())"</assert>
                 <assert>$result[8] = "(""A"") = (""a"") : (true())"</assert>
                 <assert><![CDATA[$result[9] = "(<e>A</e>) = (""A"") : (true())"]]></assert>
                 <assert><![CDATA[$result[10] = "(<e>12</e>) = (12) : (true())"]]></assert>
@@ -220,10 +227,10 @@
                 <assert>$result[13] = "() eq () : ()"</assert>
                 <assert>$result[14] = "(12) eq () : ()"</assert>
                 <assert>$result[15] = "error err:XPTY0004"</assert>
-                <assert>$result[16] = "(12) eq (1.2e1) : (true())"</assert>
-                <assert>$result[17] = "(0.2) eq (2.0e-1) : (false())"</assert>
-                <assert>$result[18] = "(NaN) eq (NaN) : (false())"</assert>
-                <assert>$result[19] = "(0.0e0) eq (-0.0e0) : (true())"</assert>
+                <assert>$result[16] = "(12) eq (xs:double(""12"")) : (true())"</assert>
+                <assert>$result[17] = "(0.2) eq (xs:double(""0.2"")) : (false())"</assert>
+                <assert>$result[18] = "(xs:double(""NaN"")) eq (xs:double(""NaN"")) : (false())"</assert>
+                <assert>$result[19] = "(xs:double(""0"")) eq (xs:double(""-0"")) : (true())"</assert>
                 <assert>$result[20] = "(""A"") eq (""a"") : (true())"</assert>
                 <assert><![CDATA[$result[21] = "(<e>A</e>) eq (""A"") : (true())"]]></assert>
                 <assert>$result[22] = "error err:XPTY0004"</assert>
@@ -231,11 +238,11 @@
                 <assert>$result[24] => ends-with("(true())")</assert>
                 <assert>$result[25] = "() DE () : (true())"</assert>
                 <assert>$result[26] = "(12) DE () : (false())"</assert>
-                <assert>normalize-space($result[27]) = normalize-space("(1 2) DE (2 3) : (false())")</assert>
-                <assert>$result[28] = "(12) DE (1.2e1) : (true())"</assert>
-                <assert>$result[29] = "(0.2) DE (2.0e-1) : (false())"</assert>
-                <assert>$result[30] = "(NaN) DE (NaN) : (true())"</assert>
-                <assert>$result[31] = "(0.0e0) DE (-0.0e0) : (true())"</assert>
+                <assert>$result[27] = "(1 2) DE (2 3) : (false())"</assert>
+                <assert>$result[28] = "(12) DE (xs:double(""12"")) : (true())"</assert>
+                <assert>$result[29] = "(0.2) DE (xs:double(""0.2"")) : (false())"</assert>
+                <assert>$result[30] = "(xs:double(""NaN"")) DE (xs:double(""NaN"")) : (true())"</assert>
+                <assert>$result[31] = "(xs:double(""0"")) DE (xs:double(""-0"")) : (true())"</assert>
                 <assert>$result[32] = "(""A"") DE (""a"") : (true())"</assert>
                 <assert><![CDATA[$result[33] = "(<e>A</e>) DE (""A"") : (false())"]]></assert>
                 <assert><![CDATA[$result[34] = "(<e>12</e>) DE (12) : (false())"]]></assert>
@@ -244,10 +251,10 @@
                 <assert>$result[37] = "error err:XPTY0004"</assert>
                 <assert>$result[38] = "error err:XPTY0004"</assert>
                 <assert>$result[39] = "error err:XPTY0004"</assert>
-                <assert>$result[40] = "(12) AE (1.2e1) : (true())"</assert>
-                <assert>$result[41] = "(0.2) AE (2.0e-1) : (false())"</assert>
-                <assert>$result[42] = "(NaN) AE (NaN) : (true())"</assert>
-                <assert>$result[43] = "(0.0e0) AE (-0.0e0) : (true())"</assert>
+                <assert>$result[40] = "(12) AE (xs:double(""12"")) : (true())"</assert>
+                <assert>$result[41] = "(0.2) AE (xs:double(""0.2"")) : (false())"</assert>
+                <assert>$result[42] = "(xs:double(""NaN"")) AE (xs:double(""NaN"")) : (true())"</assert>
+                <assert>$result[43] = "(xs:double(""0"")) AE (xs:double(""-0"")) : (true())"</assert>
                 <assert>$result[44] = "(""A"") AE (""a"") : (false())"</assert>
                 <assert><![CDATA[$result[45] = "(<e>A</e>) AE (""A"") : (true())"]]></assert>
                 <assert><![CDATA[$result[46] = "(<e>12</e>) AE (12) : (false())"]]></assert>
