@@ -248,7 +248,7 @@
    </test-case>
 
    <test-case name="Serialization-csv-19">
-      <description>Test the CSV serialization output method</description>
+      <description>Test the CSV serialization output method with normalization</description>
       <created by="Christian Gruen" on="2026-08-12"/>
       <test><![CDATA[
         declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -260,6 +260,42 @@
          <serialization-matches><![CDATA[^"a\r\nb"\r\n$]]></serialization-matches>
       </result>
    </test-case>
+   
+   <test-case name="Serialization-csv-20">
+      <description>Test the CSV serialization output method with normalization</description>
+      <created by="Michael Kay" on="2026-08-23"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        declare option output:csv-header "yes";
+        declare option output:line-ending "&#10;";
+        declare option output:normalization-form "NFD";
+        ( [ "A", "Ä" ],
+          [ "O", "Ö" ]
+        )
+      ]]></test>
+      <result>
+         <serialization-matches>A,A&#776;\nO,O&#776;\n</serialization-matches>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-21">
+      <description>Test the CSV serialization output method with a character map</description>
+      <created by="Michael Kay" on="2026-08-23"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        declare option output:parameter-document "xml/xml-character-map.xml";
+        ( [ "A", "1" ],
+          [ "B", "2" ]
+        )
+      ]]></test>
+      <result>
+         <serialization-matches><![CDATA[^A,one\nB,2\n$]]></serialization-matches>
+      </result>
+   </test-case>
+   
+   
 
    <test-case name="Serialization-csv-901">
       <description>Test the CSV serialization output method</description>
@@ -355,5 +391,133 @@
          <assert-serialization-error code="SEPM0016"/>
       </result>
    </test-case>
+   
+   <test-case name="Serialization-csv-908">
+      <description>Test the CSV serialization output method</description>
+      <created by="Michael Kay" on="2026-08-23"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        declare option output:csv-quote-character '""';
+        [ "a" ]
+      ]]></test>
+      <result>
+         <assert-serialization-error code="SEPM0016"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-909">
+      <description>Test the CSV serialization output method</description>
+      <created by="Michael Kay" on="2026-08-23"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        declare option output:csv-quote-character '&#x0A;';
+        [ "a" ]
+      ]]></test>
+      <result>
+         <assert-serialization-error code="SEPM0016"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-910">
+      <description>Test the CSV serialization output method</description>
+      <created by="Michael Kay" on="2026-08-23"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        declare option output:csv-quote-character ',';
+        [ "a" ]
+      ]]></test>
+      <result>
+         <assert-serialization-error code="SEPM0016"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-911">
+      <description>Test the CSV serialization output method</description>
+      <created by="Michael Kay" on="2026-08-23"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        declare option output:csv-quote-character '|';
+        declare option output:csv-separator "|";
+        [ "a" ]
+      ]]></test>
+      <result>
+         <assert-serialization-error code="SEPM0016"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-912">
+      <description>Test the CSV serialization output method</description>
+      <created by="Michael Kay" on="2026-08-23"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        declare option output:csv-quote-character '&#x0A;';
+        declare option output:end-of-line "&#x0D;&#x0A;";
+        [ "a" ]
+      ]]></test>
+      <result>
+         <assert-serialization-error code="SEPM0016"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-913">
+      <description>Test the CSV serialization output method</description>
+      <created by="Michael Kay" on="2026-08-23"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        <a>12</a>
+      ]]></test>
+      <result>
+         <assert-serialization-error code="SERE0025"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-914">
+      <description>Test the CSV serialization output method</description>
+      <created by="Michael Kay" on="2026-08-23"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        fn:true#0
+      ]]></test>
+      <result>
+         <assert-serialization-error code="SERE0025"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-915">
+      <description>Test the CSV serialization output method</description>
+      <created by="Michael Kay" on="2026-08-23"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        current-date()
+      ]]></test>
+      <result>
+         <assert-serialization-error code="SERE0025"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-916">
+      <description>Test the CSV serialization output method</description>
+      <created by="Michael Kay" on="2026-08-23"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "json";
+        declare option output:json-node-output-method "csv";
+        [<a>1</a>, <b>2</b>]
+      ]]></test>
+      <result>
+         <assert-serialization-error code="SEPM0016"/>
+      </result>
+   </test-case>
+
+
+
 
 </test-set>
