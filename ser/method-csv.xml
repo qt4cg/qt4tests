@@ -295,15 +295,123 @@
       </result>
    </test-case>
    
+   <test-case name="Serialization-csv-22">
+      <description>Input is an array of integers</description>
+      <created by="Michael Kay" on="2026-08-24"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        ( [ 1, 2 ],
+          [ 3, 4 ]
+        )
+      ]]></test>
+      <result>
+         <serialization-matches><![CDATA[^1,2\n3,4\n$]]></serialization-matches>
+      </result>
+   </test-case>
    
+   <test-case name="Serialization-csv-23">
+      <description>Input is a map containing an array of integers</description>
+      <created by="Michael Kay" on="2026-08-24"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        {'rows': ([ 1, 2 ], [ 3, 4 ])}
+      ]]></test>
+      <result>
+         <serialization-matches><![CDATA[^1,2\n3,4\n$]]></serialization-matches>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-24">
+      <description>Input is an array containing nodes</description>
+      <created by="Michael Kay" on="2026-08-24"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        ([ <a id='x'>1</a>, <a>2</a> ], [ <b id='y'>3</b>, <b>4</b> ])
+      ]]></test>
+      <result>
+         <serialization-matches><![CDATA[^1,2\n3,4\n$]]></serialization-matches>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-25">
+      <description>Empty input</description>
+      <created by="Michael Kay" on="2026-08-24"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        ()
+      ]]></test>
+      <result>
+         <serialization-matches><![CDATA[^$]]></serialization-matches>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-26">
+      <description>Header with no rows</description>
+      <created by="Michael Kay" on="2026-08-24"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        declare option output:csv-header "yes";
+        {'rows': (), 'columns': ('a', 'b', 'c')}
+      ]]></test>
+      <result>
+         <serialization-matches><![CDATA[^a,b,c\n$]]></serialization-matches>
+      </result>
+   </test-case>
 
-   <test-case name="Serialization-csv-901">
-      <description>Test the CSV serialization output method</description>
+   <test-case name="Serialization-csv-27">
+      <description>Array of arrays - contained arrays are atomized</description>
       <created by="Christian Gruen" on="2026-08-12"/>
+      <modified by="Michael Kay" on="2026-08-24" change="Previously -901; no longer an error under the coercion rules"/>
       <test><![CDATA[
         declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
         declare option output:method "csv";
         [ [ "a" ] ]
+      ]]></test>
+      <result>
+         <serialization-matches><![CDATA[^a\n$]]></serialization-matches>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-28">
+      <description>Quoting in header row</description>
+      <created by="Michael Kay" on="2026-08-24"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        declare option output:csv-header "yes";
+        { 'rows': (), 'columns': ('"a"', '"b"') }
+      ]]></test>
+      <result>
+         <serialization-matches><![CDATA[^"""a""","""b"""\n$]]></serialization-matches>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-29">
+      <description>Commas in header row</description>
+      <created by="Michael Kay" on="2026-08-24"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        declare option output:csv-header "yes";
+        { 'rows': ['z,1', 'z,2'], 'columns': ('a,1', 'b,2') }
+      ]]></test>
+      <result>
+         <serialization-matches><![CDATA[^"a,1","b,2"\n"z,1","z,2"\n$]]></serialization-matches>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-901">
+      <description>Test the CSV serialization output method</description>
+      <created by="Michael Kay" on="2026-08-24"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        [ ("a", "b") ]
       ]]></test>
       <result>
          <assert-serialization-error code="SERE0025"/>
@@ -516,8 +624,35 @@
          <assert-serialization-error code="SEPM0016"/>
       </result>
    </test-case>
-
-
-
+   
+   <test-case name="Serialization-csv-917">
+      <description>Input is an a sequence of JNodes wrapping arrays of integers</description>
+      <created by="Michael Kay" on="2026-08-24"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        ( jtree([ 1, 2 ]),
+          jtree([ 3, 4 ])
+        )
+      ]]></test>
+      <result>
+         <assert-serialization-error code="SERE0025"/>
+      </result>
+   </test-case>
+   
+   <test-case name="Serialization-csv-918">
+      <description>Test the CSV serialization output method</description>
+      <created by="Michael Kay" on="2026-08-24"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "csv";
+        { 'rows': [("a", "b") ] }
+      ]]></test>
+      <result>
+         <assert-serialization-error code="SERE0025"/>
+      </result>
+   </test-case>
+   
+   
 
 </test-set>
