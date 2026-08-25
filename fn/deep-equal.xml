@@ -4221,23 +4221,23 @@
       </result>
    </test-case>
    
-   <test-case name="deep-equal-40-functions-006" covers-40="PR320">
+   <test-case name="deep-equal-40-functions-006" covers-40="PR320 PR2805">
       <description>Test comparison of references to user functions</description>
       <created by="Michael Kay" on="2023-11-24"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>deep-equal(fn{24}, fn{24})</test>
       <result>
-         <assert-type>xs:boolean</assert-type>
+         <assert-true/>
       </result>
    </test-case>
    
-   <test-case name="deep-equal-40-functions-007" covers-40="PR320">
+   <test-case name="deep-equal-40-functions-007" covers-40="PR320 PR2805">
       <description>Test comparison of curried functions</description>
       <created by="Michael Kay" on="2023-11-24"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>deep-equal(contains(?, 'e'), contains(?, 'e'))</test>
       <result>
-         <assert-type>xs:boolean</assert-type>
+         <assert-true/>
       </result>
    </test-case>
    
@@ -4246,6 +4246,127 @@
       <created by="Michael Kay" on="2023-11-24"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>deep-equal(contains(?, 'e'), contains(?, 'f'))</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-functions-009" covers-40="PR2805">
+      <description>Test comparison of functions</description>
+      <created by="Michael Kay" on="2026-08-25"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>let $f := fn{@x} return deep-equal($f, $f)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-functions-010" covers-40="PR2805">
+      <description>Test comparison of functions</description>
+      <created by="Michael Kay" on="2026-08-25"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(fn{@x}, fn{@x})</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-functions-011" covers-40="PR2805">
+      <description>Test comparison of functions</description>
+      <created by="Michael Kay" on="2026-08-25"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(fn{@x}, fn{@y})</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-functions-012" covers-40="PR2805">
+      <description>Test comparison of functions</description>
+      <created by="Michael Kay" on="2026-08-25"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(fn($x){$x+1}, fn($x){$x+1})</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-functions-013" covers-40="PR2805">
+      <description>Test comparison of functions</description>
+      <created by="Michael Kay" on="2026-08-25"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(fn($x){$x+1}, fn($y){$y+1})</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-functions-014" covers-40="PR2805">
+      <description>Test comparison of functions</description>
+      <created by="Michael Kay" on="2026-08-25"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>deep-equal(fn($x){$x+1}, fn($y){1+$y})</test>
+      <result>
+         <assert-type>xs:boolean</assert-type>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-functions-015" covers-40="PR2805">
+      <description>Test comparison of functions</description>
+      <created by="Michael Kay" on="2026-08-25"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>let $f := (1 to 2)!xs:string#0 return deep-equal($f[1], $f[2])</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-functions-016" covers-40="PR2805">
+      <description>Test comparison of functions</description>
+      <created by="Michael Kay" on="2026-08-25"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>let $f := (1, 1)!xs:string#0 return deep-equal($f[1], $f[2])</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-functions-017" covers-40="PR2805">
+      <description>Test comparison of functions</description>
+      <created by="Michael Kay" on="2026-08-25"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x) {$x + 1};
+         declare function local:g($y) {$y + 1};
+         deep-equal(local:f#1, local:g#1)          
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-functions-018" covers-40="PR2805">
+      <description>Test comparison of functions</description>
+      <created by="Michael Kay" on="2026-08-25"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($x as xs:integer) as xs:integer {$x + 1};
+         declare function local:g($y as xs:decimal) as xs:decimal {$y + 1};
+         deep-equal(local:f#1, local:g#1)          
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="deep-equal-40-functions-019" covers-40="PR2805">
+      <description>Test comparison of functions</description>
+      <created by="Michael Kay" on="2026-08-25"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         deep-equal(fn($x as xs:integer) as item() {$x+1}, 
+                    fn($x as xs:decimal) as item() {$x+1})          
+      </test>
       <result>
          <assert-false/>
       </result>
