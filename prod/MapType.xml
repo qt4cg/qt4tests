@@ -1009,6 +1009,36 @@ return $m
          <assert-true/>
       </result>
    </test-case>
+   
+   <test-case name="MapType-102">
+      <description>Saxon bug 7224</description>
+      <created by="Michael Kay after Gunther Rademacher" on="2026-08-25"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test><![CDATA[
+   declare function local:f1($y as xs:string, $z as map(xs:string,item()*)) as xs:string {
+      if ($z instance of map(xs:string,xs:string)) then
+        local:f2($y, $z)
+      else
+        "42"
+    };
+
+   declare function local:f2($y as xs:string, $z as map(xs:string, xs:string)) as xs:string {
+      codepoints-to-string(
+        fold-left(1, string-to-codepoints("a"),
+          function ($u as xs:integer*, $v as xs:integer) as xs:integer* {
+            $u ! string-to-codepoints($z(codepoints-to-string(.)))
+          }
+        )
+      )
+   };
+
+   local:f1("a", map { "a": map { "b": "b" }, "c": "c" })         
+                 
+      ]]></test>
+      <result>
+         <assert-eq>"42"</assert-eq>
+      </result>
+   </test-case>
 
 
 </test-set>
