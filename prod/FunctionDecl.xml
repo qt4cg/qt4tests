@@ -2344,12 +2344,13 @@
       </result>
    </test-case>
    
-   <test-case name="function-decl-40-009" covers-40="PR197">
+   <test-case name="function-decl-40-009" covers-40="PR197 PR2858">
       <description>XQ40: Use "." as default value</description>
       <created by="Michael Kay" on="2022-10-02"/>
+      <modified by="Michael Kay" on="2026-08-25" change="PR2858"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
-         declare function local:f($x := .) { "Q{" || namespace-uri($x) || "}" || local-name($x) };
+         declare function local:f($x := context value) { "Q{" || namespace-uri($x) || "}" || local-name($x) };
          (<a/>, <b/>) ! local:f()
       ]]></test>
       <result>
@@ -2440,12 +2441,13 @@
       </result>
    </test-case>
    
-   <test-case name="function-decl-40-016" covers-40="PR197">
+   <test-case name="function-decl-40-016" covers-40="PR197 PR2858">
       <description>XQ40: function with optional parameter, default value is "."</description>
       <created by="Michael Kay" on="2022-11-04"/>
+      <modified by="Michael Kay" on="2026-08-25" change="PR2858"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
-         declare function local:f($x as xs:integer := ., $y as xs:integer := .) { $x * $y };
+         declare function local:f($x as xs:integer := context value, $y as xs:integer := context value) { $x * $y };
          12 ! local:f(3)
       </test>
       <result>
@@ -2453,12 +2455,13 @@
       </result>
    </test-case>
    
-   <test-case name="function-decl-40-017" covers-40="PR197">
+   <test-case name="function-decl-40-017" covers-40="PR197 PR2858">
       <description>XQ40: function with optional parameter, default value is "."</description>
       <created by="Michael Kay" on="2022-11-04"/>
+      <modified by="Michael Kay" on="2026-08-25" change="PR2858"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
-         declare function local:f($x as xs:integer := ., $y as xs:integer := .) { $x * $y };
+         declare function local:f($x as xs:integer := context value, $y as xs:integer := context value) { $x * $y };
          12 ! local:f(y := 3)
       </test>
       <result>
@@ -2466,12 +2469,13 @@
       </result>
    </test-case>
    
-   <test-case name="function-decl-40-018" covers-40="PR197">
+   <test-case name="function-decl-40-018" covers-40="PR197 PR2858">
       <description>XQ40: function with optional parameter, default value is "."</description>
       <created by="Michael Kay" on="2022-11-04"/>
+      <modified by="Michael Kay" on="2026-08-25" change="PR2858"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
-         declare function local:f($x as xs:integer := ., $y as xs:integer := .) { $x * $y };
+         declare function local:f($x as xs:integer := context value, $y as xs:integer := context value) { $x * $y };
          12 ! local:f()
       </test>
       <result>
@@ -2776,6 +2780,22 @@
          <assert-eq>42</assert-eq>
       </result>
    </test-case>
+   
+   <test-case name="function-decl-40-039" covers-40="PR2858">
+      <description>Default value of parameter is global context item</description>
+      <created by="Michael Kay" on="2026-08-25"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare context value as xs:integer := 17;
+         declare function foo($x as xs:integer := .) as xs:integer {
+           $x + 20
+         };
+         foo(-5)
+      ]]></test>
+      <result>
+         <assert-eq>-2</assert-eq>
+      </result>
+   </test-case>
  
    
    <test-case name="function-decl-40-901" covers-40="PR197">
@@ -2951,6 +2971,21 @@
       </test>
       <result>
          <error code="XQST0148"/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-039" covers-40="PR2858">
+      <description>Context dependent default value with no context available</description>
+      <created by="Michael Kay" on="2026-08-25"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function foo($x as xs:string := name()) as xs:string {
+           `[[{$x}]]`
+         };
+         <blah/> ! foo()
+      ]]></test>
+      <result>
+         <error code="XPDY0002"/>
       </result>
    </test-case>
 
