@@ -1760,4 +1760,71 @@ every $book in $in//*[Title and ISBN-13] satisfies $book/ISBN-13 follows $book/T
    </test-case>
  
 
+   <test-case name="PathExpr-J-418" covers-40="PR2854">
+      <description>Interpretation of the right-hand operand of a path expression</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test><![CDATA[
+         parse-xml('<a>x</a>')/*/data()
+      ]]></test>
+      <result>
+         <assert-eq>"x"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="PathExpr-J-419" covers-40="PR2854">
+      <description>Interpretation of the right-hand operand of a path expression</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>
+         {"a": 1}/data()
+      </test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="PathExpr-J-420" covers-40="PR2856">
+      <description>Interpretation of the right-hand operand of a path expression</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>
+         {"a": {"b": 1}}/(/a) =!> jkey()
+      </test>
+      <result>
+         <assert-eq>"a"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="PathExpr-J-421" covers-40="PR2856">
+      <description>Interpretation of the right-hand operand of a path expression</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>
+         {"a": {"b": 1}}/(a otherwise b) =!> jkey()
+      </test>
+      <result>
+         <assert-eq>"a"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="PathExpr-J-422" covers-40="PR2856">
+      <description>Interpretation of the right-hand operand of a path expression</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         {"a": {"b": 1}}/(try { a } catch * { b }) =!> jkey()
+      </test>
+      <result>
+         <assert-eq>"a"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="PathExpr-J-423" covers-40="PR2856">
+      <description>Interpretation of the right-hand operand of a path expression</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>
+         {"a": {"b": 1}}/(if (true()) { a }) =!> jkey()
+      </test>
+      <result>
+         <assert-eq>"a"</assert-eq>
+      </result>
+   </test-case>
+
 </test-set>
