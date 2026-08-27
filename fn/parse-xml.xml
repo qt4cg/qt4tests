@@ -381,9 +381,10 @@
         <description>parse-xml test - whitespace stripping on</description>
         <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
         <modified by="Gunther Rademacher" on="2025-03-04" change="Make test independent of boundary space"/>
+        <modified by="Christian Gruen" on="2026-08-27" change="PR2832"/>
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
-        <test><![CDATA[parse-xml('<a> <b/> </a>', {'strip-space': true()})//text() => count()]]></test>
+        <test><![CDATA[parse-xml('<a> <b/> </a>', {'strip-space': 'all'})//text() => count()]]></test>
         <result>
             <assert-eq>0</assert-eq>
         </result>
@@ -393,9 +394,10 @@
         <description>parse-xml test - whitespace stripping off</description>
         <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
         <modified by="Gunther Rademacher" on="2025-03-04" change="Make test independent of boundary space"/>
+        <modified by="Christian Gruen" on="2026-08-27" change="PR2832"/>
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
-        <test><![CDATA[parse-xml('<a> <b/> </a>', {'strip-space': false()})//text() => count()]]></test>
+        <test><![CDATA[parse-xml('<a> <b/> </a>', {'strip-space': 'none'})//text() => count()]]></test>
         <result>
             <assert-eq>2</assert-eq>
         </result>
@@ -405,10 +407,11 @@
         <description>parse-xml test - whitespace stripping on with xml:space</description>
         <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
         <modified by="Gunther Rademacher" on="2025-03-04" change="Make test independent of boundary space"/>
+        <modified by="Christian Gruen" on="2026-08-27" change="PR2832"/>
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml('<a><b> </b><b xml:space="preserve"> </b></a>', 
-                                 {'strip-space': true()})//text() => count()]]></test>
+                                 {'strip-space': 'all'})//text() => count()]]></test>
         <result>
             <assert-eq>1</assert-eq>
         </result>
@@ -417,9 +420,10 @@
     <test-case name="parse-xml-423" covers-40="PR1257">
         <description>parse-xml test - whitespace stripping</description>
         <created by="Christian Gruen" on="2026-08-01"/>
+        <modified by="Christian Gruen" on="2026-08-27" change="PR2832"/>
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
-        <test><![CDATA[parse-xml('<a>  x  <b> </b>  </a>', {'strip-space': true()})//text() => count()]]></test>
+        <test><![CDATA[parse-xml('<a>  x  <b> </b>  </a>', {'strip-space': 'all'})//text() => count()]]></test>
         <result>
             <assert-eq>1</assert-eq>
         </result>
@@ -428,9 +432,10 @@
     <test-case name="parse-xml-424" covers-40="PR1257">
         <description>parse-xml test - whitespace stripping</description>
         <created by="Christian Gruen" on="2026-08-01"/>
+        <modified by="Christian Gruen" on="2026-08-27" change="PR2832"/>
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
-        <test><![CDATA[string(parse-xml('<a>  x  <b> </b>  </a>', {'strip-space': true()}))]]></test>
+        <test><![CDATA[string(parse-xml('<a>  x  <b> </b>  </a>', {'strip-space': 'all'}))]]></test>
         <result>
             <assert-eq>'  x  '</assert-eq>
         </result>
@@ -541,6 +546,7 @@
     <test-case name="parse-xml-436" covers-40="PR1257">
         <description>parse-xml test - schema validation effect on whitespace stripping</description>
         <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <modified by="Christian Gruen" on="2026-08-27" change="PR2832"/>
         <environment ref="simplexsd"/>
         <dependency type="spec" value="XQ40+"/>
         <dependency type="feature" value="schemaImport"/>
@@ -548,7 +554,7 @@
         <test><![CDATA[
             import schema namespace simple="http://www.w3.org/XQueryTest/simple";
             parse-xml('<string xmlns="http://www.w3.org/XQueryTest/simple">    </string>', 
-                      {'xsd-validation': 'strict', 'strip-space': true()})
+                      {'xsd-validation': 'strict', 'strip-space': 'all'})
         ]]></test>
         <result>
             <assert>data($result/*:string) eq "    "</assert>
