@@ -1944,6 +1944,242 @@
       </result>
    </test-case>
    
+   <test-case name="element-to-map-550" covers-40="PR2688">
+      <description> All attributes integer - use integer type</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b id="23"/><b id=" 0 "/><b id=" -17"/><b id="+29"/></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//"@id") = 4</assert>
+            <assert>every $x in $result//"@id" satisfies jvalue($x) instance of xs:integer</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-551" covers-40="PR2688">
+      <description> A leading zero inhibits use of integer type</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b id="023"/><b id=" 0 "/><b id=" -17"/><b id="+29"/></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//"@id") = 4</assert>
+            <assert>every $x in $result//"@id" satisfies jvalue($x) instance of xs:decimal</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-552" covers-40="PR2688">
+      <description> All attributes decimal - use decimal type</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b id="23.1"/><b id=" 0 "/><b id=" -17.2"/><b id="+29"/></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//"@id") = 4</assert>
+            <assert>every $x in $result//"@id" satisfies jvalue($x) instance of xs:decimal</assert>
+            <assert>some $x in $result//"@id" satisfies not(jvalue($x) instance of xs:integer)</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-553" covers-40="PR2688">
+      <description> All attributes double - use decimal type</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b id="23.1"/><b id=" 1e0 "/><b id=" -17.2"/><b id="+29"/></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//"@id") = 4</assert>
+            <assert>every $x in $result//"@id" satisfies jvalue($x) instance of xs:double</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-554" covers-40="PR2688">
+      <description> NaN inhibits use of xs:double type</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b id="23.1"/><b id=" 1e0 "/><b id=" NaN"/><b id="+29"/></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//"@id") = 4</assert>
+            <assert>every $x in $result//"@id" satisfies jvalue($x) instance of xs:string</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-555" covers-40="PR2688">
+      <description> INF inhibits use of xs:double type</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b id="23.1"/><b id=" 1e0 "/><b id=" -INF"/><b id="+29"/></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//"@id") = 4</assert>
+            <assert>every $x in $result//"@id" satisfies jvalue($x) instance of xs:string</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-556" covers-40="PR2688">
+      <description> All attributes are xs:boolean</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b id="true"/><b id=" false "/><b id=" 0"/><b id=" 1"/></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//"@id") = 4</assert>
+            <assert>every $x in $result//"@id" satisfies jvalue($x) instance of xs:boolean</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-557" covers-40="PR2688">
+      <description> All elements integer - use integer type</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><id>23</id></b><b><id>+8</id></b><b><id> -10 </id></b><b><id> 1234</id></b></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <assert>every $x in $result//b/id satisfies jvalue($x) instance of xs:integer</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-558" covers-40="PR2688">
+      <description> A leading zero inhibits use of integer type</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><id>23</id></b><b><id>+8</id></b><b><id> -10 </id></b><b><id>01234</id></b></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <assert>every $x in $result//b/id satisfies jvalue($x) instance of xs:decimal</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-559" covers-40="PR2688">
+      <description> All elements decimal - use decimal type</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><id>23</id></b><b><id>+8.22</id></b><b><id> -10 </id></b><b><id> 1234</id></b></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//id) = 4</assert>
+            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:decimal</assert>
+            <assert>some $x in $result//id satisfies not(jvalue($x) instance of xs:integer)</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-560" covers-40="PR2688">
+      <description> All elements double - use decimal type</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><id>23</id></b><b><id>+8.22e10</id></b><b><id> -10 </id></b><b><id> 1234</id></b></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//id) = 4</assert>
+            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:double</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-561" covers-40="PR2688">
+      <description> NaN inhibits use of xs:double type</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><id>23</id></b><b><id>+8.22e10</id></b><b><id>NaN</id></b><b><id> 1234</id></b></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//id) = 4</assert>
+            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:string</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-562" covers-40="PR2688">
+      <description> INF inhibits use of xs:double type</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><id>23</id></b><b><id>+8.22e10</id></b><b><id>INF</id></b><b><id> 1234</id></b></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//id) = 4</assert>
+            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:string</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-563" covers-40="PR2688">
+      <description> All elements are xs:boolean</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><id>0 </id></b><b><id>1 </id></b><b><id> true </id></b><b><id> false</id></b></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//id) = 4</assert>
+            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:boolean</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-564" covers-40="PR2688">
+      <description> All elements are zero or one - treated as xs:integer</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><id>0 </id></b><b><id>1 </id></b><b><id> 0 </id></b><b><id> 1</id></b></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//id) = 4</assert>
+            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:integer</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-565" covers-40="PR2688">
+      <description> Signed zero or one is not a boolean </description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><id>0 </id></b><b><id>true </id></b><b><id> 0 </id></b><b><id> +1</id></b></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//id) = 4</assert>
+            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:string</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
    <!--<test-case name="element-to-map-601" covers-40="PR1596">
       <description> Empty element with empty layout disabled </description>
       <created by="Michael Kay" on="2024-12-06"/>
