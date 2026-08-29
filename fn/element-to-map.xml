@@ -2150,6 +2150,36 @@
       </result>
    </test-case>
    
+   <test-case name="element-to-map-564" covers-40="PR2688">
+      <description> All elements are zero or one - treated as xs:integer</description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><id>0 </id></b><b><id>1 </id></b><b><id> 0 </id></b><b><id> 1</id></b></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//id) = 4</assert>
+            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:integer</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="element-to-map-565" covers-40="PR2688">
+      <description> Signed zero or one is not a boolean </description>
+      <created by="Michael Kay" on="2026-08-29"/>
+      <test><![CDATA[
+         let $in := parse-xml('<a><b><id>0 </id></b><b><id>true </id></b><b><id> 0 </id></b><b><id> +1</id></b></a>')
+         return element-to-map($in/a, {'plan':element-to-map-plan($in)})
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>count($result//id) = 4</assert>
+            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:string</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
    <!--<test-case name="element-to-map-601" covers-40="PR1596">
       <description> Empty element with empty layout disabled </description>
       <created by="Michael Kay" on="2024-12-06"/>
