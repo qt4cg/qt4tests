@@ -1962,6 +1962,7 @@
    <test-case name="element-to-map-551" covers-40="PR2688">
       <description> A leading zero inhibits use of integer type</description>
       <created by="Michael Kay" on="2026-08-29"/>
+      <modified by="Christian Gruen" on="2026-08-31" change="leading zero selects type string"/>
       <test><![CDATA[
          let $in := parse-xml('<a><b id="023"/><b id=" 0 "/><b id=" -17"/><b id="+29"/></a>')
          return element-to-map($in/a, {'plan':element-to-map-plan($in)})
@@ -1969,7 +1970,7 @@
       <result>
          <all-of>
             <assert>count($result//"@id") = 4</assert>
-            <assert>every $x in $result//"@id" satisfies jvalue($x) instance of xs:decimal</assert>
+            <assert>every $x in $result//"@id" satisfies jvalue($x) instance of xs:untypedAtomic</assert>
          </all-of>
       </result>
    </test-case>
@@ -2008,6 +2009,7 @@
    <test-case name="element-to-map-554" covers-40="PR2688">
       <description> NaN inhibits use of xs:double type</description>
       <created by="Michael Kay" on="2026-08-29"/>
+      <modified by="Christian Gruen" on="2026-08-31" change="untyped content is untypedAtomic"/>
       <test><![CDATA[
          let $in := parse-xml('<a><b id="23.1"/><b id=" 1e0 "/><b id=" NaN"/><b id="+29"/></a>')
          return element-to-map($in/a, {'plan':element-to-map-plan($in)})
@@ -2015,7 +2017,7 @@
       <result>
          <all-of>
             <assert>count($result//"@id") = 4</assert>
-            <assert>every $x in $result//"@id" satisfies jvalue($x) instance of xs:string</assert>
+            <assert>every $x in $result//"@id" satisfies jvalue($x) instance of xs:untypedAtomic</assert>
          </all-of>
       </result>
    </test-case>
@@ -2023,6 +2025,7 @@
    <test-case name="element-to-map-555" covers-40="PR2688">
       <description> INF inhibits use of xs:double type</description>
       <created by="Michael Kay" on="2026-08-29"/>
+      <modified by="Christian Gruen" on="2026-08-31" change="untyped content is untypedAtomic"/>
       <test><![CDATA[
          let $in := parse-xml('<a><b id="23.1"/><b id=" 1e0 "/><b id=" -INF"/><b id="+29"/></a>')
          return element-to-map($in/a, {'plan':element-to-map-plan($in)})
@@ -2030,7 +2033,7 @@
       <result>
          <all-of>
             <assert>count($result//"@id") = 4</assert>
-            <assert>every $x in $result//"@id" satisfies jvalue($x) instance of xs:string</assert>
+            <assert>every $x in $result//"@id" satisfies jvalue($x) instance of xs:untypedAtomic</assert>
          </all-of>
       </result>
    </test-case>
@@ -2065,12 +2068,13 @@
    <test-case name="element-to-map-558" covers-40="PR2688">
       <description> A leading zero inhibits use of integer type</description>
       <created by="Michael Kay" on="2026-08-29"/>
+      <modified by="Christian Gruen" on="2026-08-31" change="leading zero selects type string"/>
       <test><![CDATA[
          let $in := parse-xml('<a><b><id>23</id></b><b><id>+8</id></b><b><id> -10 </id></b><b><id>01234</id></b></a>')
          return element-to-map($in/a, {'plan':element-to-map-plan($in)})
       ]]></test>
       <result>
-         <assert>every $x in $result//b/id satisfies jvalue($x) instance of xs:decimal</assert>
+         <assert>every $x in $result//b/id satisfies jvalue($x) instance of xs:untypedAtomic</assert>
       </result>
    </test-case>
    
@@ -2108,6 +2112,7 @@
    <test-case name="element-to-map-561" covers-40="PR2688">
       <description> NaN inhibits use of xs:double type</description>
       <created by="Michael Kay" on="2026-08-29"/>
+      <modified by="Christian Gruen" on="2026-08-31" change="untyped content is untypedAtomic"/>
       <test><![CDATA[
          let $in := parse-xml('<a><b><id>23</id></b><b><id>+8.22e10</id></b><b><id>NaN</id></b><b><id> 1234</id></b></a>')
          return element-to-map($in/a, {'plan':element-to-map-plan($in)})
@@ -2115,7 +2120,7 @@
       <result>
          <all-of>
             <assert>count($result//id) = 4</assert>
-            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:string</assert>
+            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:untypedAtomic</assert>
          </all-of>
       </result>
    </test-case>
@@ -2123,6 +2128,7 @@
    <test-case name="element-to-map-562" covers-40="PR2688">
       <description> INF inhibits use of xs:double type</description>
       <created by="Michael Kay" on="2026-08-29"/>
+      <modified by="Christian Gruen" on="2026-08-31" change="untyped content is untypedAtomic"/>
       <test><![CDATA[
          let $in := parse-xml('<a><b><id>23</id></b><b><id>+8.22e10</id></b><b><id>INF</id></b><b><id> 1234</id></b></a>')
          return element-to-map($in/a, {'plan':element-to-map-plan($in)})
@@ -2130,7 +2136,7 @@
       <result>
          <all-of>
             <assert>count($result//id) = 4</assert>
-            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:string</assert>
+            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:untypedAtomic</assert>
          </all-of>
       </result>
    </test-case>
@@ -2168,6 +2174,7 @@
    <test-case name="element-to-map-565" covers-40="PR2688">
       <description> Signed zero or one is not a boolean </description>
       <created by="Michael Kay" on="2026-08-29"/>
+      <modified by="Christian Gruen" on="2026-08-31" change="untyped content is untypedAtomic"/>
       <test><![CDATA[
          let $in := parse-xml('<a><b><id>0 </id></b><b><id>true </id></b><b><id> 0 </id></b><b><id> +1</id></b></a>')
          return element-to-map($in/a, {'plan':element-to-map-plan($in)})
@@ -2175,7 +2182,7 @@
       <result>
          <all-of>
             <assert>count($result//id) = 4</assert>
-            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:string</assert>
+            <assert>every $x in $result//id satisfies jvalue($x) instance of xs:untypedAtomic</assert>
          </all-of>
       </result>
    </test-case>
