@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-current" covers-40="PR2868">
+   <description>Tests for the XPath 4.0 fn:current function</description>
+   
+   
+   <test-case name="fn-current-001">
+      <description>Initial context item supplied</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <environment ref="staff"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+        current()/staff/employee[1]/empname
+      </test>
+      <result>
+         <assert-eq>"Alice"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-002">
+      <description>Initial context item not supplied</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+        current()/staff/employee[1]/empname
+      </test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-003">
+      <description>Initial context item supplied, and changes within a predicate</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <environment ref="staff"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+        /staff/employee[empname = current()/staff/employee[5]/empname]/empnum
+      </test>
+      <result>
+         <assert-eq>"E5"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-004">
+      <description>Initial context item supplied, value used within global variable initializer</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <environment ref="staff"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare variable $var := current()/staff/employee[5]/empname;
+         /staff/employee[empname = $var]/empnum
+      </test>
+      <result>
+         <assert-eq>"E5"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-005">
+      <description>current() used within global variable initializer, within which focus changes</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <environment ref="staff"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare variable $var := /staff/employee[empname = current()/staff/employee[5]/empname]/empnum;
+         /staff/employee[empnum = $var]/empname
+      </test>
+      <result>
+         <assert-eq>"Ed"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-006">
+      <description>current() used within function body.</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <environment ref="staff"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function findEmp($num as xs:string) {
+           current()/staff/employee[empnum = $num]
+         };
+         findEmp("E5")/empname
+      </test>
+      <result>
+         <assert-eq>"Ed"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-007">
+      <description>current() used twice within function body.</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <environment ref="staff"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function findEmp($num as xs:string) {
+           current()/staff/employee[empname = current()/staff/employee[5]/empname]
+         };
+         findEmp("E5")/empname
+      </test>
+      <result>
+         <assert-eq>"Ed"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-008">
+      <description>current#0 binds the current value</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <environment ref="staff"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $f := current#0
+         return /staff/employee[empnum = $f()/staff/employee[5]/empnum]/empname
+      </test>
+      <result>
+         <assert-eq>"Ed"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-009">
+      <description>current() as default value of function parameter</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <environment ref="staff"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function findEmp($doc as node() := current()) {
+           $doc/staff/employee[empname = "Ed"]/empnum
+         };
+         findEmp()
+      </test>
+      <result>
+         <assert-eq>"E5"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-010">
+      <description>current() as default value of function parameter</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <environment ref="staff"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function findEmp($doc as node() := current()) {
+           $doc/staff/employee[empname = "Ed"]/empnum
+         };
+         ./staff/findEmp()
+      </test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-011">
+      <description>current() as default value of function parameter</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <environment ref="staff"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function findEmp($staff as node() := current()) {
+           $staff/employee[empname = "Ed"]/empnum
+         };
+         ./staff/findEmp()
+      </test>
+      <result>
+         <assert-eq>"E5"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-012">
+      <description>current()/employee as default value of function parameter</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <environment ref="staff"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function findEmp($employees as node()* := current()/employee) {
+           $employees[empname = "Ed"]/empnum
+         };
+         ./staff/findEmp()
+      </test>
+      <result>
+         <assert-eq>"E5"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-013">
+      <description>current() as default value of function parameter, but with the wrong type</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <environment ref="staff"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function findEmp($doc as node(), $key as map(*) := current()) {
+           $doc/staff/employee[empname = $key?key]/empnum
+         };
+         findEmp(.)
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-014">
+      <description>current() used within function body. Function is recursive to inhibit inlining</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <environment ref="staff"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function findEmp($num as xs:string) {
+           if ($num = "") then findEmp("bananas") else current()/staff/employee[empnum = $num]
+         };
+         findEmp("E5"||substring(string(current-date()), 50))/empname
+      </test>
+      <result>
+         <assert-eq>"Ed"</assert-eq>
+      </result>
+   </test-case>
+   
+  
+   
+   
+   
+</test-set>
