@@ -7,11 +7,12 @@
    <dependency type="spec" value="XP40+ XQ40+"/>
 
 	<test-case name="fn-dateTime-record-empty-record">
-		<description>Creates a dateTime-record with the value of each field set to the empty sequence.</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix expected result"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record((), (), (), (), (), (), ())</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': (), 'month': (), 'day': (), 'hours': (), 'minutes': (), 'seconds': (), 'timezone': () } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -29,10 +30,11 @@
 	</test-case>
 
 	<test-case name="fn-dateTime-record-dateTime-with-timezone">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:dateTime, with a timezone.</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Michael Kay" on="2026-07-09" change="PR2566"/>
-		<test>fn:dateTime-record(xs:integer(1999), xs:integer(5), xs:integer(31), xs:integer(13), xs:integer(20), xs:decimal(0), xs:dayTimeDuration("-PT5H"))</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': xs:integer(1999), 'month': xs:integer(5), 'day': xs:integer(31), 'hours': xs:integer(13), 'minutes': xs:integer(20), 'seconds': xs:decimal(0), 'timezone': xs:dayTimeDuration("-PT5H") } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -49,11 +51,11 @@
 		</result>
 	</test-case>
 	
-	<test-case name="fn-dateTime-record-dateTime-with-timezone-using-keywords">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments 
-			supplied are equivalent to an xs:dateTime, with a timezone.</description>
+	<test-case name="fn-dateTime-record-dateTime-with-timezone-duration">
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Michael Kay" on="2026-03-26"/>
-		<test>fn:dateTime-record(year:=1999, month:=5, day:=31, hours:=13, minutes:=20, seconds:=0, timezone:=xs:duration("-PT5H"))</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': 1999, 'month': 5, 'day': 31, 'hours': 13, 'minutes': 20, 'seconds': 0, 'timezone': xs:duration("-PT5H") } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -71,11 +73,12 @@
 	</test-case>
 	
 	<test-case name="fn-dateTime-record-dateTime-without-timezone">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:dateTime without a timezone value.</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix expected result"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record(xs:integer(2000), xs:integer(6), xs:integer(12), xs:integer(13), xs:integer(20), xs:decimal(0), ())</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': xs:integer(2000), 'month': xs:integer(6), 'day': xs:integer(12), 'hours': xs:integer(13), 'minutes': xs:integer(20), 'seconds': xs:decimal(0), 'timezone': () } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -92,12 +95,12 @@
 		</result>
 	</test-case>
 	
-	<test-case name="fn-dateTime-record-dateTime-sans-timezone-using-keywords">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments 
-			supplied are equivalent to an xs:dateTime, without a timezone.</description>
+	<test-case name="fn-dateTime-record-dateTime-sans-timezone-omitted-field">
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Michael Kay" on="2026-03-26"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record(year:=1999, month:=5, day:=31, hours:=13, minutes:=20, seconds:=0)</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': 1999, 'month': 5, 'day': 31, 'hours': 13, 'minutes': 20, 'seconds': 0 } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -115,12 +118,13 @@
 	</test-case>
 	
 	<test-case name="fn-dateTime-record-date">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:date</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Christian Gruen" on="2026-03-13" change="duplicate test removed"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix expected result"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record(xs:integer(2026), xs:integer(2), xs:integer(21), (), (), (), ())</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': xs:integer(2026), 'month': xs:integer(2), 'day': xs:integer(21), 'hours': (), 'minutes': (), 'seconds': (), 'timezone': () } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -138,10 +142,11 @@
 	</test-case>
 	
 	<test-case name="fn-dateTime-record-date-omitting-absent-fields">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:date</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Michael Kay" on="2026-03-26"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record(2026, 2, 21)</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': 2026, 'month': 2, 'day': 21 } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -158,12 +163,12 @@
 		</result>
 	</test-case>
 	
-	<test-case name="fn-dateTime-record-date-using-keywords">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments 
-			supplied are equivalent to an xs:date supplied using keywords</description>
+	<test-case name="fn-dateTime-record-date-unordered-fields">
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Michael Kay" on="2026-03-26"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record(day:=21, month:=2, year:=2026)</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'day': 21, 'month': 2, 'year': 2026 } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -181,11 +186,12 @@
 	</test-case>
 	
 	<test-case name="fn-dateTime-record-time">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:time</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix expected result"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record((), (), (), xs:integer(13), xs:integer(30), xs:decimal(04.2678), ())</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': (), 'month': (), 'day': (), 'hours': xs:integer(13), 'minutes': xs:integer(30), 'seconds': xs:decimal(04.2678), 'timezone': () } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -202,12 +208,12 @@
 		</result>
 	</test-case>
 	
-	<test-case name="fn-dateTime-record-time-using-keywords">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments 
-			supplied are equivalent to an xs:time, using keywords</description>
+	<test-case name="fn-dateTime-record-time-omitting-absent-fields">
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Michael Kay" on="2026-03-26"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record(hours:=13, minutes:=30, seconds:=4.2678)</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'hours': 13, 'minutes': 30, 'seconds': 4.2678 } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -225,11 +231,12 @@
 	</test-case>
 	
 	<test-case name="fn-dateTime-record-gYear">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:gYear</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix expected result"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record(xs:integer(2007), (), (), (), (), (), ())</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': xs:integer(2007), 'month': (), 'day': (), 'hours': (), 'minutes': (), 'seconds': (), 'timezone': () } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -247,11 +254,12 @@
 	</test-case>
 	
 	<test-case name="fn-dateTime-record-gYearMonth">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:gYearMonth</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix expected result"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record(xs:integer(2007), xs:integer(5), (), (), (), (), ())</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': xs:integer(2007), 'month': xs:integer(5), 'day': (), 'hours': (), 'minutes': (), 'seconds': (), 'timezone': () } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -269,11 +277,12 @@
 	</test-case>
 	
 	<test-case name="fn-dateTime-record-gMonth">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:gMonth</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix expected result"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record((), xs:integer(10), (), (), (), (), ())</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': (), 'month': xs:integer(10), 'day': (), 'hours': (), 'minutes': (), 'seconds': (), 'timezone': () } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -291,11 +300,12 @@
 	</test-case>
 	
 	<test-case name="fn-dateTime-record-gMonthDay">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:gMonthDay</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix expected result"/>
 		<modified by="Michael Kay" on="2026-07-09" change="PR2566"/>
-		<test>fn:dateTime-record((), xs:integer(10), xs:integer(8), (), (), (), ())</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': (), 'month': xs:integer(10), 'day': xs:integer(8), 'hours': (), 'minutes': (), 'seconds': (), 'timezone': () } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -313,11 +323,12 @@
 	</test-case>
 	
 	<test-case name="fn-dateTime-record-gDay">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied are equivalent to an xs:gDay</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix expected result"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record((), (), xs:integer(8), (), (), (), ())</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': (), 'month': (), 'day': xs:integer(8), 'hours': (), 'minutes': (), 'seconds': (), 'timezone': () } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -335,12 +346,13 @@
 	</test-case>
 	
 	<test-case name="fn-dateTime-record-timezone-dayTimeDuration">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied represent a timezone, expressed as an xs:dayTimeDuration.</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix expected result"/>
 		<modified by="Sheila Thomson" on="2026-03-20" change="renamed"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record((), (), (), (), (), (), xs:dayTimeDuration("PT6H"))</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': (), 'month': (), 'day': (), 'hours': (), 'minutes': (), 'seconds': (), 'timezone': xs:dayTimeDuration("PT6H") } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -358,10 +370,11 @@
 	</test-case>
 	
 	<test-case name="fn-dateTime-record-timezone-coercion-from-duration-valid">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied represent a valid timezone, but needs to be coerced from an xs:duration to an xs:dayTimeDuration.</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-03-24"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record((), (), (), (), (), (), xs:duration("PT6H"))</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': (), 'month': (), 'day': (), 'hours': (), 'minutes': (), 'seconds': (), 'timezone': xs:duration("PT6H") } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -379,10 +392,11 @@
 	</test-case>
 	
 	<test-case name="fn-dateTime-record-timezone-coercion-from-duration-invalid">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the arguments supplied represent an invalid timezone (> 840 min), expressed as an xs:duration instead of xs:dayTimeDuration. Record should be created, as no validation required.</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-03-24"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record((), (), (), (), (), (), xs:duration("P1DT6H"))</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': (), 'month': (), 'day': (), 'hours': (), 'minutes': (), 'seconds': (), 'timezone': xs:duration("P1DT6H") } return $r</test>
 		<result>
 			<all-of>
 				<assert-count>1</assert-count>
@@ -399,41 +413,45 @@
 		</result>
 	</test-case>
 	
-	<test-case name="fn-dateTime-record-empty-sequence">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when the sole argument supplied is fn:empty-sequence</description>
+	<test-case name="fn-dateTime-record-empty-field">
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix expected result"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record(())</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': () } return $r</test>
 		<result>
 			<assert>map:size($result) eq 7</assert>
 		</result>
 	</test-case>
 	
-	<test-case name="fn-dateTime-record-zero-args">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when no argument is supplied</description>
+	<test-case name="fn-dateTime-record-empty-map">
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
 		<modified by="Gunther Rademacher" on="2026-03-18" change="fix expected result"/>
 		<modified by="Christian Gruen" on="2026-07-01" change="PR2566"/>
-		<test>fn:dateTime-record()</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := {} return $r</test>
 		<result>
 			<assert>map:size($result) eq 7</assert>
 		</result>
 	</test-case>
 	
-	<test-case name="fn-dateTime-record-multiple-args">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when too many arguments are supplied.</description>
+	<test-case name="fn-dateTime-record-surplus-field">
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
-		<test>fn:dateTime-record((), (), (), (), (), (), (), ())</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': (), 'month': (), 'day': (), 'hours': (), 'minutes': (), 'seconds': (), 'timezone': (), 'era': () } return $r</test>
 		<result>
-			<error code="XPST0017" />
+			<error code="XPTY0004" />
 		</result>
 	</test-case>
 	
 	<test-case name="fn-dateTime-record-string">
-		<description>Evaluates the implicit constructor for fn:dateTime-record when one of the arguments supplied is a string, which is not one of the expected datatypes.</description>
+		<description>Coercion of a map to fn:dateTime-record.</description>
 		<created by="Sheila Thomson" on="2026-02-24"/>
-		<test>fn:dateTime-record((), (), (), (), (), (), xs:string("UTC"))</test>
+		<modified by="Christian Gruen" on="2026-09-01" change="PR2768"/>
+		<test>let $r as fn:dateTime-record := { 'year': (), 'month': (), 'day': (), 'hours': (), 'minutes': (), 'seconds': (), 'timezone': xs:string("UTC") } return $r</test>
 		<result>
 			<error code="XPTY0004" />
 		</result>
