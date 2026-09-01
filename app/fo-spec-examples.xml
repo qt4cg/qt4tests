@@ -6331,7 +6331,7 @@ Tak, tak, tak! - da kommen sie.
         matching-segments(
   "2026-06-25",
   "(?&lt;year&gt;\d{4})-(?&lt;month&gt;\d{2})-(?&lt;day&gt;\d{2})"
-)/groups/*[?nr = 2]/value
+)/groups/*[?nr = 2]/value =&gt; string()
       </test>
       <result>
          <assert-deep-eq>"06"</assert-deep-eq>
@@ -6390,23 +6390,23 @@ return $regex?replace($title, fn { . + 1 })
          <assert-deep-eq>
   { "substring": "A1",
     "position": 1,
-    "groups": {1: { "group": "A", "position": 1 },
-               2: { "group": "1", "position": 2 } }
+    "groups": {1: { "value": "A", "position": 1, "nr": 1, "name": () },
+               2: { "value": "1", "position": 2, "nr": 2, "name": () } }
   },
   { "substring": "C15",
     "position": 4,
     "groups": {1: { "value": "C", "position": 4, "nr": 1, "name": () },
-               2: { "group": "15", "position": 5, "nr": 2, "name": () } }
+               2: { "value": "15", "position": 5, "nr": 2, "name": () } }
   },
   { "substring": "D24",
     "position": 9,
-    "groups": {1: { "group": "D", "position": 9, "nr": 1, "name": () },
-               2: { "group": "24", "position": 10, "nr": 2, "name": () } }
+    "groups": {1: { "value": "D", "position": 9, "nr": 1, "name": () },
+               2: { "value": "24", "position": 10, "nr": 2, "name": () } }
   },
   { "substring": "X50",
     "position": 14,
-    "groups": {1: { "group": "X", "position": 14, "nr": 1, "name": () },
-               2: { "group": "50", "position": 15, "nr": 2, "name": () } }
+    "groups": {1: { "value": "X", "position": 14, "nr": 1, "name": () },
+               2: { "value": "50", "position": 15, "nr": 2, "name": () } }
   }
                </assert-deep-eq>
       </result>
@@ -16565,7 +16565,7 @@ element-to-map-plan((&lt;a&gt;&lt;b/&gt;&lt;b/&gt;&lt;/a&gt;, &lt;a&gt;&lt;b/&gt
       <test>
         map-to-element(
   { "years": [ "2023", "2023" ] },
-  { "plan": { "dates": { "layout": "list", "child": "year" } } }
+  { "plan": { "years": { "layout": "list", "child": "year" } } }
 )
       </test>
       <result>
@@ -21503,7 +21503,8 @@ return every($dl/*, fn($elem, $pos) {
       <environment ref="global"/>
       <test>
         let $amounts := (150, -60, -40, 300, -25)
-return tail(scan($amounts, 0, op('+'))) ! ?*
+let $balances := scan($amounts, 0, op('+'))
+return tail($balances)?*
       </test>
       <result>
          <assert-deep-eq>150, 90, 50, 350, 325</assert-deep-eq>
@@ -21515,11 +21516,12 @@ return tail(scan($amounts, 0, op('+'))) ! ?*
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-09-01"/>
       <environment ref="global"/>
       <test>
-        tail(scan(
+        let $paths := scan(
   ("usr", "local", "bin"),
   "",
   fn($path, $step) { $path || "/" || $step }
-)) ! ?*
+)
+return tail($paths)?*
       </test>
       <result>
          <assert-deep-eq>"/usr", "/usr/local", "/usr/local/bin"</assert-deep-eq>
