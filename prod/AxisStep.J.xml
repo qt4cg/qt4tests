@@ -1719,13 +1719,14 @@
    </test-case>
    
    <test-case name="JAxes-332">
-      <description> Use type tests - gnode()</description>
+      <description> Use type tests - node()</description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Michael Kay" on="2026-02-27" change="correct expected results"/>
+      <modified by="Christian Gruen" on="2026-09-01" change="PR2795"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
          let $array := [1, xs:date('2002-02-02'), #xml:space, contains#2, {}]
-         return count($array/gnode())
+         return count($array/node())
       ]]></test>
       <result>
          <assert-eq>5</assert-eq>
@@ -1733,13 +1734,14 @@
    </test-case>
    
    <test-case name="JAxes-333">
-      <description> Use type tests - child::gnode()</description>
+      <description> Use type tests - child::node()</description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Michael Kay" on="2026-02-27" change="correct expected results"/>
+      <modified by="Christian Gruen" on="2026-09-01" change="PR2795"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
          let $array := [1, (), jtree([]), parse-xml("<doc/>"), ([], [])]
-         return count($array/child::gnode())
+         return count($array/child::node())
       ]]></test>
       <result>
          <assert-eq>5</assert-eq>
@@ -1747,19 +1749,46 @@
    </test-case>
    
    <test-case name="JAxes-334">
-      <description> Use type tests - child::jnode(*, gnode()?)</description>
+      <description> Use type tests - child::jnode(*, node()?)</description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
+      <modified by="Christian Gruen" on="2026-09-01" change="PR2795"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
          let $array := [1, (), jtree([]), parse-xml("<doc/>"), ([], [])]
-         return count($array/child::jnode(*, gnode()?))
+         return count($array/child::jnode(*, node()?))
       ]]></test>
       <result>
          <assert-eq>3</assert-eq>
       </result>
    </test-case>
    
+   <test-case name="JAxes-335" covers-40="PR2795">
+      <description>Generalized node type tests</description>
+      <created by="Christian Gruen" on="2026-09-01"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $array := [1, xs:date('2002-02-02'), #xml:space, contains#2, {}]
+         return count($array/xnode())
+      ]]></test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="JAxes-336" covers-40="PR2795">
+      <description>Generalized node type tests</description>
+      <created by="Christian Gruen" on="2026-09-01"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $array := [1, (), jtree([]), parse-xml("<doc/>"), ([], [])]
+         return count($array/child::xnode())
+      ]]></test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
    <test-case name="JAxes-901">
       <description> Obsolete syntax </description>
       <created by="Michael Kay" on="2026-02-10"/>
@@ -1823,6 +1852,35 @@
       <test><![CDATA[
          let $array := [1, 2, 3]
          return count($array/child::~map(*))
+      ]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-906" covers-40="PR2795">
+      <description>Generalized node type tests</description>
+      <created by="Christian Gruen" on="2026-09-01"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $array := [1, (), jtree([]), parse-xml("<doc/>"), ([], [])]
+         return count($array/gnode())
+      ]]></test>
+      <result>
+         <any-of>
+            <error code="XPST0003"/>
+            <error code="XPST0017"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="JAxes-907" covers-40="PR2795">
+      <description>Generalized node type tests</description>
+      <created by="Christian Gruen" on="2026-09-01"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $array := [1, (), jtree([]), parse-xml("<doc/>"), ([], [])]
+         return count($array/child::gnode())
       ]]></test>
       <result>
          <error code="XPST0003"/>
