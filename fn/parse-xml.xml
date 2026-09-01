@@ -100,22 +100,24 @@
     </test-case>
     
     <test-case name="parse-xml-008a" covers-40="PR2213">
-        <description>parse-xml test - with external DTD - 4.0 trusted</description>
+        <description>parse-xml test - with external DTD - 4.0 trust-external=true</description>
         <created by="Michael Kay" on="2026-03-25"/>        
+        <modified by="Christian Gruen" on="2026-09-02" change="PR2796"/>
         <environment name="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"></dependency>
-        <test><![CDATA[parse-xml("<!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>", {'trusted':true()})]]></test>
+        <test><![CDATA[parse-xml("<!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>", {'trust-external':true()})]]></test>
         <result>
             <assert-xml><![CDATA[<a>foo</a>]]></assert-xml>
         </result>
     </test-case>
     
     <test-case name="parse-xml-008b" covers-40="PR2213">
-        <description>parse-xml test - with external DTD - 4.0 untrusted</description>
+        <description>parse-xml test - with external DTD - 4.0 trust-external=false</description>
         <created by="Michael Kay" on="2026-03-25"/>        
+        <modified by="Christian Gruen" on="2026-09-02" change="PR2796"/>
         <environment name="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"></dependency>
-        <test><![CDATA[parse-xml("<!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>", {'trusted':false()})]]></test>
+        <test><![CDATA[parse-xml("<!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>", {'trust-external':false()})]]></test>
         <result>
             <error code="FODC0016"/>
         </result>
@@ -133,12 +135,13 @@
     </test-case>
     
     <test-case name="parse-xml-009a" covers-40="PR2213">
-        <description>parse-xml test - with XML declaration and external DTD - trusted</description>
+        <description>parse-xml test - with XML declaration and external DTD - trust-external=true</description>
         <created by="Michael Kay" on="2026-03-25"/>        
+        <modified by="Christian Gruen" on="2026-09-02" change="PR2796"/>
         <environment name="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml("<?xml version='1.0' encoding='iso-8859-1'?><!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>",
-                                 { 'trusted' : true() })]]></test>
+                                 { 'trust-external' : true() })]]></test>
         <result>
             <assert-xml><![CDATA[<a>foo</a>]]></assert-xml>
         </result>
@@ -170,12 +173,13 @@
     </test-case>
     
     <test-case name="parse-xml-010a" covers-40="PR2213">
-        <description>parse-xml test - with external entity - trusted</description>
+        <description>parse-xml test - with external entity - trust-external=true</description>
         <created by="Michael Kay" on="2026-03-25"/>
+        <modified by="Christian Gruen" on="2026-09-02" change="PR2796"/>
         <environment name="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml("<!DOCTYPE a [<!ELEMENT a (#PCDATA)><!ENTITY foo SYSTEM 'parse-xml/foo.entity'>]><a>" ||
-            codepoints-to-string(38) || "foo;</a>", {'trusted':true()})
+            codepoints-to-string(38) || "foo;</a>", {'trust-external':true()})
         ]]></test>
         <result>
             <assert-xml><![CDATA[<a><bar>baz</bar></a>]]></assert-xml>
@@ -183,12 +187,13 @@
     </test-case>
     
     <test-case name="parse-xml-010b" covers-40="PR2213">
-        <description>parse-xml test - with external entity - untrusted</description>
+        <description>parse-xml test - with external entity - trust-external=false</description>
         <created by="Michael Kay" on="2026-03-25"/>
+        <modified by="Christian Gruen" on="2026-09-02" change="PR2796"/>
         <environment name="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml("<!DOCTYPE a [<!ELEMENT a (#PCDATA)><!ENTITY foo SYSTEM 'parse-xml/foo.entity'>]><a>" ||
-            codepoints-to-string(38) || "foo;</a>", {'trusted':false()})
+            codepoints-to-string(38) || "foo;</a>", {'trust-external':false()})
         ]]></test>
         <result>
             <error code="FODC0016"/>
@@ -332,10 +337,11 @@
     <test-case name="parse-xml-412" covers-40="PR1257 PR2213">
         <description>parse-xml test - with DTD validation</description>
         <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <modified by="Christian Gruen" on="2026-09-02" change="PR2796"/>
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml("<!DOCTYPE IDS SYSTEM 'id/iddtd2.dtd'><IDS><E a='x'/><E a='y'/></IDS>", 
-            {'dtd-validation': true(), 'trusted': true()})]]></test>
+            {'dtd-validation': true(), 'trust-external': true()})]]></test>
         <result>
             <assert>exists($result//E[@a='x'])</assert>
         </result>
@@ -344,10 +350,11 @@
     <test-case name="parse-xml-413" covers-40="PR1257 PR2213">
         <description>parse-xml test - with DTD validation failure (required attribute missing)</description>
         <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <modified by="Christian Gruen" on="2026-09-02" change="PR2796"/>
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml("<!DOCTYPE IDS SYSTEM 'id/iddtd.dtd'><IDS><E a='x'/><E/></IDS>", 
-            {'dtd-validation': true(), 'trusted': true()})]]></test>
+            {'dtd-validation': true(), 'trust-external': true()})]]></test>
         <result>
             <error code="FODC0007"/>
         </result>
@@ -356,10 +363,11 @@
     <test-case name="parse-xml-414" covers-40="PR1257 PR2213">
         <description>parse-xml test - with DTD validation failure (duplicate IDs)</description>
         <created by="Michael Kay, Saxonica" on="2024-06-11"/>        
+        <modified by="Christian Gruen" on="2026-09-02" change="PR2796"/>
         <environment ref="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml("<!DOCTYPE IDS SYSTEM 'id/iddtd.dtd'><IDS><E a='x'/><E a='x'/></IDS>", 
-            {'dtd-validation': true(), 'trusted': true()})]]></test>
+            {'dtd-validation': true(), 'trust-external': true()})]]></test>
         <result>
             <error code="FODC0007"/>
         </result>
@@ -686,10 +694,11 @@
     <test-case name="parse-xml-454" covers-40="PR1879">
         <description>parse-xml test - internal DTD with external entities, OK because allowed</description>
         <created by="Michael Kay" on="2025-03-26"/>        
+        <modified by="Christian Gruen" on="2026-09-02" change="PR2796"/>
         <environment name="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml(`<!DOCTYPE foo [ <!ENTITY ext SYSTEM 'parse-xml/foo.entity'> ]><foo>&ext;</foo>`,
-            {'trusted': true()})]]></test>
+            {'trust-external': true()})]]></test>
         <result>
             <assert-xml><![CDATA[<foo><bar>baz</bar></foo>]]></assert-xml>
         </result>
@@ -755,12 +764,13 @@
         <description>parse-xml test - xinclude processing on</description>
         <created by="Michael Kay" on="2025-03-26"/>
         <modified by="Christian Gruen" on="2026-07-21" change="PR2213"/>
+        <modified by="Christian Gruen" on="2026-09-02" change="PR2796"/>
         <environment name="empty"/>
         <dependency type="spec" value="XP40+ XQ40+"/>
         <test><![CDATA[parse-xml(`<foo xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="parse-xml/foo.entity"/>
 </foo>`,
-            { 'xinclude': true(), 'trusted': true() } )]]></test>
+            { 'xinclude': true(), 'trust-external': true() } )]]></test>
         <result>
             <any-of>
                 <error code="FODC0013"/>
