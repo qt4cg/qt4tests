@@ -4484,4 +4484,162 @@ Second line</text>
         </result>
     </test-case>
 
+    <test-case name="serialize-xml-162" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(codepoints-to-string(1), { 'version': '1.0' })
+        ]]></test>
+        <result>
+            <error code="SERE0006"/>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-163" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize(codepoints-to-string(1), { 'version': '1.1' })
+        ]]></test>
+        <result>
+            <assert>matches($result, '^' || codepoints-to-string(38) || '#(x0*1|0*1);$', 'i')</assert>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-164" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            string-to-codepoints(serialize(codepoints-to-string(1), { 'method': 'text' }))
+        ]]></test>
+        <result>
+            <assert-eq>1</assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-json-343" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            serialize([ codepoints-to-string(1) ], { 'method': 'json' })
+        ]]></test>
+        <result>
+            <assert-eq>'["\u0001"]'</assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-165" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>string-to-codepoints(serialize(codepoints-to-string((9, 10, 13)), { 'version': '1.0' }))</test>
+        <result>
+            <assert-deep-eq>9, 10, 38, 35, 120, 68, 59</assert-deep-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-166" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(codepoints-to-string(0x7F), { 'version': '1.0' })</test>
+        <result>
+            <assert>matches($result, '^' || codepoints-to-string(38) || '#(x0*7F|0*127);$', 'i')</assert>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-167" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(codepoints-to-string(1), { 'version': '1.0', 'use-character-maps': { codepoints-to-string(1): 'CTRL' } })</test>
+        <result>
+            <assert-eq>'CTRL'</assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-json-344" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize([ codepoints-to-string(0x1F) ], { 'method': 'json' })</test>
+        <result>
+            <assert-eq>'["\u001F"]'</assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-json-345" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize([ codepoints-to-string(0x20) ], { 'method': 'json' })</test>
+        <result>
+            <assert-eq>'[" "]'</assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-json-346" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize([ codepoints-to-string(1) ], { 'method': 'json', 'canonical': true() })</test>
+        <result>
+            <assert-eq>'["\u0001"]'</assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-html-008" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(codepoints-to-string(1), { 'method': 'html', 'html-version': 5.0 })</test>
+        <result>
+            <assert>matches($result, '^' || codepoints-to-string(38) || '#(x0*1|0*1);$', 'i')</assert>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-html-009" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>string-to-codepoints(serialize(codepoints-to-string((9, 10)), { 'method': 'html', 'html-version': 4.01 }))</test>
+        <result>
+            <assert-deep-eq>9, 10</assert-deep-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xhtml-151" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(codepoints-to-string(1), { 'method': 'xhtml' })</test>
+        <result>
+            <error code="SERE0006"/>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-168" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>serialize(codepoints-to-string(1 to 31), { 'version': '1.0' })</test>
+        <result>
+            <error code="SERE0006"/>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-169" covers-40="PR546">
+        <description>Serialization of permitted characters.</description>
+        <created by="Christian Gruen" on="2026-09-08"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>string-length(serialize(codepoints-to-string(1 to 31), { 'method': 'text' }))</test>
+        <result>
+            <assert-eq>31</assert-eq>
+        </result>
+    </test-case>
+
 </test-set>

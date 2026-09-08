@@ -261,12 +261,24 @@
       <description> Codepoint 8 is invalid in XML 1.0 but valid in XML 1.1. </description>
       <created by="Frans Englich" on="2007-11-26"/>
       <modified by="O'Neil Delpratt" on="2016-04-19" change="Added XML 1.0 dependency" />
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <dependency type="xml-version" value="1.0" />
+      <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"/>
       <test>codepoints-to-string(8)</test>
       <result>
          <any-of>
             <error code="FOCH0001"/>
          </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="K-CodepointToStringFunc-8b" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>codepoints-to-string(8)</test>
+      <result>
+         <assert>string-to-codepoints($result) eq 8</assert>
       </result>
    </test-case>
 
@@ -304,10 +316,22 @@
    <test-case name="K-CodepointToStringFunc-11">
       <description> Codepoint 11 is invalid in XML 1.0 but valid in XML 1.1. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <dependency type="xml-version" value="1.0"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"/>
       <test>codepoints-to-string(11)</test>
       <result>
          <error code="FOCH0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="K-CodepointToStringFunc-11a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>codepoints-to-string(11)</test>
+      <result>
+         <assert>string-to-codepoints($result) eq 11</assert>
       </result>
    </test-case>
 
@@ -324,10 +348,22 @@
    <test-case name="K-CodepointToStringFunc-12">
       <description> Codepoint 12 is invalid in XML 1.0 but valid in XML 1.1. </description>
       <created by="Frans Englich" on="2007-11-26"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <dependency type="xml-version" value="1.0"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"/>
       <test>codepoints-to-string(12)</test>
       <result>
          <error code="FOCH0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="K-CodepointToStringFunc-12a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>codepoints-to-string(12)</test>
+      <result>
+         <assert>string-to-codepoints($result) eq 12</assert>
       </result>
    </test-case>
 
@@ -365,6 +401,16 @@
       </result>
    </test-case>
 
+   <test-case name="K-CodepointToStringFunc-14a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-to-codepoints(codepoints-to-string(14))</test>
+      <result>
+         <assert-eq>14</assert-eq>
+      </result>
+   </test-case>
+
    <test-case name="K-CodepointToStringFunc-15">
       <description> Codepoint 31 is invalid in XML 1.0 but valid in XML 1.1. </description>
       <created by="Frans Englich" on="2007-11-26"/>
@@ -374,6 +420,16 @@
             <assert-eq>31</assert-eq>
             <error code="FOCH0001"/>
          </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="K-CodepointToStringFunc-15a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-to-codepoints(codepoints-to-string(31))</test>
+      <result>
+         <assert-eq>31</assert-eq>
       </result>
    </test-case>
 
@@ -522,7 +578,8 @@
       <description> test fn:codepoints-to-string with invalid control character </description>
       <created by="Tim Mills" on="2008-04-11"/>
       <modified by="Michael Kay" on="2016-11-12" change="Added dependency, See bug 30001"/>
-      <dependency type="spec" value="XQ10+"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <dependency type="xsd-version" value="1.0"/>      
       <test>
         declare function local:test($test as xs:integer) as xs:integer? { 
@@ -533,13 +590,29 @@
          <error code="FOCH0001"/>
       </result>
    </test-case>
+   <test-case name="cbcl-codepoints-to-string-002a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="xsd-version" value="1.0"/>      
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+        declare function local:test($test as xs:integer) as xs:integer? { 
+          if ($test = 1) then ( 0 ) else if ($test = 2) then ( 9 ) else if ($test = 3) then ( 13 ) else if ($test = 4) then ( 16 ) else () 
+        }; 
+        fn:codepoints-to-string( local:test(2) to 32 )</test>
+      <result>
+         <assert>deep-equal(string-to-codepoints($result), 9 to 32)</assert>
+      </result>
+   </test-case>
+
    
 
    <test-case name="cbcl-codepoints-to-string-003">
       <description> test fn:codepoints-to-string with invalid control character </description>
       <created by="Tim Mills" on="2008-04-11"/>
       <modified by="Michael Kay" on="2016-11-12" change="Added dependency, See bug 30001"/>
-      <dependency type="spec" value="XQ10+"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <dependency type="xsd-version" value="1.0"/> 
       <test>
       declare function local:test($test as xs:integer) as xs:integer? { 
@@ -550,13 +623,29 @@
          <error code="FOCH0001"/>
       </result>
    </test-case>
+   <test-case name="cbcl-codepoints-to-string-003a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="xsd-version" value="1.0"/> 
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+      declare function local:test($test as xs:integer) as xs:integer? { 
+        if ($test = 1) then ( 0 ) else if ($test = 2) then ( 9 ) else if ($test = 3) then ( 13 )else if ($test = 4) then ( 16 ) else () 
+      }; 
+      fn:codepoints-to-string( local:test(3) to 32 )</test>
+      <result>
+         <assert>deep-equal(string-to-codepoints($result), 13 to 32)</assert>
+      </result>
+   </test-case>
+
    
 
    <test-case name="cbcl-codepoints-to-string-004">
       <description> test fn:codepoints-to-string with invalid control character </description>
       <created by="Tim Mills" on="2008-04-11"/>
       <modified by="Michael Kay" on="2016-11-12" change="Added dependency, See bug 30001"/>
-      <dependency type="spec" value="XQ10+"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <dependency type="xsd-version" value="1.0"/>       
       <test>declare function local:test($test as xs:integer) as xs:integer? { 
         if ($test = 1) then ( 0 ) else if ($test = 2) then ( 9 ) else if ($test = 3) then ( 13 ) else if ($test = 4) then ( 16 ) else () 
@@ -566,6 +655,20 @@
          <error code="FOCH0001"/>
       </result>
    </test-case>
+   <test-case name="cbcl-codepoints-to-string-004a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="xsd-version" value="1.0"/>       
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare function local:test($test as xs:integer) as xs:integer? { 
+        if ($test = 1) then ( 0 ) else if ($test = 2) then ( 9 ) else if ($test = 3) then ( 13 ) else if ($test = 4) then ( 16 ) else () 
+      }; 
+      fn:codepoints-to-string( local:test(4) to 32 )</test>
+      <result>
+         <assert>deep-equal(string-to-codepoints($result), 16 to 32)</assert>
+      </result>
+   </test-case>
+
    
 
    <test-case name="cbcl-codepoints-to-string-005">
@@ -759,24 +862,48 @@
       <description> Tests invalid codepoint 0xB </description>
       <created by="Nick Jones" on="2008-06-16"/>
       <modified by="Michael Kay" on="2013-03-19" change="add dependency"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <dependency type="xml-version" value="1.0"/>      
+      <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"/>
       <test>for $x in 9 to 15 return codepoints-to-string($x to $x)</test>
       <result>
          <error code="FOCH0001"/>
       </result>
    </test-case>
+   <test-case name="cbcl-codepoints-to-string-023a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>for $x in 9 to 15 return codepoints-to-string($x to $x)</test>
+      <result>
+         <assert>deep-equal(string-to-codepoints(string-join($result)), 9 to 15)</assert>
+      </result>
+   </test-case>
+
    
 
    <test-case name="cbcl-codepoints-to-string-024">
       <description> Tests invalid codepoint 0xE </description>
       <created by="Nick Jones" on="2008-06-16"/>
       <modified by="Michael Kay" on="2013-03-19" change="add dependency, correct description"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <dependency type="xml-version" value="1.0"/>      
+      <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"/>
       <test>for $x in 13 to 15 return codepoints-to-string($x to $x)</test>
       <result>
          <error code="FOCH0001"/>
       </result>
    </test-case>
+   <test-case name="cbcl-codepoints-to-string-024a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>for $x in 13 to 15 return codepoints-to-string($x to $x)</test>
+      <result>
+         <assert>deep-equal(string-to-codepoints(string-join($result)), 13 to 15)</assert>
+      </result>
+   </test-case>
+
    
 
    <test-case name="cbcl-codepoints-to-string-025">
@@ -917,4 +1044,94 @@
          <error code="XPST0017"/>
       </result>
    </test-case>
+   <test-case name="fn-codepoints-to-string-40-001" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-to-codepoints(codepoints-to-string(1 to 31))</test>
+      <result>
+         <assert-deep-eq>1 to 31</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-codepoints-to-string-40-002" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-to-codepoints(codepoints-to-string((0xD7FF, 0xE000, 0x10FFFF)))</test>
+      <result>
+         <assert-deep-eq>55295, 57344, 1114111</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-codepoints-to-string-40-003" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-to-codepoints(codepoints-to-string(1))</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-codepoints-to-string-40-004" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-to-codepoints(codepoints-to-string((97, 1, 98)))</test>
+      <result>
+         <assert-deep-eq>97, 1, 98</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-codepoints-to-string-40-005" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>codepoints-to-string(57343)</test>
+      <result>
+         <error code="FOCH0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-codepoints-to-string-40-006" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>codepoints-to-string((1, 55296))</test>
+      <result>
+         <error code="FOCH0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-codepoints-to-string-40-007" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-to-codepoints(codepoints-to-string((9, 10, 13)))</test>
+      <result>
+         <assert-deep-eq>9, 10, 13</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-codepoints-to-string-40-008" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-to-codepoints(codepoints-to-string((0x1, 0xD7FF, 0xE000, 0xFFFD, 0x10000, 0x10FFFF)))</test>
+      <result>
+         <assert-deep-eq>1, 55295, 57344, 65533, 65536, 1114111</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-codepoints-to-string-40-009" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-to-codepoints(codepoints-to-string(0xFFFD))</test>
+      <result>
+         <assert-eq>65533</assert-eq>
+      </result>
+   </test-case>
+
 </test-set>

@@ -542,12 +542,24 @@
    <test-case name="fn-parse-json-055">
       <description>Character not in XML 1.0, no fallback</description>
       <created by="Michael Kay, Saxonica" on="2015-03-11"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <dependency type="xml-version" value="1.0"/>
+      <dependency type="spec" value="XP31 XQ31"/>
       <test>parse-json('"\b"')</test>
       <result>
         <assert-eq>codepoints-to-string(65533)</assert-eq>
       </result>
    </test-case>
+   <test-case name="fn-parse-json-055a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>parse-json('"\b"')</test>
+      <result>
+        <assert-eq>codepoints-to-string(8)</assert-eq>
+      </result>
+   </test-case>
+
    <test-case name="fn-parse-json-056">
       <description>Invalid XML char, no fallback</description>
       <created by="Michael Kay, Saxonica" on="2015-03-11"/>
@@ -574,14 +586,26 @@
       <description>Character not in XML 1.0, no fallback</description>
       <created by="Michael Kay, Saxonica" on="2015-03-11"/>
       <modified by="O'Neil Delpratt" on="2016-02-01" change="Bug fix #29412: Removed XT30+ dependency."/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <environment ref="map" />
-      <dependency type="spec" value="XP31+ XQ31+"/>
+      <dependency type="spec" value="XP31 XQ31"/>
       <dependency type="xml-version" value="1.0"/>
       <test>parse-json('{"\b":""}') => map:keys()</test>
       <result>
         <assert-eq>codepoints-to-string(65533)</assert-eq>
       </result>
    </test-case>
+   <test-case name="fn-parse-json-058a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <environment ref="map" />
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>parse-json('{"\b":""}') => map:keys()</test>
+      <result>
+        <assert-eq>codepoints-to-string(8)</assert-eq>
+      </result>
+   </test-case>
+
    <test-case name="fn-parse-json-059">
       <description>Invalid XML char, fallback</description>
       <created by="Michael Kay, Saxonica" on="2015-03-11"/>
@@ -604,8 +628,10 @@
       <description>Character not in XML 1.0, fallback</description>
       <created by="Michael Kay, Saxonica" on="2015-03-11"/>
       <modified by="Debbie Lockett" on="2015-08-07" change="Add alternate result"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <dependency type="xml-version" value="1.0"/>
       <dependency type="feature" value="higherOrderFunctions"/>
+      <dependency type="spec" value="XP31 XQ31"/>
       <test>parse-json('"\b"', map{'fallback':lower-case#1})</test>
       <result>
          <any-of>
@@ -614,6 +640,17 @@
          </any-of>
       </result>
    </test-case>
+   <test-case name="fn-parse-json-061a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>parse-json('"\b"', map{'fallback':lower-case#1})</test>
+      <result>
+        <assert-eq>codepoints-to-string(8)</assert-eq>
+      </result>
+   </test-case>
+
    <test-case name="fn-parse-json-062">
       <description>Invalid XML char, no fallback</description>
       <created by="Michael Kay, Saxonica" on="2015-03-11"/>
@@ -643,8 +680,9 @@
       <created by="Michael Kay, Saxonica" on="2015-03-11"/>
       <modified by="Debbie Lockett" on="2015-08-07" change="Add alternate result"/>
       <modified by="O'Neil Delpratt" on="2016-02-01" change="Bug fix #29412: Removed XT30+ dependency."/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <environment ref="map" />
-      <dependency type="spec" value="XP31+ XQ31+"/>
+      <dependency type="spec" value="XP31 XQ31"/>
       <dependency type="xml-version" value="1.0"/>
       <dependency type="feature" value="higherOrderFunctions"/>
       <test>parse-json('{"\b":""}', map{'fallback':lower-case#1}) => map:keys()</test>
@@ -655,6 +693,18 @@
          </any-of>
       </result>
    </test-case>
+   <test-case name="fn-parse-json-064a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <environment ref="map" />
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>parse-json('{"\b":""}', map{'fallback':lower-case#1}) => map:keys()</test>
+      <result>
+        <assert-eq>codepoints-to-string(8)</assert-eq>
+      </result>
+   </test-case>
+
    
    <test-case name="fn-parse-json-065">
       <description>Ignore 'validate' option parameter</description>
@@ -1077,8 +1127,9 @@
    <test-case name="fn-parse-json-734" covers-40="PR975">
       <description>fallback option yielding a string</description>
       <created by="Christian Gruen" on="2024-03-14"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <dependency type="spec" value="XP40+ XQ40+"></dependency>
-      <test>parse-json('"\b"', map { 'fallback': fn { 'INVALID' } })</test>
+      <test>parse-json('"\u0000"', map { 'fallback': fn { 'INVALID' } })</test>
       <result>
          <assert-string-value>INVALID</assert-string-value>
       </result>
@@ -1087,8 +1138,9 @@
    <test-case name="fn-parse-json-735" covers-40="PR975">
       <description>fallback option yielding a number</description>
       <created by="Christian Gruen" on="2024-03-14"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <dependency type="spec" value="XP40+ XQ40+"></dependency>
-      <test>parse-json('"a\bc"', map { 'fallback': number#1 })</test>
+      <test>parse-json('"a\u0000c"', map { 'fallback': number#1 })</test>
       <result>
          <assert-string-value>aNaNc</assert-string-value>
       </result>
@@ -1097,8 +1149,9 @@
    <test-case name="fn-parse-json-736" covers-40="PR975">
       <description>fallback option yielding an empty sequence</description>
       <created by="Christian Gruen" on="2024-03-14"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <dependency type="spec" value="XP40+ XQ40+"></dependency>
-      <test>parse-json('"a\bc"', map { 'fallback': void#1 })</test>
+      <test>parse-json('"a\u0000c"', map { 'fallback': void#1 })</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -1107,8 +1160,9 @@
    <test-case name="fn-parse-json-737" covers-40="PR975">
       <description>fallback option yielding a function item</description>
       <created by="Christian Gruen" on="2024-03-14"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <dependency type="spec" value="XP40+ XQ40+"></dependency>
-      <test>parse-json('"a\bc"', map { 'fallback': fn { void#1 } })</test>
+      <test>parse-json('"a\u0000c"', map { 'fallback': fn { void#1 } })</test>
       <result>
          <error code="FOTY0013"/>
       </result>
@@ -1117,8 +1171,9 @@
    <test-case name="fn-parse-json-738" covers-40="PR975">
       <description>fallback option yielding a sequence</description>
       <created by="Christian Gruen" on="2024-03-14"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <dependency type="spec" value="XP40+ XQ40+"></dependency>
-      <test>parse-json('"a\bc"', map { 'fallback': fn { ., . } })</test>
+      <test>parse-json('"a\u0000c"', map { 'fallback': fn { ., . } })</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -1704,7 +1759,9 @@
       <description>Syntax error: invalid character under XML 1.0</description>
       <created by="Michael Kay, Saxonica" on="2011-03-31"/>
       <modified by="Christian Gruen" on="2015-01-31" change="Encode as xFFFD"/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
      <dependency type="xml-version" value="1.0"/>
+      <dependency type="spec" value="XP31 XQ31"/>
       <test>parse-json('["\b"]')</test>
       <result>
          <any-of>
@@ -1713,6 +1770,16 @@
          </any-of>
       </result>
    </test-case>
+   <test-case name="fn-parse-json-919a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>parse-json('["\b"]')</test>
+      <result>
+        <assert-deep-eq>[ codepoints-to-string(8) ]</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fn-parse-json-920">
       <description>Syntax error</description>
       <created by="Michael Kay, Saxonica" on="2011-03-31"/>
@@ -1954,8 +2021,9 @@
       <description>Fallback throws an error</description>
       <created by="Michael Kay, Saxonica" on="2015-03-11"/>
       <modified by="O'Neil Delpratt" on="2016-02-01" change="Bug fix #29412: Removed XT30+ dependency."/>
+      <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
       <environment ref="map" />
-      <dependency type="spec" value="XP31+ XQ31+"/>
+      <dependency type="spec" value="XP31 XQ31"/>
       <dependency type="xml-version" value="1.0"/>
       <dependency type="feature" value="higherOrderFunctions"/>
       <test>parse-json('{"\b":""}', map{'fallback':error(QName("","USER9999"), ?)}) => map:keys()</test>
@@ -1963,6 +2031,18 @@
         <error code="Q{}USER9999"/>
       </result>
    </test-case>
+   <test-case name="fn-parse-json-943a" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <environment ref="map" />
+      <dependency type="feature" value="higherOrderFunctions"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>parse-json('{"\b":""}', map{'fallback':error(QName("","USER9999"), ?)}) => map:keys()</test>
+      <result>
+        <assert-eq>codepoints-to-string(8)</assert-eq>
+      </result>
+   </test-case>
+
    <test-case name="fn-parse-json-944">
       <description>Fallback is not called for invalid escape sequences</description>
       <created by="Michael Kay, Saxonica" on="2015-03-11"/>
@@ -2101,4 +2181,94 @@
          <assert-string-value>A</assert-string-value>
       </result>
    </test-case>
+   <test-case name="fn-parse-json-956" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>parse-json('["\u0001"]')?1</test>
+      <result>
+         <assert-eq>codepoints-to-string(1)</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-957" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>parse-json('["\u0001"]', map{'escape':true()})?1</test>
+      <result>
+         <assert-eq>'\u0001'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-958" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>parse-json('["\u001F"]')?1</test>
+      <result>
+         <assert-eq>codepoints-to-string(31)</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-959" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[string-to-codepoints(parse-json('{"\u0001":1}') => map:keys())]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-960" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[parse-json('{"\u0001":1}', { 'escape': true() }) => map:keys()]]></test>
+      <result>
+         <assert-eq>'\u0001'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-961" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-to-codepoints(parse-json('["\u0000"]', { 'escape': false() })?1)</test>
+      <result>
+         <assert-eq>65533</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-962" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>parse-json('["\u0000"]', { 'fallback': fn($s) { '[' || $s || ']' } })?1</test>
+      <result>
+         <assert-eq>'[\u0000]'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-963" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>string-to-codepoints(parse-json('["\u0001"]', { 'fallback': fn($s) { '[' || $s || ']' } })?1)</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-parse-json-964" covers-40="PR546">
+      <description>Permitted characters in a string value.</description>
+      <created by="Christian Gruen" on="2026-09-08"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>parse-json('["' || codepoints-to-string(1) || '"]')</test>
+      <result>
+         <error code="FOJS0001"/>
+      </result>
+   </test-case>
+
 </test-set>
