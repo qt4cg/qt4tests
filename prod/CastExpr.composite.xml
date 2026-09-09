@@ -101,12 +101,12 @@
    </test-case>
    
    <test-case name="cast-array-010">
-      <description>Casting an array, function-valued members</description>
+      <description>Casting an array, member type is not a cast target, but all members are instances</description>
       <created by="Michael Kay" on="2026-09-08"/>
       <test>
-         [(1,2,3), (1,2), identity#1] cast as array((xs:double | fn(*))*)</test>
+         [(1,2,3), (1,2), identity#1] cast as array((xs:integer | fn(*))*)</test>
       <result>
-         <assert>$result?1[3] instance of xs:double</assert>
+         <assert>$result?1[3] instance of xs:integer</assert>
       </result>
    </test-case>
    
@@ -204,6 +204,17 @@
       </result>
    </test-case>
    
+   <test-case name="cast-array-019">
+      <description>Cast to array of empty-sequence()</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         [(), (), ()] cast as array(empty-sequence())
+      </test>
+      <result>
+         <assert-deep-eq>[(), (), ()]</assert-deep-eq>
+      </result>
+   </test-case>
+   
    <test-case name="cast-array-901">
       <description>Casting an array, failure case</description>
       <created by="Michael Kay" on="2026-07-28"/>
@@ -285,7 +296,7 @@
       <description>Casting an array, not allowing empty</description>
       <created by="Michael Kay" on="2026-09-08"/>
       <test>
-         [(1,2,3), (1,2)][array:size() = 17] cast as array(xs:double*)
+         [(1,2,3), (1,2)][array:size(.) = 17] cast as array(xs:double*)
       </test>
       <result>
          <error code="XPTY0004"/>
@@ -328,6 +339,16 @@
       <created by="Michael Kay" on="2026-07-28"/>
       <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
       <test>([1, 2], [3, 4]) cast as array(xs:string)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-913">
+      <description>Casting an array, member type is a choice type and not a CastTarget</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         [(1,2,3), (1,2), identity#1] cast as array((xs:double | fn(*))*)</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -394,7 +415,7 @@
          declare namespace a = "http://a.namespace/";
          {"a:x": 1, "a:y": 2} cast as map(xs:QName, xs:integer)</test>
       <result>
-         <assert>$result?#Q{http://a.namespace/}x = 1</assert>>
+         <assert>$result?#Q{http://a.namespace/}x = 1</assert>
       </result>
    </test-case>
    
@@ -405,7 +426,7 @@
          declare namespace a = "http://a.namespace/";
          jtree([1, {"a:x": 1, "a:y": 2}])/2 cast as map(xs:QName, xs:integer)</test>
       <result>
-         <assert>$result?#Q{http://a.namespace/}x = 1</assert>>
+         <assert>$result?#Q{http://a.namespace/}x = 1</assert>
       </result>
    </test-case>
    
@@ -563,7 +584,7 @@
    <test-case name="cast-record-007">
       <description>Casting from JNode to a record</description>
       <created by="Michael Kay" on="2026-09-09"/>
-      <test>jtree([[{"a": 1}]])//a cast as record(a as xs:double)</test>
+      <test>jtree([[{"a": 1}]])/1/1 cast as record(a as xs:double)</test>
       <result>
          <all-of>
             <assert>$result?a = 1</assert>

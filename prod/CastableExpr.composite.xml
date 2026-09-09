@@ -41,7 +41,7 @@
       <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
       <test>([1, 2], [3, 4]) ! (. castable as array(xs:string))</test>
       <result>
-         <assert-true/>
+         <assert-deep-eq>true(), true()</assert-deep-eq>
       </result>
    </test-case>
 
@@ -101,7 +101,7 @@
       <description>Casting an array, function-valued members</description>
       <created by="Michael Kay" on="2026-09-08"/>
       <test>
-         [(1,2,3), (1,2), identity#1] castable as array((xs:double | fn(*))*)</test>
+         [(1,2,3), (1,2), identity#1] castable as array((xs:integer | fn(*))*)</test>
       <result>
          <assert-true/>
       </result>
@@ -274,7 +274,7 @@
       <description>Casting an array, not allowing empty</description>
       <created by="Michael Kay" on="2026-09-08"/>
       <test>
-         [(1,2,3), (1,2)][array:size() = 17] castable as array(xs:double*)
+         [(1,2,3), (1,2)][array:size(.) = 17] castable as array(xs:double*)
       </test>
       <result>
          <assert-false/>
@@ -516,7 +516,7 @@
    <test-case name="castable-record-004" covers-40="PR2855">
       <description>Casting to a wildcard array, map, or record type</description>
       <created by="Christian Gruen" on="2026-08-26"/>
-      <test>({"a": 1} castable as record(a)) castable as record(*)</test>
+      <test>({"a": 1} cast as record(a)) castable as record(*)</test>
       <result>
          <assert-true/>
       </result>
@@ -525,7 +525,7 @@
    <test-case name="castable-record-005">
       <description>Casting to a record defaulting a field</description>
       <created by="Michael Kay" on="2026-09-09"/>
-      <test>({"a": 1} castable as record(a, b, c)) castable as record(*)</test>
+      <test>({"a": 1} cast as record(a, b, c)) castable as record(*)</test>
       <result>
          <assert-true/>
       </result>
@@ -543,7 +543,7 @@
    <test-case name="castable-record-007">
       <description>Casting from JNode to a record</description>
       <created by="Michael Kay" on="2026-09-09"/>
-      <test>jtree([[{"a": 1}]])//a castable as record(a as xs:double)</test>
+      <test>jtree([[{"a": 1}]])/1/1 castable as record(a as xs:double)</test>
       <result>
          <assert-true/>
       </result>
@@ -608,7 +608,7 @@
       <created by="Michael Kay" on="2026-09-09"/>
       <test>{'year': 2026, 'month': 9, 'day': 9} castable as fn:dateTime-pseudo-record</test>
       <result>
-         <assert-false/>
+         <error code="XPST0051"/>
       </result>
    </test-case>
    
@@ -617,7 +617,7 @@
       <created by="Michael Kay" on="2026-09-09"/>
       <test>{"a": 1} castable as function(*)</test>
       <result>
-         <assert-false/>
+         <error code="XPST0080"/>
       </result>
    </test-case>
    
@@ -626,7 +626,16 @@
       <created by="Michael Kay" on="2026-09-09"/>
       <test>{"a": 1} castable as jnode(*)</test>
       <result>
-         <assert-false/>
+         <error code="XPST0080"/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-bad-target-903">
+      <description>Casting to a non-atomic choice - not a valid casting target</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": 1} castable as (xs:integer | array(*))</test>
+      <result>
+         <error code="XPST0080"/>
       </result>
    </test-case>
 </test-set>
