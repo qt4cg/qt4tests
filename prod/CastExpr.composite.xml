@@ -5,21 +5,23 @@
  
    <dependency type="spec" value="XP40+ XQ40+"/>      
 
-   <test-case name="cast-sequence-001">
+   <test-case name="cast-sequence-001" covers-40="PR2869">
       <description>Casting a sequence</description>
       <created by="Michael Kay" on="2026-07-28"/>
-      <test>(1 to 5) cast as xs:string*</test>
+      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
+      <test>() cast as xs:string?</test>
       <result>
-         <assert-deep-eq>("1", "2", "3", "4", "5")</assert-deep-eq>
+         <assert-empty/>
       </result>
    </test-case>
    
-   <test-case name="cast-sequence-002">
+   <test-case name="cast-sequence-002" covers-40="PR2869">
       <description>Casting a sequence</description>
       <created by="Michael Kay" on="2026-07-28"/>
-      <test>("1", "2", "3", "4", "5") cast as xs:integer+</test>
+      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
+      <test>"1" cast as xs:integer?</test>
       <result>
-         <assert-deep-eq>1 to 5</assert-deep-eq>
+         <assert-eq>1</assert-eq>
       </result>
    </test-case>
    
@@ -36,9 +38,19 @@
       <description>Casting a sequence</description>
       <created by="Michael Kay" on="2026-07-28"/>
       <modified by="Christian Gruen" on="2026-07-29" change="error code fixed"/>
-      <test>("2026-07-07", "2026-07-08", "12:20:00Z") cast as xs:date*</test>
+      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
+      <test>"12:20:00Z" cast as xs:date</test>
       <result>
          <error code="FORG0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="cast-sequence-903" covers-40="PR2869">
+      <description>Casting a sequence</description>
+      <created by="Christian Gruen" on="2026-09-09"/>
+      <test>() cast as xs:string</test>
+      <result>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
    
@@ -70,12 +82,13 @@
       </result>
    </test-case>
    
-   <test-case name="cast-array-004">
+   <test-case name="cast-array-004" covers-40="PR2869">
       <description>Casting a sequence of arrays</description>
       <created by="Michael Kay" on="2026-07-28"/>
-      <test>([1, 2], [3, 4]) cast as array(xs:string)+</test>
+      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
+      <test>([1, 2], [3, 4]) cast as array(xs:string)</test>
       <result>
-         <assert-deep-eq>["1", "2"], ["3", "4"]</assert-deep-eq>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
    
@@ -83,9 +96,10 @@
       <description>Casting an array containing a function</description>
       <created by="Michael Kay" on="2026-07-28"/>
       <modified by="Christian Gruen" on="2026-07-29" change="syntax fixed"/>
-      <test>(["1", "2"], ["3", "4", fn:not#1]) cast as array((xs:string | function(*)))+</test>
+      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
+      <test>["1", "2", fn:not#1] cast as array((xs:string | function(*)))</test>
       <result>
-         <assert-deep-eq>["1", "2"], ["3", "4", fn:not#1]</assert-deep-eq>
+         <assert-deep-eq>["1", "2", fn:not#1]</assert-deep-eq>
       </result>
    </test-case>
    
@@ -113,7 +127,8 @@
       <created by="Michael Kay" on="2026-07-28"/>
       <modified by="Christian Gruen" on="2026-07-29" change="corrected syntax and error code"/>
       <modified by="Christian Gruen" on="2026-08-26" change="PR2855"/>
-      <test>([1, 2], [3, 4, fn:not#1]) cast as array((xs:string | (function(xs:date) as xs:time)))+</test>
+      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
+      <test>[3, 4, fn:not#1] cast as array((xs:string | (function(xs:date) as xs:time)))</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -218,6 +233,15 @@
       <test>[1, 2] cast as array(*)</test>
       <result>
          <assert-deep-eq>[1, 2]</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="cast-array-007" covers-40="PR2869">
+      <description>Casting an array</description>
+      <created by="Christian Gruen" on="2026-09-09"/>
+      <test>() cast as array(xs:string)?</test>
+      <result>
+         <assert-empty/>
       </result>
    </test-case>
 
