@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-CastableExpr.composite" covers-40="PR2777">
+   <description>Tests for the CastableExpr production: castable expressions casting to sequences, arrays, maps, and record types</description>
+   
+ 
+   <dependency type="spec" value="XP40+ XQ40+"/>      
+
+   
+   
+   <test-case name="castable-array-001">
+      <description>Casting an array</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>[1, 2, 3, 4, 5] castable as array(xs:string)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-002">
+      <description>Casting an array</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="typo"/>
+      <test>["1", "2", "3", "4", "5"] castable as array(xs:integer)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-003">
+      <description>Casting an array of sequences</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>[(1, 2), (3, 4, 5)] castable as array(xs:string+)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-004" covers-40="PR2869">
+      <description>Casting a sequence of arrays</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
+      <test>([1, 2], [3, 4]) ! (. castable as array(xs:string))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="castable-array-005">
+      <description>Casting an array containing a function</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="syntax fixed"/>
+      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
+      <test>["1", "2", fn:not#1] castable as array((xs:string | function(*)))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-006" covers-40="PR2855">
+      <description>Casting to a wildcard array, map, or record type</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>[1, 2] castable as array(*)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-007">
+      <description>Casting an array to a namespace-sensitive type</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         declare namespace m = "http://m.org.ns/";
+         ["a", "m:a"] castable as array(xs:QName)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-008">
+      <description>Casting an array to a namespace-sensitive type</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         declare namespace m = "http://m.org.ns/";
+         [["a", "m:a"]] castable as array(array(xs:QName))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-009">
+      <description>Casting an array, sequence-valued members</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         [(1,2,3), (1,2), ()] castable as array(xs:double*)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-010">
+      <description>Casting an array, function-valued members</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         [(1,2,3), (1,2), identity#1] castable as array((xs:double | fn(*))*)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-011">
+      <description>Casting an array, allowing empty</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         [(1,2,3), (1,2)][array:size(.) = 17] castable as array(xs:double*)?
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-012">
+      <description>Input is JNode</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         jtree({"a":['1','2','3']})/a castable as array(xs:integer)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-013">
+      <description>Cast to array of named record type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         [{'year':2026, 'month':9, 'day':9}] castable as array(fn:dateTime-record)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-014">
+      <description>Cast to array of union type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         [1, '2', true()] castable as array(xs:numeric)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-015">
+      <description>Cast to array of enum type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         ['red', 'green', 'blue'] castable as array(enum('red', 'green', 'blue', 'yellow'))
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-016">
+      <description>Casting an array, members are atomized</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>[["1"], ["2"], ["3"], "4", "5"] castable as array(xs:integer)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-017">
+      <description>Cast to array of enum type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         [3, 4, 5] castable as array(enum('1', '2', '3', '4', '5'))
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-018">
+      <description>Cast to array of sequences of enum type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         [(3, 4), 5] castable as array(enum('1', '2', '3', '4', '5')+)
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-901">
+      <description>Casting an array, failure case</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>(1 to 5) castable as array(xs:string)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-902">
+      <description>Casting an array, failure case</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="error code fixed"/>
+      <test>["2026-07-07", "2026-07-08", "12:20:00Z"] castable as array(xs:date)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-903">
+      <description>Casting an array containing a function</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="corrected syntax and error code"/>
+      <modified by="Christian Gruen" on="2026-08-26" change="PR2855"/>
+      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
+      <test>([1, 2], [3, 4, fn:not#1]) castable as array((xs:string | function(xs:date) as xs:time)+)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="castable-array-904">
+      <description>Casting an array to a namespace-sensitive type - error case</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         declare namespace m = "http://m.org.ns/";
+         ["a", "M:a"] castable as array(xs:QName)
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-905">
+      <description>Casting an array to a namespace-sensitive type - error case</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         declare namespace m = "http://m.org.ns/";
+         [["a", "M:a"]] castable as array(array(xs:QName))
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-906">
+      <description>Casting an array, cardinality mismatch on member type</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         declare namespace m = "http://m.org.ns/";
+         [(1,2,3), (1,2)] castable as array(xs:string)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-907">
+      <description>Casting an array, cardinality mismatch on member type</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         declare namespace m = "http://m.org.ns/";
+         [(1,2,3), (1,2), ()] castable as array(xs:integer+)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-908">
+      <description>Casting an array, not allowing empty</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         [(1,2,3), (1,2)][array:size() = 17] castable as array(xs:double*)
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-909" covers-40="PR2855">
+      <description>Casting to a wildcard array, map, or record type</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>1 castable as array(*)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-910">
+      <description>Cast to array of union type, failure case</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         [1, '2', 'three'] castable as array(xs:numeric)
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-911">
+      <description>Cast to array of enum type - failure case</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         ['red', 'green', 'pink'] castable as array(enum('red', 'green', 'blue', 'yellow'))
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-array-912" covers-40="PR2869">
+      <description>Casting a sequence of arrays</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
+      <test>([1, 2], [3, 4]) castable as array(xs:string)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-001">
+      <description>Casting a map</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"x": 1, "y": 2} castable as map(xs:string, xs:string)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-002">
+      <description>Casting a map</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"10": 1, "11": 2} castable as map(xs:integer, xs:integer)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-003">
+      <description>Casting a map</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"10": "1", "11": "2"} castable as map(xs:integer, xs:integer)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-004">
+      <description>Casting a map containing arrays</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"10": ["1"], "11": ["2"]} castable as map(xs:integer, array(xs:integer))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-005" covers-40="PR2855">
+      <description>Casting to a wildcard array, map, or record type</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>{"a": 1} castable as map(*)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-006">
+      <description>Casting a map, allowing empty</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"x": 1, "y": 2}[?x = 3] castable as map(xs:string, xs:integer)?</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-007">
+      <description>Casting a map, namespace-sensitive</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         declare namespace a = "http://a.namespace/";
+         {"a:x": 1, "a:y": 2} castable as map(xs:QName, xs:integer)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-008">
+      <description>Casting JNode to map</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         declare namespace a = "http://a.namespace/";
+         jtree([1, {"a:x": 1, "a:y": 2}])/2 castable as map(xs:QName, xs:integer)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-901">
+      <description>Casting a map fails with duplicates</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="query and error code fixed"/>
+      <test>{12: "a", "12": "b"} castable as map(xs:string, xs:string)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-902">
+      <description>Casting a map to an array fails</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="typo"/>
+      <test>{12: "a", "12": "b"} castable as array(xs:string)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-903">
+      <description>Casting a map, not allowing empty</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"x": 1, "y": 2}[?x = 3] castable as map(xs:string, xs:integer)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-904">
+      <description>Casting a map, key conversion fails</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"x": 1, "y": 2} castable as map(xs:date, xs:integer)?</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-905">
+      <description>Casting a map, value conversion fails</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"x": '1', "y": '2'} castable as map(xs:string, xs:boolean)?</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-906">
+      <description>Casting a map, value conversion fails</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"x": 1, "y": (2, 3)} castable as map(xs:string, xs:integer)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-907" covers-40="PR2855">
+      <description>Casting to a wildcard array, map, or record type</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>1 castable as map(*)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-908">
+      <description>Casting a map, namespace-sensitive, undeclared namespace</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         declare namespace a = "http://a.namespace/";
+         {"a:x": 1, "b:y": 2} castable as map(xs:QName, xs:integer)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-map-909">
+      <description>Casting a map, namespace-sensitive, duplicate QNames</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         declare namespace a = "http://a.namespace/";
+         declare namespace b = "http://a.namespace/";
+         {"a:x": 1, "b:x": 2} castable as map(xs:QName, xs:integer)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-record-001">
+      <description>Casting a map to a record type</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"x": 1, "y": 2} castable as record(x as xs:integer, y as xs:integer)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-record-002">
+      <description>Casting a map to a record type</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"x": 1, "y": 2, "z": 3} castable as record(x as xs:integer, y as xs:integer)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-record-003">
+      <description>Casting a map to a record type</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"y": 2, "z": 3} castable as record(x as xs:integer?, y as xs:integer?)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="castable-record-004" covers-40="PR2855">
+      <description>Casting to a wildcard array, map, or record type</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>({"a": 1} castable as record(a)) castable as record(*)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-record-005">
+      <description>Casting to a record defaulting a field</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>({"a": 1} castable as record(a, b, c)) castable as record(*)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-record-006">
+      <description>Casting to a record, emptiable</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": 1}[?a = 2] castable as record(a as xs:integer)?</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-record-007">
+      <description>Casting from JNode to a record</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>jtree([[{"a": 1}]])//a castable as record(a as xs:double)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-record-008">
+      <description>Casting to a built-in record type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{'year': 2026, 'month': 9, 'day': 9} castable as fn:dateTime-record</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="castable-record-901" covers-40="PR2855">
+      <description>Casting to a wildcard array, map, or record type</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>{"a": 1} castable as record(*)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-record-902">
+      <description>Casting to a record, no default available</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": 1} castable as record(a, b, c as xs:integer)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-record-903">
+      <description>Casting to a record, value is wrong type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": 1} castable as record(a as xs:date)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-record-904">
+      <description>Casting to a record, value is wrong type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": (1, 2, 3)} castable as record(a as xs:integer)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-record-905">
+      <description>Casting to a record, not emptiable</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": 1}[?a = 2] castable as record(a as xs:integer)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-record-906">
+      <description>Casting to an unknown built-in record type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{'year': 2026, 'month': 9, 'day': 9} castable as fn:dateTime-pseudo-record</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-bad-target-901">
+      <description>Casting to a function type - not a valid casting target</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": 1} castable as function(*)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="castable-bad-target-902">
+      <description>Casting to a jnode type - not a valid casting target</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": 1} castable as jnode(*)</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+</test-set>
