@@ -329,5 +329,56 @@
          <assert-eq>"global"</assert-eq>
       </result>
    </test-case>
+   
+   <test-case name="fn-current-024">
+      <description>Default value depends both on current() and on "."</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare context value as xs:integer := 4;
+         declare function f($num as xs:string := replicate(current(), .)) {
+           '[' || $num || ']'
+         };
+         "X" -> f()
+      </test>
+      <result>
+         <assert-eq>"[XXXX]"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-current-025">
+      <description>current() in a dynamically loaded XQuery module</description>
+      <created by="Michael Kay" on="2026-08-30"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         let $module-text := ``[
+          xquery version "4.0";
+          
+          module namespace vm = "http://www.w3.org/fots/fn/load-xquery-module/valid/module";
+          context item as xs:integer := 6;
+          declare variable vm:fortyTwo := current() * 7;
+          declare function vm:eightyFour($in := current()) {
+              $fortyTwo + $in
+          };
+          
+      ]``
+      
+      let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/valid/module",
+          $module := fn:load-xquery-module($module-ns, {'content': $module-text})
+      return
+        let $vars := $module("variables"),
+            $fns := $module("functions")
+        return
+          let $f := $fns(QName($module-ns, "eightyFour"))(0)
+          return 3 ! $f() eq static-base-uri()
+      </test>
+      <result>
+         <assert-eq>"[XXXX]"</assert-eq>
+      </result>
+   </test-case>
+   
+  
+   
+   
 
 </test-set>
