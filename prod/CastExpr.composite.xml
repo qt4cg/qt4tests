@@ -5,54 +5,7 @@
  
    <dependency type="spec" value="XP40+ XQ40+"/>      
 
-   <test-case name="cast-sequence-001" covers-40="PR2869">
-      <description>Casting a sequence</description>
-      <created by="Michael Kay" on="2026-07-28"/>
-      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
-      <test>() cast as xs:string?</test>
-      <result>
-         <assert-empty/>
-      </result>
-   </test-case>
    
-   <test-case name="cast-sequence-002" covers-40="PR2869">
-      <description>Casting a sequence</description>
-      <created by="Michael Kay" on="2026-07-28"/>
-      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
-      <test>"1" cast as xs:integer?</test>
-      <result>
-         <assert-eq>1</assert-eq>
-      </result>
-   </test-case>
-   
-   <test-case name="cast-sequence-901">
-      <description>Casting a sequence</description>
-      <created by="Michael Kay" on="2026-07-28"/>
-      <test>(1 to 5) cast as xs:string</test>
-      <result>
-         <error code="XPTY0004"/>
-      </result>
-   </test-case>
-   
-   <test-case name="cast-sequence-902">
-      <description>Casting a sequence</description>
-      <created by="Michael Kay" on="2026-07-28"/>
-      <modified by="Christian Gruen" on="2026-07-29" change="error code fixed"/>
-      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
-      <test>"12:20:00Z" cast as xs:date</test>
-      <result>
-         <error code="FORG0001"/>
-      </result>
-   </test-case>
-
-   <test-case name="cast-sequence-903" covers-40="PR2869">
-      <description>Casting a sequence</description>
-      <created by="Christian Gruen" on="2026-09-09"/>
-      <test>() cast as xs:string</test>
-      <result>
-         <error code="XPTY0004"/>
-      </result>
-   </test-case>
    
    <test-case name="cast-array-001">
       <description>Casting an array</description>
@@ -86,6 +39,16 @@
       <description>Casting a sequence of arrays</description>
       <created by="Michael Kay" on="2026-07-28"/>
       <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
+      <test>([1, 2], [3, 4]) ! (. cast as array(xs:string))</test>
+      <result>
+         <assert-deep-eq>["1", "2"], ["3", "4"]</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="cast-array-004a" covers-40="PR2869">
+      <description>Casting a sequence of arrays</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
       <test>([1, 2], [3, 4]) cast as array(xs:string)</test>
       <result>
          <error code="XPTY0004"/>
@@ -102,9 +65,169 @@
          <assert-deep-eq>["1", "2", fn:not#1]</assert-deep-eq>
       </result>
    </test-case>
+
+   <test-case name="cast-array-005a">
+      <description>Casting an array containing a function</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="syntax fixed"/>
+      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
+      <test>(["1", "2"], ["3", "4", fn:not#1]) ! (. cast as array((xs:string | function(*))))</test>
+      <result>
+         <assert-deep-eq>["1", "2", fn:not#1]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-006" covers-40="PR2855">
+      <description>Casting to a wildcard array, map, or record type</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>[1, 2] cast as array(*)</test>
+      <result>
+         <assert-deep-eq>[1, 2]</assert-deep-eq>
+      </result>
+   </test-case>
+
+   
+   <test-case name="cast-array-007">
+      <description>Casting an array to a namespace-sensitive type</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         declare namespace m = "http://m.org.ns/";
+         ["a", "m:a"] cast as array(xs:QName)</test>
+      <result>
+         <assert-deep-eq>[fn:QName("", "a"), fn:QName("http://m.org.ns/", "m:a")]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-008">
+      <description>Casting an array to a namespace-sensitive type</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         declare namespace m = "http://m.org.ns/";
+         [["a", "m:a"]] cast as array(array(xs:QName))</test>
+      <result>
+         <assert-deep-eq>[[fn:QName("", "a"), fn:QName("http://m.org.ns/", "m:a")]]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-009">
+      <description>Casting an array, sequence-valued members</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         [(1,2,3), (1,2), ()] cast as array(xs:double*)</test>
+      <result>
+         <all-of>
+            <assert-deep-eq>[(1,2,3), (1,2), ()]</assert-deep-eq>
+            <assert>$result?1[3] instance of xs:double</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-010">
+      <description>Casting an array, function-valued members</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         [(1,2,3), (1,2), identity#1] cast as array((xs:double | fn(*))*)</test>
+      <result>
+         <assert>$result?1[3] instance of xs:double</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-011">
+      <description>Casting an array, allowing empty</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         [(1,2,3), (1,2)][array:size(.) = 17] cast as array(xs:double*)?
+      </test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-012">
+      <description>Input is JNode</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         jtree({"a":['1','2','3']})/a cast as array(xs:integer)
+      </test>
+      <result>
+         <assert-deep-eq>[1, 2, 3]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-013">
+      <description>Cast to array of named record type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         [{'year':2026, 'month':9, 'day':9}] cast as array(fn:dateTime-record)
+      </test>
+      <result>
+         <all-of>
+            <assert>$result/1/year = 2026</assert>
+            <assert>jvalue($result/1) instance of fn:dateTime-record</assert>
+            <assert>empty(jvalue($result/1/seconds))</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-014">
+      <description>Cast to array of union type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         [1, '2', true()] cast as array(xs:numeric)
+      </test>
+      <result>
+         <all-of>
+            <assert>$result?1 instance of xs:integer</assert>
+            <assert>$result?2 instance of xs:double</assert>
+            <assert>$result?3 instance of xs:double</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-015">
+      <description>Cast to array of enum type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         ['red', 'green', 'blue'] cast as array(enum('red', 'green', 'blue', 'yellow'))
+      </test>
+      <result>
+         <assert-deep-eq>['red', 'green', 'blue']</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-016">
+      <description>Casting an array, members are atomized</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>[["1"], ["2"], ["3"], "4", "5"] cast as array(xs:integer)</test>
+      <result>
+         <assert-deep-eq>[1, 2, 3, 4, 5]</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-017">
+      <description>Cast to array of enum type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         [3, 4, 5] cast as array(enum('1', '2', '3', '4', '5'))
+      </test>
+      <result>
+         <assert-deep-eq>['3', '4', '5']</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-018">
+      <description>Cast to array of sequences of enum type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         [(3, 4), 5] cast as array(enum('1', '2', '3', '4', '5')+)
+      </test>
+      <result>
+         <assert-deep-eq>[('3', '4'), '5']</assert-deep-eq>
+      </result>
+   </test-case>
    
    <test-case name="cast-array-901">
-      <description>Casting an array</description>
+      <description>Casting an array, failure case</description>
       <created by="Michael Kay" on="2026-07-28"/>
       <test>(1 to 5) cast as array(xs:string)</test>
       <result>
@@ -113,7 +236,7 @@
    </test-case>
    
    <test-case name="cast-array-902">
-      <description>Casting a sequence</description>
+      <description>Casting an array, failure case</description>
       <created by="Michael Kay" on="2026-07-28"/>
       <modified by="Christian Gruen" on="2026-07-29" change="error code fixed"/>
       <test>["2026-07-07", "2026-07-08", "12:20:00Z"] cast as array(xs:date)</test>
@@ -128,9 +251,109 @@
       <modified by="Christian Gruen" on="2026-07-29" change="corrected syntax and error code"/>
       <modified by="Christian Gruen" on="2026-08-26" change="PR2855"/>
       <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
+      <test>([1, 2], [3, 4, fn:not#1]) cast as array((xs:string | function(xs:date) as xs:time)+)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="cast-array-903a">
+      <description>Casting an array containing a function</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <modified by="Christian Gruen" on="2026-07-29" change="corrected syntax and error code"/>
+      <modified by="Christian Gruen" on="2026-08-26" change="PR2855"/>
+      <modified by="Christian Gruen" on="2026-09-09" change="PR2869"/>
       <test>[3, 4, fn:not#1] cast as array((xs:string | (function(xs:date) as xs:time)))</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-904">
+      <description>Casting an array to a namespace-sensitive type - error case</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         declare namespace m = "http://m.org.ns/";
+         ["a", "M:a"] cast as array(xs:QName)
+      </test>
+      <result>
+         <error code="FONS0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-905">
+      <description>Casting an array to a namespace-sensitive type - error case</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         declare namespace m = "http://m.org.ns/";
+         [["a", "M:a"]] cast as array(array(xs:QName))
+      </test>
+      <result>
+         <error code="FONS0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-906">
+      <description>Casting an array, cardinality mismatch on member type</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         declare namespace m = "http://m.org.ns/";
+         [(1,2,3), (1,2)] cast as array(xs:string)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-907">
+      <description>Casting an array, cardinality mismatch on member type</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         declare namespace m = "http://m.org.ns/";
+         [(1,2,3), (1,2), ()] cast as array(xs:integer+)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-908">
+      <description>Casting an array, not allowing empty</description>
+      <created by="Michael Kay" on="2026-09-08"/>
+      <test>
+         [(1,2,3), (1,2)][array:size() = 17] cast as array(xs:double*)
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-909" covers-40="PR2855">
+      <description>Casting to a wildcard array, map, or record type</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>1 cast as array(*)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-910">
+      <description>Cast to array of union type, failure case</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         [1, '2', 'three'] cast as array(xs:numeric)
+      </test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-array-911">
+      <description>Cast to array of enum type - failure case</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         ['red', 'green', 'pink'] cast as array(enum('red', 'green', 'blue', 'yellow'))
+      </test>
+      <result>
+         <error code="FORG0001"/>
       </result>
    </test-case>
    
@@ -170,6 +393,46 @@
       </result>
    </test-case>
    
+   <test-case name="cast-map-005" covers-40="PR2855">
+      <description>Casting to a wildcard array, map, or record type</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>{"a": 1} cast as map(*)</test>
+      <result>
+         <assert-deep-eq>{"a": 1}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-006">
+      <description>Casting a map, allowing empty</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"x": 1, "y": 2}[?x = 3] cast as map(xs:string, xs:integer)?</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-007">
+      <description>Casting a map, namespace-sensitive</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         declare namespace a = "http://a.namespace/";
+         {"a:x": 1, "a:y": 2} cast as map(xs:QName, xs:integer)</test>
+      <result>
+         <assert>$result?#Q{http://a.namespace/}x = 1</assert>>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-007">
+      <description>Casting JNode to map</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         declare namespace a = "http://a.namespace/";
+         jtree([1, {"a:x": 1, "a:y": 2}])/2 cast as map(xs:QName, xs:integer)</test>
+      <result>
+         <assert>$result?#Q{http://a.namespace/}x = 1</assert>>
+      </result>
+   </test-case>
+   
    <test-case name="cast-map-901">
       <description>Casting a map fails with duplicates</description>
       <created by="Michael Kay" on="2026-07-28"/>
@@ -187,6 +450,74 @@
       <test>{12: "a", "12": "b"} cast as array(xs:string)</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-903">
+      <description>Casting a map, not allowing empty</description>
+      <created by="Michael Kay" on="2026-07-28"/>
+      <test>{"x": 1, "y": 2}[?x = 3] cast as map(xs:string, xs:integer)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-904">
+      <description>Casting a map, key conversion fails</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"x": 1, "y": 2} cast as map(xs:date, xs:integer)?</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-905">
+      <description>Casting a map, value conversion fails</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"x": '1', "y": '2'} cast as map(xs:string, xs:boolean)?</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-906">
+      <description>Casting a map, value conversion fails</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"x": 1, "y": (2, 3)} cast as map(xs:string, xs:integer)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-907" covers-40="PR2855">
+      <description>Casting to a wildcard array, map, or record type</description>
+      <created by="Christian Gruen" on="2026-08-26"/>
+      <test>1 cast as map(*)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-908">
+      <description>Casting a map, namespace-sensitive, undeclared namespace</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         declare namespace a = "http://a.namespace/";
+         {"a:x": 1, "b:y": 2} cast as map(xs:QName, xs:integer)</test>
+      <result>
+         <error code="FONS0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-map-909">
+      <description>Casting a map, namespace-sensitive, duplicate QNames</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>
+         declare namespace a = "http://a.namespace/";
+         declare namespace b = "http://a.namespace/";
+         {"a:x": 1, "b:x": 2} cast as map(xs:QName, xs:integer)</test>
+      <result>
+         <error code="XQDY0137"/>
       </result>
    </test-case>
    
@@ -225,7 +556,7 @@
          </all-of>
       </result>
    </test-case>
-   
+
 
    <test-case name="cast-array-006" covers-40="PR2855">
       <description>Casting to a wildcard array, map, or record type</description>
@@ -280,6 +611,48 @@
          <assert-deep-eq>{"a": 1}</assert-deep-eq>
       </result>
    </test-case>
+   
+   <test-case name="cast-record-005">
+      <description>Casting to a record defaulting a field</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>({"a": 1} cast as record(a, b, c)) cast as record(*)</test>
+      <result>
+         <assert-deep-eq>{"a": 1, "b": (), "c": ()}</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-006">
+      <description>Casting to a record, emptiable</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": 1}[?a = 2] cast as record(a as xs:integer)?</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-007">
+      <description>Casting from JNode to a record</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>jtree([[{"a": 1}]])//a cast as record(a as xs:double)</test>
+      <result>
+         <all-of>
+            <assert>$result?a = 1</assert>
+            <assert>$result?a instance of xs:double</assert>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-008">
+      <description>Casting to a built-in record type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{'year': 2026, 'month': 9, 'day': 9} cast as fn:dateTime-record</test>
+      <result>
+         <all-of>
+            <assert>$result?year = 2026</assert>
+            <assert>empty($result?seconds)</assert>
+         </all-of>
+      </result>
+   </test-case>
 
    <test-case name="cast-record-901" covers-40="PR2855">
       <description>Casting to a wildcard array, map, or record type</description>
@@ -287,6 +660,75 @@
       <test>{"a": 1} cast as record(*)</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-902">
+      <description>Casting to a record, no default available</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": 1} cast as record(a, b, c as xs:integer)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-903">
+      <description>Casting to a record, value is wrong type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": 1} cast as record(a as xs:date)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-904">
+      <description>Casting to a record, value is wrong type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": (1, 2, 3)} cast as record(a as xs:integer)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-905">
+      <description>Casting to a record, not emptiable</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": 1}[?a = 2] cast as record(a as xs:integer)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-906">
+      <description>Casting to an unknown built-in record type</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{'year': 2026, 'month': 9, 'day': 9} cast as fn:dateTime-pseudo-record</test>
+      <result>
+         <error code="XPST0051"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-bad-target-901">
+      <description>Casting to a function type - not a valid casting target</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": 1} cast as function(*)</test>
+      <result>
+         <any-of>
+            <error code="XPST0003"/>
+            <error code="XPST0080"/>
+         </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-bad-target-902">
+      <description>Casting to a jnode type - not a valid casting target</description>
+      <created by="Michael Kay" on="2026-09-09"/>
+      <test>{"a": 1} cast as jnode(*)</test>
+      <result>
+         <any-of>
+            <error code="XPST0003"/>
+            <error code="XPST0080"/>
+         </any-of>
       </result>
    </test-case>
 </test-set>
