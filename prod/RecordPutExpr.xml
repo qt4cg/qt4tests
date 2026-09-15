@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-RecordPutExpr"
           covers-40="PR2566">
-   <description>Tests for the +:= (record put) operator in 4.0</description>
+   <description>Tests for the "but with" (aka record put, formerly +:=) operator in 4.0</description>
  
    
    <!--<environment name="user-defined-types">
@@ -16,7 +16,7 @@
    <test-case name="recordPut-001">
       <description>Basic test</description>
       <created by="Michael Kay" on="2026-09-13"/>
-      <test>(parts-of-dateTime(xs:date('2026-09-13')) +:= {'year': 2027}) => build-dateTime()</test>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {'year': 2027}) => build-dateTime()</test>
       <result>
          <assert-eq>xs:date('2027-09-13')</assert-eq>
       </result>
@@ -25,7 +25,7 @@
    <test-case name="recordPut-002">
       <description>Repeated application</description>
       <created by="Michael Kay" on="2026-09-13"/>
-      <test>(parts-of-dateTime(xs:date('2026-09-13')) +:= {'year': 2027} +:= {'month': 10}) => build-dateTime()</test>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {'year': 2027} but with {'month': 10}) => build-dateTime()</test>
       <result>
          <assert-eq>xs:date('2027-10-13')</assert-eq>
       </result>
@@ -34,7 +34,7 @@
    <test-case name="recordPut-003">
       <description>Multiple entries in map</description>
       <created by="Michael Kay" on="2026-09-13"/>
-      <test>(parts-of-dateTime(xs:date('2026-09-13')) +:= {'year': 2027, 'month': 10}) => build-dateTime()</test>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {'year': 2027, 'month': 10}) => build-dateTime()</test>
       <result>
          <assert-eq>xs:date('2027-10-13')</assert-eq>
       </result>
@@ -43,7 +43,7 @@
    <test-case name="recordPut-004">
       <description>Value gets coerced</description>
       <created by="Michael Kay" on="2026-09-13"/>
-      <test>(parts-of-dateTime(xs:date('2026-09-13')) +:= {'timezone': xs:duration('PT1H')})</test>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {'timezone': xs:duration('PT1H')})</test>
       <result>
          <assert>$result?timezone instance of xs:dayTimeDuration</assert>
       </result>
@@ -54,7 +54,7 @@
       <created by="Michael Kay" on="2026-09-13"/>
       <test><![CDATA[
         let $tz := parse-xml('<a>PT1H</a>')
-        return (parts-of-dateTime(xs:date('2026-09-13')) +:= {'timezone': $tz}) 
+        return (parts-of-dateTime(xs:date('2026-09-13')) but with {'timezone': $tz}) 
       ]]></test>
       <result>
          <assert>$result?timezone instance of xs:dayTimeDuration</assert>
@@ -66,7 +66,7 @@
       <created by="Michael Kay" on="2026-09-13"/>
       <test><![CDATA[
         let $key := parse-xml('<a>month</a>')
-        return (parts-of-dateTime(xs:date('2026-09-13')) +:= {$key: 10}) => build-dateTime()
+        return (parts-of-dateTime(xs:date('2026-09-13')) but with {$key: 10}) => build-dateTime()
       ]]></test>
       <result>
          <assert-eq>xs:date('2026-10-13')</assert-eq>
@@ -77,7 +77,7 @@
       <description>RHS is an empty map</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>
-        (parts-of-dateTime(xs:date('2026-09-13')) +:= {}) => build-dateTime()
+        (parts-of-dateTime(xs:date('2026-09-13')) but with {}) => build-dateTime()
       </test>
       <result>
          <assert-eq>xs:date('2026-09-13')</assert-eq>
@@ -88,7 +88,7 @@
       <description>RHS is a JNode whose value is a map</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>
-        (parts-of-dateTime(xs:date('2026-09-13')) +:= [{'year': 2027}]/1) => build-dateTime()
+        (parts-of-dateTime(xs:date('2026-09-13')) but with [{'year': 2027}]/1) => build-dateTime()
       </test>
       <result>
          <assert-eq>xs:date('2027-09-13')</assert-eq>
@@ -99,7 +99,7 @@
       <description>Lower operator precedence than "treat as"</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>
-        parts-of-dateTime(xs:date('2026-09-13')) treat as fn:dateTimeRecord +:= {'year': 2027} treat as map(xs:string, xs:integer)
+        parts-of-dateTime(xs:date('2026-09-13')) treat as fn:dateTimeRecord but with {'year': 2027} treat as map(xs:string, xs:integer)
       </test>
       <result>
          <assert-eq>xs:date('2027-09-13')</assert-eq>
@@ -110,7 +110,7 @@
       <description>Higher operator precedence than "otherwise"</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>
-        42 otherwise parts-of-dateTime(xs:date('2026-09-13')) +:= {'year': 2027}
+        42 otherwise parts-of-dateTime(xs:date('2026-09-13')) but with {'year': 2027}
       </test>
       <result>
          <assert-eq>42</assert-eq>
@@ -120,7 +120,7 @@
    <test-case name="recordPut-901">
       <description>Field name not in record definition</description>
       <created by="Michael Kay" on="2026-09-13"/>
-      <test>(parts-of-dateTime(xs:date('2026-09-13')) +:= {'century': 19}) => build-dateTime()</test>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {'century': 19}) => build-dateTime()</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -129,7 +129,7 @@
    <test-case name="recordPut-902">
       <description>Field name not in record definition</description>
       <created by="Michael Kay" on="2026-09-13"/>
-      <test>(parts-of-dateTime(xs:date('2026-09-13')) +:= {22 : 19}) => build-dateTime()</test>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {22 : 19}) => build-dateTime()</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -138,7 +138,7 @@
    <test-case name="recordPut-903">
       <description>Value wrong type for field</description>
       <created by="Michael Kay" on="2026-09-13"/>
-      <test>(parts-of-dateTime(xs:date('2026-09-13')) +:= {'year': 'nineteen-eighty-four'}) => build-dateTime()</test>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {'year': 'nineteen-eighty-four'}) => build-dateTime()</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -147,7 +147,7 @@
    <test-case name="recordPut-904">
       <description>RHS is not a map</description>
       <created by="Michael Kay" on="2026-09-13"/>
-      <test>(parts-of-dateTime(xs:date('2026-09-13')) +:= [1982, 1983]) => build-dateTime()</test>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) but with [1982, 1983]) => build-dateTime()</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -156,7 +156,7 @@
    <test-case name="recordPut-905">
       <description>RHS is a sequence of maps</description>
       <created by="Michael Kay" on="2026-09-13"/>
-      <test>(parts-of-dateTime(xs:date('2026-09-13')) +:= ({'year': 1984}, {'month': 10})) => build-dateTime()</test>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) but with ({'year': 1984}, {'month': 10})) => build-dateTime()</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -165,7 +165,7 @@
    <test-case name="recordPut-906">
       <description>RHS is an empty sequence of maps</description>
       <created by="Michael Kay" on="2026-09-13"/>
-      <test>(parts-of-dateTime(xs:date('2026-09-13')) +:= ()) => build-dateTime()</test>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) but with ()) => build-dateTime()</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -174,7 +174,7 @@
    <test-case name="recordPut-907">
       <description>LHS is not a record</description>
       <created by="Michael Kay" on="2026-09-13"/>
-      <test>{'a': 2, 'b': 3} +:= {'a': 1}</test>
+      <test>{'a': 2, 'b': 3} but with {'a': 1}</test>
       <result>
          <error code="XPTY0004"/>
       </result>
@@ -183,7 +183,7 @@
    <test-case name="recordPut-908">
       <description>LHS is an empty sequence</description>
       <created by="Michael Kay" on="2026-09-13"/>
-      <test>parts-of-dateTime(xs:date('2026-09-13'))[800] +:= {'year': 1066}</test>
+      <test>parts-of-dateTime(xs:date('2026-09-13'))[800] but with {'year': 1066}</test>
       <result>
          <error code="XPTY0004"/>
       </result>
