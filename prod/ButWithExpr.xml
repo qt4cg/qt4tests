@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-RecordPutExpr"
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="prod-ButWithExpr"
           covers-40="PR2566">
    <description>Tests for the "but with" (aka record put, formerly +:=) operator in 4.0</description>
  
@@ -13,7 +13,7 @@
          
    <dependency type="spec" value="XP40+ XQ40+"/>
       
-   <test-case name="recordPut-001">
+   <test-case name="butWith-001">
       <description>Basic test</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {'year': 2027}) => build-dateTime()</test>
@@ -22,7 +22,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-002">
+   <test-case name="butWith-002">
       <description>Repeated application</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {'year': 2027} but with {'month': 10}) => build-dateTime()</test>
@@ -31,7 +31,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-003">
+   <test-case name="butWith-003">
       <description>Multiple entries in map</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {'year': 2027, 'month': 10}) => build-dateTime()</test>
@@ -40,7 +40,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-004">
+   <test-case name="butWith-004">
       <description>Value gets coerced</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {'timezone': xs:duration('PT1H')})</test>
@@ -49,7 +49,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-005">
+   <test-case name="butWith-005">
       <description>Value gets coerced</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test><![CDATA[
@@ -61,7 +61,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-006">
+   <test-case name="butWith-006">
       <description>Key gets coerced</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test><![CDATA[
@@ -73,7 +73,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-007">
+   <test-case name="butWith-007">
       <description>RHS is an empty map</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>
@@ -84,7 +84,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-008">
+   <test-case name="butWith-008">
       <description>RHS is a JNode whose value is a map</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>
@@ -95,18 +95,19 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-009">
+   <test-case name="butWith-009">
       <description>Lower operator precedence than "treat as"</description>
       <created by="Michael Kay" on="2026-09-13"/>
+      <modified by="Christian Gruen" on="2026-09-15" change="type name, result is a map"/>
       <test>
-        parts-of-dateTime(xs:date('2026-09-13')) treat as fn:dateTimeRecord but with {'year': 2027} treat as map(xs:string, xs:integer)
+        parts-of-dateTime(xs:date('2026-09-13')) treat as fn:dateTime-record but with {'year': 2027} treat as map(xs:string, xs:integer)
       </test>
       <result>
-         <assert-eq>xs:date('2027-09-13')</assert-eq>
+         <assert>$result?year = 2027 and $result?day = 13</assert>
       </result>
    </test-case>
    
-   <test-case name="recordPut-010">
+   <test-case name="butWith-010">
       <description>Higher operator precedence than "otherwise"</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>
@@ -116,8 +117,53 @@
          <assert-eq>42</assert-eq>
       </result>
    </test-case>
-   
-   <test-case name="recordPut-901">
+
+   <test-case name="butWith-011">
+      <description>Evaluation of but with operator.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) treat as fn:dateTime-record but with { 'year': 2027 } treat as map(xs:string, xs:integer)) => build-dateTime()</test>
+      <result>
+         <assert-eq>xs:date('2027-09-13')</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="butWith-012">
+      <description>Evaluation of but with operator.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) but with { 'year': 2027 } => map:put('month', 10)) => build-dateTime()</test>
+      <result>
+         <assert-eq>xs:date('2027-10-13')</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="butWith-013">
+      <description>Evaluation of but with operator.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) but with { 'year': 2027 } but with { 'year': 2028 }) => build-dateTime()</test>
+      <result>
+         <assert-eq>xs:date('2028-09-13')</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="butWith-014">
+      <description>Evaluation of but with operator.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test>(parts-of-dateTime(xs:dateTime('2026-09-13T10:00:00+01:00')) but with { 'timezone': () }) => build-dateTime()</test>
+      <result>
+         <assert-eq>xs:dateTime('2026-09-13T10:00:00')</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="butWith-015">
+      <description>Evaluation of but with operator.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test>(parts-of-dateTime(xs:date('2026-09-13')) but with { 'year': 2027 }) instance of fn:dateTime-record</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="butWith-901">
       <description>Field name not in record definition</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {'century': 19}) => build-dateTime()</test>
@@ -126,7 +172,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-902">
+   <test-case name="butWith-902">
       <description>Field name not in record definition</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {22 : 19}) => build-dateTime()</test>
@@ -135,7 +181,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-903">
+   <test-case name="butWith-903">
       <description>Value wrong type for field</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>(parts-of-dateTime(xs:date('2026-09-13')) but with {'year': 'nineteen-eighty-four'}) => build-dateTime()</test>
@@ -144,7 +190,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-904">
+   <test-case name="butWith-904">
       <description>RHS is not a map</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>(parts-of-dateTime(xs:date('2026-09-13')) but with [1982, 1983]) => build-dateTime()</test>
@@ -153,7 +199,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-905">
+   <test-case name="butWith-905">
       <description>RHS is a sequence of maps</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>(parts-of-dateTime(xs:date('2026-09-13')) but with ({'year': 1984}, {'month': 10})) => build-dateTime()</test>
@@ -162,7 +208,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-906">
+   <test-case name="butWith-906">
       <description>RHS is an empty sequence of maps</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>(parts-of-dateTime(xs:date('2026-09-13')) but with ()) => build-dateTime()</test>
@@ -171,7 +217,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-907">
+   <test-case name="butWith-907">
       <description>LHS is not a record</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>{'a': 2, 'b': 3} but with {'a': 1}</test>
@@ -180,7 +226,7 @@
       </result>
    </test-case>
    
-   <test-case name="recordPut-908">
+   <test-case name="butWith-908">
       <description>LHS is an empty sequence</description>
       <created by="Michael Kay" on="2026-09-13"/>
       <test>parts-of-dateTime(xs:date('2026-09-13'))[800] but with {'year': 1066}</test>
@@ -188,5 +234,32 @@
          <error code="XPTY0004"/>
       </result>
    </test-case>
-   
+
+   <test-case name="butWith-909">
+      <description>Evaluation of but with operator.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test>parts-of-dateTime(xs:date('2026-09-13')) but with { 'year': 2027 } instance of map(*)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="butWith-910">
+      <description>Evaluation of but with operator.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test>parts-of-dateTime(xs:date('2026-09-13')) instance of record(*) but with { 'year': 2027 }</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="butWith-911">
+      <description>Evaluation of but with operator.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test>parts-of-dateTime(xs:date('2026-09-13')) but with { 'year': 2027 }?year</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
 </test-set>
