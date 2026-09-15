@@ -2425,6 +2425,147 @@
          <assert-deep-eq>{ "a": { "@b": "" } }</assert-deep-eq>
       </result>
    </test-case>
+   <test-case name="element-to-map-582">
+      <description>Names of namespaced elements in nested content.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<b xmlns="http://u.com/">text<c>x</c></b>')/*)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Q{http://u.com/}b": [ "text", { "c": "x" } ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-583">
+      <description>Names of namespaced elements in nested content.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<b xmlns="http://u.com/"><c/><d/><c/></b>')/*)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Q{http://u.com/}b": [ { "c": "" }, { "d": "" }, { "c": "" } ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-584">
+      <description>Names of namespaced elements in nested content.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<b xmlns="http://u.com/">text<c xmlns="">x</c></b>')/*)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Q{http://u.com/}b": [ "text", { "Q{}c": "x" } ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-585">
+      <description>Names of namespaced elements in nested content.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<b xmlns="http://u.com/">text<c xmlns="http://v.com/">x</c></b>')/*)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Q{http://u.com/}b": [ "text", { "Q{http://v.com/}c": "x" } ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-586">
+      <description>Names of namespaced elements in nested content.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xmlns="http://u.com/">t<b>u<c>x</c></b></a>')/*)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Q{http://u.com/}a": [ "t", { "b": [ "u", { "c": "x" } ] } ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-587">
+      <description>Names of namespaced elements in nested content.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b xmlns="http://u.com/">text<c>x</c></b></a>')/*)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "a": { "Q{http://u.com/}b": [ "text", { "c": "x" } ] } }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-588">
+      <description>Names of namespaced elements in nested content.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<list xmlns="http://u.com/" id="1"><item>a</item><item>b</item></list>')/*)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Q{http://u.com/}list": { "@id": "1", "item": [ "a", "b" ] } }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-589">
+      <description>Names of namespaced elements in nested content.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xmlns="http://u.com/"><b><c>1</c><c>2</c></b></a>')/*)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Q{http://u.com/}a": { "b": [ 1, 2 ] } }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-590">
+      <description>Names of namespaced elements in nested content.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test><![CDATA[
+         element-to-map(
+             parse-xml('<b xmlns="http://u.com/"><c/><d/><c/></b>')/*,
+             { 'name-format': 'eqname' }
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Q{http://u.com/}b": [ { "Q{http://u.com/}c": "" }, { "Q{http://u.com/}d": "" }, { "Q{http://u.com/}c": "" } ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-591">
+      <description>Names of namespaced elements in nested content.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test><![CDATA[
+         element-to-map(
+             parse-xml('<b xmlns="http://u.com/"><c/><d/><c/></b>')/*,
+             { 'name-format': 'local' }
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "b": [ { "c": "" }, { "d": "" }, { "c": "" } ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-592">
+      <description>Names of namespaced elements in nested content.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test><![CDATA[
+         element-to-map(
+             parse-xml('<p:b xmlns:p="http://u.com/">t<p:c>x</p:c></p:b>')/*,
+             { 'name-format': 'lexical' }
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "p:b": [ "t", { "p:c": "x" } ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-593">
+      <description>Names of namespaced elements in nested content.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test><![CDATA[
+         element-to-map(parse-xml(
+             '<b xmlns="http://u.com/" xmlns:p="http://p.com/" x="1" p:y="2">t<c/></b>')/*)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "Q{http://u.com/}b": [ { "@x": "1" }, { "@Q{http://p.com/}y": "2" }, "t", { "c": "" } ] }</assert-deep-eq>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-594">
+      <description>Names of namespaced elements in nested content.</description>
+      <created by="Christian Gruen" on="2026-09-15"/>
+      <test><![CDATA[
+         let $e := parse-xml('<b xmlns="http://u.com/">text<c>x</c><c xmlns="">y</c></b>')/*
+         return deep-equal(map-to-element(element-to-map($e)), $e)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
 
    <!--<test-case name="element-to-map-601" covers-40="PR1596">
       <description> Empty element with empty layout disabled </description>
