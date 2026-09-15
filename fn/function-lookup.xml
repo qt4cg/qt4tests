@@ -6377,6 +6377,47 @@
       </any-of>
     </result>
   </test-case>
-  
+
+  <test-case name="fn-function-lookup-902">
+    <description>Looks up a user-defined function with a default value.</description>
+    <created by="Christian Gruen" on="2026-09-15"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      declare function local:f($a := current()) { $a };
+      'lookup' ! function-lookup(xs:QName('local:f'), 0)()
+    </test>
+    <result>
+      <assert-eq>"lookup"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-function-lookup-903">
+    <description>Looks up a user-defined function with a default value.</description>
+    <created by="Christian Gruen" on="2026-09-15"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      declare function local:f($a := upper-case('x')) { $a };
+      function-lookup(xs:QName('local:f'), 0)()
+    </test>
+    <result>
+      <assert-eq>"X"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-function-lookup-904">
+    <description>Looks up a user-defined function with a default value.</description>
+    <created by="Christian Gruen" on="2026-09-15"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      declare function local:f($a := upper-case('x')) { $a };
+      declare function local:g($a := lower-case('Y')) { $a };
+      for $name in ('f', 'g')
+      return function-lookup(QName('http://www.w3.org/2005/xquery-local-functions', $name), 0)()
+    </test>
+    <result>
+      <assert-deep-eq>"X", "y"</assert-deep-eq>
+    </result>
+  </test-case>
+
 
 </test-set>
