@@ -705,6 +705,565 @@
          <assert-false/>
       </result>
    </test-case>
+
+   <test-case name="recordTypeDecl-049" covers-40="PR1874">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         declare function local:f($r as local:BA) { $r?a };
+         local:f(local:AB(1, 2))
+      ]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-050" covers-40="PR1874">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         declare function local:f($r as local:BA) { map:keys($r) };
+         local:f(local:AB(1, 2))
+      ]]></test>
+      <result>
+         <assert-deep-eq>"b", "a"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-051" covers-40="PR1874">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         declare function local:f($r as local:BA) { $r?a, map:keys($r) };
+         for-each((local:AB(1, 2), local:AB(3, 4)), local:f#1)
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, "b", "a", 3, "b", "a"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-052" covers-40="PR1874">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         declare function local:f() as local:BA { local:AB(1, 2) };
+         local:f()?a, map:keys(local:f())
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, "b", "a"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-053" covers-40="PR1874">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         let $r as local:BA := local:AB(1, 2)
+         return ($r?a, map:keys($r))
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, "b", "a"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-054" covers-40="PR1874">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         declare record local:N(r as local:AB);
+         declare record local:M(r as local:BA);
+         let $m as local:M := local:N(local:AB(1, 2))
+         return ($m?r?a, map:keys($m?r))
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, "b", "a"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-055" covers-40="PR1874">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         let $array as array(local:BA) := [ local:AB(1, 2) ]
+         return ($array(1)?a, map:keys($array(1)))
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, "b", "a"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-056" covers-40="PR1874">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         let $map as map(xs:string, local:BA) := { 'x': local:AB(1, 2) }
+         return ($map?x?a, map:keys($map?x))
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, "b", "a"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-057" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         local:AB(1, 2) instance of local:BA
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-058" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         let $r := local:AB(1, 2) treat as local:BA
+         return ($r?a, map:keys($r))
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, "a", "b"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-059" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         for $item in (local:AB(1, 2), 'x')
+         return typeswitch($item) {
+           case $r as local:BA return ($r?a, map:keys($r))
+           default return 0
+         }
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, "a", "b", 0</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-060" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         (local:AB(1, 2), 'x')[. instance of local:BA]?a
+      ]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-061" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         for $r in (local:AB(1, 2), 'x')
+         where $r instance of local:BA
+         return $r?a
+      ]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-062" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         for $i in 1 to 2
+         let $r := if($i = 1) then local:AB(1, 2) else local:BA(2, 1)
+         return $r?a
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, 1</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-063" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         let $r := map:put(local:AB(1, 2) treat as local:BA, 'a', 5)
+         return ($r?a, $r?b)
+      ]]></test>
+      <result>
+         <assert-deep-eq>5, 2</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-064" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         count(jtree([ local:AB(1, 2) ])/jnode(*, local:AB)/self::jnode(*, local:BA))
+      ]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-065" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         count(jtree([ { 'a': 1, 'b': 2 } ])/jnode(*, local:AB)/self::jnode(*, local:BA))
+      ]]></test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-066" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         let $tree := jtree([ local:AB(1, 2) ])
+         return count($tree/jnode(*, local:AB) intersect $tree/jnode(*, local:BA))
+      ]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-067" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         array:of-members(jtree([ local:AB(1, 2), 'x' ])/jnode(*, local:BA))(1)?a
+      ]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-068" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         declare function local:f($r as local:AB) { $r?a };
+         local:f#1 instance of fn(local:BA) as item()*
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-069" covers-40="PR1874">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         declare function local:f($r as local:AB) { $r?a, map:keys($r) };
+         let $f as fn(local:BA) as item()* := local:f#1
+         return $f(local:BA(2, 1))
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, "a", "b"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-070" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         declare function local:f() as local:AB { local:AB(1, 2) };
+         local:f#0 instance of fn() as local:BA
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-071" covers-40="PR1874">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         declare function local:f() as local:AB { local:AB(1, 2) };
+         let $f as fn() as local:BA := local:f#0
+         return ($f()?a, map:keys($f()))
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, "b", "a"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-072" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:A(a as xs:integer);
+         declare record local:AC(a as xs:integer, c as xs:integer?);
+         local:A(1) instance of local:AC
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-073" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:A(a as xs:integer);
+         declare record local:AD(a as xs:integer, d as xs:integer);
+         local:A(1) instance of local:AD
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-074" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:A(a as xs:integer);
+         declare record local:AC(a as xs:integer, c as xs:integer?);
+         local:AC(1, ()) instance of local:A
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-075" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         let $r as record(x) := { 'x': 1 }
+         return (
+           $r instance of record(x, y),
+           $r instance of record(y, x),
+           $r instance of record(x, y as item()),
+           $r instance of record(y)
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>true(), true(), false(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-076" covers-40="PR1874">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:A(a as xs:integer);
+         declare record local:AC(a as xs:integer, c as xs:integer?);
+         let $r as local:AC := local:A(1)
+         return (map:keys($r), empty($r?c))
+      ]]></test>
+      <result>
+         <assert-deep-eq>"a", "c", true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-077" covers-40="PR1874">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:A(a as xs:integer);
+         declare record local:CA(c as xs:integer?, a as xs:integer);
+         declare function local:f($r as local:CA) { $r?a, map:keys($r) };
+         local:f(local:A(1))
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, "c", "a"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-078" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:A(a as xs:integer);
+         declare record local:CA(c as xs:integer?, a as xs:integer);
+         for $item in (local:A(1), 'x')
+         return typeswitch($item) {
+           case $r as local:CA return ($r?a, map:keys($r))
+           default return 0
+         }
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, "a", 0</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-079" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:A(a as xs:integer);
+         declare record local:CA(c as xs:integer?, a as xs:integer);
+         (local:A(1), 'x')[. instance of local:CA]?a
+      ]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-080" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:I(a as xs:integer);
+         declare record local:D(a as xs:decimal);
+         declare function local:f($r as local:D) { $r instance of local:I };
+         local:f(local:I(1)), for-each(local:I(1), local:f#1)
+      ]]></test>
+      <result>
+         <assert-deep-eq>false(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-081" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:I(a as xs:integer);
+         declare record local:D(a as xs:decimal);
+         let $r as local:D := local:I(1)
+         return ($r instance of local:I, $r instance of local:D)
+      ]]></test>
+      <result>
+         <assert-deep-eq>false(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-082" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:I(a as xs:integer);
+         declare record local:D(a as xs:decimal);
+         let $array as array(local:D) := [ local:I(1) ]
+         return ($array(1) instance of local:I, $array(1) instance of local:D)
+      ]]></test>
+      <result>
+         <assert-deep-eq>false(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-083" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:I(a as xs:integer);
+         let $r as local:I := local:I(1)
+         return $r instance of local:I
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-084" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         declare record local:N(r as array(local:AB));
+         declare record local:M(r as array(local:BA));
+         local:N([ local:AB(1, 2) ]) instance of local:M
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-085" covers-40="PR1874">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         declare record local:N(r as array(local:AB));
+         declare record local:M(r as array(local:BA));
+         let $m as local:M := local:N([ local:AB(1, 2) ])
+         return ($m?r(1)?a, map:keys($m?r(1)))
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, "b", "a"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-086" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         declare function local:f($records as local:BA*) {
+           for $r in $records return $r?a
+         };
+         local:f((local:AB(1, 2), local:BA(4, 3)))
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, 3</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-087" covers-40="PR2566">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-09-16"/>
+      <test><![CDATA[
+         declare record local:AB(a as xs:integer, b as xs:integer);
+         declare record local:BA(b as xs:integer, a as xs:integer);
+         let $records := (local:AB(1, 2), local:BA(4, 3))
+         return (
+           $records[. instance of local:AB]?a,
+           $records[. instance of local:BA]?b
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, 3, 2, 4</assert-deep-eq>
+      </result>
+   </test-case>
    
  
    
