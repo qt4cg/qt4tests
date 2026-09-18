@@ -351,13 +351,14 @@
    </test-case>
    
    <test-case name="element-to-map-106">
-      <description> Extra entries are allowed in an entry of the plan </description>
+      <description> Extra entries in an entry of the plan are rejected </description>
       <created by="Michael Kay" on="2024-11-16"/>
+      <modified by="Christian Gruen" on="2026-09-18" change="PR2903"/>
       <test><![CDATA[
          let $data := parse-xml('<p>lorem</p>')
          return element-to-map($data/*, {'plan': {'p': {'layout':'xml', 'colour': 'green'}}})]]></test>
       <result>
-         <assert-deep-eq><![CDATA[{'p': '<p>lorem</p>'}]]></assert-deep-eq>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
    
@@ -2563,6 +2564,64 @@
       ]]></test>
       <result>
          <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-595" covers-40="PR2903">
+      <description>Errors in the conversion plan.</description>
+      <created by="Christian Gruen" on="2026-09-18"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a>1</a>')/a,
+             { 'plan': { 'a': { 'layout': 'simple', 'x': 1 }, '*': { 'layout': 'xml' } } })
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-596" covers-40="PR2903">
+      <description>Errors in the conversion plan.</description>
+      <created by="Christian Gruen" on="2026-09-18"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a x="1"/>')/a,
+             { 'plan': { '@x': { 'type': 'integer', 'layout': 'simple' } } })
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-597" covers-40="PR2903">
+      <description>Errors in the conversion plan.</description>
+      <created by="Christian Gruen" on="2026-09-18"/>
+      <test><![CDATA[
+         let $e := parse-xml('<a>1</a>')/a
+         return deep-equal(
+             element-to-map($e, { 'plan': { 'xml:a': { 'layout': 'unknown' } } }),
+             element-to-map($e)
+         )
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-598" covers-40="PR2903">
+      <description>Errors in the conversion plan.</description>
+      <created by="Christian Gruen" on="2026-09-18"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b/><b/></a>')/a,
+             { 'plan': { 'a': { 'layout': 'list', 'child': 'xml:b' } } })
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-599" covers-40="PR2903">
+      <description>Errors in the conversion plan.</description>
+      <created by="Christian Gruen" on="2026-09-18"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a><b/></a>')/a,
+             { 'plan': { 'a': { 'layout': 'record', 'type': 'integer' }, '*': { 'layout': 'xml' } } })
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 
