@@ -334,10 +334,11 @@
    <test-case name="xsd-validator-016">
       <description> In xsd-validate(), test validation failure. </description>
       <created by="Michael Kay" on="2025-04-30"/>
+      <modified by="Michael Ennen" on="2026-09-17" change="request error details and allow optional diagnostic fields"/>
       <environment ref="orderDataDynamic"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
-        xsd-validator({'schema-location': "http://www.w3.org/XQueryTestOrderBy", 'validation-mode':'strict', 'return-typed-node': false()})
+        xsd-validator({'schema-location': "http://www.w3.org/XQueryTestOrderBy", 'validation-mode':'strict', 'return-typed-node': false(), 'return-error-details': true()})
            (<Strings><orderData>A String</orderData></Strings>) 
         ]]></test>
       <result>
@@ -460,17 +461,18 @@
       <description> Test returned error details. </description>
       <created by="Michael Kay" on="2025-04-30"/>
       <modified by="Gunther Rademacher" on="2025-05-10" change="changed dependency to XQuery only"/>
+      <modified by="Michael Ennen" on="2026-09-17" change="request error details and allow optional diagnostic fields"/>
       <environment ref="simplexsd"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         import schema namespace simple="http://www.w3.org/XQueryTest/simple";
-        xsd-validator() (<simple:duration>sorry, no duration here</simple:duration>) ? error-details
+        xsd-validator({'return-error-details': true()}) (<simple:duration>sorry, no duration here</simple:duration>) ? error-details
       ]]></test>
       <result>
          <all-of>
-            <assert>exists($result ? message)</assert>
-            <assert>exists($result ? node)</assert>
-            <assert>local-name($result ? node) = 'duration'</assert>
+            <assert-type>map(*)+</assert-type>
+            <assert>every $detail in $result satisfies $detail?message instance of xs:string?</assert>
+            <assert>every $detail in $result satisfies $detail?node instance of node()?</assert>
          </all-of>
       </result>
    </test-case>
@@ -1120,14 +1122,18 @@
    <test-case name="xsd-validator-075">
       <description/>
       <created by="Michael Kay" on="2025-04-30"/>
+      <modified by="Michael Ennen" on="2026-09-17" change="request error details and allow optional diagnostic fields"/>
       <environment ref="hats"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         import schema namespace hat = "http://www.w3.org/XQueryTest/hats";
-        xsd-validator({'type':xs:QName('hat:hatsize')}) ( <hat>banana</hat> ) ? error-details ? message
+        xsd-validator({'type':xs:QName('hat:hatsize'), 'return-error-details': true()}) ( <hat>banana</hat> ) ? error-details
       ]]></test>
       <result>
-         <assert>exists($result)</assert>
+         <all-of>
+            <assert-type>map(*)+</assert-type>
+            <assert>every $detail in $result satisfies $detail?message instance of xs:string?</assert>
+         </all-of>
       </result>
    </test-case>
    
@@ -1135,16 +1141,20 @@
    <test-case name="xsd-validator-077">
       <description> In xsd-validate(), test , with lax validation and a type specified by xsi:type </description>
       <created by="Michael Kay" on="2025-04-30"/>
+      <modified by="Michael Ennen" on="2026-09-17" change="request error details and allow optional diagnostic fields"/>
       <environment ref="validate"/>
       <dependency type="spec" value="XQ10+"/>
       <test><![CDATA[
         declare default element namespace "http://www.w3.org/XQueryTest/testcases";
         import schema "http://www.w3.org/XQueryTest/testcases";
-        let $var := xsd-validator({'validation-mode':'lax'}) (
+        let $var := xsd-validator({'validation-mode':'lax', 'return-error-details': true()}) (
           <Unknown xsi:type="tc:choice" xmlns:tc="http://www.w3.org/XQueryTest/testcases"> {element a {element z {"12.345"}}}</Unknown>)
-        return $var ? error-details ? message]]></test>
+        return $var ? error-details]]></test>
       <result>
-         <assert>exists($result)</assert>
+         <all-of>
+            <assert-type>map(*)+</assert-type>
+            <assert>every $detail in $result satisfies $detail?message instance of xs:string?</assert>
+         </all-of>
       </result>
    </test-case>
 
@@ -1165,15 +1175,19 @@
    <test-case name="xsd-validator-079">
       <description> In xsd-validate(), test , with lax validation and a type specified by xsi:type </description>
       <created by="Michael Kay" on="2025-04-30"/>
+      <modified by="Michael Ennen" on="2026-09-17" change="request error details and allow optional diagnostic fields"/>
       <environment ref="validate"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         declare default element namespace "http://www.w3.org/XQueryTest/testcases";
         import schema "http://www.w3.org/XQueryTest/testcases";
-        let $var := xsd-validator({'validation-mode':'lax'}) ( <Unknown xsi:type="tc:choice" xmlns:tc="http://www.w3.org/XQueryTest/testcases"> {element z {"12.345"}}</Unknown>) 
-        return $var ? error-details ? message]]></test>
+        let $var := xsd-validator({'validation-mode':'lax', 'return-error-details': true()}) ( <Unknown xsi:type="tc:choice" xmlns:tc="http://www.w3.org/XQueryTest/testcases"> {element z {"12.345"}}</Unknown>)
+        return $var ? error-details]]></test>
       <result>
-         <assert>exists($result)</assert>
+         <all-of>
+            <assert-type>map(*)+</assert-type>
+            <assert>every $detail in $result satisfies $detail?message instance of xs:string?</assert>
+         </all-of>
       </result>
    </test-case>
 
@@ -1194,59 +1208,75 @@
    <test-case name="xsd-validator-081">
       <description> In xsd-validate(), test , with lax validation and a type specified by xsi:type </description>
       <created by="Michael Kay" on="2025-04-30"/>
+      <modified by="Michael Ennen" on="2026-09-17" change="request error details and allow optional diagnostic fields"/>
       <environment ref="validate"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         declare default element namespace "http://www.w3.org/XQueryTest/testcases";
         import schema "http://www.w3.org/XQueryTest/testcases";
-        let $var := xsd-validator() ( <Unknown xsi:type="tc:choice" xmlns:tc="http://www.w3.org/XQueryTest/testcases"> {element a {element z {"12.345"}}}</Unknown>)
-        return $var ? error-details ? message ]]></test>
+        let $var := xsd-validator({'return-error-details': true()}) ( <Unknown xsi:type="tc:choice" xmlns:tc="http://www.w3.org/XQueryTest/testcases"> {element a {element z {"12.345"}}}</Unknown>)
+        return $var ? error-details ]]></test>
       <result>
-         <assert>exists($result)</assert>
+         <all-of>
+            <assert-type>map(*)+</assert-type>
+            <assert>every $detail in $result satisfies $detail?message instance of xs:string?</assert>
+         </all-of>
       </result>
    </test-case>
 
    <test-case name="xsd-validator-082">
       <description> In xsd-validate(), test , with lax validation and a type specified by xsi:type </description>
       <created by="Michael Kay" on="2025-04-30"/>
+      <modified by="Michael Ennen" on="2026-09-17" change="request error details and allow optional diagnostic fields"/>
       <environment ref="validate"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         declare default element namespace "http://www.w3.org/XQueryTest/testcases";
         import schema "http://www.w3.org/XQueryTest/testcases";
-        let $var := xsd-validator() ( <Unknown xsi:type="tc:choice" xmlns:tc="http://www.w3.org/XQueryTest/testcases"> {element a {"12.345"}}</Unknown>) 
-        return $var ? error-details ? message]]></test>
+        let $var := xsd-validator({'return-error-details': true()}) ( <Unknown xsi:type="tc:choice" xmlns:tc="http://www.w3.org/XQueryTest/testcases"> {element a {"12.345"}}</Unknown>)
+        return $var ? error-details]]></test>
       <result>
-         <assert>exists($result)</assert>
+         <all-of>
+            <assert-type>map(*)+</assert-type>
+            <assert>every $detail in $result satisfies $detail?message instance of xs:string?</assert>
+         </all-of>
       </result>
    </test-case>
 
    <test-case name="xsd-validator-083">
       <description> In xsd-validate(), test , with lax validation and a type specified by xsi:type </description>
       <created by="Michael Kay" on="2025-04-30"/>
+      <modified by="Michael Ennen" on="2026-09-17" change="request error details and allow optional diagnostic fields"/>
       <environment ref="validate"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         declare default element namespace "http://www.w3.org/XQueryTest/testcases";
         import schema "http://www.w3.org/XQueryTest/testcases";
-        let $var := xsd-validator() ( <Unknown xsi:type="tc:choice" xmlns:tc="http://www.w3.org/XQueryTest/testcases"> {element z {"12.345"}}</Unknown>) 
-        return $var ? error-details ? message]]></test>
+        let $var := xsd-validator({'return-error-details': true()}) ( <Unknown xsi:type="tc:choice" xmlns:tc="http://www.w3.org/XQueryTest/testcases"> {element z {"12.345"}}</Unknown>)
+        return $var ? error-details]]></test>
       <result>
-         <assert>exists($result)</assert>
+         <all-of>
+            <assert-type>map(*)+</assert-type>
+            <assert>every $detail in $result satisfies $detail?message instance of xs:string?</assert>
+         </all-of>
       </result>
    </test-case>
 
    <test-case name="xsd-validator-084">
       <description> In xsd-validate(), test , with lax validation and a type specified by xsi:type </description>
       <created by="Michael Kay" on="2025-04-30"/>
+      <modified by="Michael Ennen" on="2026-09-17" change="request error details and allow optional diagnostic fields"/>
       <environment ref="validate"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         declare default element namespace "http://www.w3.org/XQueryTest/testcases";
         import schema "http://www.w3.org/XQueryTest/testcases";
-        let $var := xsd-validator() ( <Unknown> {element z {"12.345"}}</Unknown>) return $var ? error-details ? message]]></test>
+        let $var := xsd-validator({'return-error-details': true()}) ( <Unknown> {element z {"12.345"}}</Unknown>) return $var ? error-details]]></test>
       <result>
-         <assert>exists($result)</assert>
+         <all-of>
+            <assert-type>map(*)+</assert-type>
+            <assert>every $detail in $result satisfies $detail?message instance of xs:string?</assert>
+         </all-of>
       </result>
    </test-case>
 
@@ -1374,22 +1404,23 @@
       <description> Test returned error details. </description>
       <created by="Michael Kay" on="2026-08-18"/>
       <modified by="Gunther Rademacher" on="2026-09-02" change="change dependency to XQuery-only"/>
+      <modified by="Michael Ennen" on="2026-09-17" change="request error details and allow optional diagnostic fields"/>
       <environment ref="simplexsd"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
         import schema namespace simple="http://www.w3.org/XQueryTest/simple";
         let $doc := parse-xml('<duration xmlns="http://www.w3.org/XQueryTest/simple">sorry, no duration here</duration>',
                               {'retain-location': true()})
-        return xsd-validator({'schema-location': '../prod/ValidateExpr/simple.xsd'}) 
+        return xsd-validator({'schema-location': '../prod/ValidateExpr/simple.xsd', 'return-error-details': true()})
                      ($doc) ? error-details
       ]]></test>
       <result>
          <all-of>
-            <assert>exists($result ? message)</assert>
-            <assert>exists($result ? node)</assert>
-            <assert>exists($result ? location)</assert>
-            <assert>$result ? location ? line-number = 1)</assert>
-            <assert>local-name($result ? node) = 'duration'</assert>
+            <assert-type>map(*)+</assert-type>
+            <assert>every $detail in $result satisfies $detail?message instance of xs:string?</assert>
+            <assert>every $detail in $result satisfies $detail?node instance of node()?</assert>
+            <assert>every $detail in $result satisfies $detail?location instance of fn:location-record?</assert>
+            <assert>every $line in $result?location?line-number satisfies $line = 1</assert>
          </all-of>
      </result>
    </test-case>
@@ -1411,4 +1442,38 @@
       </result>
    </test-case>
  
+   <test-case name="xsd-validator-096">
+      <description>Validation failure returns no error details by default.</description>
+      <created by="Michael Ennen" on="2026-09-17"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        xsd-validator({'type': xs:QName('xs:integer')})
+          (<n>not-an-integer</n>)
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>not($result?is-valid)</assert>
+            <assert>empty($result?typed-node)</assert>
+            <assert>empty($result?error-details)</assert>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="xsd-validator-097">
+      <description>Validation failure returns no error details when disabled.</description>
+      <created by="Michael Ennen" on="2026-09-17"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        xsd-validator({'type': xs:QName('xs:integer'), 'return-error-details': false()})
+          (<n>not-an-integer</n>)
+      ]]></test>
+      <result>
+         <all-of>
+            <assert>not($result?is-valid)</assert>
+            <assert>empty($result?typed-node)</assert>
+            <assert>empty($result?error-details)</assert>
+         </all-of>
+      </result>
+   </test-case>
+
 </test-set>
