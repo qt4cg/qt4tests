@@ -770,9 +770,10 @@
       </result>
    </test-case>
    
-   <test-case name="JAxes-041">
+   <test-case name="JAxes-041" covers-40="PR2878">
       <description> Evaluate all axes in JSON document, modified using map:put() </description>
       <created by="Michael Kay" on="2025-08-20"/>
+      <modified by="Michael Kay" on="2026-09-22" change="PR2878"/>
       <dependency type="spec" value="XQ40+"/>
       <module uri="http://www.w3.org/TestModules/AxisStepJ/Histogram" file="AxisStep.J/histogram.xq"/>
       <test>
@@ -789,8 +790,8 @@
             "child": 0,
             "descendant": 0,
             "descendant-or-self": 1,
-            "following": 14,
-            "following-or-self": 15,
+            "following": 16,
+            "following-or-self": 17,
             "following-sibling": 5,
             "following-sibling-or-self": 6,
             "parent": 1,
@@ -804,9 +805,10 @@
       </result>
    </test-case>
    
-   <test-case name="JAxes-042">
+   <test-case name="JAxes-042" covers-40="PR2878">
       <description> Evaluate all axes in JSON document, modified using map:remove() and map:put() </description>
       <created by="Michael Kay" on="2025-08-20"/>
+      <modified by="Michael Kay" on="2026-09-22" change="PR2878"/>
       <dependency type="spec" value="XQ40+"/>
       <module uri="http://www.w3.org/TestModules/AxisStepJ/Histogram" file="AxisStep.J/histogram.xq"/>
       <test>
@@ -823,8 +825,8 @@
             "child": 0,
             "descendant": 0,
             "descendant-or-self": 1,
-            "following": 14,
-            "following-or-self": 15,
+            "following": 16,
+            "following-or-self": 17,
             "following-sibling": 5,
             "following-sibling-or-self": 6,
             "parent": 1,
@@ -1401,17 +1403,18 @@
       </result>
    </test-case>
    
-   <test-case name="JAxes-304">
+   <test-case name="JAxes-304" covers-40="PR2878">
       <description> Use type test with occurrence indicator</description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Christian Gruen" on="2026-02-10" change="syntax updated"/>
+      <modified by="Michael Kay" on="2026-09-22" change="PR2878"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {"v": (), "w": 11e0, "x": 12, "y": 12.1, "z": 12e0, "*": {"w": (15e0, 16e0)}}
          return $map//jnode(*, xs:double*) =!> jkey()
       </test>
       <result>
-         <assert-deep-eq>"v", "w", "z", "w"</assert-deep-eq>
+         <assert-deep-eq>"v", "w", "z", "w", 1, 2</assert-deep-eq>
       </result>
    </test-case>
    
@@ -1491,11 +1494,12 @@
       </result>
    </test-case>
    
-   <test-case name="JAxes-314">
+   <test-case name="JAxes-314" covers-40="PR2878">
       <description> Use record type tests - // operator</description>
       <created by="Michael Kay" on="2025-09-01"/>
       <modified by="Michael Kay" on="2026-02-10" change="syntax updated"/>
       <modified by="Christian Gruen" on="2026-03-05" change="PR2413"/>
+      <modified by="Michael Kay" on="2026-09-22" change="PR2878"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>
          let $map := {"w": {"A":11e0, "B":"B"}, 
@@ -1506,7 +1510,7 @@
          return $map//*[jnode(A, xs:double)][count(B) = 1] =!> jkey()
       </test>
       <result>
-         <assert-deep-eq>"w", "z", "*"</assert-deep-eq>
+         <assert-deep-eq>"w", "z", "*", 1, 2</assert-deep-eq>
       </result>
    </test-case>
    
@@ -1788,6 +1792,162 @@
          <assert-eq>0</assert-eq>
       </result>
    </test-case>
+   
+   <test-case name="JAxes-337" covers-40="PR2878">
+      <description>JNodes and sequences</description>
+      <created by="Michael Kay" on="2026-09-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $array := [(), 1, (1, 2), (1, 2, 3)]
+         return count($array/*)
+      ]]></test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-338" covers-40="PR2878">
+      <description>JNodes and sequences</description>
+      <created by="Michael Kay" on="2026-09-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $array := [(), 1, (1, 2), (1, 2, 3)]
+         return count($array/*/*)
+      ]]></test>
+      <result>
+         <assert-eq>5</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-339" covers-40="PR2878">
+      <description>JNodes and sequences</description>
+      <created by="Michael Kay" on="2026-09-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $map := {'A':(), 'B':1, 'C':(1, 2), 'D':(1, 2, 3)}
+         return count($map/*)
+      ]]></test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-340" covers-40="PR2878">
+      <description>JNodes and sequences</description>
+      <created by="Michael Kay" on="2026-09-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $map := {'A':(), 'B':1, 'C':(1, 2), 'D':(1, 2, 3)}
+         return count($map/*/*)
+      ]]></test>
+      <result>
+         <assert-eq>5</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-341" covers-40="PR2878">
+      <description>JNodes and sequences</description>
+      <created by="Michael Kay" on="2026-09-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $map := {'A':(), 'B':1, 'C':(1, 2), 'D':(1, 2, 3)}
+         return string-join($map/D/1/following-sibling::*, '|')
+      ]]></test>
+      <result>
+         <assert-eq>"2|3"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-342" covers-40="PR2878">
+      <description>JNodes and sequences</description>
+      <created by="Michael Kay" on="2026-09-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $map := {'A':(), 'B':1, 'C':(1, 2), 'D':(1, 2, 3)}
+         return string-join($map/D/3/preceding-sibling::*, '|')
+      ]]></test>
+      <result>
+         <assert-eq>"1|2"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-343" covers-40="PR2878">
+      <description>JNodes and sequences</description>
+      <created by="Michael Kay" on="2026-09-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $map := {'A':(), 'B':1, 'C':(1, 2), 'D':[([1,2], [3,4], [5,6])]}
+         return string-join($map/D/1/2/*, '|')
+      ]]></test>
+      <result>
+         <assert-eq>"3|4"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-344" covers-40="PR2878">
+      <description>JNodes and sequences</description>
+      <created by="Michael Kay" on="2026-09-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $map := {'A':(), 'B':1, 'C':(1, 2), 'D':[([1,2], [3,4], [5,6])]}
+         return $map/D/1/2/following-sibling::* ! array:size(.)
+      ]]></test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-345" covers-40="PR2878">
+      <description>JNodes and sequences</description>
+      <created by="Michael Kay" on="2026-09-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $map := {'A':(), 'B':1, 'C':(1, 2), 'D':[([1,2], [3,4], [5,6])]}
+         return string-join($map/D/1/3/preceding-sibling::*/*, '|')
+      ]]></test>
+      <result>
+         <assert-eq>"1|2|3|4"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-370" covers-40="PR2878">
+      <description>JNodes and sequences: item axis</description>
+      <created by="Michael Kay" on="2026-09-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $map := {'A':(), 'B':1, 'C':(2, 3)}
+         return string-join($map/*/item::*, '|')
+      ]]></test>
+      <result>
+         <assert-eq>"1|2|3"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-371" covers-40="PR2878">
+      <description>JNodes and sequences: item axis</description>
+      <created by="Michael Kay" on="2026-09-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $map := {'A':[], 'B':[1], 'C':[(2, 3)]}
+         return string-join($map/*/*/item::*, '|')
+      ]]></test>
+      <result>
+         <assert-eq>"1|2|3"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="JAxes-372" covers-40="PR2878">
+      <description>JNodes and sequences: item axis</description>
+      <created by="Michael Kay" on="2026-09-22"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $map := {'A':[], 'B':[1], 'C':[(2, 3)]}
+         return string-join($map/*/*/item::*/../.. ! jkey(.), '|')
+      ]]></test>
+      <result>
+         <assert-eq>"B|C"</assert-eq>
+      </result>
+   </test-case>
 
    <test-case name="JAxes-901">
       <description> Obsolete syntax </description>
@@ -1859,7 +2019,7 @@
    </test-case>
    
    <test-case name="JAxes-906" covers-40="PR2795">
-      <description>Generalized node type tests</description>
+      <description>Generalized node type tests (gnode() has been dropped)</description>
       <created by="Christian Gruen" on="2026-09-01"/>
       <modified by="Gunther Rademacher" on="2026-09-02" change="remove error code XPST0003"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
@@ -1873,7 +2033,7 @@
    </test-case>
 
    <test-case name="JAxes-907" covers-40="PR2795">
-      <description>Generalized node type tests</description>
+      <description>Generalized node type tests (gnode() has been dropped)</description>
       <created by="Christian Gruen" on="2026-09-01"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
