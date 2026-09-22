@@ -1,0 +1,118 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="bin-to-base64url" covers-40="PR2910">
+  <description>Tests for the bin:to-base64url function</description>
+
+  <environment name="EXPath-binary">
+    <namespace prefix="bin" uri="http://expath.org/ns/binary"/>
+  </environment>
+
+  <dependency type="feature" value="binary"/>
+
+  <test-case name="bin-to-base64url-001">
+    <description>Evaluation of bin:to-base64url.</description>
+    <created by="Christian Gruen" on="2026-09-22"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:to-base64url(())</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="bin-to-base64url-002">
+    <description>Evaluation of bin:to-base64url.</description>
+    <created by="Christian Gruen" on="2026-09-22"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:to-base64url(xs:base64Binary(''))</test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert-eq>''</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="bin-to-base64url-003">
+    <description>Evaluation of bin:to-base64url.</description>
+    <created by="Christian Gruen" on="2026-09-22"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:to-base64url(xs:base64Binary('+/8='))</test>
+    <result>
+      <assert-eq>'-_8'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-to-base64url-004">
+    <description>Evaluation of bin:to-base64url.</description>
+    <created by="Christian Gruen" on="2026-09-22"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:to-base64url(xs:hexBinary('FBFF'))</test>
+    <result>
+      <assert-eq>'-_8'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-to-base64url-005">
+    <description>Evaluation of bin:to-base64url.</description>
+    <created by="Christian Gruen" on="2026-09-22"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:to-base64url(xs:hexBinary('FBFFBF'))</test>
+    <result>
+      <assert-eq>'-_-_'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-to-base64url-006">
+    <description>Evaluation of bin:to-base64url.</description>
+    <created by="Christian Gruen" on="2026-09-22"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:to-base64url(xs:hexBinary('FB'))</test>
+    <result>
+      <assert-eq>'-w'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-to-base64url-007">
+    <description>Evaluation of bin:to-base64url.</description>
+    <created by="Christian Gruen" on="2026-09-22"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:to-base64url(bin:encode-string('Hello'))</test>
+    <result>
+      <assert-eq>'SGVsbG8'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="bin-to-base64url-008">
+    <description>Evaluation of bin:to-base64url.</description>
+    <created by="Christian Gruen" on="2026-09-22"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:to-base64url(bin:from-octets(0 to 255)) => matches('^[A-Za-z0-9_\-]+$')</test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="bin-to-base64url-009">
+    <description>Evaluation of bin:to-base64url.</description>
+    <created by="Christian Gruen" on="2026-09-22"/>
+    <environment ref="EXPath-binary"/>
+    <test>
+      every $n in 0 to 10 satisfies (
+        let $bin := bin:from-octets(reverse(1 to $n) ! (. * 23 mod 256))
+        return bin:from-base64url(bin:to-base64url($bin)) eq $bin
+      )
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="bin-to-base64url-010">
+    <description>Evaluation of bin:to-base64url.</description>
+    <created by="Christian Gruen" on="2026-09-22"/>
+    <environment ref="EXPath-binary"/>
+    <test>bin:to-base64url('+/8=')</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
+</test-set>
