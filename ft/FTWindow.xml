@@ -1,0 +1,323 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-FTWindow">
+  <description>XQuery Full Text - Window Selection - Window selection. Section 3.6.2.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="FTWindow-words1">
+    <description>ftwindow words, at edge of range</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-words1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text ("physical" ftand "swift") window 4 words]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-words2">
+    <description>ftwindow words, just out of range</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-words2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text ("physical" ftand "swift") window 1 words]/title]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-words3">
+    <description>ftwindow words with expression</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-words3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+let $x := 4 return
+$input-context/books/book[para contains text ("physical" ftand "swift") window $x words]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-words4">
+    <description>ftwindow words as subtype xs:integer</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-words4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+let $x := xs:positiveInteger(4) return
+$input-context/books/book[para contains text ("physical" ftand "swift") window $x words]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-complexwords1">
+    <description>ftwindow complex</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-complexwords1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text ("ninja" ftand "coder" ftand "knows") window 3 words]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-complexwords2">
+    <description>ftwindow complex</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-complexwords2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text 
+(("ninja" ftand "knows") ftand ("coder" ftand "otherwise")) window 4 words]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-complexwords3">
+    <description>ftwindow complex</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-complexwords3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text 
+("ninja" ftand "coder" window 2 words) ftand "knows" distance exactly 0 words]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+        <error code="FTST0011"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-complexwords4">
+    <description>ftwindow complex</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-complexwords4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text ("usability" not in "usability studies") ftand "software" window 31 words]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>Software For Fun and Profit, 2nd edition</title>]]></assert-xml>
+        <error code="FTST0011"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-badwords1">
+    <description>word not words</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-badwords1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Note to maintainers: This query has an intentional syntax error. Do not "fix" it. :)
+(: "word" instead of "words" causes XPST0003 :)
+declare variable $input-context external;
+$input-context/books/book[para contains text ("physical" ftand "swift") window 1 word]/title]]></test>
+    <result>
+      <error code="XPST0003"/>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-badwords2">
+    <description>Decimal not integer</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-badwords2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text ("physical" ftand "swift") window 4.5 words]/title]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-badwords3">
+    <description>Decimal not integer</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-badwords3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+let $x := 4.5 return
+$input-context/books/book[para contains text ("physical" ftand "swift") window $x words]/title]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-badwords4">
+    <description>String not integer</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-badwords4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+let $x := "1" return
+$input-context/books/book[para contains text ("physical" ftand "swift") window $x words]/title]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-badwords5">
+    <description>String not integer</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-badwords5"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+let $x := fn:true() return
+$input-context/books/book[para contains text ("physical" ftand "swift") window $x words]/title]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-sentences1">
+    <description>ftwindow sentences, at edge of range</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-sentences1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text ("swift" ftand "software") window 2 sentences]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+        <error code="FTST0003"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-sentences2">
+    <description>ftwindow sentences, just out of range</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-sentences2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text ("ninja" ftand "software") window 1 sentences]/title]]></test>
+    <result>
+      <any-of>
+        <assert-empty/>
+        <error code="FTST0003"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-sentences3">
+    <description>ftwindow sentences, at edge of range</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-sentences3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+let $x := 2 return
+$input-context/books/book[para contains text ("swift" ftand "software") window $x sentences]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+        <error code="FTST0003"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-badsentences1">
+    <description>sentence not sentences</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-badsentences1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Note to maintainers: This query has an intentional syntax error. Do not "fix" it. :)
+(: "sentence" instead of "sentences" causes XPST0003 :)
+declare variable $input-context external;
+$input-context/books/book[para contains text ("swift" ftand "software") window 0 sentence]/title]]></test>
+    <result>
+      <error code="XPST0003"/>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-paragraphs1">
+    <description>ftwindow paragraphs, at edge of range</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-paragraphs1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <dependency type="feature" value="fullText-units"/>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[content contains text ("heuristic" ftand "experience") window 2 paragraphs]/metadata/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title>]]></assert-xml>
+        <error code="FTST0003"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-paragraphs2">
+    <description>ftwindow paragraphs, just out of range</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-paragraphs2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[content contains text ("recommend" ftand "hardware") window 0 paragraphs]/metadata/title]]></test>
+    <result>
+      <any-of>
+        <assert-empty/>
+        <error code="FTST0003"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-paragraphs3">
+    <description>ftwindow paragraphs, at edge of range</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-paragraphs3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <dependency type="feature" value="fullText-units"/>
+    <test><![CDATA[declare variable $input-context external;
+let $x := 1 return
+$input-context/books/book[content contains text ("heuristic" ftand "experience") window $x paragraphs]/metadata/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title>]]></assert-xml>
+        <error code="FTST0003"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-badparagraphs1">
+    <description>paragraph not paragraphs</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-badparagraphs1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Note to maintainers: This query has an intentional syntax error. Do not "fix" it. :)
+(: "paragraph" instead of "paragraphs" causes XPST0003 :)
+declare variable $input-context external;
+$input-context/books/book[content contains text ("heuristic" ftand "experience") window 0 paragraph]/metadata/title]]></test>
+    <result>
+      <error code="XPST0003"/>
+    </result>
+  </test-case>
+</test-set>

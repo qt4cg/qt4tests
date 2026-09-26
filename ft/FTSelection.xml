@@ -1,0 +1,147 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-FTSelection">
+  <description>XQuery Full Text - Full-Text Selections - Section 3.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="FTPrimary-FTWords-q1">
+    <description>Positive test to demonstrate that queries comprising an FTPrimary that is an FTWords are supported.</description>
+    <created by="Full-Text Task Force, Jim" on="2008-08-18"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTPrimary-FTWords-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/xpath-full-text-10.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: 3.1 FTPrimary ::= FTWords FTTimes? | ...          :)
+(:   Test to ensure that the syntax is recognized    :)
+(:   Test assumes $input-context identifies FT spec  :)
+declare variable $input-context external;
+<paragraphs>
+{ for $p in $input-context//div2[head = "Match Options"]/p
+where $p contains text "example"
+return $p }
+</paragraphs>]]></test>
+    <result>
+      <assert-xml><![CDATA[<paragraphs><p>
+It is a static error
+<errorref class="ST" code="0019"/> 
+if, within a single <nt xmlns:xlink="http://www.w3.org/1999/xlink" def="doc-xquery-FTMatchOptions" xlink:type="simple">FTMatchOptions</nt>,
+there is more than one match option of any given 
+<termref def="dt-match-option-group">match option group</termref>.
+For example, if the <nt xmlns:xlink="http://www.w3.org/1999/xlink" def="doc-xquery-FTCaseOption" xlink:type="simple">FTCaseOption</nt> "lowercase" 
+is specified, then "uppercase" cannot also be specified as part of the same 
+<nt xmlns:xlink="http://www.w3.org/1999/xlink" def="doc-xquery-FTMatchOptions" xlink:type="simple">FTMatchOptions</nt>.
+</p><p>
+               <termdef id="dt-match-option-order" term="match option application order">
+The order in which effective match options for an 
+<nt xmlns:xlink="http://www.w3.org/1999/xlink" def="doc-xquery-FTWords" xlink:type="simple">FTWords</nt> are applied 
+ is called the <term>match option application order</term>.</termdef>
+This order is significant
+because match options are not always commutative.
+For example,
+    synonym(stem(word))
+is not always the same as
+    stem(synonym(word)).
+</p></paragraphs>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTPrimary-FTWords-FTTimes-q1">
+    <description>Positive test to demonstrate that queries comprising an FTPrimary that is an FTWords with an FTTimes are supported.</description>
+    <created by="Full-Text Task Force, Jim" on="2008-08-18"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTPrimary-FTWords-FTTimes-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/xpath-full-text-10.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: 3.1 FTPrimary ::= FTWords FTTimes? | ...          :)
+(:   Test to ensure that the syntax is recognized    :)
+(:   Test assumes $input-context identifies FT spec  :)
+declare variable $input-context external;
+<paragraphs>
+{ for $p in $input-context//div2[head = "Match Options"]/p
+where $p contains text "option" occurs at least 4 times
+return $p }
+</paragraphs>]]></test>
+    <result>
+      <assert-xml><![CDATA[<paragraphs><p>
+The match option application order is subject to some constraints:
+<olist><item><p>The Language Option must be applied first</p></item><item><p>The Stemming Option must be applied before the Case Option and the
+Diacritics Option</p></item></olist>
+Aside from these constraints, the full order of the application of match
+options is <termref def="dt-implementation-defined">implementation-defined</termref>.
+</p></paragraphs>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTPrimary-FTSelection-q1">
+    <description>Positive test to demonstrate that queries comprising an FTPrimary that is an FTWords are supported.</description>
+    <created by="Full-Text Task Force, Jim" on="2008-08-18"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTPrimary-FTSelection-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/xpath-full-text-10.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: 3.1 FTPrimary ::= ... | FTSelection  | ...        :)
+(:   Test to ensure that the syntax is recognized    :)
+(:   Test assumes $input-context identifies FT spec  :)
+declare variable $input-context external;
+<paragraphs>
+{ for $p in $input-context//div2[head = "Match Options"]/p
+where $p contains text ("options" ftand "matching")
+return $p }
+</paragraphs>]]></test>
+    <result>
+      <assert-xml><![CDATA[<paragraphs><p>Full-text match options modify the matching behaviour of 
+the <termref def="dt-ftprimary">primary full-text selection</termref> to which 
+they are applied. </p><p>
+Match options are propagated through the query via the static context.
+For each of the seven match option groups,
+the static context has a component
+that contains one option from that group.
+The seven settings are initialized by the implementation
+in accordance with the table in 
+Appendix <specref ref="id-xqft-static-context-components"/>,
+and are modified
+by any <nt xmlns:xlink="http://www.w3.org/1999/xlink" def="doc-xquery-FTOptionDecl" xlink:type="simple">FTOptionDecl</nt>s
+in the <nt xmlns:xlink="http://www.w3.org/1999/xlink" def="doc-xquery-Prolog" xlink:type="simple">Prolog</nt>.
+The resulting settings are then propagated unchanged
+to every <nt xmlns:xlink="http://www.w3.org/1999/xlink" def="doc-xquery-FTContainsExpr" xlink:type="simple">FTContainsExpr</nt> in the module
+(including those in <code>VarDecl</code>s and <code>FunctionDecl</code>s,
+and including any that happen to be nested within
+another <code>FTContainsExpr</code>).
+At any given <code>FTContainsExpr</code>,
+the settings from the static context
+are copied to the <code>FTContainsExpr</code>'s inner settings,
+which are then propagated down the syntax tree.
+At each <nt xmlns:xlink="http://www.w3.org/1999/xlink" def="doc-xquery-FTPrimaryWithOptions" xlink:type="simple">FTPrimaryWithOptions</nt>,
+the locally specified match options (if any)
+overwrite the corresponding inner setting(s).
+At each <nt xmlns:xlink="http://www.w3.org/1999/xlink" def="doc-xquery-FTWords" xlink:type="simple">FTWords</nt>,
+the inner settings are used
+as the effective match options
+for tokenizing the query strings
+and matching them against the tokens in the text.
+(These inner settings could be seen
+as a parallel set of components in the static context,
+but Section <specref ref="tq-semantics"/> models them
+as structures that get passed as parameters
+to various semantic functions.)
+</p></paragraphs>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTPrimary-FTExtensionSelection-q1">
+    <description>Positive test to demonstrate that queries comprising an FTPrimary that is an FTWords are supported.</description>
+    <created by="Full-Text Task Force, Jim" on="2008-08-18"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTPrimary-FTExtensionSelection-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/xpath-full-text-10.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: 3.1 FTPrimary ::= ... | FTExtensionSelection     :)
+(:   Test to ensure that the syntax is recognized   :)
+(:   Test assumes $input-context identifies FT spec  :)
+declare namespace exq = "http://example.org/examples/pragmas";
+declare variable $input-context external;
+<paragraphs>
+{ for $p in $input-context//div2[head = "Match Options"]/p
+where $p contains text (# exq:classifier with class 'Antonyms' #) { "single" }
+return $p }
+</paragraphs>]]></test>
+    <result>
+      <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+    </result>
+  </test-case>
+</test-set>

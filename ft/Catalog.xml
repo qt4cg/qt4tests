@@ -1,0 +1,58 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-Catalog">
+  <description>XQuery Full Text - Consistency in XQFTTS Catalog</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="ft-Catalog001">
+    <description>Check variable name is used, if source is not "emptydoc"</description>
+    <created by="Andreas Behm, Jim" on="2009-07-05"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test Catalog001"/>
+    <environment>
+      <source role="$input-context" file="TestSources/XQFTTSCatalog.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Name: Catalog001 :)
+(: Description: test all input files have variable references :)
+(: declare variable $input-context external; :)
+<missing-variable>{
+  for $x in doc("TestSources/XQFTTSCatalog.xml")//*:input-file
+    [count(@variable) = 0 and ./text() != "emptydoc"]
+  return string($x/../@name)
+}</missing-variable>]]></test>
+    <result>
+      <assert-xml><![CDATA[<missing-variable/>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="ft-Catalog002">
+    <description>test all standard test cases have at least one output file</description>
+    <created by="Andreas Behm, Jim" on="2009-07-05"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test Catalog002"/>
+    <environment>
+      <source role="$input-context" file="TestSources/XQFTTSCatalog.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Name: Catalog002 :)
+(: Description: test all standard test cases have at least one output file :)
+declare variable $input-context external;
+<standard-no-outputfile>{
+  doc("TestSources/XQFTTSCatalog.xml")//*:test-case[@scenario = "standard"][fn:count(*:output-file) = 0]/@name/string()
+}</standard-no-outputfile>]]></test>
+    <result>
+      <assert-xml><![CDATA[<standard-no-outputfile/>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="ft-Catalog003">
+    <description>test all error test cases have at least one expected error</description>
+    <created by="Andreas Behm, Jim" on="2009-07-05"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test Catalog003"/>
+    <environment>
+      <source role="$input-context" file="TestSources/XQFTTSCatalog.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Name: Catalog003 :)
+(: Description: test all error test cases have at least one expected error :)
+declare variable $input-context external;
+<error-no-expected-error>{
+  doc("TestSources/XQFTTSCatalog.xml")//*:test-case[@scenario = "runtime-error" or @scenario = "parse-error"][fn:count(*:expected-error) = 0 and fn:count(*:output-file[@compare = "Inspect"]) = 0]/@name/string()
+}</error-no-expected-error>]]></test>
+    <result>
+      <assert-xml><![CDATA[<error-no-expected-error/>]]></assert-xml>
+    </result>
+  </test-case>
+</test-set>

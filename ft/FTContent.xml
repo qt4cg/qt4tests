@@ -1,0 +1,181 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-FTContent">
+  <description>XQuery Full Text - Anchoring Selection - Anchoring selection. Section 3.6.5. FTContent is an optional feature: here we allow error FTST0012</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="FTContent-q1">
+    <description>at start</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTContent-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text "The secret of the blues" at start]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>The Blues</title>]]></assert-xml>
+        <error code="FTST0012"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTContent-q2">
+    <description>ftnot at start</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTContent-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text ftnot("The secret of the blues" at start)]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>Software For Fun and Profit</title><title>Software For Fun and Profit, 2nd edition</title><title>No Bad Software</title><title>Ninja Coder</title>]]></assert-xml>
+        <error code="FTST0012"/>
+        <error code="FTST0002"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTContent-q3">
+    <description>at end</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTContent-q3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[title contains text "Fun and Profit" at end]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>Software For Fun and Profit</title>]]></assert-xml>
+        <error code="FTST0012"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTContent-q4">
+    <description>entire content</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTContent-q4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[title contains text "Software for Fun and Profit" entire content]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>Software For Fun and Profit</title>]]></assert-xml>
+        <error code="FTST0012"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTContent-and1">
+    <description>ftand entire content</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTContent-and1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text "The secret" ftand "nice" entire content]/title]]></test>
+    <result>
+      <any-of>
+        <assert-empty/>
+        <error code="FTST0012"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTContent-complex1">
+    <description>entire content complex example</description>
+    <created by="Full-Text Task Force" on="2009-02-19"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTContent-complex1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Complex example: without entire content, would succeed :)
+declare variable $input-context external;
+$input-context/books/book[para contains text 
+("Usability" ftand "highly" at start) ftand ("pay" ftand "bills." at end) 
+entire content]/title]]></test>
+    <result>
+      <any-of>
+        <assert-empty/>
+        <error code="FTST0012"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTContent-complex2">
+    <description>entire content complex example</description>
+    <created by="Full-Text Task Force" on="2009-02-19"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTContent-complex2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Complex example: fails, spanning stringInclude is not contiguous :)
+declare variable $input-context external;
+$input-context/books/book[para contains text 
+("Usability" ftand "bills."  window 50 words) entire content]/title]]></test>
+    <result>
+      <any-of>
+        <assert-empty/>
+        <error code="FTST0012"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTContent-complex3">
+    <description>entire content complex example</description>
+    <created by="Full-Text Task Force" on="2009-02-19"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTContent-complex3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Complex example: overlapping :)
+declare variable $input-context external;
+$input-context/books/book[title contains text 
+("No Bad") ftand ("Bad Software") entire content]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>No Bad Software</title>]]></assert-xml>
+        <error code="FTST0012"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTContent-complex4">
+    <description>entire content complex example</description>
+    <created by="Full-Text Task Force" on="2009-02-19"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTContent-complex4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Complex example: overlapping :)
+declare variable $input-context external;
+$input-context/books/book[title contains text 
+"Software for Fun and" ftand "Fun" ftand "Profit" entire content]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>Software For Fun and Profit</title>]]></assert-xml>
+        <error code="FTST0012"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTContent-complex5">
+    <description>entire content spans, but not contiguous</description>
+    <created by="Full-Text Task Force" on="2009-03-19"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTContent-complex5"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Complex example: spans, but not contiguously :)
+declare variable $input-context external;
+"one two three four"
+contains text
+   ("one" ftand "three" window 3 words)
+   ftand
+   ("two" ftand "four" window 3 words)
+   entire content]]></test>
+    <result>
+      <any-of>
+        <assert-false/>
+        <error code="FTST0012"/>
+      </any-of>
+    </result>
+  </test-case>
+</test-set>

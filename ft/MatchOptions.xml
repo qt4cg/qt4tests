@@ -1,0 +1,268 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-MatchOptions">
+  <description>XQuery Full Text - Full-text Match Options - Full-text match options. Section 3.4.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="ftmatchoptions-q1">
+    <description>There can be multiple match options applied to an FTWord, written in any order (although there are constraints on processing order). This query applies multiple match options in a random order.</description>
+    <created by="Full-Text Task Force" on="2008-11-28"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test ftmatchoptions-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+      <resource uri="http://bstore1.example.com/StopWordList.xml" file="TestSources/stopwords.txt"/>
+      <resource uri="http://bstore1.example.com/UsabilityThesaurus.xml" file="TestSources/usability.xml"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[
+    .//content contains text "Resume" using stemming using stop words at "http://bstore1.example.com/StopWordList.xml" using diacritics sensitive using case sensitive using language "de" using thesaurus at "http://bstore1.example.com/UsabilityThesaurus.xml"
+]]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<book number="2">
+   <metadata>
+      <title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title>
+      <publicationInfo>
+         <place>New York</place>
+         <publisher>Ersatz Publications</publisher>
+         <publisher>Electronic BookWorks</publisher>         
+         <dateIssued>2000</dateIssued>
+         <dateRevised>2001</dateRevised>
+      </publicationInfo>
+      <price>174.00</price>   
+      <subjects xml:lang="en">
+         <subject>Usability testing</subject>
+         <subject>Web site development</subject>
+         <subject>Guides and finding aids</subject>
+      </subjects>
+      <subjects xml:lang="fr">
+         <subject>Tests d'ergonomie</subject>
+         <subject>Développement de site web</subject>
+         <subject>Guides et outils de recherche</subject>
+      </subjects>
+      <subjects xml:lang="zh">
+         <subject>可用性测试</subject>
+         <subject>网站建置</subject>
+         <subject>指南和检索工具</subject>
+      </subjects>
+   </metadata>
+   <content>
+      <introduction>
+         <p>This is a basic handbook for planning and 
+         conducting usability tests on Web sites. Usability 
+         testing should be used in conjunction with other 
+         expert review methods.</p>
+         <p>This book has not been approved by the Web Site 
+         Users Association.</p>
+      </introduction>
+      <part number="1">
+         <chapter>
+            <title>Planning then Conducting Usability 
+            Tests</title> 
+            <p>Take the following steps to plan usability 
+            testing. <step number="1">Clarify and 
+            articulate the goal of the usability testing.
+            </step> <step number="2">Identify tasks which 
+            are critical for users to be able to complete 
+            successfully.</step> <step number="3">Compile 
+            a script of questions or instructions which 
+            will prompt the user to attempt those 
+            tasks.</step> <step number="4">Identify your 
+            users and begin recruiting them.</step> <step number="5">Conduct a pretest on a few users.
+            </step> <step number="6">Edit the script based 
+            on insights gleaned from the pretest.</step> 
+            <step number="7">Resume testing.</step></p>
+         </chapter>
+      </part>
+      <part number="2">
+         <chapter>
+            <title>Conducting Usability Tests</title> 
+         <p>Users can be tested at any computer 
+            workstation <footnote>They may be more 
+            comfortable at their own workstation than in 
+            a lab.</footnote> or in a lab.</p>
+            <p>Give the user the script, then assure them 
+            that you are testing the Web site, not them. 
+            Users are asked to verbalize their thoughts as 
+            they complete the tasks. The event is recorded 
+            or someone takes notes. It is often preferable 
+            to have two testers, <footnote>Usability 
+            testing can be done at great expense or on a 
+            shoe string, using <testingProcedure>in-house 
+            expertise</testingProcedure> or 
+            <testingProcedure>contracting with human 
+            computer interaction professionals
+            </testingProcedure>.</footnote> one to ask the 
+            questions, another to take notes. Testers should 
+            offer no guidance or comments to the user. Mouse 
+            movements, typing, expressions, and the user's 
+            words should be recorded.</p>
+         </chapter>
+         <chapter>
+            <title>Evaluating and Implementing Results</title> 
+            <p>Compile the results and review collectively. 
+            Make changes to the site to alleviate the problems 
+            found in Web site components which were propagating 
+            the largest number of or the most devastating errors. 
+            Begin new iterations of testing and changes, until 
+            users are successful in the accomplishing the 
+            tasks.</p>
+         </chapter>
+      </part>
+   </content>
+</book>]]></assert-xml>
+        <error code="FTST0006"/>
+        <error code="FTST0009"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="ftmatchoptions-q2">
+    <description>There can be multiple match options applied to an FTSelection, written in any order (although there are constraints on processing order). This query applies multiple match options in a random order.</description>
+    <created by="Full-Text Task Force" on="2008-11-28"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test ftmatchoptions-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+      <resource uri="http://bstore1.example.com/UsabilityThesaurus.xml" file="TestSources/usability.xml"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[
+    .//content contains text ("Plan" ftand "Conduct" distance at most 5 words) using stemming using diacritics insensitive using case insensitive using thesaurus at "http://bstore1.example.com/UsabilityThesaurus.xml"
+]]]></test>
+    <result>
+      <assert-xml><![CDATA[<book number="2">
+   <metadata>
+      <title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title>
+      <publicationInfo>
+         <place>New York</place>
+         <publisher>Ersatz Publications</publisher>
+         <publisher>Electronic BookWorks</publisher>         
+         <dateIssued>2000</dateIssued>
+         <dateRevised>2001</dateRevised>
+      </publicationInfo>
+      <price>174.00</price>   
+      <subjects xml:lang="en">
+         <subject>Usability testing</subject>
+         <subject>Web site development</subject>
+         <subject>Guides and finding aids</subject>
+      </subjects>
+      <subjects xml:lang="fr">
+         <subject>Tests d'ergonomie</subject>
+         <subject>Développement de site web</subject>
+         <subject>Guides et outils de recherche</subject>
+      </subjects>
+      <subjects xml:lang="zh">
+         <subject>可用性测试</subject>
+         <subject>网站建置</subject>
+         <subject>指南和检索工具</subject>
+      </subjects>
+   </metadata>
+   <content>
+      <introduction>
+         <p>This is a basic handbook for planning and 
+         conducting usability tests on Web sites. Usability 
+         testing should be used in conjunction with other 
+         expert review methods.</p>
+         <p>This book has not been approved by the Web Site 
+         Users Association.</p>
+      </introduction>
+      <part number="1">
+         <chapter>
+            <title>Planning then Conducting Usability 
+            Tests</title> 
+            <p>Take the following steps to plan usability 
+            testing. <step number="1">Clarify and 
+            articulate the goal of the usability testing.
+            </step> <step number="2">Identify tasks which 
+            are critical for users to be able to complete 
+            successfully.</step> <step number="3">Compile 
+            a script of questions or instructions which 
+            will prompt the user to attempt those 
+            tasks.</step> <step number="4">Identify your 
+            users and begin recruiting them.</step> <step number="5">Conduct a pretest on a few users.
+            </step> <step number="6">Edit the script based 
+            on insights gleaned from the pretest.</step> 
+            <step number="7">Resume testing.</step></p>
+         </chapter>
+      </part>
+      <part number="2">
+         <chapter>
+            <title>Conducting Usability Tests</title> 
+         <p>Users can be tested at any computer 
+            workstation <footnote>They may be more 
+            comfortable at their own workstation than in 
+            a lab.</footnote> or in a lab.</p>
+            <p>Give the user the script, then assure them 
+            that you are testing the Web site, not them. 
+            Users are asked to verbalize their thoughts as 
+            they complete the tasks. The event is recorded 
+            or someone takes notes. It is often preferable 
+            to have two testers, <footnote>Usability 
+            testing can be done at great expense or on a 
+            shoe string, using <testingProcedure>in-house 
+            expertise</testingProcedure> or 
+            <testingProcedure>contracting with human 
+            computer interaction professionals
+            </testingProcedure>.</footnote> one to ask the 
+            questions, another to take notes. Testers should 
+            offer no guidance or comments to the user. Mouse 
+            movements, typing, expressions, and the user's 
+            words should be recorded.</p>
+         </chapter>
+         <chapter>
+            <title>Evaluating and Implementing Results</title> 
+            <p>Compile the results and review collectively. 
+            Make changes to the site to alleviate the problems 
+            found in Web site components which were propagating 
+            the largest number of or the most devastating errors. 
+            Begin new iterations of testing and changes, until 
+            users are successful in the accomplishing the 
+            tasks.</p>
+         </chapter>
+      </part>
+   </content>
+</book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="ftmatchoptions-q3">
+    <description>Only one match option from any given match option group may be applied to an FTWord or FTSelection. This query applies both stemming and no stemming to test and returns an error.</description>
+    <created by="Full-Text Task Force" on="2008-11-28"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test ftmatchoptions-q3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Note to maintainers: This query has an intentional syntax error. Do not "fix" it. :)
+(: "using stemming using no stemming" causes FTST0019 :)
+declare variable $input-context external;
+$input-context/books/book[
+   .//content contains text "test" using stemming using no stemming
+]]]></test>
+    <result>
+      <error code="FTST0019"/>
+    </result>
+  </test-case>
+  <test-case name="ftmatchoptions-q4">
+    <description>Only one match option from any given match option group may be applied to an FTWord or FTSelection. This query applies both case sensitive and case insensitive to Complete and returns an error.</description>
+    <created by="Full-Text Task Force" on="2008-11-28"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test ftmatchoptions-q4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Note to maintainers: This query has an intentional syntax error. Do not "fix" it. :)
+(: "using case sensitive using case insensitive" causes FTST0019 :)
+declare variable $input-context external;
+for $book in $input-context/books/book
+let $cont := $book//content
+where $cont contains text "Complete" using case sensitive using case insensitive
+return $book]]></test>
+    <result>
+      <any-of>
+        <error code="FTST0019"/>
+        <error code="FOCH0002"/>
+      </any-of>
+    </result>
+  </test-case>
+</test-set>

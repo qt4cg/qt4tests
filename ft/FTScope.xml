@@ -1,0 +1,377 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-FTScope">
+  <description>XQuery Full Text - Scope Selection - Scope selection. Section 3.6.4. FTScope is an optional feature: here we allow error FTST0004</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="FTScope-q1">
+    <description>same sentence</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTScope-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/emptydoc.xml"/>
+    </environment>
+    <test><![CDATA[<example>
+<part><name>Part 1</name>
+<p>This is a simple example.</p><p>It is not complex.</p>
+</part>
+<part><name>Part 2</name>
+<p>This example is simple, not complex.</p>
+</part>
+</example>//part[. contains text ("simple" ftand "complex") same sentence]/name]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<name>Part 2</name>]]></assert-xml>
+        <error code="FTST0004"/>
+        <error code="FTST0003"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTScope-q2">
+    <description>different sentence</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTScope-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/emptydoc.xml"/>
+    </environment>
+    <test><![CDATA[<example>
+<part><name>Part 1</name>
+<p>This is a simple example.</p><p>It is not complex.</p>
+</part>
+<part><name>Part 2</name>
+<p>This example is simple, not complex.</p>
+</part>
+</example>//part[. contains text ("simple" ftand "complex") different sentence]/name]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<name>Part 1</name>]]></assert-xml>
+        <error code="FTST0004"/>
+        <error code="FTST0003"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTScope-q3">
+    <description>same paragraph</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTScope-q3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/emptydoc.xml"/>
+    </environment>
+    <dependency type="feature" value="fullText-units"/>
+    <test><![CDATA[<example>
+<part><name>Part 1</name>
+<p>This is a simple example.</p><p>It is not complex.</p>
+</part>
+<part><name>Part 2</name>
+<p>This example is simple, not complex.</p>
+</part>
+</example>//part[. contains text ("simple" ftand "complex") same paragraph]/name]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<name>Part 2</name>]]></assert-xml>
+        <error code="FTST0004"/>
+        <error code="FTST0003"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTScope-q4">
+    <description>different paragraph</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTScope-q4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/emptydoc.xml"/>
+    </environment>
+    <dependency type="feature" value="fullText-units"/>
+    <test><![CDATA[<example>
+<part><name>Part 1</name>
+<p>This is a simple example.</p><p>It is not complex.</p>
+</part>
+<part><name>Part 2</name>
+<p>This example is simple, not complex.</p>
+</part>
+</example>//part[. contains text ("simple" ftand "complex") different paragraph]/name]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<name>Part 1</name>]]></assert-xml>
+        <error code="FTST0004"/>
+        <error code="FTST0003"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-01">
+    <description>Filter a match consisting of one single-sentence StringInclude. Yields false because there's only one StringInclude.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-01"/>
+    <test><![CDATA[(: Name: different-sentence-01 :)
+(: Description:
+    Filter a match consisting of one single-sentence StringInclude.
+    Yields false because there's only one StringInclude.
+:)
+"One two. Three four." contains text
+    "one"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-false/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-02">
+    <description>Filter a match consisting of two single-sentence StringIncludes. Clearly yields false.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-02"/>
+    <test><![CDATA[(: Name: different-sentence-02 :)
+(: Description:
+    Filter a match consisting of two single-sentence StringIncludes.
+    Clearly yields false.
+:)
+"One two. Three four." contains text
+    "one" ftand "two"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-false/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-03">
+    <description>Filter a match consisting of two single-sentence StringIncludes. Clearly yields true.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-03"/>
+    <test><![CDATA[(: Name: different-sentence-03 :)
+(: Description:
+    Filter a match consisting of two single-sentence StringIncludes.
+    Clearly yields true.
+:)
+"One two. Three four." contains text
+    "one" ftand "three"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-04">
+    <description>Filter a match consisting of two single-sentence StringIncludes. Although each "one" is in the same sentence as a "two", you can still find a "one" and a "two" in different sentences.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-04"/>
+    <test><![CDATA[(: Name: different-sentence-04 :)
+(: Description:
+    Filter a match consisting of two single-sentence StringIncludes.
+    Although each "one" is in the same sentence as a "two",
+    you can still find a "one" and a "two" in different sentences.
+:)
+"One two. One two." contains text
+    "one" ftand "two"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-05">
+    <description>Filter a match consisting of three single-sentence StringIncludes. Clearly yields true.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-05"/>
+    <test><![CDATA[(: Name: different-sentence-05 :)
+(: Description:
+    Filter a match consisting of three single-sentence StringIncludes.
+    Clearly yields true.
+:)
+"One two. Three four. Five six." contains text
+    "one" ftand "three" ftand "five"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-06">
+    <description>Filter a match consisting of three single-sentence StringIncludes. Yields false because "one" and "two" are both in the first sentence.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-06"/>
+    <test><![CDATA[(: Name: different-sentence-06 :)
+(: Description:
+    Filter a match consisting of three single-sentence StringIncludes.
+    Yields false because "one" and "two" are both in the first sentence.
+:)
+"One two. Three four." contains text
+    "one" ftand "two" ftand "three"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-false/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-07">
+    <description>Filter a match consisting of one multi-sentence StringInclude. Yields false because there's only one StringInclude (despite the fact that it straddles two sentences).</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-07"/>
+    <test><![CDATA[(: Name: different-sentence-07 :)
+(: Description:
+    Filter a match consisting of one multi-sentence StringInclude.
+    Yields false because there's only one StringInclude
+    (despite the fact that it straddles two sentences).
+:)
+"One two. Three four." contains text
+    "two three"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-false/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-08">
+    <description>Filter a match consisting of two StringIncludes, one of them multi-sentence.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-08"/>
+    <test><![CDATA[(: Name: different-sentence-08 :)
+(: Description: Filter a match consisting of two StringIncludes, one of them multi-sentence. :)
+"One two. Three four." contains text
+    "one two three four" ftand "three four"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-09">
+    <description>Filter a match consisting of two StringIncludes, one of them multi-sentence.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-09"/>
+    <test><![CDATA[(: Name: different-sentence-09 :)
+(: Description: Filter a match consisting of two StringIncludes, one of them multi-sentence. :)
+"One two. Three four." contains text
+    "two three" ftand "four"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-10">
+    <description>Filter a match consisting of two StringIncludes, both of them multi-sentence.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-10"/>
+    <test><![CDATA[(: Name: different-sentence-10 :)
+(: Description: Filter a match consisting of two StringIncludes, both of them multi-sentence. :)
+"One two. Three four." contains text
+    "two three" ftand "two three"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-11">
+    <description>Filter a match consisting of two StringIncludes, both of them multi-sentence.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-11"/>
+    <test><![CDATA[(: Name: different-sentence-11 :)
+(: Description: Filter a match consisting of two StringIncludes, both of them multi-sentence. :)
+"One two. Three four. Five six." contains text
+    "two three" ftand "four five"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-12">
+    <description>Filter a match consisting of two StringIncludes, both of them multi-sentence.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-12"/>
+    <test><![CDATA[(: Name: different-sentence-12 :)
+(: Description: Filter a match consisting of two StringIncludes, both of them multi-sentence. :)
+"One two. Three four. Five six. Seven eight." contains text
+    "two three" ftand "six seven"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-13">
+    <description>Filter a match consisting of three StringIncludes, one of them multi-sentence.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-13"/>
+    <test><![CDATA[(: Name: different-sentence-13 :)
+(: Description: Filter a match consisting of three StringIncludes, one of them multi-sentence. :)
+"One two. Three four." contains text
+    "one" ftand "two three" ftand "four"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-14">
+    <description>Filter a match consisting of three StringIncludes, one of them multi-sentence.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-14"/>
+    <test><![CDATA[(: Name: different-sentence-14 :)
+(: Description: Filter a match consisting of three StringIncludes, one of them multi-sentence. :)
+"One two. Three four." contains text
+    "one" ftand "two three" ftand "two"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-false/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="different-sentence-15">
+    <description>Filter a match consisting of three StringIncludes, one of them multi-sentence.</description>
+    <created by="Michael Dyck" on="2010-09-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test different-sentence-15"/>
+    <test><![CDATA[(: Name: different-sentence-15 :)
+(: Description: Filter a match consisting of three StringIncludes, one of them multi-sentence. :)
+"One two. Three four. Five six." contains text
+    "one" ftand "two" ftand "four five"
+    different sentence]]></test>
+    <result>
+      <any-of>
+        <assert-false/>
+        <error code="FTST0003"/>
+        <error code="FTST0004"/>
+      </any-of>
+    </result>
+  </test-case>
+</test-set>

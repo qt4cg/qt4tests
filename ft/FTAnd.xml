@@ -1,0 +1,164 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-FTAnd">
+  <description>XQuery Full Text - Full-Text ftand Operator - And-Selection. Section 3.5.2.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="FTAnd-q1">
+    <description>Simple ftand query</description>
+    <created by="Full-Text Task Force" on="2008-10-09"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTAnd-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTAnd-q1: Basic syntax :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "software" ftand "ninja"]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTAnd-q2">
+    <description>Using 'and' instead of 'ftand'</description>
+    <created by="Full-Text Task Force" on="2008-10-09"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTAnd-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTAnd-q2: 'and' instead of 'ftand'; 'and "ninja"' is a no-op :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "software" and "ninja"]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Software For Fun and Profit, 2nd edition</title><title>No Bad Software</title><title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTAnd-q3">
+    <description>Simple ftand query, all branches false</description>
+    <created by="Full-Text Task Force" on="2008-10-09"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTAnd-q3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTAnd-q3: Both branches fail :)
+declare variable $input-context external;
+fn:count($input-context/books/book[para contains text "dingbat" ftand "numbskull"]/title)]]></test>
+    <result>
+      <assert-string-value>0</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="FTAnd-q4">
+    <description>Simple ftand query, one branch false</description>
+    <created by="Full-Text Task Force" on="2008-10-09"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTAnd-q4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTAnd-q4: One branch false :)
+declare variable $input-context external;
+fn:count($input-context/books/book[para contains text "software" ftand "numbskull"]/title)]]></test>
+    <result>
+      <assert-string-value>0</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="FTAnd-q5">
+    <description>Simple ftand query, one branch false</description>
+    <created by="Full-Text Task Force" on="2008-10-09"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTAnd-q5"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTAnd-q5: One branch false :)
+declare variable $input-context external;
+fn:count($input-context/books/book[para contains text "numbskull" ftand "software"]/title)]]></test>
+    <result>
+      <assert-string-value>0</assert-string-value>
+    </result>
+  </test-case>
+  <test-case name="FTAnd-expr1">
+    <description>ftand with computed arguments</description>
+    <created by="Full-Text Task Force" on="2008-10-09"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTAnd-expr1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTAnd-expr1: Computed expression :)
+declare variable $input-context external;
+let $string1 := "software"
+let $string2 := "ninja"
+return $input-context/books/book[para contains text {$string1} ftand {$string2}]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTAnd-expr2">
+    <description>ftand with computed arguments, which need atomization</description>
+    <created by="Full-Text Task Force" on="2008-10-09"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTAnd-expr2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTAnd-expr1: Computed expression :)
+declare variable $input-context external;
+let $string1 := $input-context/books/book[1]/title
+return $input-context/books/book[. contains text {$string1} ftand "Rain"]/author]]></test>
+    <result>
+      <assert-xml><![CDATA[<author>Heavy Rain</author>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTAnd-badexpr1">
+    <description>FTAnd with empty sequence</description>
+    <created by="Full-Text Task Force" on="2008-10-09"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTAnd-badexpr1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTAnd-badexpr1: Bad computed expression :)
+declare variable $input-context external;
+$input-context/books/book[para contains text {(47)} ftand "ninja"]/title]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  <test-case name="FTAnd-bad1">
+    <description>Using 'and' instead of 'ftand'</description>
+    <created by="Full-Text Task Force" on="2008-10-09"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTAnd-bad1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Note to maintainers: This query has an intentional syntax error. Do not "fix" it. :)
+(: FTAnd-bad1: 'and' instead of 'ftand': error :)
+declare variable $input-context external;
+$input-context/books/book[para contains text ("software" and "ninja")]/title]]></test>
+    <result>
+      <error code="XPST0003"/>
+    </result>
+  </test-case>
+  <test-case name="FTAnd-bad2">
+    <description>Bad nesting with 'ftand'</description>
+    <created by="Full-Text Task Force" on="2008-10-09"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTAnd-bad2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Note to maintainers: This query has an intentional syntax error. Do not "fix" it. :)
+(: FTAnd-bad2: 'ftand' in nested expression: parse error :)
+declare variable $input-context external;
+$input-context/books/book[para contains text {"software" ftand "ninja"}]/title]]></test>
+    <result>
+      <error code="XPST0003"/>
+    </result>
+  </test-case>
+  <test-case name="FTAnd-andor">
+    <description>Simple ftand query</description>
+    <created by="Full-Text Task Force" on="2008-10-20"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTAnd-andor"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTAnd-andor: Test and/or precedence :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "numbskull" ftand "software" ftor "ninja"]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+</test-set>

@@ -1,0 +1,100 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-FTExtensionSelections">
+  <description>XQuery Full Text - Full-Text Extension Selections - Extension Selections. Section 3.8.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="FTExtension-Opt-q1">
+    <description>Negative test to demonstrate that prefix of the ft-option must be defined</description>
+    <created by="Full-Text Task Force, Zhen Hua Liu" on="2008-08-25"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTExtension-Opt-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/xpath-full-text-10.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: 3.4.8 Extension Option  negative case, oraxqft prefix is not declared :)
+declare variable $input-context external;
+/books/book/author[name contains text (# oraxqft:user-index #){'Berner-lee'}]]]></test>
+    <result>
+      <error code="XPST0081"/>
+    </result>
+  </test-case>
+  <test-case name="FTExtension-Opt-q2">
+    <description>Negative test to test the extension syntax error</description>
+    <created by="Full-Text Task Force, Zhen Hua Liu" on="2008-08-25"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTExtension-Opt-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/xpath-full-text-10.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Note to maintainers: This query has an intentional syntax error. Do not "fix" it. :)
+(: 3.4.8 Extension Option  negative case, ending #) is missing:)
+declare namespace oraxqft = "http://www.oracle.com/technology/tech/xml/xmldb/index.html";
+declare variable $input-context external;
+/books/book/author[name contains text (# oraxqft:user-index {'Berner-lee'}]]]></test>
+    <result>
+      <error code="XPST0003"/>
+    </result>
+  </test-case>
+  <test-case name="FTExtension-Opt-q3">
+    <description>Negative test to test the extension syntax error</description>
+    <created by="Full-Text Task Force, Zhen Hua Liu" on="2008-08-25"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTExtension-Opt-q3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/xpath-full-text-10.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Note to maintainers: This query has an intentional syntax error. Do not "fix" it. :)
+(: 3.4.8 Extension Option  negative case, beginning # is missing:)
+declare namespace oraxqft = "http://www.oracle.com/technology/tech/xml/xmldb/index.html";
+declare variable $input-context external;
+/books/book/author[name contains text oraxqft:user-index #) {'Berner-lee'}]]]></test>
+    <result>
+      <error code="XPST0003"/>
+    </result>
+  </test-case>
+  <test-case name="FTExtension-Opt-q4">
+    <description>Positive case, behavior is implementation defined</description>
+    <created by="Full-Text Task Force, Zhen Hua Liu" on="2008-08-25"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTExtension-Opt-q4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/xpath-full-text-10.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: 3.4.8 Extension Option  positive case :)
+declare namespace oraxqft = "http://www.oracle.com/technology/tech/xml/xmldb/index.html";
+declare variable $input-context external;
+$input-context/books/book/author[name contains text (# oraxqft:user-index #){'Berner-lee'}]]]></test>
+    <result>
+      <any-of>
+        <assert-empty/>
+        <error code="*"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTExtension-Opt-q5">
+    <description>Negative case</description>
+    <created by="Full-Text Task Force, Zhen Hua Liu" on="2008-08-25"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTExtension-Opt-q5"/>
+    <environment>
+      <source role="$input-context" file="TestSources/xpath-full-text-10.xml"/>
+    </environment>
+    <test><![CDATA[(: 3.4.8 Extension Option  negative case :)
+(: It is a static error err:XQST0013 XQ if an implementation recognizes a pragma but determines that its content is invalid. ::)
+fn:error( fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0013'))]]></test>
+    <result>
+      <error code="XQST0013"/>
+    </result>
+  </test-case>
+  <test-case name="FTExtension-Opt-q6">
+    <description>Negative case</description>
+    <created by="Full-Text Task Force, Zhen Hua Liu" on="2008-08-25"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTExtension-Opt-q6"/>
+    <environment>
+      <source role="$input-context" file="TestSources/xpath-full-text-10.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: 3.4.8 Extension Option  negative case :)
+(: XQST0079 says: If all the pragmas in an FTExtensionSelection are ignored, then full-text extension selection is just the full-text selection enclosed in curly braces; if this full-text selection is absent, then a static error is raised.
+:)
+declare namespace oraxqft = "http://www.oracle.com/technology/tech/xml/xmldb/index.html";
+declare variable $input-context external;
+/books/book/author[name contains text (# oraxqft:user-index #){}]]]></test>
+    <result>
+      <error code="XQST0079"/>
+    </result>
+  </test-case>
+</test-set>

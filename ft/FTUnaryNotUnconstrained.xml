@@ -1,0 +1,87 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-FTUnaryNotUnconstrained">
+  <description>XQuery Full Text - Unconstrained Full-Text ftnot Operator - Unary not. Sections 3.5.4 and 5.2.2.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="FTNot-unconstrained-q1">
+    <description>Simple ftnot query</description>
+    <created by="Full-Text Task Force" on="2008-11-24"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTNot-unconstrained-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTNot-unconstrained-q1: Unadorned ftnot violates negation constraint 1 :)
+declare variable $input-context external;
+$input-context/books/book[para contains text ftnot "ninja"]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Software For Fun and Profit</title><title>Software For Fun and Profit, 2nd edition</title><title>The Blues</title><title>No Bad Software</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTNot-unconstrained-q3">
+    <description>ftnot with ftor query</description>
+    <created by="Full-Text Task Force" on="2008-11-24"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTNot-unconstrained-q3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTAnd-unconstrained-q3: more complex ftnot: violates negation constraint 1 :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "software" ftand (ftnot "hacker" ftor "ninja")]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Software For Fun and Profit, 2nd edition</title><title>No Bad Software</title><title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTNot-unconstrained-q5">
+    <description>ftand ftnot with ftand and window</description>
+    <created by="Full-Text Task Force" on="2008-11-24"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTNot-unconstrained-q5"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTNot-q5: More complex ftand ftnot: violates negation constaint 2 :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "software" ftand ftnot ("coder" ftand
+"ninja" window 5 words)]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Software For Fun and Profit, 2nd edition</title><title>No Bad Software</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTNot-unconstrained-q6">
+    <description>ftand ftnot with window</description>
+    <created by="Full-Text Task Force" on="2008-11-24"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTNot-unconstrained-q6"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="excludes outside the window are ignored"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTNot-q6: violates negation restriction 2 :)
+declare variable $input-context external;
+(: nothing :)
+$input-context/books/book[para contains text "software" ftand ("coder" ftand ftnot
+"ninja" window 5 words)]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+        <error code="FTST0011"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTNot-complex1">
+    <description>ftand ftnot with window</description>
+    <created by="Full-Text Task Force" on="2008-12-03"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTNot-complex1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTNot-complex1: violates negation restriction 2 :)
+declare variable $input-context external;
+(: nothing :)
+$input-context/books/book[para contains text ("software" ftand ("coder" ftand ftnot
+"ninja")) window 5 words]/title]]></test>
+    <result>
+      <any-of>
+        <assert-empty/>
+        <error code="FTST0011"/>
+      </any-of>
+    </result>
+  </test-case>
+</test-set>

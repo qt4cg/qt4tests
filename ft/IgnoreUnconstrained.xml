@@ -1,0 +1,83 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-IgnoreUnconstrained">
+  <description>XQuery Full Text - Unconstrained Ignore Option - FTIgnore. Sections 3.7 and 5.2.13.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="FTIgnore-unconstrained-q1">
+    <description>Ignore titles, return titles</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTIgnore-unconstrained-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <dependency type="feature" value="fullText-ignore"/>
+    <test><![CDATA[declare variable $input-context external;
+<results>{
+$input-context/books/book[. contains text "software" without content ./title]/title
+}</results>]]></test>
+    <result>
+      <assert-xml><![CDATA[<results><title>Software For Fun and Profit, 2nd edition</title><title>No Bad Software</title><title>Ninja Coder</title></results>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTIgnore-unconstrained-q2">
+    <description>Bad ignore sequence</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTIgnore-unconstrained-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <dependency type="feature" value="fullText-ignore"/>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[. contains text "software" without content "bad"]/title]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  <test-case name="FTIgnore-unconstrained-q3">
+    <description>Ignore nothing (implicit)</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTIgnore-unconstrained-q3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <dependency type="feature" value="fullText-ignore"/>
+    <test><![CDATA[declare variable $input-context external;
+<results>{
+$input-context/books/book[. contains text "software" without content ./nonesuch]/title
+}</results>]]></test>
+    <result>
+      <assert-xml><![CDATA[<results><title>Software For Fun and Profit</title><title>Software For Fun and Profit, 2nd edition</title><title>No Bad Software</title><title>Ninja Coder</title></results>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTIgnore-unconstrained-q4">
+    <description>Ignore nothing (explicit)</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTIgnore-unconstrained-q4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <dependency type="feature" value="fullText-ignore"/>
+    <test><![CDATA[declare variable $input-context external;
+<results>{
+$input-context/books/book[. contains text "software" without content ()]/title
+}</results>]]></test>
+    <result>
+      <assert-xml><![CDATA[<results><title>Software For Fun and Profit</title><title>Software For Fun and Profit, 2nd edition</title><title>No Bad Software</title><title>Ninja Coder</title></results>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTIgnore-unconstrained-q5">
+    <description>Ignore everything</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTIgnore-unconstrained-q5"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <dependency type="feature" value="fullText-ignore"/>
+    <test><![CDATA[declare variable $input-context external;
+<results>{
+$input-context/books/book[. contains text "software" without content .]/title
+}</results>]]></test>
+    <result>
+      <assert-xml><![CDATA[<results/>]]></assert-xml>
+    </result>
+  </test-case>
+</test-set>

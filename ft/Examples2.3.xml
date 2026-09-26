@@ -1,0 +1,128 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-Examples2.3">
+  <description>XQuery Full Text - Section 2.3 - Examples Section 2.3</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="examples-23-q1">
+    <description>Return scores for books whose content contains "web site" and "usability" and whose title contains "testing"</description>
+    <created by="Full-Text Task Force" on="2008-08-17"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test examples-23-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: 2.3 Scoring: Example 1. Expect 2 scores :)
+declare variable $input-context external;
+for $b score $s 
+    in $input-context/books/book[content contains text "web site" ftand "usability" 
+                   and .//chapter/title contains text "testing"]
+return $s]]></test>
+    <result>
+      <any-of>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <error code="FTST0014"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="examples-23-q2">
+    <description>Return titles and scores for books whose content contains "web site" and "usability" where the score is more than 0.5</description>
+    <created by="Full-Text Task Force" on="2008-08-17"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test examples-23-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: 2.3 Scoring: Example 2. Exact results depend on scoring. :)
+declare variable $input-context external;
+for $b score $s 
+    in $input-context/books/book[content contains text "web site" ftand "usability"]
+where $s > 0.5
+order by $s descending
+return <result>  
+          <title> {$b//title} </title> 
+          <score> {$s} </score> 
+       </result>]]></test>
+    <result>
+      <any-of>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <error code="FTST0014"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="examples-23-q3">
+    <description>Return paragraphs containing "usability" of books whose title contains "software", ordered by score</description>
+    <created by="Full-Text Task Force" on="2008-08-17"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test examples-23-q3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: 2.3 Scoring: Example 3. Exact order depends on scoring. :)
+declare variable $input-context external;
+for $p score $s in $input-context//book[title contains text "software"]/para[. contains text "usability"]
+     order by $s descending
+  return $p]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<para>Sometimes usability is the most important thing. Sometimes usability is
+    the only thing. Sometimes usability is nothing.</para><para>Usability is highly overrated.  My advice is similar to that
+    Heinlein gave prospective authors: you must write, you must finish what
+    you write, you must publish what you write.  Ship software, pay the bills.
+    </para>]]></assert-xml>
+        <assert-xml><![CDATA[<para>Usability is highly overrated.  My advice is similar to that
+      Heinlein gave prospective authors: you must write, you must finish what
+      you write, you must publish what you write.  Ship software, pay the bills.
+</para><para>Sometimes usability is the most important thing. Sometimes usability is
+      the only thing. Sometimes usability is nothing.</para>]]></assert-xml>
+        <error code="FTST0014"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="examples-23-q4">
+    <description>Return paragraphs containing "usability" of books whose title contains "software", ordered by score</description>
+    <created by="Full-Text Task Force" on="2008-08-17"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test examples-23-q4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: 2.3 Scoring: Example 4. Exact order depend on scoring. :)
+declare variable $input-context external;
+for $b score $score1 in $input-context//book[title contains text "software"]
+    order by $score1 descending
+return
+    for $p score $score2 in $b/para[. contains text "usability"]
+       order by $score2 descending
+    return $p]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<para>Sometimes usability is the most important thing. Sometimes usability is
+    the only thing. Sometimes usability is nothing.</para><para>Usability is highly overrated.  My advice is similar to that
+    Heinlein gave prospective authors: you must write, you must finish what
+    you write, you must publish what you write.  Ship software, pay the bills.
+    </para>]]></assert-xml>
+        <assert-xml><![CDATA[<para>Usability is highly overrated.  My advice is similar to that 
+      Heinlein gave prospective authors: you must write, you must finish what 
+      you write, you must publish what you write.  Ship software, pay the bills. 
+</para><para>Sometimes usability is the most important thing. Sometimes usability is 
+      the only thing. Sometimes usability is nothing.</para>]]></assert-xml>
+        <error code="FTST0014"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="examples-23-q5">
+    <description>Return books whose chapter title contains "testing", ordered by the score of their content containing "web site" and "usability"</description>
+    <created by="Full-Text Task Force" on="2008-08-17"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test examples-23-q5"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: 2.3 Scoring: Example 5. Exact results depend on scoring. :)
+declare variable $input-context external;
+for $b in $input-context/books/book[.//chapter/title contains text "testing"]
+let score $s := $b/content contains text "web site" ftand "usability" 
+order by $s descending
+return <result score="{$s}">{$b}</result>]]></test>
+    <result>
+      <any-of>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <error code="FTST0014"/>
+      </any-of>
+    </result>
+  </test-case>
+</test-set>

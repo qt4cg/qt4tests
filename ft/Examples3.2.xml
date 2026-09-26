@@ -1,0 +1,128 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-Examples3.2">
+  <description>XQuery Full Text - Section 3.2 - Examples from Section 3.2</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="ft-3.2-examples-q1">
+    <description>Returns the sample book element, because its title element contains the token "Expert"</description>
+    <created by="Jim Melton" on="2008-10-10"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test ft-3.2-examples-q1"/>
+    <environment>
+      <source role="." file="TestSources/FT-3-examples-source-document.xml"/>
+    </environment>
+    <test><![CDATA[(: 3.2 Search Tokens and Phrases: Example #1 :)
+//book[./title contains text "Expert"]]]></test>
+    <result>
+      <assert-xml><![CDATA[<book number="1">
+    <title shortTitle="Improving Web Site Usability">Improving  
+        the Usability of a Web Site Through Expert Reviews and
+        Usability Testing</title>
+    <author>Millicent Marigold</author>
+    <author>Montana Marigold</author>
+    <editor>Véra Tudor-Medina</editor>
+    <content>
+      <p>The usability of a Web site is how well the  
+          site supports the users in achieving specified  
+          goals. A Web site should facilitate learning,  
+          and enable efficient and effective task  
+          completion, while propagating few errors.
+      </p>
+      <note>This book has been approved by the Web Site  
+          Users Association.
+      </note>
+    </content>
+  </book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="ft-3.2-examples-q2">
+    <description>Returns the sample book element, because its title element contains the phrase "Expert Reviews"</description>
+    <created by="Jim Melton" on="2008-10-10"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test ft-3.2-examples-q2"/>
+    <environment>
+      <source role="." file="TestSources/FT-3-examples-source-document.xml"/>
+    </environment>
+    <test><![CDATA[(: 3.2 Search Tokens and Phrases: Example #2 :)
+//book[./title contains text "Expert Reviews"]]]></test>
+    <result>
+      <assert-xml><![CDATA[<book number="1">
+    <title shortTitle="Improving Web Site Usability">Improving  
+        the Usability of a Web Site Through Expert Reviews and
+        Usability Testing</title>
+    <author>Millicent Marigold</author>
+    <author>Montana Marigold</author>
+    <editor>Véra Tudor-Medina</editor>
+    <content>
+      <p>The usability of a Web site is how well the  
+          site supports the users in achieving specified  
+          goals. A Web site should facilitate learning,  
+          and enable efficient and effective task  
+          completion, while propagating few errors.
+      </p>
+      <note>This book has been approved by the Web Site  
+          Users Association.
+      </note>
+    </content>
+  </book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="ft-3.2-examples-q3">
+    <description>Returns the sample book element, because its title element contains the two tokens "Expert" and "Reviews"</description>
+    <created by="Jim Melton" on="2008-10-10"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test ft-3.2-examples-q3"/>
+    <environment>
+      <source role="." file="TestSources/FT-3-examples-source-document.xml"/>
+    </environment>
+    <test><![CDATA[(: 3.2 Search Tokens and Phrases: Example #3 :)
+//book[./title contains text {"Expert", "Reviews"} all]]]></test>
+    <result>
+      <assert-xml><![CDATA[<book number="1">
+    <title shortTitle="Improving Web Site Usability">Improving  
+        the Usability of a Web Site Through Expert Reviews and
+        Usability Testing</title>
+    <author>Millicent Marigold</author>
+    <author>Montana Marigold</author>
+    <editor>Véra Tudor-Medina</editor>
+    <content>
+      <p>The usability of a Web site is how well the  
+          site supports the users in achieving specified  
+          goals. A Web site should facilitate learning,  
+          and enable efficient and effective task  
+          completion, while propagating few errors.
+      </p>
+      <note>This book has been approved by the Web Site  
+          Users Association.
+      </note>
+    </content>
+  </book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="ft-3.2-examples-q4">
+    <description>Returns false for the sample document, because the p element doesn't contain the phrase "Web Site Usability" although it contains all of the tokens in the phrase</description>
+    <created by="Jim Melton" on="2008-10-10"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test ft-3.2-examples-q4"/>
+    <environment>
+      <source role="." file="TestSources/FT-3-examples-source-document.xml"/>
+    </environment>
+    <test><![CDATA[(: 3.2 Search Tokens and Phrases: Example #4 :)
+//book//p contains text "Web Site Usability"]]></test>
+    <result>
+      <assert-false/>
+    </result>
+  </test-case>
+  <test-case name="ft-3.2-examples-q5">
+    <description>Returns book numbers of book elements by "Marigold" with a title about "Web Site Usability", sorting them in descending score order</description>
+    <created by="Jim Melton" on="2008-10-10"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test ft-3.2-examples-q5"/>
+    <environment>
+      <source role="." file="TestSources/FT-3-examples-source-document.xml"/>
+    </environment>
+    <test><![CDATA[(: 3.2 Search Tokens and Phrases: Example #5 :)
+for $book in /books/book[.//author contains text "Marigold"] 
+let score $score := $book/title/@shortTitle contains text "Web Site Usability" 
+where $score > 0.1
+order by $score descending
+return data($book/@number)]]></test>
+    <result>
+      <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+    </result>
+  </test-case>
+</test-set>

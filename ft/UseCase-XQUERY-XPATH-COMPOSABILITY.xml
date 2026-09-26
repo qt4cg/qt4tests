@@ -1,0 +1,389 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-UseCase-XQUERY-XPATH-COMPOSABILITY">
+  <description>XQuery Full Text - Use Case "XQUERY-XPATH-COMPOSABILITY" - Queries combining full-text queries with other XQuery and XPath functionalities. Section 16.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="xquery-xpath-composability-queries-results-q1">
+    <description>Q1 Full-Text Query Constructing New Element: For books with "usability" in the title create a flat list of all title-author pairs, with each pair enclosed in a newly constructed element. This query finds a word in an element and returns the element and another wrapped in a new element.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test xquery-xpath-composability-queries-results-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book
+let $var := $book/metadata/title
+where $var contains text "usability"
+return <result> 
+          {$book/metadata/title, $book/metadata/author} 
+           </result>]]></test>
+    <result>
+      <assert-xml><![CDATA[<result><title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title><author>Millicent Marigold</author><author>Montana Marigold</author></result><result><title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title></result>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="xquery-xpath-composability-queries-results-q2">
+    <description>Q2 Full-Text Query Returning Count of Descendant Element Occurrences: Find all books with a chapter title on "usability tests". Return book title, chapter title, and the number of steps in chapters. This query finds words then returns among other elements a constructed element reporting the number of occurrences of a descendant element.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test xquery-xpath-composability-queries-results-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book
+let $ct := $book/content/part/chapter/title
+where $ct contains text "usability" ftand "test" 
+   using stemming
+return <book number="{$book/@number}"> 
+          {$book/metadata/title,
+          for $title in $ct
+          return 
+             ($title, 
+             <number-of-steps> 
+                {count($title/..//step)}
+             </number-of-steps>)}
+       </book>]]></test>
+    <result>
+      <assert-xml><![CDATA[<book number="1"><title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title><title>Heuristic Evaluation</title><number-of-steps>0</number-of-steps><title>Cognitive Walk-Through</title><number-of-steps>0</number-of-steps><title>Usability Testing</title><number-of-steps>0</number-of-steps></book><book number="2"><title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title><title>Planning then Conducting Usability 
+            Tests</title><number-of-steps>7</number-of-steps><title>Conducting Usability Tests</title><number-of-steps>0</number-of-steps><title>Evaluating and Implementing Results</title><number-of-steps>0</number-of-steps></book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="xquery-xpath-composability-queries-results-q3">
+    <description>Q3 Full-Text Query with Conditional Return: For each book with "usability" in the book title, return the book title and a second element. Return the book title and a third element if the second element does not exist. This query finds a word and contains a conditional return.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test xquery-xpath-composability-queries-results-q3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book[./metadata/title contains text 
+   "usability"]
+return <book number="{$book/@number}">
+          {$book/metadata/title,
+             if (count($book/metadata//author) > 0) 
+             then $book/metadata//author 
+             else $book/metadata//publisher}
+       </book>]]></test>
+    <result>
+      <assert-xml><![CDATA[<book number="1"><title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title><author>Millicent Marigold</author><author>Montana Marigold</author></book><book number="2"><title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title><publisher>Ersatz Publications</publisher><publisher>Electronic BookWorks</publisher></book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="xquery-xpath-composability-queries-results-q4">
+    <description>Q4 Full-Text Query with Numeric Value Comparison: For each book with "usability" in the book title, return its book title and the round number of its suggested price if the price exceeds $25. This query finds a word and contains a conditional return based on a function on a numeric value.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test xquery-xpath-composability-queries-results-q4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book[metadata/title contains text "usability"]
+return <book number="{$book/@number}">
+           {$book/metadata/title,  
+             if ($book/metadata/price > 25)
+             then <price>{concat("$", round($book/metadata/price))}</price>
+             else ()
+           }   
+       </book>]]></test>
+    <result>
+      <assert-xml><![CDATA[<book number="1"><title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title><price>$26</price></book><book number="2"><title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title><price>$174</price></book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="xquery-xpath-composability-queries-results-q5">
+    <description>Q5 Full-Text Query with Character String Query: Find all introductions in books, published in "Washington, D.C.", which include listings for "résumés", "drafts", and "correspondence". This query finds words and a character string.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test xquery-xpath-composability-queries-results-q5"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book[.//publicationInfo/place/text() 
+   = "Washington, D.C."]
+let $intro := $book/content/introduction
+where $intro contains text "résumés" using diacritics sensitive
+   ftand "drafts" ftand "correspondence"
+return <book number="{$book/@number}">
+           {$book/metadata/title, $intro}
+           </book>]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<book number="3"><title shortTitle="Usabilityguy Manuscript Guide">John Wesley Usabilityguy: A Register of His 
+      Papers</title><introduction>
+         <p>The papers of John Wesley Usabilityguy span the 
+         years 1946-2001, with the bulk of the items 
+         concentrated in the period from 1985 to 2001. The 
+         papers feature his career as a developer of software 
+         applications and usability specialist. The collection 
+         consists of correspondence, memoranda, journals, 
+         speeches, article drafts, book drafts, notes, charts, 
+         graphs, family papers, clippings, printed matter, 
+         photographs, résumés and other materials.</p>
+      </introduction></book>]]></assert-xml>
+        <error code="FOCH0002"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="xquery-xpath-composability-queries-results-q6">
+    <description>Q6 Full-Text Query with Conditional Return of Boolean Values: For each book on "usability" return the book title and a new has-publishers element with value true if the book has more than 1 publisher. Return the title and a new has-publishers element with value false if the book does not have more than one publisher. This query finds a word, then returns Boolean values based on the number of occurrences of an element.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test xquery-xpath-composability-queries-results-q6"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book[metadata/title contains text 
+   "usability"]
+return <book number="{$book/@number}">
+          {$book/metadata/title} 
+          <has-publishers> 
+             {if (count($book//publisher) > 1) 
+             then "true" else "false"}
+          </has-publishers>
+       </book>]]></test>
+    <result>
+      <assert-xml><![CDATA[<book number="1"><title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title><has-publishers>false</has-publishers></book><book number="2"><title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title><has-publishers>true</has-publishers></book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="xquery-xpath-composability-queries-results-q7">
+    <description>Q7 Full-Text Query with Date Comparison and Element Occurrence Count: Find all books about conducting "usability tests" which have more than one author and are published after "2000". This query finds a phrase, counts the number of occurrences of an element, runs a greater than comparison on dates, and combines the results.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test xquery-xpath-composability-queries-results-q7"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book[./metadata/publicationInfo/
+   (dateIssued|dateRevised) > "2000-12-31" 
+   and count(metadata/author) > 1]
+let $subj := $book//subject[
+             . contains text "usability test.*" using wildcards]
+where $subj
+return <book number="{$book/@number}"> 
+          {$book/metadata/title, $book/metadata/author, $subj}
+           </book>]]></test>
+    <result>
+      <assert-xml><![CDATA[<book number="1"><title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title><author>Millicent Marigold</author><author>Montana Marigold</author><subject>Usability testing</subject></book><book number="3"><title shortTitle="Usabilityguy Manuscript Guide">John Wesley Usabilityguy: A Register of His 
+      Papers</title><author>Millicent Marigold</author><author>Morty Marigold</author><subject>Usability testing</subject></book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="xquery-xpath-composability-queries-results-q8">
+    <description>Q8 Query with XPath Expression Within Full-Text Expression: Find all books published after "2001" which share a subject with the book with the short title "Usability Basics". This query finds words using an XPath expression to identify the words queried and looks for a publication date after the one specified.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test xquery-xpath-composability-queries-results-q8"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+let $books := $input-context/books/book
+let $bookSubject := 
+   $books/metadata[./title/@shortTitle 
+   contains text "Usability Basics"]/subjects/subject
+for $book in $books   
+where $book/metadata/publicationInfo/
+(dateIssued|dateRevised) > 2001 and 
+$book/metadata/subjects/subject contains text 
+     {$bookSubject} any
+return
+        <book number="{$book/@number}">
+           {$book/metadata/title,
+           $book/metadata/author}
+        </book>]]></test>
+    <result>
+      <assert-xml><![CDATA[<book number="1"><title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title><author>Millicent Marigold</author><author>Montana Marigold</author></book><book number="3"><title shortTitle="Usabilityguy Manuscript Guide">John Wesley Usabilityguy: A Register of His 
+      Papers</title><author>Millicent Marigold</author><author>Morty Marigold</author></book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="xquery-xpath-composability-queries-results-q9">
+    <description>Q9 Query Using an XQuery Expression to Determine the Number of Words Allowed in a Window: Find all books which discuss "successfully completing tasks". This query finds words within a window, allowing more words within the window depending on the number of chapters in the book.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test xquery-xpath-composability-queries-results-q9"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book
+let $cont := $book/content
+where $cont contains text ("successfully" 
+   ftand "completing" ftand "tasks"
+   window (count($cont/part/chapter) * 4) 
+   words) using stemming
+return ($book/metadata/title, $cont)]]></test>
+    <result>
+      <assert-xml><![CDATA[<title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title><content>
+      <introduction>
+         <p>This is a basic handbook for planning and 
+         conducting usability tests on Web sites. Usability 
+         testing should be used in conjunction with other 
+         expert review methods.</p>
+         <p>This book has not been approved by the Web Site 
+         Users Association.</p>
+      </introduction>
+      <part number="1">
+         <chapter>
+            <title>Planning then Conducting Usability 
+            Tests</title> 
+            <p>Take the following steps to plan usability 
+            testing. <step number="1">Clarify and 
+            articulate the goal of the usability testing.
+            </step> <step number="2">Identify tasks which 
+            are critical for users to be able to complete 
+            successfully.</step> <step number="3">Compile 
+            a script of questions or instructions which 
+            will prompt the user to attempt those 
+            tasks.</step> <step number="4">Identify your 
+            users and begin recruiting them.</step> <step number="5">Conduct a pretest on a few users.
+            </step> <step number="6">Edit the script based 
+            on insights gleaned from the pretest.</step> 
+            <step number="7">Resume testing.</step></p>
+         </chapter>
+      </part>
+      <part number="2">
+         <chapter>
+            <title>Conducting Usability Tests</title> 
+         <p>Users can be tested at any computer 
+            workstation <footnote>They may be more 
+            comfortable at their own workstation than in 
+            a lab.</footnote> or in a lab.</p>
+            <p>Give the user the script, then assure them 
+            that you are testing the Web site, not them. 
+            Users are asked to verbalize their thoughts as 
+            they complete the tasks. The event is recorded 
+            or someone takes notes. It is often preferable 
+            to have two testers, <footnote>Usability 
+            testing can be done at great expense or on a 
+            shoe string, using <testingProcedure>in-house 
+            expertise</testingProcedure> or 
+            <testingProcedure>contracting with human 
+            computer interaction professionals
+            </testingProcedure>.</footnote> one to ask the 
+            questions, another to take notes. Testers should 
+            offer no guidance or comments to the user. Mouse 
+            movements, typing, expressions, and the user's 
+            words should be recorded.</p>
+         </chapter>
+         <chapter>
+            <title>Evaluating and Implementing Results</title> 
+            <p>Compile the results and review collectively. 
+            Make changes to the site to alleviate the problems 
+            found in Web site components which were propagating 
+            the largest number of or the most devastating errors. 
+            Begin new iterations of testing and changes, until 
+            users are successful in the accomplishing the 
+            tasks.</p>
+         </chapter>
+      </part>
+   </content>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="xquery-xpath-composability-queries-results-q9b">
+    <description>Q9 Query Using an XQuery Expression to Determine the Number of Words Allowed in a Window: Find all books which discuss "successfully completing tasks". This query finds words within a window, allowing more words within the window depending on the number of chapters in the book.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test xquery-xpath-composability-queries-results-q9b"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[content contains text ("successfully" 
+ftand "completing" ftand "tasks"
+window (count(content/part/chapter) * 4) 
+words) using stemming]/(metadata/title, content)]]></test>
+    <result>
+      <assert-xml><![CDATA[<title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title><content>
+      <introduction>
+         <p>This is a basic handbook for planning and 
+         conducting usability tests on Web sites. Usability 
+         testing should be used in conjunction with other 
+         expert review methods.</p>
+         <p>This book has not been approved by the Web Site 
+         Users Association.</p>
+      </introduction>
+      <part number="1">
+         <chapter>
+            <title>Planning then Conducting Usability 
+            Tests</title> 
+            <p>Take the following steps to plan usability 
+            testing. <step number="1">Clarify and 
+            articulate the goal of the usability testing.
+            </step> <step number="2">Identify tasks which 
+            are critical for users to be able to complete 
+            successfully.</step> <step number="3">Compile 
+            a script of questions or instructions which 
+            will prompt the user to attempt those 
+            tasks.</step> <step number="4">Identify your 
+            users and begin recruiting them.</step> <step number="5">Conduct a pretest on a few users.
+            </step> <step number="6">Edit the script based 
+            on insights gleaned from the pretest.</step> 
+            <step number="7">Resume testing.</step></p>
+         </chapter>
+      </part>
+      <part number="2">
+         <chapter>
+            <title>Conducting Usability Tests</title> 
+         <p>Users can be tested at any computer 
+            workstation <footnote>They may be more 
+            comfortable at their own workstation than in 
+            a lab.</footnote> or in a lab.</p>
+            <p>Give the user the script, then assure them 
+            that you are testing the Web site, not them. 
+            Users are asked to verbalize their thoughts as 
+            they complete the tasks. The event is recorded 
+            or someone takes notes. It is often preferable 
+            to have two testers, <footnote>Usability 
+            testing can be done at great expense or on a 
+            shoe string, using <testingProcedure>in-house 
+            expertise</testingProcedure> or 
+            <testingProcedure>contracting with human 
+            computer interaction professionals
+            </testingProcedure>.</footnote> one to ask the 
+            questions, another to take notes. Testers should 
+            offer no guidance or comments to the user. Mouse 
+            movements, typing, expressions, and the user's 
+            words should be recorded.</p>
+         </chapter>
+         <chapter>
+            <title>Evaluating and Implementing Results</title> 
+            <p>Compile the results and review collectively. 
+            Make changes to the site to alleviate the problems 
+            found in Web site components which were propagating 
+            the largest number of or the most devastating errors. 
+            Begin new iterations of testing and changes, until 
+            users are successful in the accomplishing the 
+            tasks.</p>
+         </chapter>
+      </part>
+   </content>]]></assert-xml>
+    </result>
+  </test-case>
+</test-set>

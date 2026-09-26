@@ -1,0 +1,97 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-LetScoreExpr">
+  <description>XQuery Full Text - Let Clause with Score variable - Tests for the LET SCORE part of the FLWOR expression syntax</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="LetScoreExpr-1">
+    <description>Basic syntax: score variable</description>
+    <created by="Full-Text Task Force" on="2008-09-22"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test LetScoreExpr-1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: LetScoreExpr-1: Basic syntax: score variable :)
+declare variable $input-context external;
+let score $s := $input-context//metadata/title[. contains text "Usability"]
+return ($s ge 0.0) and ($s le 1.0)]]></test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <error code="FTST0014"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="LetScoreExpr-2">
+    <description>Basic syntax: score variable with as</description>
+    <created by="Full-Text Task Force" on="2008-09-22"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test LetScoreExpr-2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: Note to maintainers: This query has an intentional syntax error. Do not "fix" it. :)
+(: LetScoreExpr-2: Basic syntax: score variable cannot have as clause :)
+declare variable $input-context external;
+let score $s as xs:double := $input-context//metadata/title[. contains text "Usability"]
+return ($s ge 0.0) and ($s le 1.0)]]></test>
+    <result>
+      <any-of>
+        <error code="XPST0003"/>
+        <error code="FTST0014"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="LetScoreExpr-3">
+    <description>Basic syntax: score variable</description>
+    <created by="Full-Text Task Force" on="2008-09-22"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test LetScoreExpr-3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: LetScoreExpr-3: Basic syntax: score variable :)
+declare variable $input-context external;
+for $t in $input-context//metadata/title[. contains text "Usability"]
+let score $s := $t
+return $t]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title><title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title>]]></assert-xml>
+        <error code="FTST0014"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="LetScoreExpr-4">
+    <description>Basic syntax: score variable</description>
+    <created by="Full-Text Task Force" on="2008-09-22"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test LetScoreExpr-4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: LetScoreExpr-3: Order by score variable :)
+declare variable $input-context external;
+for $t in $input-context//metadata/title[. contains text "Usability"]
+let score $s := $t
+order by $s
+return $t]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title><title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title>]]></assert-xml>
+        <assert-xml><![CDATA[<title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title><title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title>]]></assert-xml>
+        <error code="FTST0014"/>
+      </any-of>
+    </result>
+  </test-case>
+</test-set>

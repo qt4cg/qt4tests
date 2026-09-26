@@ -1,0 +1,71 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-Examples2.2.2">
+  <description>XQuery Full Text - Section 2.2.2 - Examples Section 2.2.2</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="examples-222-q1">
+    <description>Find the author of each book with a title containing a token with the same root as dog and the token cat.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test examples-222-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $b in $input-context/books/book
+where $b/title contains text ("dog" using stemming) ftand "cat" 
+return $b/author]]></test>
+    <result>
+      <assert-xml><![CDATA[<author>Melton Mowbray</author>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="examples-222-q1b">
+    <description>Find the author of each book with a title containing a token with the same root as dog and the token cat.</description>
+    <created by="Full-Text Task Force" on="2009-01-15"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test examples-222-q1b"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[title contains text ("dog" using stemming) ftand "cat"]/author]]></test>
+    <result>
+      <assert-xml><![CDATA[<author>Melton Mowbray</author>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="examples-222-q2">
+    <description>Find books that have a price of less than 50 and a title which contains a token with the same root as train.</description>
+    <created by="Full-Text Task Force" on="2009-01-15"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test examples-222-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[price < 50 and title contains text ("train" using stemming)]]]></test>
+    <result>
+      <assert-xml><![CDATA[<book>
+    <title>Angelic Intervention For Those Who Train Cats</title>
+    <author>John Dee</author>
+    <date>1607</date>
+    <publisher>Example Books</publisher>
+    <price>41</price>
+  </book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="examples-222-q3">
+    <description>Finds books where either the title contains the token dog and the token cat and the content does not contain a token with the same root as train, or where the title fails to have one of the matching tokens but the content does.</description>
+    <created by="Full-Text Task Force" on="2009-01-15"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test examples-222-q3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books//book[title contains text "dog" ftand "cat" ne para contains text ("train" using stemming)]]]></test>
+    <result>
+      <assert-xml><![CDATA[<book>
+    <title>The Story of a Dog and a Cat</title>
+    <author>Melton Mowbray</author>
+    <date>1832</date>
+    <publisher>Example Books</publisher>
+    <price>100</price>
+  </book>]]></assert-xml>
+    </result>
+  </test-case>
+</test-set>

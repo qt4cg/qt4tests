@@ -1,0 +1,25 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-Examples2.3.1">
+  <description>XQuery Full Text - Section 2.3.1 - Examples Section 2.3.1</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="examples-231-q1">
+    <description>Return books with a score based on weighting "web site" in their content 0.5 and "usability" in their content 2</description>
+    <created by="Full-Text Task Force" on="2008-08-17"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test examples-231-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: 2.3 Scoring: Example 6. Exact results depend on scoring :)
+declare variable $input-context external;
+for $b in $input-context/books/book
+let score $s := $b/content contains text ("web site" weight {0.5})
+                                ftand ("usability" weight {2})
+return <result score="{$s}">{$b}</result>]]></test>
+    <result>
+      <any-of>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <error code="FTST0014"/>
+      </any-of>
+    </result>
+  </test-case>
+</test-set>

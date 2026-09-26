@@ -1,0 +1,133 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-FTMildNotUnconstrained">
+  <description>XQuery Full Text - Full-Text not in Operator - Mild not. Sections 3.5.3 and 5.2.1.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="unconstrained-examples-353-1">
+    <description>Does any book contain "usability" not in "usability testing"?</description>
+    <created by="Full-Text Task Force" on="2008-11-24"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test unconstrained-examples-353-1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/FT-3-examples-source-document.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book contains text "usability" not in "usability testing"]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  <test-case name="FTMildNot-unconstrained-q1">
+    <description>Simple not in query: no error allowed</description>
+    <created by="Full-Text Task Force" on="2008-12-03"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTMildNot-unconstrained-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTMildNot-q1: mild not :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "usability" not in "usability studies"]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Software For Fun and Profit</title><title>Software For Fun and Profit, 2nd edition</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTMildNot-unconstrained-q2">
+    <description>Simple not in query: no error allowed</description>
+    <created by="Full-Text Task Force" on="2008-12-03"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTMildNot-unconstrained-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTMildNot-q2: mild not :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "usability studies" not in "usability"]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTMildNot-unconstrained-expr1">
+    <description>Simple not in query with expressions: no FTST0001</description>
+    <created by="Full-Text Task Force" on="2008-12-03"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTMildNot-unconstrained-expr1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTMildNot-expr1: mild not with expressions :)
+declare variable $input-context external;
+let $expr1 := "usability"
+let $expr2 := "usability studies"
+return
+$input-context/books/book[para contains text {$expr1} not in {$expr2}]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Software For Fun and Profit</title><title>Software For Fun and Profit, 2nd edition</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTMildNot-unconstrained-and1">
+    <description>Mild not with ftand</description>
+    <created by="Full-Text Task Force" on="2008-12-03"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTMildNot-unconstrained-and1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTMildNot-and1: mild not with ands :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "usability" ftand ("ninja" not in "ninja coder")]/title]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  <test-case name="FTMildNot-unconstrained-and2">
+    <description>Mild not with ftand</description>
+    <created by="Full-Text Task Force" on="2008-12-03"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTMildNot-unconstrained-and2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTMildNot-and2: mild not with ands :)
+declare variable $input-context external;
+$input-context/books/book[para contains text ("usability" ftand "ninja") not in "ninja coder"]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTMildNot-unconstrained-or1">
+    <description>Mild not with ftor</description>
+    <created by="Full-Text Task Force" on="2008-12-03"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTMildNot-unconstrained-or1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTMildNot-or1: mild not with ors :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "usability" ftor ("ninja" not in "ninja coder")]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Software For Fun and Profit</title><title>Software For Fun and Profit, 2nd edition</title><title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTMildNot-unconstrained-or2">
+    <description>Mild not with ftor</description>
+    <created by="Full-Text Task Force" on="2008-12-03"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTMildNot-unconstrained-or2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTMildNot-or2: mild not with ors :)
+declare variable $input-context external;
+$input-context/books/book[para contains text ("usability" ftor "ninja") not in "ninja coder"]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Software For Fun and Profit</title><title>Software For Fun and Profit, 2nd edition</title><title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTMildNot-unconstrained-not1">
+    <description>Mild not with fnnot</description>
+    <created by="Full-Text Task Force" on="2008-12-03"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTMildNot-unconstrained-not1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTMildNot-not1: mild not with not :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "software" ftand ftnot ("usability" not in "usability studies")]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>No Bad Software</title><title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+</test-set>

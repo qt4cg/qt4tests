@@ -1,0 +1,179 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-UseCase-SCORE">
+  <description>XQuery Full Text - Use Case "SCORE" - Queries that must be written with score.  Section 17.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="score-queries-results-q1">
+    <description>Q1 Query Returning Scores: Find all books which mention "usability" in the title or the text. Return book titles and scores. This query performs a word query and returns scores, highest scores first. Score is implementation-dependent, so any answer is acceptable, a few possible answers are provided.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test score-queries-results-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book
+let score $s := ($book/metadata/title contains text 
+   "usability" or $book/content contains text "usability") 
+where $s > 0  
+order by $s descending 
+return <book number="{$book/@number}">
+          {$book/metadata/title}
+          <score>{$s}</score>
+       </book>]]></test>
+    <result>
+      <any-of>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="score-queries-results-q2">
+    <description>Q2 Query Returning Results with Top Scores: Find the best two books on "usability". This query performs a word query and returns only the results with the two top scores. Score is implementation-dependent, so any answer is acceptable, a few possible answers are provided.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test score-queries-results-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $result at $i in
+     for $book score $s in 
+        $input-context/books/book[. contains text "usability"]
+      order by $s ascending
+      return $book
+   where $i <= 2
+   return <book number="{$result/@number}"> 
+      {$result/metadata/title}</book>]]></test>
+    <result>
+      <any-of>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="score-queries-results-q3">
+    <description>Q3 Query Filtering on Scores: Find all books that focus on "usability". This query performs a word query and filters on scores.Score is implementation-dependent, so any answer is acceptable, a few possible answers are provided.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test score-queries-results-q3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book score $s in 
+   $input-context/books/book[. contains text "usability"]
+where $s > 0.1
+return $book/metadata/title]]></test>
+    <result>
+      <any-of>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="score-queries-results-q3b">
+    <description>Q3 Query Filtering on Scores: Find all books that focus on "usability". This query performs a word query and filters on scores. Score is implementation-dependent, so any answer is acceptable, a few possible answers are provided.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test score-queries-results-q3b"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[(for $i score $s in .[. contains text "usability"]
+return $s) > 0.1]/metadata/title]]></test>
+    <result>
+      <any-of>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="score-queries-results-q4">
+    <description>Q4 Query Combining Score and XML Structure with a Conditional Return: Find all books with parts about "usability testing". This query finds books which contain parts about usability testing, returning entire books, but without part elements identified as irrelevant via score. Score is implementation-dependent, so any answer is acceptable, a few possible answers are provided.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test score-queries-results-q4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+declare function local:filter ( $nodes 
+   as node()*, $exclude as element()* ) as node()*
+   {
+      for $node in $nodes except $exclude
+      return
+         typeswitch ($node)
+            case $e as element()
+               return 
+                 element {node-name($e)}
+                   {
+                       $e/@*,
+                      local:filter( $e/node() except $exclude, 
+                      $exclude )
+                   }
+            default 
+               return $node
+   };
+for $book in $input-context/books/book
+let $irrelevantParts := 
+   for $part in $book//part
+   let score $score := $part contains text "usability test.*" 
+      using wildcards
+   where $score < 0.5
+   return $part
+where count($irrelevantParts) < count($book//part)
+return local:filter($book, $irrelevantParts)]]></test>
+    <result>
+      <any-of>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="score-queries-results-q5">
+    <description>Q5 Query Returning All Books Ordered by Score: Return all books, listing books with text on "software" first. This query performs a word query, returns all the documents in the database, and orders them returning those with found word first, those without last. Score is implementation-dependent, so any answer is acceptable, a few possible answers are provided.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test score-queries-results-q5"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book
+let score $s := $book/content contains text "software"
+order by $s descending
+return $book]]></test>
+    <result>
+      <any-of>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="score-queries-results-q6">
+    <description>Q6 Query with Weight Declaration: Finds books which discuss "conducting usability tests" returning those which mention "measuring success" first. This query finds words using weighting on optional words to impact the scoring and sorting. Score is implementation-dependent, so any answer is acceptable, a few possible answers are provided.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test score-queries-results-q6"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book
+let $booktext := $book/content [. contains text ("conduct" 
+   ftand "usability" ftand "tests" distance at most 
+   10 words) using stemming] 
+let score $s := $booktext contains text 
+   (("measuring" ftand "success" distance
+   at most 4 words) weight {1.8}) using stemming 
+where $booktext
+order by $s descending
+return ($book/metadata/title, $booktext)]]></test>
+    <result>
+      <any-of>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+        <assert>$result instance of item()* (: any non-error result is OK :)</assert>
+      </any-of>
+    </result>
+  </test-case>
+</test-set>

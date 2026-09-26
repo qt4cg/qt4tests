@@ -1,0 +1,60 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-UseCase-OTHER">
+  <description>XQuery Full Text - Use Case "OTHER" - Explicit query of attributes. Section 4.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="other-queries-results-q1">
+    <description>Q1 Query on Attribute: Find all books with "improve" "web" "usability" in the short title. This query finds multiple words in an attribute allowing word variants and allowing the words in any order with up to a specified number of intervening words.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test other-queries-results-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book
+where $book/metadata/title/@shortTitle contains text "improve" 
+   using stemming ftand "web" ftand "usability" distance 
+   at most 2 words    
+return $book/metadata/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="other-queries-results-q1b">
+    <description>Q1 Query on Attribute: Find all books with "improve" "web" "usability" in the short title. This query finds multiple words in an attribute allowing word variants and allowing the words in any order with up to a specified number of intervening words.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test other-queries-results-q1b"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[metadata/title/@shortTitle contains text 
+"improve" using stemming ftand "web" ftand "usability" 
+distance at most 2 words]/metadata/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="other-queries-results-q2">
+    <description>Q2 Query on Element and Attribute: Find all books with the phrase "manuscript guides" in the short title and the phrase "user profiling" in a component title. This query finds a phrase in an attribute and a phrase in an element.</description>
+    <created by="Full-Text Task Force" on="2008-06-26"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test other-queries-results-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book
+let $stitle := $book/metadata/title/@shortTitle    
+let $ctitle := $book//componentTitle  
+where $stitle contains text "manuscript guides"
+   using stemming and $ctitle contains text "user profiling" 
+   using stemming
+return data($stitle)]]></test>
+    <result>
+      <assert-xml><![CDATA[Usabilityguy Manuscript Guide]]></assert-xml>
+    </result>
+  </test-case>
+</test-set>

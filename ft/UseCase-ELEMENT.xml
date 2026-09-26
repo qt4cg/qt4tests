@@ -1,0 +1,389 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-UseCase-ELEMENT">
+  <description>XQuery Full Text - Use Case "ELEMENT" - Query words and phrases in XML elements with simple content. Section 2.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="element-queries-results-q1">
+    <description>Find all book titles containing the word "usability".</description>
+    <created by="Full-Text Task Force" on="2008-02-18"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test element-queries-results-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book/metadata/title[. contains text "usability"]]]></test>
+    <result>
+      <assert-xml><![CDATA[<title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title><title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="element-queries-results-q2">
+    <description>Find all book subjects containing the phrase "usability testing".</description>
+    <created by="Full-Text Task Force" on="2008-04-04"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test element-queries-results-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book/metadata/subjects/subject[. contains text 
+   "usability testing"]]]></test>
+    <result>
+      <assert-xml><![CDATA[<subject>Usability testing</subject><subject>Usability testing</subject><subject>Usability testing</subject>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="element-queries-results-q3">
+    <description>Find all book subjects containing the phrase "网站".</description>
+    <created by="Full-Text Task Force" on="2008-04-04"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test element-queries-results-q3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book/metadata/subjects/subject[. contains text 
+   "网站" using language "zh"]]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<subject>网站建置</subject>  
+<subject>网站可用性</subject>
+<subject>网站建置</subject>]]></assert-xml>
+        <error code="FTST0009"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="element-queries-results-q4">
+    <description>Find all books with "usability tests" in book or chapter titles.</description>
+    <created by="Full-Text Task Force" on="2008-04-04"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test element-queries-results-q4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book
+let $title := $book/(metadata|content/part/chapter)/title
+where $title contains text "usability tests"
+return $book]]></test>
+    <result>
+      <assert-xml><![CDATA[<book number="2">
+   <metadata>
+      <title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title>
+      <publicationInfo>
+         <place>New York</place>
+         <publisher>Ersatz Publications</publisher>
+         <publisher>Electronic BookWorks</publisher>         
+         <dateIssued>2000</dateIssued>
+         <dateRevised>2001</dateRevised>
+      </publicationInfo>
+      <price>174.00</price>   
+      <subjects xml:lang="en">
+         <subject>Usability testing</subject>
+         <subject>Web site development</subject>
+         <subject>Guides and finding aids</subject>
+      </subjects>
+      <subjects xml:lang="fr">
+         <subject>Tests d'ergonomie</subject>
+         <subject>Développement de site web</subject>
+         <subject>Guides et outils de recherche</subject>
+      </subjects>
+      <subjects xml:lang="zh">
+         <subject>可用性测试</subject>
+         <subject>网站建置</subject>
+         <subject>指南和检索工具</subject>
+      </subjects>
+   </metadata>
+   <content>
+      <introduction>
+         <p>This is a basic handbook for planning and 
+         conducting usability tests on Web sites. Usability 
+         testing should be used in conjunction with other 
+         expert review methods.</p>
+         <p>This book has not been approved by the Web Site 
+         Users Association.</p>
+      </introduction>
+      <part number="1">
+         <chapter>
+            <title>Planning then Conducting Usability 
+            Tests</title> 
+            <p>Take the following steps to plan usability 
+            testing. <step number="1">Clarify and 
+            articulate the goal of the usability testing.
+            </step> <step number="2">Identify tasks which 
+            are critical for users to be able to complete 
+            successfully.</step> <step number="3">Compile 
+            a script of questions or instructions which 
+            will prompt the user to attempt those 
+            tasks.</step> <step number="4">Identify your 
+            users and begin recruiting them.</step> <step number="5">Conduct a pretest on a few users.
+            </step> <step number="6">Edit the script based 
+            on insights gleaned from the pretest.</step> 
+            <step number="7">Resume testing.</step></p>
+         </chapter>
+      </part>
+      <part number="2">
+         <chapter>
+            <title>Conducting Usability Tests</title> 
+         <p>Users can be tested at any computer 
+            workstation <footnote>They may be more 
+            comfortable at their own workstation than in 
+            a lab.</footnote> or in a lab.</p>
+            <p>Give the user the script, then assure them 
+            that you are testing the Web site, not them. 
+            Users are asked to verbalize their thoughts as 
+            they complete the tasks. The event is recorded 
+            or someone takes notes. It is often preferable 
+            to have two testers, <footnote>Usability 
+            testing can be done at great expense or on a 
+            shoe string, using <testingProcedure>in-house 
+            expertise</testingProcedure> or 
+            <testingProcedure>contracting with human 
+            computer interaction professionals
+            </testingProcedure>.</footnote> one to ask the 
+            questions, another to take notes. Testers should 
+            offer no guidance or comments to the user. Mouse 
+            movements, typing, expressions, and the user's 
+            words should be recorded.</p>
+         </chapter>
+         <chapter>
+            <title>Evaluating and Implementing Results</title> 
+            <p>Compile the results and review collectively. 
+            Make changes to the site to alleviate the problems 
+            found in Web site components which were propagating 
+            the largest number of or the most devastating errors. 
+            Begin new iterations of testing and changes, until 
+            users are successful in the accomplishing the 
+            tasks.</p>
+         </chapter>
+      </part>
+   </content>
+</book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="element-queries-results-q4b">
+    <description>Find all books with "usability tests" in book or chapter titles.</description>
+    <created by="Full-Text Task Force" on="2008-04-04"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test element-queries-results-q4b"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[(metadata|content/part/chapter)
+/title contains text "usability tests"]]]></test>
+    <result>
+      <assert-xml><![CDATA[<book number="2">
+   <metadata>
+      <title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title>
+      <publicationInfo>
+         <place>New York</place>
+         <publisher>Ersatz Publications</publisher>
+         <publisher>Electronic BookWorks</publisher>         
+         <dateIssued>2000</dateIssued>
+         <dateRevised>2001</dateRevised>
+      </publicationInfo>
+      <price>174.00</price>   
+      <subjects xml:lang="en">
+         <subject>Usability testing</subject>
+         <subject>Web site development</subject>
+         <subject>Guides and finding aids</subject>
+      </subjects>
+      <subjects xml:lang="fr">
+         <subject>Tests d'ergonomie</subject>
+         <subject>Développement de site web</subject>
+         <subject>Guides et outils de recherche</subject>
+      </subjects>
+      <subjects xml:lang="zh">
+         <subject>可用性测试</subject>
+         <subject>网站建置</subject>
+         <subject>指南和检索工具</subject>
+      </subjects>
+   </metadata>
+   <content>
+      <introduction>
+         <p>This is a basic handbook for planning and 
+         conducting usability tests on Web sites. Usability 
+         testing should be used in conjunction with other 
+         expert review methods.</p>
+         <p>This book has not been approved by the Web Site 
+         Users Association.</p>
+      </introduction>
+      <part number="1">
+         <chapter>
+            <title>Planning then Conducting Usability 
+            Tests</title> 
+            <p>Take the following steps to plan usability 
+            testing. <step number="1">Clarify and 
+            articulate the goal of the usability testing.
+            </step> <step number="2">Identify tasks which 
+            are critical for users to be able to complete 
+            successfully.</step> <step number="3">Compile 
+            a script of questions or instructions which 
+            will prompt the user to attempt those 
+            tasks.</step> <step number="4">Identify your 
+            users and begin recruiting them.</step> <step number="5">Conduct a pretest on a few users.
+            </step> <step number="6">Edit the script based 
+            on insights gleaned from the pretest.</step> 
+            <step number="7">Resume testing.</step></p>
+         </chapter>
+      </part>
+      <part number="2">
+         <chapter>
+            <title>Conducting Usability Tests</title> 
+         <p>Users can be tested at any computer 
+            workstation <footnote>They may be more 
+            comfortable at their own workstation than in 
+            a lab.</footnote> or in a lab.</p>
+            <p>Give the user the script, then assure them 
+            that you are testing the Web site, not them. 
+            Users are asked to verbalize their thoughts as 
+            they complete the tasks. The event is recorded 
+            or someone takes notes. It is often preferable 
+            to have two testers, <footnote>Usability 
+            testing can be done at great expense or on a 
+            shoe string, using <testingProcedure>in-house 
+            expertise</testingProcedure> or 
+            <testingProcedure>contracting with human 
+            computer interaction professionals
+            </testingProcedure>.</footnote> one to ask the 
+            questions, another to take notes. Testers should 
+            offer no guidance or comments to the user. Mouse 
+            movements, typing, expressions, and the user's 
+            words should be recorded.</p>
+         </chapter>
+         <chapter>
+            <title>Evaluating and Implementing Results</title> 
+            <p>Compile the results and review collectively. 
+            Make changes to the site to alleviate the problems 
+            found in Web site components which were propagating 
+            the largest number of or the most devastating errors. 
+            Begin new iterations of testing and changes, until 
+            users are successful in the accomplishing the 
+            tasks.</p>
+         </chapter>
+      </part>
+   </content>
+</book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="element-queries-results-q5">
+    <description>Find all books with "usability tests" in some subject.</description>
+    <created by="Full-Text Task Force" on="2008-04-04"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test element-queries-results-q5"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book
+where $book//subject contains text "usability testing"
+return $book/metadata/(title|author)]]></test>
+    <result>
+      <assert-xml><![CDATA[<title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title><author>Millicent Marigold</author><author>Montana Marigold</author><title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title><title shortTitle="Usabilityguy Manuscript Guide">John Wesley Usabilityguy: A Register of His 
+      Papers</title><author>Millicent Marigold</author><author>Morty Marigold</author>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="element-queries-results-q5b">
+    <description>Find all books with "usability tests" in some subject.</description>
+    <created by="Full-Text Task Force" on="2008-04-04"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test element-queries-results-q5b"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[./metadata/subjects/subject 
+contains text "usability testing"]/metadata/(title|author)]]></test>
+    <result>
+      <assert-xml><![CDATA[<title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title><author>Millicent Marigold</author><author>Montana Marigold</author><title shortTitle="Usability Basics">Usability 
+      Basics: How to Plan for and Conduct Usability Tests 
+      on Web Site Thereby Improving the Usability of Your 
+      Web Site</title><title shortTitle="Usabilityguy Manuscript Guide">John Wesley Usabilityguy: A Register of His 
+      Papers</title><author>Millicent Marigold</author><author>Morty Marigold</author>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="element-queries-results-q6">
+    <description>Find all book titles which start with "improving" followed within 2 words by "usability".</description>
+    <created by="Full-Text Task Force" on="2008-04-04"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test element-queries-results-q6"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book
+let $title := $book/metadata/title 
+where $title contains text "improving" ftand "usability" 
+   ordered distance at most 2 words at start
+return $title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="element-queries-results-q6b">
+    <description>Find all book titles which start with "improving" followed within 2 words by "usability".</description>
+    <created by="Full-Text Task Force" on="2008-04-04"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test element-queries-results-q6b"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context//books/book/metadata/title[. contains text "improving" 
+ftand "usability" ordered distance at most 2 words 
+at start]]]></test>
+    <result>
+      <assert-xml><![CDATA[<title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="element-queries-results-q7">
+    <description>Find the phrase when it is the entire content of an element.</description>
+    <created by="Full-Text Task Force" on="2008-04-04"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test element-queries-results-q7"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+for $book in $input-context/books/book
+let $exactTitle := $book/metadata/title
+where $exactTitle contains text "improv.* the usability of a 
+   web site through expert reviews and usability testing" 
+   using wildcards entire content
+return $exactTitle]]></test>
+    <result>
+      <assert-xml><![CDATA[<title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="element-queries-results-q7b">
+    <description>Find the phrase when it is the entire content of an element.</description>
+    <created by="Full-Text Task Force" on="2008-04-04"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test element-queries-results-q7b"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftusecases.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book/metadata/title[. contains text 
+"improv.* the usability of a web site through expert 
+reviews and usability testing" using wildcards entire 
+content]]]></test>
+    <result>
+      <assert-xml><![CDATA[<title shortTitle="Improving Web Site Usability">Improving 
+      the Usability of a Web Site Through Expert Reviews and 
+      Usability Testing</title>]]></assert-xml>
+    </result>
+  </test-case>
+</test-set>

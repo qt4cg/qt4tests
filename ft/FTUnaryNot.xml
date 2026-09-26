@@ -1,0 +1,119 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-FTUnaryNot">
+  <description>XQuery Full Text - Full-Text ftnot Operator - Minimal Not-selection support. Section 3.5.4.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="FTNot-q1">
+    <description>Simple ftnot query</description>
+    <created by="Full-Text Task Force" on="2008-11-24"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTNot-q1"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTNot-q1: Unadorned ftnot; may get FTST0002 :)
+declare variable $input-context external;
+$input-context/books/book[para contains text ftnot "ninja"]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>Software For Fun and Profit</title><title>Software For Fun and Profit, 2nd edition</title><title>The Blues</title><title>No Bad Software</title>]]></assert-xml>
+        <error code="FTST0002"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTNot-q2">
+    <description>Simple ftand ftnot query</description>
+    <created by="Full-Text Task Force" on="2008-11-24"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTNot-q2"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTNot-q2: Simple ftand ftnot :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "software" ftand ftnot "ninja"]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Software For Fun and Profit, 2nd edition</title><title>No Bad Software</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTNot-q3">
+    <description>ftnot with ftor query</description>
+    <created by="Full-Text Task Force" on="2008-11-24"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTNot-q3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTAnd-q3: more complex ftnot, may get FTST0002 :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "software" ftand (ftnot "hacker" ftor "ninja")]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>Software For Fun and Profit, 2nd edition</title><title>No Bad Software</title><title>Ninja Coder</title>]]></assert-xml>
+        <error code="FTST0002"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTNot-q4">
+    <description>ftand ftnot with complex ftnot</description>
+    <created by="Full-Text Task Force" on="2008-11-24"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTNot-q4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTNot-q4: more complex ftnot :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "software" ftand ftnot ("coder" ftand "ninja")]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Software For Fun and Profit, 2nd edition</title><title>No Bad Software</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTNot-q5">
+    <description>ftand ftnot with ftand and window</description>
+    <created by="Full-Text Task Force" on="2008-11-24"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTNot-q5"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTNot-q5: More complex ftand ftnot :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "software" ftand ftnot ("coder" ftand
+"ninja" window 5 words)]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Software For Fun and Profit, 2nd edition</title><title>No Bad Software</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTNot-q6">
+    <description>ftand ftnot with window</description>
+    <created by="Full-Text Task Force" on="2008-11-24"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTNot-q6"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="excludes outside the window are ignored"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTNot-q6: violates negation restriction 2: FTST0002 possible :)
+declare variable $input-context external;
+(: nothing :)
+$input-context/books/book[para contains text "software" ftand ("coder" ftand ftnot
+"ninja" window 5 words)]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+        <error code="FTST0002"/>
+        <error code="FTST0011"/>
+      </any-of>
+    </result>
+  </test-case>
+  <test-case name="FTNot-q7">
+    <description>precedence: ftand and ftnot</description>
+    <created by="Full-Text Task Force" on="2008-11-24"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTNot-q7"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTNot-q7: precedence :)
+(: Anything with 'blues' and 'software' but not 'ninja' :)
+(: NOT: Anything with 'blues' but not ('ninja' and 'software') :)
+declare variable $input-context external;
+$input-context/books/book[para contains text "blues" ftand ftnot "ninja" ftand "software"]/title]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+</test-set>

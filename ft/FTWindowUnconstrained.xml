@@ -1,0 +1,98 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="ft-FTWindowUnconstrained">
+  <description>XQuery Full Text - Unconstrained Window Selection - Window selection. Sections 3.6.2 and 5.2.6.</description>
+  <dependency type="spec" value="XQ10+"/>
+  <dependency type="feature" value="fullText"/>
+  <test-case name="unconstrained-examples-362-4">
+    <description>Windowing example 4</description>
+    <created by="Full-Text Task Force" on="2008-11-11"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test unconstrained-examples-362-4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/FT-3-examples-source-document.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[@number="1" and . contains text "efficient" 
+ftand ftnot "and" window 2 words]]]></test>
+    <result>
+      <assert-xml><![CDATA[<book number="1">
+    <title shortTitle="Improving Web Site Usability">Improving  
+        the Usability of a Web Site Through Expert Reviews and
+        Usability Testing</title>
+    <author>Millicent Marigold</author>
+    <author>Montana Marigold</author>
+    <editor>Véra Tudor-Medina</editor>
+    <content>
+      <p>The usability of a Web site is how well the  
+          site supports the users in achieving specified  
+          goals. A Web site should facilitate learning,  
+          and enable efficient and effective task  
+          completion, while propagating few errors.
+      </p>
+      <note>This book has been approved by the Web Site  
+          Users Association.
+      </note>
+    </content>
+  </book>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="unconstrained-examples-362-5">
+    <description>Windowing example 5</description>
+    <created by="Full-Text Task Force" on="2008-11-11"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test unconstrained-examples-362-5"/>
+    <environment>
+      <source role="$input-context" file="TestSources/FT-3-examples-source-document.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[@number="1" and . contains text "efficient" 
+ftand ftnot "and" window 3 words]]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-unconstrained-complexwords3">
+    <description>ftwindow complex</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-unconstrained-complexwords3"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text 
+("ninja" ftand "coder" window 2 words) ftand "knows" distance exactly 0 words]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTWindow-unconstrained-complexwords4">
+    <description>ftwindow complex</description>
+    <created by="Full-Text Task Force" on="2008-12-21"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTWindow-unconstrained-complexwords4"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[declare variable $input-context external;
+$input-context/books/book[para contains text ("usability" not in "usability studies") ftand "software" window 31 words]/title]]></test>
+    <result>
+      <assert-xml><![CDATA[<title>Software For Fun and Profit, 2nd edition</title>]]></assert-xml>
+    </result>
+  </test-case>
+  <test-case name="FTNot-q6-unconstrained-window">
+    <description>ftand ftnot with window</description>
+    <created by="Full-Text Task Force" on="2008-11-24"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="converted from original XQFTTS test FTNot-q6-unconstrained-window"/>
+    <modified by="Christian Gruen" on="2026-09-26" change="excludes outside the window are ignored"/>
+    <environment>
+      <source role="$input-context" file="TestSources/ftbookexample.xml" declared="true"/>
+    </environment>
+    <test><![CDATA[(: FTNot-q6: violates negation restriction 2: FTST0002 possible :)
+declare variable $input-context external;
+(: nothing :)
+$input-context/books/book[para contains text "software" ftand ("coder" ftand ftnot
+"ninja" window 5 words)]/title]]></test>
+    <result>
+      <any-of>
+        <assert-xml><![CDATA[<title>Ninja Coder</title>]]></assert-xml>
+        <error code="FTST0002"/>
+      </any-of>
+    </result>
+  </test-case>
+</test-set>
