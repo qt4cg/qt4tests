@@ -26,6 +26,10 @@
        <created by="Tim Mills" on="2008-01-01"/>
      </schema>
    </environment>  
+
+   <environment name="derived-xsd11">
+     <schema uri="http://www.w3.org/XQueryTest/derivedTypes" file="CastExpr/derived.xsd" xsd-version="1.1"/>
+   </environment>
          
 
    <test-case name="CastableAs001">
@@ -5960,9 +5964,11 @@
       <created by="Michael Kay" on="2013-04-08"/>
       <modified by="Michael Kay" on="2014-09-18" change="see bug 26865"/>
       <modified by="Michael Kay" on="2015-01-06" change="further consideration of bug 26865"/>
+      <modified by="Michael Ennen" on="2026-10-06" change="Restrict the decimal-point expectation to pre-4.0 with XSD 1.0"/>
       <environment ref="derived"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <dependency type="feature" value="schemaImport"/>
+      <dependency type="xsd-version" value="1.0"/>
       <test>
         import schema namespace d="http://www.w3.org/XQueryTest/derivedTypes";
         12 castable as d:canonicalDecimal
@@ -5972,14 +5978,47 @@
       </result>
    </test-case>
    
+   <test-case name="CastableAs653a">
+      <description>In XSD 1.1, the canonical decimal representation of 12 has no decimal point.</description>
+      <created by="Michael Ennen" on="2026-09-27"/>
+      <environment ref="derived-xsd11"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
+      <dependency type="feature" value="schemaImport"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test>
+        import schema namespace d="http://www.w3.org/XQueryTest/derivedTypes";
+        12 castable as d:canonicalDecimal
+      </test>
+      <result>
+        <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="CastableAs653b" covers-40="PR2964">
+      <description>In 4.0, casting uses XSD 1.1 canonical forms regardless of the XSD version used for validation.</description>
+      <created by="Michael Ennen" on="2026-10-06"/>
+      <environment ref="derived"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test>
+        import schema namespace d="http://www.w3.org/XQueryTest/derivedTypes";
+        12 castable as d:canonicalDecimal
+      </test>
+      <result>
+        <assert-false/>
+      </result>
+   </test-case>
+
    <test-case name="CastableAs654">
       <description>Pattern must match canonical representation (not the result of string())</description>
       <created by="Michael Kay" on="2013-04-08"/>
       <modified by="Michael Kay" on="2014-09-18" change="see bug 26865"/>
       <modified by="Michael Kay" on="2015-01-06" change="further consideration of bug 26865"/>
+      <modified by="Michael Ennen" on="2026-10-06" change="Restrict the decimal-point expectation to pre-4.0 with XSD 1.0"/>
       <environment ref="derived"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
       <dependency type="feature" value="schemaImport"/>
+      <dependency type="xsd-version" value="1.0"/>
       <test>
         import schema namespace d="http://www.w3.org/XQueryTest/derivedTypes";
         -12 castable as d:canonicalDecimal
@@ -5989,6 +6028,37 @@
       </result>
    </test-case>
    
+   <test-case name="CastableAs654a">
+      <description>In XSD 1.1, the canonical decimal representation of -12 has no decimal point.</description>
+      <created by="Michael Ennen" on="2026-09-27"/>
+      <environment ref="derived-xsd11"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
+      <dependency type="feature" value="schemaImport"/>
+      <dependency type="xsd-version" value="1.1"/>
+      <test>
+        import schema namespace d="http://www.w3.org/XQueryTest/derivedTypes";
+        -12 castable as d:canonicalDecimal
+      </test>
+      <result>
+        <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="CastableAs654b" covers-40="PR2964">
+      <description>In 4.0, casting uses XSD 1.1 canonical forms regardless of the XSD version used for validation.</description>
+      <created by="Michael Ennen" on="2026-10-06"/>
+      <environment ref="derived"/>
+      <dependency type="spec" value="XQ40+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <test>
+        import schema namespace d="http://www.w3.org/XQueryTest/derivedTypes";
+        -12 castable as d:canonicalDecimal
+      </test>
+      <result>
+        <assert-false/>
+      </result>
+   </test-case>
+
    <test-case name="CastableAs655">
       <description>Pattern must match canonical representation (not the result of string())</description>
       <created by="Michael Kay" on="2013-04-08"/>
