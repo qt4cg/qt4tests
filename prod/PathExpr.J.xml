@@ -1762,7 +1762,7 @@ every $book in $in//*[Title and ISBN-13] satisfies $book/ISBN-13 follows $book/T
  
 
    <test-case name="PathExpr-J-418" covers-40="PR2854">
-      <description>Interpretation of the right-hand operand of a path expression</description>
+      <description>Interpretation of the RHS of a path expression</description>
       <created by="Christian Gruen" on="2026-08-26"/>
       <test><![CDATA[
          parse-xml('<a>x</a>')/*/data()
@@ -1773,7 +1773,7 @@ every $book in $in//*[Title and ISBN-13] satisfies $book/ISBN-13 follows $book/T
    </test-case>
    
    <test-case name="PathExpr-J-419" covers-40="PR2854">
-      <description>Interpretation of the right-hand operand of a path expression</description>
+      <description>Interpretation of the RHS of a path expression</description>
       <created by="Christian Gruen" on="2026-08-26"/>
       <test>
          {"a": 1}/data()
@@ -1784,7 +1784,7 @@ every $book in $in//*[Title and ISBN-13] satisfies $book/ISBN-13 follows $book/T
    </test-case>
    
    <test-case name="PathExpr-J-420" covers-40="PR2856">
-      <description>Interpretation of the right-hand operand of a path expression</description>
+      <description>Interpretation of the RHS of a path expression</description>
       <created by="Christian Gruen" on="2026-08-26"/>
       <test>
          {"a": {"b": 1}}/(/a) =!> jkey()
@@ -1795,7 +1795,7 @@ every $book in $in//*[Title and ISBN-13] satisfies $book/ISBN-13 follows $book/T
    </test-case>
    
    <test-case name="PathExpr-J-421" covers-40="PR2856">
-      <description>Interpretation of the right-hand operand of a path expression</description>
+      <description>Interpretation of the RHS of a path expression</description>
       <created by="Christian Gruen" on="2026-08-26"/>
       <test>
          {"a": {"b": 1}}/(a otherwise b) =!> jkey()
@@ -1806,7 +1806,7 @@ every $book in $in//*[Title and ISBN-13] satisfies $book/ISBN-13 follows $book/T
    </test-case>
    
    <test-case name="PathExpr-J-422" covers-40="PR2856">
-      <description>Interpretation of the right-hand operand of a path expression</description>
+      <description>Interpretation of the RHS of a path expression</description>
       <created by="Christian Gruen" on="2026-08-26"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
@@ -1818,13 +1818,166 @@ every $book in $in//*[Title and ISBN-13] satisfies $book/ISBN-13 follows $book/T
    </test-case>
    
    <test-case name="PathExpr-J-423" covers-40="PR2856">
-      <description>Interpretation of the right-hand operand of a path expression</description>
+      <description>Interpretation of the RHS of a path expression</description>
       <created by="Christian Gruen" on="2026-08-26"/>
       <test>
          {"a": {"b": 1}}/(if (true()) { a }) =!> jkey()
       </test>
       <result>
          <assert-eq>"a"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-424" covers-40="PR2734">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test>['a', 'b']/string()</test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-425" covers-40="PR2734">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test>['a', 'b', 'c']/position()</test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-426" covers-40="PR2734">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test>{'a': 1, 'b': 2}/(if (. instance of jnode()) then 'a' else 'b')</test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-427" covers-40="PR2734">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test>{'a': {'b': 1}}/(a, 'b')</test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-428" covers-40="PR2734">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test>{'a': 1, 'b': 2}/(if (true()) then 'a' else 'b') =!> jvalue()</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-429" covers-40="PR2734">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test>{'a': 1, 'b': 2}/(let $k := 'b' return $k) =!> jvalue()</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-430" covers-40="PR2734">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test>{'A': 1}/upper-case('a') =!> jvalue()</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-431" covers-40="PR2734">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test>{'a': 1, 'b': 2}/(a, b) =!> jvalue()</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-432" covers-40="PR2734">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test>{'a': {'b': 3}}/(a/b) =!> jvalue()</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-433" covers-40="PR2856">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test>{'a': 1, 'b': 2}/(if (. instance of jnode()) then a else b) =!> jkey()</test>
+      <result>
+         <assert-eq>"a"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-434" covers-40="PR2856">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($f as function(*)) {
+           $f/(if (. instance of jnode()) then a else b) =!> jkey()
+         };
+         local:f({'a': 1, 'b': 2})
+      </test>
+      <result>
+         <assert-eq>"a"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-435" covers-40="PR2856">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test><![CDATA[count((parse-xml('<x><a/></x>')/x, {'a': 1})/a)]]></test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-436" covers-40="PR2856">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test><![CDATA[
+         let $r := (parse-xml('<x><a/></x>')/x, {'a': 1})/a
+         return (count($r[. instance of element()]), count($r[. instance of jnode()]))
+      ]]></test>
+      <result>
+         <assert-deep-eq>1, 1</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-437" covers-40="PR2856">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test><![CDATA[sort((parse-xml('<x><a>A</a></x>')/x, {'a': 'B'})/a ! string())]]></test>
+      <result>
+         <assert-deep-eq>"A", "B"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-438" covers-40="PR2856">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test><![CDATA[(parse-xml('<x>1</x>')/x, [5])/(if (true()) then 1 else 2)]]></test>
+      <result>
+         <error code="XPTY0018"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-439" covers-40="PR2856">
+      <description>Interpretation of the RHS of a path expression</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test><![CDATA[(parse-xml('<x><a>A</a></x>')/x, {'a': 'B'})/'a']]></test>
+      <result>
+         <error code="XPTY0018"/>
       </result>
    </test-case>
 

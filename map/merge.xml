@@ -591,4 +591,67 @@
             </all-of>
         </result>
     </test-case>
+
+    <test-case name="map-merge-409" covers-40="PR1727">
+        <description>Duplicates callback of map:merge.</description>
+        <created by="Christian Gruen" on="2026-10-01"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>map:merge(({'a': 1}, {'a': 2}, {'a': 3}), {'duplicates': fn($a, $b) { $a + $b }})</test>
+        <result>
+            <assert-deep-eq>{'a': 6}</assert-deep-eq>
+        </result>
+    </test-case>
+
+    <test-case name="map-merge-410" covers-40="PR1727">
+        <description>Duplicates callback of map:merge.</description>
+        <created by="Christian Gruen" on="2026-10-01"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>map:merge(({'a': 1}, {'a': 2}, {'b': 3}), {'duplicates': op('-')})</test>
+        <result>
+            <assert-deep-eq>{'a': -1, 'b': 3}</assert-deep-eq>
+        </result>
+    </test-case>
+
+    <test-case name="map-merge-411" covers-40="PR1727">
+        <description>Duplicates callback of map:merge.</description>
+        <created by="Christian Gruen" on="2026-10-01"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>map:merge(({'a': (1, 2)}, {'a': 3}), {'duplicates': fn($a, $b) { $b }})</test>
+        <result>
+            <assert-deep-eq>{'a': 3}</assert-deep-eq>
+        </result>
+    </test-case>
+
+    <test-case name="map-merge-412" covers-40="PR1727">
+        <description>Duplicates callback of map:merge.</description>
+        <created by="Christian Gruen" on="2026-10-01"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>map:merge(({'a': 1}, {'b': 2}), {'duplicates': fn($a, $b) { error() }})</test>
+        <result>
+            <assert-deep-eq>{'a': 1, 'b': 2}</assert-deep-eq>
+        </result>
+    </test-case>
+
+    <test-case name="map-merge-413" covers-40="PR1727">
+        <description>Duplicates callback of map:merge.</description>
+        <created by="Christian Gruen" on="2026-10-01"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>map:merge(({'a': 1}, {'a': 2}), {'duplicates': fn($a, $b) { error() }})</test>
+        <result>
+            <error code="FOER0000"/>
+        </result>
+    </test-case>
+
+    <test-case name="map-merge-414" covers-40="PR1727">
+        <description>Duplicates callback of map:merge.</description>
+        <created by="Christian Gruen" on="2026-10-01"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test>map:merge(({1: 'x'}, {1.0: 'y'}, {1e0: 'z'}), {'duplicates': concat#2})</test>
+        <result>
+            <all-of>
+                <assert>map:size($result) eq 1</assert>
+                <assert>$result?1 eq 'xyz'</assert>
+            </all-of>
+        </result>
+    </test-case>
 </test-set>
