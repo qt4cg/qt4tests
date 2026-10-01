@@ -602,4 +602,40 @@ it put its sooty foot.</fn:non-match></fn:analyze-string-result>]]></assert-xml>
          </all-of>
       </result>
    </test-case>
+
+   <test-case name="analyzeString-041">
+      <description>Regular expressions in fn:analyze-string.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test>analyze-string('ab', '((a)|b)+')</test>
+      <result>
+         <all-of>
+            <assert>string($result) = 'ab'</assert>
+            <assert>$result/fn:match/fn:group[@nr = 1] = 'b'</assert>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="analyzeString-042" covers-40="PR1856">
+      <description>Regular expressions in fn:analyze-string.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>analyze-string('abc', '(a)(?=(bc))(b)')</test>
+      <result>
+         <all-of>
+            <assert>string($result) = 'abc'</assert>
+            <assert>$result/fn:match/fn:group[@nr = 3] = 'b'</assert>
+            <assert>$result/fn:match/fn:lookahead-group[@nr = 2]/@value = 'bc'</assert>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="analyzeString-043" covers-40="PR1856 PR1913">
+      <description>Regular expressions in fn:analyze-string.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>analyze-string(codepoints-to-string((119070, 98)), '(?=(b))')</test>
+      <result>
+         <assert>$result//fn:lookahead-group/@position = 2</assert>
+      </result>
+   </test-case>
 </test-set>
