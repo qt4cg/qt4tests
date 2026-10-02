@@ -1038,6 +1038,160 @@
          <assert-eq>5</assert-eq>
       </result>
    </test-case>
-   
+
+   <test-case name="typeswitch-40-002" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>typeswitch ('a') { case xs:integer return 1 default $d return $d || '!' }</test>
+      <result>
+         <assert-eq>'a!'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="typeswitch-40-003" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>typeswitch (1.5) { case $n as xs:integer | xs:decimal return $n * 2 default return 0 }</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="typeswitch-40-004" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>typeswitch (()) { case empty-sequence() return 'empty' default return 'other' }</test>
+      <result>
+         <assert-eq>'empty'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="typeswitch-40-005" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         typeswitch ('x') {
+           case xs:string return typeswitch (1) {
+             case xs:string return 'a'
+             default return 'b'
+           }
+           default return 'c'
+         }
+      </test>
+      <result>
+         <assert-eq>'b'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="typeswitch-40-006" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>(typeswitch (1) { case xs:integer return 1 default return 2 }) + 1</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="typeswitch-40-007" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>typeswitch (1) { case xs:integer return 1 default return 2 } + 1</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="typeswitch-40-008" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>typeswitch (1) { case xs:integer return 1 }</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="typeswitch-40-009" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>typeswitch (1) { case xs:integer return 1 default return 2</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="typeswitch-40-010" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>typeswitch (1) { } </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="typeswitch-40-011" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>for $i in (1, 'a', 2.5) return typeswitch ($i) { case xs:integer return 'i' case xs:string return 's' default return 'd' }</test>
+      <result>
+         <assert-deep-eq>'i', 's', 'd'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="typeswitch-40-012" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[typeswitch (<?_ _?>) { case element() return 'e' case processing-instruction() return 'pi' default return 'd' }]]></test>
+      <result>
+         <assert-eq>'pi'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="typeswitch-40-013" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[typeswitch (data(<?_ _?>)) { case xs:untypedAtomic return 'u' case xs:string return 's' default return 'd' }]]></test>
+      <result>
+         <assert-eq>'s'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="typeswitch-40-014" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[typeswitch (<a/>/text()) { case empty-sequence() return 'e' default return 'd' }]]></test>
+      <result>
+         <assert-eq>'e'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="typeswitch-40-015" covers-40="PR587">
+      <description>Typeswitch expressions in XQuery 4.0.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         typeswitch (if (<a/>/text()) then 1 else 'x') {
+           case $i as xs:integer return $i
+           case $s as xs:string return $s || $s
+           default return ()
+         }
+      ]]></test>
+      <result>
+         <assert-eq>'xx'</assert-eq>
+      </result>
+   </test-case>
+
 
 </test-set>

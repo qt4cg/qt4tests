@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-system-properties" covers-40="PR2552">
+   <description>Tests for the fn:system-properties() function (4.0)</description>
+
+   <dependency type="spec" value="XP40+ XQ40+"/>
+
+   <test-case name="system-properties-001">
+      <description>Evaluation of system-properties function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <test>system-properties()?#xpath-version</test>
+      <result>
+         <all-of>
+            <assert-type>xs:decimal</assert-type>
+            <assert>$result ge 4.0</assert>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="system-properties-002">
+      <description>Evaluation of system-properties function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <test>system-properties()?#xsd-version</test>
+      <result>
+         <all-of>
+            <assert-type>xs:decimal</assert-type>
+            <assert>$result = (1.0, 1.1)</assert>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="system-properties-003">
+      <description>Evaluation of system-properties function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <test>system-properties()?(#product-name, #product-version)</test>
+      <result>
+         <all-of>
+            <assert-type>xs:string+</assert-type>
+            <assert-count>2</assert-count>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="system-properties-004">
+      <description>Evaluation of system-properties function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <test>
+         system-properties()?(
+           #schema-aware, #accepts-typed-data, #supports-xinclude,
+           #supports-dtd-validation, #supports-dtd-attribute-typing,
+           #supports-invisible-xml, #supports-dynamic-xquery, #supports-dynamic-xslt,
+           #supports-binary-library, #supports-file-library
+         )
+      </test>
+      <result>
+         <all-of>
+            <assert-type>xs:boolean+</assert-type>
+            <assert-count>10</assert-count>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="system-properties-005">
+      <description>Evaluation of system-properties function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <test>
+         let $required := (
+           #xpath-version, #xsd-version, #product-name, #product-version,
+           #schema-aware, #accepts-typed-data, #supports-xinclude,
+           #supports-dtd-validation, #supports-dtd-attribute-typing,
+           #supports-invisible-xml, #supports-dynamic-xquery, #supports-dynamic-xslt,
+           #supports-binary-library, #supports-file-library
+         )
+         return $required[not(map:contains(system-properties(), .))]
+      </test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="system-properties-006">
+      <description>Evaluation of system-properties function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <test>every $key in map:keys(system-properties()) satisfies $key instance of xs:QName</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="system-properties-007">
+      <description>Evaluation of system-properties function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <test>system-properties() instance of map(xs:QName, xs:anyAtomicType)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="system-properties-008">
+      <description>Evaluation of system-properties function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <test>system-properties()?#unknown-property</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="system-properties-009">
+      <description>Evaluation of system-properties function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <test>deep-equal(system-properties(), system-properties#0())</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="system-properties-010">
+      <description>Evaluation of system-properties function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <test>
+         let $standard := (
+           'xpath-version', 'xsd-version', 'product-name', 'product-version',
+           'schema-aware', 'accepts-typed-data', 'supports-xinclude',
+           'supports-dtd-validation', 'supports-dtd-attribute-typing',
+           'supports-invisible-xml', 'supports-dynamic-xquery', 'supports-dynamic-xslt',
+           'supports-binary-library', 'supports-file-library'
+         )
+         return map:keys(system-properties())[namespace-uri-from-QName(.) = '']
+           [not(local-name-from-QName(.) = $standard)]
+      </test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="system-properties-011">
+      <description>Evaluation of system-properties function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <test>system-properties(1)</test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+</test-set>
