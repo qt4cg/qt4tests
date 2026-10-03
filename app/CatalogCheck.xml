@@ -366,6 +366,87 @@
     </result>
   </test-case>
   
+  <test-case name="Catalog016">
+    <description>Check that all files referenced by the catalog and the test sets exist.</description>
+    <created by="Christian Gruen" on="2026-10-03"/>
+    <environment ref="catalog"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
+      let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
+      for $file in (.|$testsets)//fots:*[not(self::fots:test-set)]/@file
+      where not(contains($file, 'intentionally-missing'))
+      group by $uri := resolve-uri($file, base-uri($file/..))
+      where not(try { exists(unparsed-binary($uri)) } catch * { false() })
+      return $uri
+    ]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="Catalog017">
+    <description>Check that the spec dependencies of each test case are compatible with those of its test set.</description>
+    <created by="Christian Gruen" on="2026-10-03"/>
+    <environment ref="catalog"/>
+    <dependency type="spec" value="XQ30+"/>
+    <test><![CDATA[
+      declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
+      let $all := ('XP20', 'XP30', 'XP31', 'XP40', 'XQ10', 'XQ30', 'XQ31', 'XQ40', 'XT30', 'XT40')
+      let $versions := function($deps) {
+        distinct-values(
+          for $token in $deps[@type = 'spec'][not(@satisfied = 'false')]/tokenize(normalize-space(@value), ' ')
+          let $base := replace($token, '\+$', '')
+          return if (ends-with($token, '+'))
+            then $all[substring(., 1, 2) = substring($base, 1, 2) and . ge $base]
+            else $base
+        )
+      }
+      let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
+      for $test in $testsets/fots:test-set[fots:dependency/@type = 'spec']/fots:test-case[fots:dependency/@type = 'spec']
+      where not($versions($test/fots:dependency) = $versions($test/../fots:dependency))
+      return string($test/@name)
+    ]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="Catalog018">
+    <description>Check that all named environments of the test sets are referenced.</description>
+    <created by="Christian Gruen" on="2026-10-03"/>
+    <environment ref="catalog"/>
+    <dependency type="spec" value="XQ10+"/>
+    <test><![CDATA[
+      declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
+      let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
+      let $refs := (.|$testsets)//fots:environment/@ref
+      for $env in $testsets/fots:test-set/fots:environment[@name]
+      where not($env/@name = $refs)
+      return string($env/@name)
+    ]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="Catalog019">
+    <description>Check that no creation or modification date lies in the future.</description>
+    <created by="Christian Gruen" on="2026-10-03"/>
+    <environment ref="catalog"/>
+    <dependency type="spec" value="XQ10+"/>
+    <test><![CDATA[
+      declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
+      let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
+      for $date in (.|$testsets)//(fots:created | fots:modified)/@on
+      where xs:date($date) gt current-date()
+      return concat($date/ancestor::fots:test-case/@name, ' ', $date)
+    ]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
   <!--
   TEST DELETED: see bug 28639
   <test-case name="Catalog015">
