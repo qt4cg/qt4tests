@@ -216,6 +216,7 @@
     <modified by="Michael Kay" on="2015-07-13" change="success is an empty element"/>
     <modified by="Michael Kay" on="2022-12-21" change="upgrade to 4.0"/>
     <modified by="Christian Gruen" on="2026-07-06" change="faster execution"/>
+    <modified by="Christian Gruen" on="2026-10-03" change="count PR tokens of changes"/>
     <environment ref="catalog"/>
     <dependency type="spec" value="XQ30+"/>
     <test><![CDATA[
@@ -237,11 +238,13 @@
           return <c t="{$t}" n="{sum($w/@n)}" names="{$w/@name}"/>
         )
         for $token in distinct-values($changesid)
-        let $c := $counts[@t = $token]
+        let $change := $changes[@id = $token]
+        let $tokens := ($token, $change/@PR ! tokenize(.) ! concat("PR", .))
+        let $c := $counts[@t = $tokens]
         let $count := xs:integer(sum($c/@n))
         where $count lt 5
-        return <out spec="{$changes[@id=$token]/../@name}" change="{$token}" tests="{$count}" names="{$c/@names}">
-        {$changes[@id=$token]/text()}
+        return <out spec="{$change[1]/../@name}" change="{$token}" tests="{$count}" names="{$c/@names}">
+        {$change[1]/text()}
         </out>
      }</r>
       ]]></test>
@@ -318,6 +321,7 @@
     <description> Output the test coverage data. The test always passes. </description>
     <created by="Michael Kay" on="2023-04-28"/>
     <modified by="Christian Gruen" on="2026-07-06" change="faster execution"/>
+    <modified by="Christian Gruen" on="2026-10-03" change="count PR tokens of changes"/>
     <environment ref="catalog"/>
     <dependency type="spec" value="XQ30+"/>
     <test><![CDATA[
@@ -339,9 +343,11 @@
           return <c t="{$t}" n="{sum($w/@n)}"/>
         )
         for $token in distinct-values($changesid)
-        let $count := xs:integer(sum($counts[@t = $token]/@n))
+        let $change := $changes[@id = $token]
+        let $tokens := ($token, $change/@PR ! tokenize(.) ! concat("PR", .))
+        let $count := xs:integer(sum($counts[@t = $tokens]/@n))
         order by $token
-        return <tests change="{$token}" count="{$count}" description="{$changes[@id=$token]/text()}"/>
+        return <tests change="{$token}" count="{$count}" description="{$change[1]/text()}"/>
      }</r>, map{'indent':true()})
       ]]></test>
     <result>
