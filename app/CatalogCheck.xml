@@ -80,15 +80,18 @@
    <test-case name="Catalog004">
       <description> test that all schemas named in catalog files have the correct target namespace </description>
       <created by="Michael Kay" on="2011-08-10"/>
+      <modified by="Christian Gruen" on="2026-10-03" change="check schema/@uri, parse each schema once"/>
       <environment ref="catalog"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ30+"/>
       <test><![CDATA[
         declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
         let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
-        for $schema in (.|$testsets)//fots:environment/fots:schema
-        let $targetNamespace := doc(resolve-uri($schema/@file, base-uri($schema)))/*/@targetNamespace
-        where not($schema/@uri eq $targetNamespace or (empty($targetNamespace) and string(@uri)=''))
-        return ($schema, <file>{base-uri($schema)}</file>)
+        for $schema in (.|$testsets)//fots:environment/fots:schema[@file]
+        group by $path := resolve-uri($schema/@file, base-uri($schema))
+        let $targetNamespace := doc($path)/*/@targetNamespace
+        for $s in $schema
+        where not($s/@uri eq $targetNamespace or (empty($targetNamespace) and string($s/@uri) = ''))
+        return ($s, <file>{base-uri($s)}</file>)
       ]]></test>
       <result>
          <assert-empty/>
