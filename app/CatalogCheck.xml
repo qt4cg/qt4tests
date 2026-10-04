@@ -20,14 +20,15 @@
       <description> test that all named environments are present </description>
       <created by="Michael Kay" on="2011-07-10"/>
       <modified by="Christian Gruen" on="2026-10-03" change="resolve references in own test set and catalog"/>
+      <modified by="Christian Gruen" on="2026-10-04" change="faster execution"/>
       <environment ref="catalog"/>
       <dependency type="spec" value="XQ10+"/>
       <test>
         declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
         let $catalog-envs := //fots:environment/@name
-        for $ref in //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))//fots:environment[@ref]
-        where not($ref/@ref = ($catalog-envs, root($ref)//fots:environment/@name))
-        return $ref
+        for $testset in //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
+        let $names := ($catalog-envs, $testset//fots:environment/@name)
+        return $testset//fots:environment[@ref][not(@ref = $names)]
       </test>
       <result>
          <assert-empty/>
@@ -40,13 +41,16 @@
       <modified by="Michael Kay" on="2011-08-30" change="put validate expression in parens"/>
       <modified by="Michael Kay" on="2013-01-21" change="add schema import declaration, see bug 20706"/>
       <modified by="Christian Gruen" on="2026-10-03" change="match fots:test, ignore literals and comments, check @value"/>
+      <modified by="Christian Gruen" on="2026-10-04" change="faster execution"/>
       <environment ref="catalog"/>
       <dependency type="spec" value="XQ10+"/>
       <test><![CDATA[
         declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
         let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
         for $test in $testsets//fots:test-case[not(fots:result//fots:error)]
-        let $code := replace(replace(replace(replace(string-join($test/fots:test, ' '),
+        let $test-code := string-join($test/fots:test, ' ')
+        where contains($test-code, '<') or contains($test-code, 'declare') or contains($test-code, 'typeswitch')
+        let $code := replace(replace(replace(replace($test-code,
           '\(:.*?:\)', ' ', 's'), '``\[.*?\]``', '""', 's'), '`[^`]*`', '""'),
           '"[^"]*"|''[^'']*''', '""')
         where matches($code, '(^|[^\w.-])(declare\s+(variable|function)|typeswitch\s*\()|<[\p{L}_][\w.:-]*(\s[^<>]*)?/?>')
@@ -105,6 +109,7 @@
       <description> Check that all tests using an environment with a decimal-format declaration are XPath tests </description>
       <created by="Michael Kay" on="2011-08-11"/>
       <modified by="Christian Gruen" on="2026-10-03" change="fall back to dependency of test set"/>
+      <modified by="Christian Gruen" on="2026-10-04" change="faster execution"/>
       <environment ref="catalog"/>
       <dependency type="spec" value="XQ10+"/>
       <test><![CDATA[
@@ -116,13 +121,9 @@
                and not(starts-with($t/@name, 'fo-test-' (: special exemption for generated tests :)))
         };
         let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
-        let $nsenvs :=
-            for $t in ($testsets|.)
-            for $e in $t//fots:environment
-            where exists($e/fots:decimal-format) 
-            return $e/@name/string()
-        let $xq-testcases := $testsets//fots:test-case [local:needs-xq(.)]
-        for $tc in $xq-testcases [fots:environment/@ref = $nsenvs or fots:environment[fots:decimal-format]]
+        let $nsenvs := ($testsets|.)//fots:environment[fots:decimal-format]/@name/string()
+        for $tc in $testsets//fots:test-case[fots:environment/@ref = $nsenvs or fots:environment/fots:decimal-format]
+        where local:needs-xq($tc)
         return $tc/@name/string()
       ]]></test>
       <result>
@@ -388,6 +389,7 @@
   <test-case name="Catalog017">
     <description>Check that the spec dependencies of each test case are compatible with those of its test set.</description>
     <created by="Christian Gruen" on="2026-10-03"/>
+    <modified by="Christian Gruen" on="2026-10-04" change="faster execution"/>
     <environment ref="catalog"/>
     <dependency type="spec" value="XQ30+"/>
     <test><![CDATA[
@@ -403,8 +405,10 @@
         )
       }
       let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
-      for $test in $testsets/fots:test-set[fots:dependency/@type = 'spec']/fots:test-case[fots:dependency/@type = 'spec']
-      where not($versions($test/fots:dependency) = $versions($test/../fots:dependency))
+      for $testset in $testsets/fots:test-set[fots:dependency/@type = 'spec']
+      let $set-versions := $versions($testset/fots:dependency)
+      for $test in $testset/fots:test-case[fots:dependency/@type = 'spec']
+      where not($versions($test/fots:dependency) = $set-versions)
       return string($test/@name)
     ]]></test>
     <result>
