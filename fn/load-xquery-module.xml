@@ -1811,4 +1811,654 @@ return $module("functions")(QName("http://www.w3.org/fots/fn/load-xquery-module/
     </result>
   </test-case>
 
+  <test-case name="fn-load-xquery-module-501" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { unparsed-text("does-not-exist.txt") };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-502" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { unparsed-text("does-not-exist.txt") };',
+  'trusted': false()
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-503" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { unparsed-text("does-not-exist.txt") };',
+  'trusted': true()
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FOUT1170"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-504" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { doc("does-not-exist.xml") };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-505" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { doc("does-not-exist.xml") };',
+  'trusted': true()
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-506" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { 42 };',
+  'trusted': false()
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <assert-eq>42</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-507" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:v := 42;',
+  'trusted': 'yes'
+})
+return $module/variables/QName('urn:x', 'v')
+    </test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-508" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    import module namespace vm = "http://www.w3.org/fots/fn/load-xquery-module/valid/module"
+      at "load-xquery-module/valid-module.xqm";
+    declare variable $x:v := $vm:var1;'
+})
+return $module/variables/QName('urn:x', 'v')
+    </test>
+    <result>
+      <any-of>
+        <error code="FOQM0003"/>
+        <error code="FODC0016"/>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-509" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    import module namespace vm = "http://www.w3.org/fots/fn/load-xquery-module/valid/module"
+      at "load-xquery-module/valid-module.xqm";
+    declare variable $x:v := $vm:var1;',
+  'trusted': true()
+})
+return $module?variables?(QName('urn:x', 'v'))
+    </test>
+    <result>
+      <assert-eq>"var1"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-510" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { exists(doc("../docs/bib.xml")) };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-511" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { exists(doc("../docs/bib.xml")) };',
+  'trusted': true()
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-512" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:v := exists(doc("../docs/bib.xml"));'
+})
+return $module/variables/QName('urn:x', 'v')
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-513" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { doc-available("../docs/bib.xml") };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <any-of>
+        <assert-false/>
+        <error code="FODC0016"/>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-514" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { collection("../docs/") };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-515" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() {
+      load-xquery-module("urn:y", {
+        "content": "module namespace y = ''urn:y'';
+          declare function y:f() { exists(doc(''../docs/bib.xml'')) };",
+        "trusted": true()
+      })?functions?(QName("urn:y", "f"))?0()
+    };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-516" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() {
+      load-xquery-module("urn:y", {
+        "content": "module namespace y = ''urn:y'';
+          declare function y:f() { exists(doc(''../docs/bib.xml'')) };",
+        "trusted": true()
+      })?functions?(QName("urn:y", "f"))?0()
+    };',
+  'trusted': true()
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-517" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() {
+      load-xquery-module("urn:y", {
+        "content": "module namespace y = ''urn:y''; declare variable $y:v := 42;"
+      })?variables?(QName("urn:y", "v"))
+    };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <assert-eq>42</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-518" covers-40="PR1333 PR2213 PR2796">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f($callback) { $callback() };'
+})
+let $callback := fn() { exists(doc('../docs/bib.xml')) }
+return $module?functions?(QName('urn:x', 'f'))?1($callback)
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-519" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:doc external;
+    declare variable $x:v := count($x:doc//book);',
+  'variables': { QName('urn:x', 'doc'): doc('../docs/bib.xml') }
+})
+return $module?variables?(QName('urn:x', 'v'))
+    </test>
+    <result>
+      <assert-eq>4</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-520" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare context item external;
+    declare variable $x:v := count(//book);',
+  'context-item': doc('../docs/bib.xml')
+})
+return $module?variables?(QName('urn:x', 'v'))
+    </test>
+    <result>
+      <assert-eq>4</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-521" covers-40="PR1333 PR2213 PR2796">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:doc := doc#1;'
+})
+return exists($module?variables?(QName('urn:x', 'doc'))('../docs/bib.xml'))
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-522" covers-40="PR1333 PR2213 PR2796">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { fn($uri) { exists(doc($uri)) } };'
+})
+let $f := $module?functions?(QName('urn:x', 'f'))?0()
+return $f('../docs/bib.xml')
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-523" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:v := 42;',
+  'trusted': ()
+})
+return $module?variables?(QName('urn:x', 'v'))
+    </test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-524" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $names := available-environment-variables()
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f($name) { environment-variable($name) };'
+})
+let $f := $module?functions?(QName('urn:x', 'f'))?1
+return empty($names) or empty($f($names[1]))
+    </test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <error code="FODC0016"/>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-525" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { available-environment-variables() };'
+})
+return empty($module?functions?(QName('urn:x', 'f'))?0())
+    </test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <error code="FODC0016"/>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-928" covers-40="PR727 PR1333">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { 42 };'
+})
+return function-lookup(QName('urn:x', 'f'), 0)
+    </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-929" covers-40="PR727">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/valid/module" file="load-xquery-module/valid-module.xqm"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/valid/module"
+let $module := load-xquery-module($module-ns)
+return function-lookup(QName($module-ns, 'func1'), 0)
+    </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-930" covers-40="PR1333 PR2895">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f($a := 1) { $a };'
+})
+return sort(map:keys($module?functions?(QName('urn:x', 'f'))))
+    </test>
+    <result>
+      <assert-deep-eq>0, 1</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-931" covers-40="PR1333 PR2895">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f($a := 1) { $a };'
+})
+let $f := $module?functions?(QName('urn:x', 'f'))
+return ($f?0(), $f?1(5))
+    </test>
+    <result>
+      <assert-deep-eq>1, 5</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-932" covers-40="PR1333 PR2895">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { 0 };
+    declare function x:f($a, $b := 2, $c := 3) { $a + $b + $c };'
+})
+let $f := $module?functions?(QName('urn:x', 'f'))
+return (sort(map:keys($f)), $f?0(), $f?1(1), $f?2(1, 1), $f?3(1, 1, 1))
+    </test>
+    <result>
+      <assert-deep-eq>0, 1, 2, 3, 0, 6, 5, 3</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-933" covers-40="PR1333 PR2826">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/valid/module" file="load-xquery-module/valid-module.xqm"/>
+    <test>
+let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/valid/module"
+let $module := load-xquery-module($module-ns, { 'content': '' })
+return $module?variables?(QName($module-ns, 'var1'))
+    </test>
+    <result>
+      <assert-eq>"var1"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-934" covers-40="PR1333">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:v as xs:double external;',
+  'variables': { QName('urn:x', 'v'): 1 }
+})
+return $module/variables/QName('urn:x', 'v')
+    </test>
+    <result>
+      <error code="FOQM0005"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-935" covers-40="PR1333">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:v as xs:integer external;',
+  'variables': { QName('urn:x', 'v'): xs:untypedAtomic('1') }
+})
+return $module/variables/QName('urn:x', 'v')
+    </test>
+    <result>
+      <error code="FOQM0005"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-936" covers-40="PR1333 PR2826">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare context value as xs:double external;
+    declare variable $x:v := .;',
+  'context-value': 1
+})
+return $module/variables/QName('urn:x', 'v')
+    </test>
+    <result>
+      <error code="FOQM0005"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-937" covers-40="PR1333">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:v := .;',
+  'context-item': (1, 2)
+})
+return $module/variables/QName('urn:x', 'v')
+    </test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-938" covers-40="PR1333">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'xquery version "4.0";
+    module namespace x = "urn:x";
+    declare variable $x:v := () otherwise 42;',
+  'xquery-version': 3.1
+})
+return $module?variables?(QName('urn:x', 'v'))
+    </test>
+    <result>
+      <assert-eq>42</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-939" covers-40="PR1333">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:v := 42;',
+  'location-hints': 1
+})
+return $module/variables/QName('urn:x', 'v')
+    </test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
 </test-set>
