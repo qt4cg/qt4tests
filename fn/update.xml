@@ -232,7 +232,7 @@
       <created by="Christian Gruen" on="2026-09-26"/>
       <test>fn:update({ 'a': 1 }, fn { * }, [ 9 ])</test>
       <result>
-         <error code="FOUP0004"/>
+         <assert-deep-eq>{ 'a': [ 9 ] }</assert-deep-eq>
       </result>
    </test-case>
 
@@ -655,6 +655,24 @@
       </result>
    </test-case>
 
+   <test-case name="fn-update-map-071">
+      <description>Evaluation of the fn:update function with maps.</description>
+      <created by="Christian Gruen" on="2026-10-05"/>
+      <test>fn:update({ 'name': 'Ida Wells' }, fn { .//name }, fn { array { tokenize(.) } })</test>
+      <result>
+         <assert-deep-eq>{ 'name': [ 'Ida', 'Wells' ] }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-update-map-072">
+      <description>Evaluation of the fn:update function with maps.</description>
+      <created by="Christian Gruen" on="2026-10-05"/>
+      <test>fn:update({ 'a': 1, 'b': 2 }, fn { * }, [])</test>
+      <result>
+         <assert-deep-eq>{ 'a': [], 'b': [] }</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fn-update-array-001">
       <description>Evaluation of the fn:update function with arrays.</description>
       <created by="Christian Gruen" on="2026-09-26"/>
@@ -759,7 +777,7 @@
       <created by="Christian Gruen" on="2026-09-26"/>
       <test>fn:update([ 1 ], fn { * }, { 'k': 9 })</test>
       <result>
-         <error code="FOUP0004"/>
+         <assert-deep-eq>[ { 'k': 9 } ]</assert-deep-eq>
       </result>
    </test-case>
 
@@ -871,6 +889,33 @@
       <test>fn:update([ 1 ], fn {})</test>
       <result>
          <assert-type>array(xs:integer)</assert-type>
+      </result>
+   </test-case>
+
+   <test-case name="fn-update-array-025">
+      <description>Evaluation of the fn:update function with arrays.</description>
+      <created by="Christian Gruen" on="2026-10-05"/>
+      <test>fn:update([ { 'price': 2, 'qty': 3 }, { 'price': 5, 'qty': 1 } ], fn { * }, fn { let $p := jvalue() return map:merge(($p, { 'total': $p?price * $p?qty })) })</test>
+      <result>
+         <assert-deep-eq>[ { 'price': 2, 'qty': 3, 'total': 6 }, { 'price': 5, 'qty': 1, 'total': 5 } ]</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-update-array-026">
+      <description>Evaluation of the fn:update function with arrays.</description>
+      <created by="Christian Gruen" on="2026-10-05"/>
+      <test>fn:update([ 1, 2 ], fn { * }, {})</test>
+      <result>
+         <assert-deep-eq>[ {}, {} ]</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-update-array-027">
+      <description>Evaluation of the fn:update function with arrays.</description>
+      <created by="Christian Gruen" on="2026-10-05"/>
+      <test>fn:update([ [ 1 ] ], fn { * }, fn { [ 2 ] })</test>
+      <result>
+         <assert-deep-eq>[ 2 ]</assert-deep-eq>
       </result>
    </test-case>
 
