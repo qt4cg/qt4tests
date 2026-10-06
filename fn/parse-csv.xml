@@ -1026,8 +1026,54 @@
       <assert>deep-equal($result?rows, (["one","two","three,four"],["five","six","seven,eight"]) )</assert>
     </result>
   </test-case>
+  
+  <test-case name="parse-csv-111" covers-40="PR2778">
+    <description>Single comment line</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
+    <test>fn:parse-csv("# this is a comment", {'comment-marker': '#'})?rows</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
 
-<test-case name="parse-csv-140" covers-40="PR2778">
+  <test-case name="parse-csv-112" covers-40="PR2962">
+    <description>Quotes in unquoted fields.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:parse-csv('Monitor,24" wide,Robert "Bob" Smith')?rows</test>
+    <result>
+      <assert-deep-eq>[ "Monitor", '24" wide', 'Robert "Bob" Smith' ]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-113" covers-40="PR2962">
+    <description>Quotes in unquoted fields.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:parse-csv('a""b,c"')?rows</test>
+    <result>
+      <assert-deep-eq>[ 'a""b', 'c"' ]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-114" covers-40="PR2962">
+    <description>Quotes in unquoted fields.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:parse-csv('"Field 1", "Field 2"')?rows</test>
+    <result>
+      <assert-deep-eq>[ "Field 1", ' "Field 2"' ]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-115" covers-40="PR2962">
+    <description>Quotes in unquoted fields.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:parse-csv('"Field 1", "Field 2"', { 'trim-whitespace': true() })?rows</test>
+    <result>
+      <assert-deep-eq>[ "Field 1", '"Field 2"' ]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-140" covers-40="PR2778">
     <description>Comment followed by data line</description>
     <created by="Michael Kay" on="2024-02-26"/>
     <test>fn:parse-csv("# this is a comment" || char(10) || 'one,two,"z"'||char(10), {'comment-marker': '#'})?rows</test>
@@ -1412,51 +1458,7 @@
     </result>
   </test-case>
 
-  <test-case name="parse-csv-111" covers-40="PR2778">
-    <description>Single comment line</description>
-    <created by="Michael Kay" on="2026-07-14"/>
-    <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
-    <test>fn:parse-csv("# this is a comment", {'comment-marker': '#'})?rows</test>
-    <result>
-      <assert-empty/>
-    </result>
-  </test-case>
-
-  <test-case name="parse-csv-112" covers-40="PR2962">
-    <description>Quotes in unquoted fields.</description>
-    <created by="Christian Gruen" on="2026-10-06"/>
-    <test>fn:parse-csv('Monitor,24" wide,Robert "Bob" Smith')?rows</test>
-    <result>
-      <assert-deep-eq>[ "Monitor", '24" wide', 'Robert "Bob" Smith' ]</assert-deep-eq>
-    </result>
-  </test-case>
-
-  <test-case name="parse-csv-113" covers-40="PR2962">
-    <description>Quotes in unquoted fields.</description>
-    <created by="Christian Gruen" on="2026-10-06"/>
-    <test>fn:parse-csv('a""b,c"')?rows</test>
-    <result>
-      <assert-deep-eq>[ 'a""b', 'c"' ]</assert-deep-eq>
-    </result>
-  </test-case>
-
-  <test-case name="parse-csv-114" covers-40="PR2962">
-    <description>Quotes in unquoted fields.</description>
-    <created by="Christian Gruen" on="2026-10-06"/>
-    <test>fn:parse-csv('"Field 1", "Field 2"')?rows</test>
-    <result>
-      <assert-deep-eq>[ "Field 1", ' "Field 2"' ]</assert-deep-eq>
-    </result>
-  </test-case>
-
-  <test-case name="parse-csv-115" covers-40="PR2962">
-    <description>Quotes in unquoted fields.</description>
-    <created by="Christian Gruen" on="2026-10-06"/>
-    <test>fn:parse-csv('"Field 1", "Field 2"', { 'trim-whitespace': true() })?rows</test>
-    <result>
-      <assert-deep-eq>[ "Field 1", '"Field 2"' ]</assert-deep-eq>
-    </result>
-  </test-case>
+  
 
   <test-case name="parse-csv-924">
     <description>delimiter not a single string</description>
@@ -1568,8 +1570,8 @@
       <error code="FOCV0002"/>
     </result>
   </test-case>
-
-  <test-case name="parse-csv-927" covers-40="PR2778">
+  
+  <test-case name="parse-csv-937" covers-40="PR2778">
     <description>Same delimiter in multiple roles</description>
     <created by="Michael Kay" on="2026-07-14"/>
     <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
@@ -1579,7 +1581,7 @@
     </result>
   </test-case>
 
-  <test-case name="parse-csv-928" covers-40="PR2778">
+  <test-case name="parse-csv-938" covers-40="PR2778">
     <description>Comment marker must not be a newline</description>
     <created by="Michael Kay" on="2026-07-14"/>
     <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
@@ -1589,7 +1591,7 @@
     </result>
   </test-case>
 
-  <test-case name="parse-csv-929" covers-40="PR2778">
+  <test-case name="parse-csv-939" covers-40="PR2778">
     <description>Comment marker must be single character</description>
     <created by="Michael Kay" on="2026-07-14"/>
     <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
@@ -1599,7 +1601,7 @@
     </result>
   </test-case>
 
-  <test-case name="parse-csv-930" covers-40="PR2962">
+  <test-case name="parse-csv-940" covers-40="PR2962">
     <description>Quotes in unquoted fields.</description>
     <created by="Christian Gruen" on="2026-10-06"/>
     <test>fn:parse-csv("a;'b;c'd", { 'separator': ';', 'quote-character': "'" })?rows</test>
@@ -1608,7 +1610,7 @@
     </result>
   </test-case>
 
-  <test-case name="parse-csv-931" covers-40="PR2962">
+  <test-case name="parse-csv-941" covers-40="PR2962">
     <description>Quotes in unquoted fields.</description>
     <created by="Christian Gruen" on="2026-10-06"/>
     <test>fn:parse-csv('"Bob" Smith,Berlin')?rows</test>
@@ -1617,7 +1619,7 @@
     </result>
   </test-case>
 
-  <test-case name="parse-csv-932" covers-40="PR2962">
+  <test-case name="parse-csv-942" covers-40="PR2962">
     <description>Quotes in unquoted fields.</description>
     <created by="Christian Gruen" on="2026-10-06"/>
     <test>fn:parse-csv('"Field 1" ,"Field 2"')?rows</test>
@@ -1625,5 +1627,7 @@
       <error code="FOCV0001"/>
     </result>
   </test-case>
+
+  
 
 </test-set>
