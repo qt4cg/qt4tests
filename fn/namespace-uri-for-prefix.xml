@@ -276,6 +276,30 @@
       <test><![CDATA[fn:namespace-uri-for-prefix((), <e/>)]]></test>
       <result><assert-empty/></result>
    </test-case>
+   
+   <test-case name="fn-namespace-uri-for-prefix-24">
+      <description>Whitespace in prefix results in no match (not an error) prior to 4.0 </description>
+      <created by="Michael Kay" on="2026-10-06"/>
+      <dependency type="spec" value="XQ10 XQ30 XQ31"/>
+      <test><![CDATA[
+        let $var := <anElement xmlns:p1 = "http://www.example.com/examples">some context</anElement> 
+        return fn:string(fn:namespace-uri-for-prefix("p1 ", $var))]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-namespace-uri-for-prefix-25">
+      <description>Whitespace in prefix is a type error in 4.0 (coercion to xs:NCName fails) </description>
+      <created by="Michael Kay" on="2026-10-06"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        let $var := <anElement xmlns:p1 = "http://www.example.com/examples">some context</anElement> 
+        return fn:string(fn:namespace-uri-for-prefix("p1 ", $var))]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
 
    <test-case name="K-NamespaceURIForPrefixFunc-1">
       <description> A test whose essence is: `namespace-uri-for-prefix()`. </description>
