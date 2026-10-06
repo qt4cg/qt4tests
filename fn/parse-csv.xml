@@ -167,27 +167,23 @@
     </result>
   </test-case>
   
-  <!--<test-case name="parse-csv-011">
+  <test-case name="parse-csv-011">
     <description>CRLF delimiter</description>
-    <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one,two"||char(13)||char(10)||"three,four")</test>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:parse-csv("one,two"||char(13)||char(10)||"three,four")?rows</test>
     <result>
-      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
-          ><rows><row><field>one</field><field>two</field></row
-          ><row><field>three</field><field>four</field></row></rows></csv>]]></assert-xml>
+      <assert-deep-eq>["one","two"],["three","four"]</assert-deep-eq>
     </result>
-  </test-case>-->
+  </test-case>
   
-  <!--<test-case name="parse-csv-012">
+  <test-case name="parse-csv-012">
     <description>CR delimiter</description>
-    <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv("one,two"||char(13)||"three,four"||char(13))</test>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:parse-csv("one,two"||char(13)||"three,four"||char(13))?rows</test>
     <result>
-      <assert-xml><![CDATA[<csv xmlns="http://www.w3.org/2005/xpath-functions"
-          ><rows><row><field>one</field><field>two</field></row
-          ><row><field>three</field><field>four</field></row></rows></csv>]]></assert-xml>
+      <assert-deep-eq>["one","two"],["three","four"]</assert-deep-eq>
     </result>
-  </test-case>-->
+  </test-case>
   
   <test-case name="parse-csv-013">
     <description>Empty fields</description>
@@ -435,6 +431,42 @@
         map{"columns":(), 
         "column-index": map{}, 
         "rows":([], [], [])})</assert>
+    </result>
+  </test-case>
+
+<test-case name="parse-csv-036">
+    <description>Close quote at end of file</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:parse-csv('one,two,"z"')?rows</test>
+    <result>
+      <assert-deep-eq>["one", "two", "z"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-037">
+    <description>Close quote at end of record</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:parse-csv('one,two,"z"'||char(10))?rows</test>
+    <result>
+      <assert-deep-eq>["one", "two", "z"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-038" covers-40="PR2778">
+    <description>Single comment line</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:parse-csv("# this is a comment", {'comment-marker': '#'})?rows</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-039" covers-40="PR2778">
+    <description>Single comment line</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <test>fn:parse-csv("# this is a comment" || char(10), {'comment-marker': '#'})?rows</test>
+    <result>
+      <assert-empty/>
     </result>
   </test-case>
   
@@ -994,6 +1026,131 @@
       <assert>deep-equal($result?rows, (["one","two","three,four"],["five","six","seven,eight"]) )</assert>
     </result>
   </test-case>
+
+<test-case name="parse-csv-140" covers-40="PR2778">
+    <description>Comment followed by data line</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:parse-csv("# this is a comment" || char(10) || 'one,two,"z"'||char(10), {'comment-marker': '#'})?rows</test>
+    <result>
+      <assert-deep-eq>["one", "two", "z"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-141" covers-40="PR2778">
+    <description>Data row followed by comment line</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:parse-csv('one,two,"z"'||char(10) || "% this is a comment" || char(10), {'comment-marker': '%'})?rows</test>
+    <result>
+      <assert-deep-eq>["one", "two", "z"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-142" covers-40="PR2778">
+    <description>Multiple adjacent comments</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:parse-csv("# this is one comment" || char(10) 
+      || "# this is two comment" || char(10) 
+      || "# this is three comment" || char(10) 
+      ||'one,two,"z"'||char(10), {'comment-marker': '#'})?rows</test>
+    <result>
+      <assert-deep-eq>["one", "two", "z"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  
+  
+  
+  <test-case name="parse-csv-801">
+    <description>
+      Array behaviour.
+      Saxon uses a custom implementation of arrays for the results of the parse-csv function. The
+      following tests are written to ensure that this array implementation behaves properly.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')))?rows[1] => array:append("x")</test>
+    <result>
+      <assert-deep-eq>["a","b","c","d","e","f","x"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-802">
+    <description>
+      Array behaviour.
+      Saxon uses a custom implementation of arrays for the results of the parse-csv function. The
+      following tests are written to ensure that this array implementation behaves properly.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')))?rows[1] => array:remove(1)</test>
+    <result>
+      <assert-deep-eq>["b","c","d","e","f"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-803">
+    <description>
+      Array behaviour.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u"  => translate('|', char('\n')))?rows[1] => array:remove((1,3))</test>
+    <result>
+      <assert-deep-eq>["b","d","e","f"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-804">
+    <description>
+      Array behaviour.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u" => translate('|', char('\n')))?rows[1] => array:subarray(3,2)</test>
+    <result>
+      <assert-deep-eq>["c","d"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-805">
+    <description>
+      Array behaviour.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>parse-csv("a,b,c|p,q,r" => translate('|', char('\n')))?rows => array:join()</test>
+    <result>
+      <assert-deep-eq>["a","b","c","p","q","r"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  
+  
+  <test-case name="parse-csv-809">
+    <description>
+      Array behaviour.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u" => translate('|', char('\n')))?rows[2] 
+      => array:put(3,"z")</test>
+    <result>
+      <assert-deep-eq>["p","q","z","s","t","u"]</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-810">
+    <description>
+      Array behaviour.
+    </description>
+    <created by="Michael Kay" on="2024-03-11"/>
+    <modified by="Michael Kay" on="2026-07-07" change="PR2746 - row-delimiter option abolished"/>
+    <test>parse-csv("a,b,c,d,e,f|p,q,r,s,t,u" => translate('|', char('\n')))?rows?3</test>
+    <result>
+      <assert-deep-eq>"c","r"</assert-deep-eq>
+    </result>
+  </test-case>
+  
   
   <test-case name="parse-csv-901">
     <description>Unclosed quotes</description>
@@ -1314,25 +1471,101 @@
     </result>
   </test-case>
 
+
   <test-case name="parse-csv-925" covers-40="PR2746">
     <description>Same delimiter in multiple roles</description>
     <created by="Christian Gruen" on="2026-07-10"/>
     <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
     <test>fn:parse-csv('a,b', { 'quote-character': ',' })?rows</test>
+
+  
+  <test-case name="parse-csv-928">
+    <description>Obsolete option</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
+    <test>fn:parse-csv('one,two', map{'row-delimiter':','})</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-929">
+    <description>Newline as separator</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
+    <modified by="Michael Kay" on="2026-07-16" change="PR2778"/>
+    <modified by="Christian Gruen" on="2026-07-16" change="PR2746, PR2778 - newline option values raise FOCV0002"/>
+    <test>fn:parse-csv('one,two', map{'separator':char(10)})</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-930">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
+    <test>fn:parse-csv('one,two', map{'separator':'"'})</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-931">
+    <description>Obsolete option</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <modified by="Christian Gruen" on="2026-07-10" change="PR2746"/>
+    <test>fn:parse-csv('one,two', map{'separator':';', 'row-delimiter':';'})</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="parse-csv-932">
+    <description>Open quote at end of file</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <test>fn:parse-csv('one,two,"')</test>
+    <result>
+      <error code="FOCV0001"/>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-933" covers-40="PR2746">
+    <description>Custom separator and quote character</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:parse-csv("a;'b;c'", { 'separator': ';', 'quote-character': "'" })?rows</test>
+    <result>
+      <assert-deep-eq>[ "a", "b;c" ]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-934" covers-40="PR2746">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:parse-csv('a,b', { 'separator': ';', 'quote-character': ';' })</test>
     <result>
       <error code="FOCV0002"/>
     </result>
   </test-case>
 
-  <test-case name="parse-csv-926">
-    <description>Quote character not a single char</description>
+  <test-case name="parse-csv-935" covers-40="PR2746">
+    <description>Same delimiter in multiple roles</description>
     <created by="Christian Gruen" on="2026-07-10"/>
-    <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
-    <test>fn:parse-csv('a,b', { 'quote-character': '||' })?rows</test>
+    <test>fn:parse-csv('a,b', { 'quote-character': ',' })</test>
     <result>
       <error code="FOCV0002"/>
     </result>
   </test-case>
+
+  <test-case name="parse-csv-936">
+    <description>Quote character not a single char</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <test>fn:parse-csv('a,b', { 'quote-character': '||' })</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
 
   <test-case name="parse-csv-927" covers-40="PR2778">
     <description>Same delimiter in multiple roles</description>
@@ -1364,6 +1597,7 @@
     </result>
   </test-case>
 
+
   <test-case name="parse-csv-930" covers-40="PR2962">
     <description>Quotes in unquoted fields.</description>
     <created by="Christian Gruen" on="2026-10-06"/>
@@ -1390,4 +1624,5 @@
       <error code="FOCV0001"/>
     </result>
   </test-case>
+
 </test-set>
