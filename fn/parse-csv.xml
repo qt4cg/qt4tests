@@ -1004,12 +1004,13 @@
     </result>
   </test-case>
   
-  <test-case name="parse-csv-902">
+  <test-case name="parse-csv-902" covers-40="PR2962">
     <description>Quotes in mid-field</description>
     <created by="Michael Kay" on="2024-03-07"/>
-    <test>fn:parse-csv('one,two"three"')</test>
+    <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
+    <test>fn:parse-csv('one,two"three"')?rows</test>
     <result>
-      <error code="FOCV0001"/>
+      <assert-deep-eq>[ "one", 'two"three"' ]</assert-deep-eq>
     </result>
   </test-case>
   
@@ -1242,6 +1243,151 @@
     <test>fn:parse-csv('a,b', { 'separator': ';', 'quote-character': ';' })</test>
     <result>
       <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-923">
+    <description>Values at the limits of numeric precision.</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <test>fn:parse-csv('a,b', { 'select-columns': (4294967298, 1) })?rows</test>
+    <result>
+      <assert-deep-eq>[ "", "a" ]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-111" covers-40="PR2778">
+    <description>Single comment line</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
+    <test>fn:parse-csv("# this is a comment", {'comment-marker': '#'})?rows</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-112" covers-40="PR2962">
+    <description>Quotes in unquoted fields.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:parse-csv('Monitor,24" wide,Robert "Bob" Smith')?rows</test>
+    <result>
+      <assert-deep-eq>[ "Monitor", '24" wide', 'Robert "Bob" Smith' ]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-113" covers-40="PR2962">
+    <description>Quotes in unquoted fields.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:parse-csv('a""b,c"')?rows</test>
+    <result>
+      <assert-deep-eq>[ 'a""b', 'c"' ]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-114" covers-40="PR2962">
+    <description>Quotes in unquoted fields.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:parse-csv('"Field 1", "Field 2"')?rows</test>
+    <result>
+      <assert-deep-eq>[ "Field 1", ' "Field 2"' ]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-115" covers-40="PR2962">
+    <description>Quotes in unquoted fields.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:parse-csv('"Field 1", "Field 2"', { 'trim-whitespace': true() })?rows</test>
+    <result>
+      <assert-deep-eq>[ "Field 1", '"Field 2"' ]</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-924">
+    <description>delimiter not a single string</description>
+    <created by="Michael Kay" on="2024-02-26"/>
+    <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
+    <test>fn:parse-csv('one,two', map{'separator':('|','||')})?rows</test>
+    <result>
+      <any-of>
+         <error code="FOCV0002"/>
+         <error code="XPTY0004"/>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-925" covers-40="PR2746">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
+    <test>fn:parse-csv('a,b', { 'quote-character': ',' })?rows</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-926">
+    <description>Quote character not a single char</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
+    <test>fn:parse-csv('a,b', { 'quote-character': '||' })?rows</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-927" covers-40="PR2778">
+    <description>Same delimiter in multiple roles</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
+    <test>fn:parse-csv('one,two', map{'comment-marker':'"'})?rows</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-928" covers-40="PR2778">
+    <description>Comment marker must not be a newline</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
+    <test>fn:parse-csv('one,two', map{'comment-marker':char(10)})?rows</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-929" covers-40="PR2778">
+    <description>Comment marker must be single character</description>
+    <created by="Michael Kay" on="2026-07-14"/>
+    <modified by="Christian Gruen" on="2026-10-06" change="PR2962"/>
+    <test>fn:parse-csv('one,two', map{'comment-marker':'##'})?rows</test>
+    <result>
+      <error code="FOCV0002"/>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-930" covers-40="PR2962">
+    <description>Quotes in unquoted fields.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:parse-csv("a;'b;c'd", { 'separator': ';', 'quote-character': "'" })?rows</test>
+    <result>
+      <error code="FOCV0001"/>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-931" covers-40="PR2962">
+    <description>Quotes in unquoted fields.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:parse-csv('"Bob" Smith,Berlin')?rows</test>
+    <result>
+      <error code="FOCV0001"/>
+    </result>
+  </test-case>
+
+  <test-case name="parse-csv-932" covers-40="PR2962">
+    <description>Quotes in unquoted fields.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:parse-csv('"Field 1" ,"Field 2"')?rows</test>
+    <result>
+      <error code="FOCV0001"/>
     </result>
   </test-case>
 </test-set>

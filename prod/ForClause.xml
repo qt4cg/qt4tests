@@ -454,7 +454,7 @@
       </result>
    </test-case>
 
-   <test-case name="ForExpr029">
+   <test-case name="ForExpr029" covers-40="PR28">
       <description> Embedded FLOWR expression that binds same variable on boths expressions (two for clauses) </description>
       <created by="NIST" on="2006-01-24"/>
       <modified by="Michael Kay" on="2026-04-13" change="allowed in XP40 (but not XP31)"/>
@@ -522,6 +522,78 @@
          every(for $x allowing empty at $p in -2000 to -2005
                return $p instance of xs:integer)
       </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="ForExpr035" covers-40="PR1177">
+      <description>Type of positional variable</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>for $x at $p in (1, 2) return $p instance of xs:positiveInteger</test>
+      <result>
+         <assert-deep-eq>false(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="ForExpr036" covers-40="PR1177">
+      <description>Type of positional variable</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>for $x allowing empty at $p in () return $p instance of xs:nonNegativeInteger</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="ForExpr037" covers-40="PR254">
+      <description>Coercion of the for clause variable</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>for $x as xs:double in (1, 2) return $x instance of xs:double</test>
+      <result>
+         <assert-deep-eq>true(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="ForExpr038" covers-40="PR254">
+      <description>Coercion of the for clause variable</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         for $x as xs:string in <a>b</a> return $x
+      ]]></test>
+      <result>
+         <assert-eq>"b"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="ForExpr039" covers-40="PR254">
+      <description>Coercion of the for clause variable</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>for $x as xs:decimal in xs:untypedAtomic('1.5') return $x instance of xs:decimal</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="ForExpr040" covers-40="PR254">
+      <description>Coercion of the for clause variable</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>for $x as xs:integer in 'a' return $x</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="ForExpr041" covers-40="PR254">
+      <description>Coercion of the for clause variable</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>for $x as xs:string? allowing empty in () return empty($x)</test>
       <result>
          <assert-true/>
       </result>
@@ -664,7 +736,7 @@
       </result>
    </test-case>
    
-   <test-case name="K-ForExprWithout-13a" covers="PR28">
+   <test-case name="K-ForExprWithout-13a" covers-40="PR28">
       <description> A test whose essence is: `3 eq (for $foo in 1 return for $bar in 2 return $bar + $foo)`. </description>
       <created by="Michael Kay" on="2023-05-27"/>
       <dependency type="spec" value="XQ10+ XP40+"/>
@@ -1565,7 +1637,7 @@
       </result>
    </test-case>
    
-   <test-case name="K2-ForExprWithout-42a" covers-40="PR1450">
+   <test-case name="K2-ForExprWithout-42a" covers-40="PR1480">
       <description> Use a computed attribute constructor with name return, inside a for loop. </description>
       <created by="Michael Kay" on="2024-10-26"/>
       <dependency type="spec" value="XQ40+"/>
@@ -1585,7 +1657,7 @@
       </result>
    </test-case>
    
-   <test-case name="K2-ForExprWithout-43a" covers-40="PR1450">
+   <test-case name="K2-ForExprWithout-43a" covers-40="PR1480">
       <description> Use a computed element constructor with name return, inside a for loop. </description>
       <created by="Michael Kay" on="2024-10-26"/>
       <dependency type="spec" value="XQ40+"/>
@@ -1605,7 +1677,7 @@
       </result>
    </test-case>
    
-   <test-case name="K2-ForExprWithout-44a" covers-40="PR1450">
+   <test-case name="K2-ForExprWithout-44a" covers-40="PR1480">
       <description> Use a computed processing-instruction constructor with name return, inside a for loop. </description>
       <created by="Michael Kay" on="2024-10-26"/>
       <dependency type="spec" value="XQ40+"/>

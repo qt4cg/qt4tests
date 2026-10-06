@@ -490,8 +490,10 @@ it put its sooty foot.</fn:non-match></fn:analyze-string-result>]]></assert-xml>
    <test-case name="analyzeString-037" covers-40="PR1856">
       <description>Validate result against build-in schema for FN namespace</description>
       <created by="Michael Kay" on="2025-10-06"/>
+      <modified by="Christian Gruen" on="2026-10-03" change="add schemaImport dependency"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="schemaValidation"/>
+      <dependency type="feature" value="schemaImport"/>
       <test>
          import schema "http://www.w3.org/2005/xpath-functions";
          let $d1 := document { fn:analyze-string("Chapter 17", "(Chapter|Appendix)\s+(?=(\d+))") }
@@ -600,6 +602,42 @@ it put its sooty foot.</fn:non-match></fn:analyze-string-result>]]></assert-xml>
             <assert>count(/fn:analyze-string-result/fn:match) = 4</assert>
             <assert>count(/fn:analyze-string-result/*) = 4</assert>
          </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="analyzeString-041">
+      <description>Regular expressions in fn:analyze-string.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <test>analyze-string('ab', '((a)|b)+')</test>
+      <result>
+         <all-of>
+            <assert>string($result) = 'ab'</assert>
+            <assert>$result/fn:match/fn:group[@nr = 1] = 'b'</assert>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="analyzeString-042" covers-40="PR1856">
+      <description>Regular expressions in fn:analyze-string.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>analyze-string('abc', '(a)(?=(bc))(b)')</test>
+      <result>
+         <all-of>
+            <assert>string($result) = 'abc'</assert>
+            <assert>$result/fn:match/fn:group[@nr = 3] = 'b'</assert>
+            <assert>$result/fn:match/fn:lookahead-group[@nr = 2]/@value = 'bc'</assert>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="analyzeString-043" covers-40="PR1856 PR1913">
+      <description>Regular expressions in fn:analyze-string.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>analyze-string(codepoints-to-string((119070, 98)), '(?=(b))')</test>
+      <result>
+         <assert>$result//fn:lookahead-group/@position = 2</assert>
       </result>
    </test-case>
 </test-set>

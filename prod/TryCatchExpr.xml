@@ -213,7 +213,7 @@
     </result>
   </test-case>
   
-  <test-case name="try-016a" covers-40="PR888">
+  <test-case name="try-016a" covers-40="PR992">
     <description>No context item is a type error in 4.0, so it can be raised statically</description>
     <created by="Michael Kay" on="2026-06-15"/>
     <environment ref="err"/>
@@ -2180,6 +2180,220 @@
     ]]></test>
     <result>
       <error code="FOAR0001"/>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-013" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      try {
+        try { error(#Q{urn:x}try) } finally { error(#Q{urn:x}finally) }
+      } catch * {
+        local-name-from-QName($err:code)
+      }
+    </test>
+    <result>
+      <assert-eq>'finally'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-014" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      try {
+        try { error(#Q{urn:x}try) }
+        catch * { error(#Q{urn:x}catch) }
+        finally { error(#Q{urn:x}finally) }
+      } catch * {
+        local-name-from-QName($err:code)
+      }
+    </test>
+    <result>
+      <assert-eq>'finally'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-015" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      try {
+        try { error(#Q{urn:x}try) }
+        catch * { error(#Q{urn:x}catch) }
+        finally { }
+      } catch * {
+        local-name-from-QName($err:code)
+      }
+    </test>
+    <result>
+      <assert-eq>'catch'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-016" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      try {
+        try { error(#Q{urn:x}try) } finally { }
+      } catch * {
+        local-name-from-QName($err:code)
+      }
+    </test>
+    <result>
+      <assert-eq>'try'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-017" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>try { 1 to 3 } finally { message('done') }</test>
+    <result>
+      <assert-deep-eq>1, 2, 3</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-018" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>let $x := 1 return try { $x + 1 } finally { $x[. = 0] }</test>
+    <result>
+      <assert-eq>2</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-019" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>try { 1 } catch * { 2 } finally { $err:code }</test>
+    <result>
+      <error code="XPST0008"/>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-020" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>try { } finally { }</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-021" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>try { 1 } finally { } finally { }</test>
+    <result>
+      <error code="XPST0003"/>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-022" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>try { 1 } finally { } catch * { 2 }</test>
+    <result>
+      <error code="XPST0003"/>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-023" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>try { 1 } finally</test>
+    <result>
+      <error code="XPST0003"/>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-024" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      try {
+        try { 1 div 0 } finally { }
+      } catch err:FOAR0001 {
+        'caught'
+      }
+    </test>
+    <result>
+      <assert-eq>'caught'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-025" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>for $i in 1 to 3 return try { 10 idiv ($i - 2) } catch * { 0 } finally { }</test>
+    <result>
+      <assert-deep-eq>-10, 0, 10</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-026" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[try { xs:integer(string(<?_ x?>)) } catch err:FORG0001 { 'caught' } finally { <a/>/text() }]]></test>
+    <result>
+      <assert-eq>'caught'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-027" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[try { 1 } finally { if (<a/>/text()) then () else error() }]]></test>
+    <result>
+      <error code="FOER0000"/>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-028" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[try { 1 } finally { <a/>/text(), <?_ _?> }]]></test>
+    <result>
+      <error code="XQTY0153"/>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-029" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[try { string(<?_ _?>) } finally { <a/>/text() }]]></test>
+    <result>
+      <assert-eq>'_'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="try-finally-030" covers-40="PR1914">
+    <description>Tests for 'finally' clause</description>
+    <created by="Christian Gruen" on="2026-10-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[try { 1 } catch * { 2 } finally { if (<a/>/text()) then () else error() }]]></test>
+    <result>
+      <error code="FOER0000"/>
     </result>
   </test-case>
 

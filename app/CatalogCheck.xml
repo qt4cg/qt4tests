@@ -19,15 +19,16 @@
    <test-case name="Catalog001">
       <description> test that all named environments are present </description>
       <created by="Michael Kay" on="2011-07-10"/>
+      <modified by="Christian Gruen" on="2026-10-03" change="resolve references in own test set and catalog"/>
+      <modified by="Christian Gruen" on="2026-10-04" change="faster execution"/>
       <environment ref="catalog"/>
       <dependency type="spec" value="XQ10+"/>
       <test>
         declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
-        let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..))),
-            $tests := $testsets//fots-test-case,
-            $environments := (//fots:environment | $testsets//fots:environment)[@name],
-            $refs := $testsets//fots:environment[@ref]
-            return $refs[not(@ref = $environments/@name)]
+        let $catalog-envs := //fots:environment/@name
+        for $testset in //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
+        let $names := ($catalog-envs, $testset//fots:environment/@name)
+        return $testset//fots:environment[@ref][not(@ref = $names)]
       </test>
       <result>
          <assert-empty/>
@@ -39,22 +40,25 @@
       <created by="Michael Kay" on="2011-07-10"/>
       <modified by="Michael Kay" on="2011-08-30" change="put validate expression in parens"/>
       <modified by="Michael Kay" on="2013-01-21" change="add schema import declaration, see bug 20706"/>
+      <modified by="Christian Gruen" on="2026-10-03" change="match fots:test, ignore literals and comments, check @value"/>
+      <modified by="Christian Gruen" on="2026-10-04" change="faster execution"/>
       <environment ref="catalog"/>
       <dependency type="spec" value="XQ10+"/>
-      <dependency type="feature" value="schemaValidation"/>
-      <dependency type="feature" value="schemaImport"/>
-      <test>
-        import schema namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
-        let $testsets := //fots:test-set/@file/(validate{doc(resolve-uri(., base-uri(..)))})
-        for $test in $testsets//fots:test-case[not(fots:result/fots:error)][
-                contains(test, "declare variable") or
-                contains(test, "declare function") or
-                matches(test, "&lt;.+&gt;") or
-                contains(test, "typeswitch")]
-        where empty($test/(fots:dependency | ../fots:dependency)) or
-              exists($test/(fots:dependency | ../fots:dependency)[contains(., "XP")])
-        return $test
-      </test>
+      <test><![CDATA[
+        declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
+        let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
+        for $test in $testsets//fots:test-case[not(fots:result//fots:error)]
+        let $test-code := string-join($test/fots:test, ' ')
+        where contains($test-code, '<') or contains($test-code, 'declare') or contains($test-code, 'typeswitch')
+        let $code := replace(replace(replace(replace($test-code,
+          '\(:.*?:\)', ' ', 's'), '``\[.*?\]``', '""', 's'), '`[^`]*`', '""'),
+          '"[^"]*"|''[^'']*''', '""')
+        where matches($code, '(^|[^\w.-])(declare\s+(variable|function)|typeswitch\s*\()|<[\p{L}_][\w.:-]*(\s[^<>]*)?/?>')
+        let $deps := ($test/fots:dependency[@type = 'spec'],
+          $test/../fots:dependency[@type = 'spec'][empty($test/fots:dependency[@type = 'spec'])])
+        where empty($deps) or exists($deps[contains(@value, 'XP')])
+        return $test/@name/string()
+      ]]></test>
       <result>
          <assert-empty/>
       </result>
@@ -63,14 +67,17 @@
    <test-case name="Catalog003">
       <description> test all tests containing an "import schema" constructs have an appropriate dependency </description>
       <created by="Michael Kay" on="2011-07-10"/>
+      <modified by="Christian Gruen" on="2026-10-03" change="match fots:test, exempt XQST0009 and XPST0003"/>
       <environment ref="catalog"/>
       <dependency type="spec" value="XQ10+"/>
       <test>
         declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
         let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
-        for $test in $testsets//fots:test-case[contains(test, "import schema")]
-        where empty($test/(fots:dependency | ../fots:dependency)[@type='feature' and @value="schemaImport"]) 
-        return $test
+        for $test in $testsets/fots:test-set[@name != 'app-CatalogCheck']/fots:test-case[
+          contains(string-join(fots:test, ' '), "import schema")]
+        where empty($test/(fots:dependency | ../fots:dependency)[@type='feature' and @value="schemaImport"])
+        where empty($test/fots:result//fots:error[@code = ('XQST0009', 'XPST0003')])
+        return $test/@name/string()
       </test>
       <result>
          <assert-empty/>
@@ -80,15 +87,18 @@
    <test-case name="Catalog004">
       <description> test that all schemas named in catalog files have the correct target namespace </description>
       <created by="Michael Kay" on="2011-08-10"/>
+      <modified by="Christian Gruen" on="2026-10-03" change="check schema/@uri, parse each schema once"/>
       <environment ref="catalog"/>
-      <dependency type="spec" value="XQ10+"/>
+      <dependency type="spec" value="XQ30+"/>
       <test><![CDATA[
         declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
         let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
-        for $schema in (.|$testsets)//fots:environment/fots:schema
-        let $targetNamespace := doc(resolve-uri($schema/@file, base-uri($schema)))/*/@targetNamespace
-        where not($schema/@uri eq $targetNamespace or (empty($targetNamespace) and string(@uri)=''))
-        return ($schema, <file>{base-uri($schema)}</file>)
+        for $schema in (.|$testsets)//fots:environment/fots:schema[@file]
+        group by $path := resolve-uri($schema/@file, base-uri($schema))
+        let $targetNamespace := doc($path)/*/@targetNamespace
+        for $s in $schema
+        where not($s/@uri eq $targetNamespace or (empty($targetNamespace) and string($s/@uri) = ''))
+        return ($s, <file>{base-uri($s)}</file>)
       ]]></test>
       <result>
          <assert-empty/>
@@ -98,24 +108,22 @@
    <test-case name="Catalog006">
       <description> Check that all tests using an environment with a decimal-format declaration are XPath tests </description>
       <created by="Michael Kay" on="2011-08-11"/>
+      <modified by="Christian Gruen" on="2026-10-03" change="fall back to dependency of test set"/>
+      <modified by="Christian Gruen" on="2026-10-04" change="faster execution"/>
       <environment ref="catalog"/>
       <dependency type="spec" value="XQ10+"/>
       <test><![CDATA[
         declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
         (: ask whether a test is XQuery-only :)
         declare function local:needs-xq($t as element(fots:test-case)) as xs:boolean {
-            let $spec := $t/fots:dependency[@type='spec'][1]
+            let $spec := ($t/fots:dependency[@type='spec'], $t/../fots:dependency[@type='spec'])[1]
             return exists($spec) and contains($spec/@value, 'XQ') and not(contains($spec/@value, 'XP'))
                and not(starts-with($t/@name, 'fo-test-' (: special exemption for generated tests :)))
         };
         let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
-        let $nsenvs :=
-            for $t in ($testsets|.)
-            for $e in $t//fots:environment
-            where exists($e/fots:decimal-format) 
-            return $e/@name/string()
-        let $xq-testcases := $testsets//fots:test-case [local:needs-xq(.)]
-        for $tc in $xq-testcases [fots:environment/@ref = $nsenvs or fots:environment[fots:decimal-format]]
+        let $nsenvs := ($testsets|.)//fots:environment[fots:decimal-format]/@name/string()
+        for $tc in $testsets//fots:test-case[fots:environment/@ref = $nsenvs or fots:environment/fots:decimal-format]
+        where local:needs-xq($tc)
         return $tc/@name/string()
       ]]></test>
       <result>
@@ -192,6 +200,7 @@
       are names of changes listed in the changes.xml file. </description>
     <created by="Michael Kay" on="2011-08-23"/>
     <modified by="Michael Kay" on="2022-12-21" change="upgrade to 4.0"/>
+    <modified by="Christian Gruen" on="2026-10-03" change="anchor PR pattern"/>
     <environment ref="catalog"/>
     <dependency type="spec" value="XQ10+"/>
     <test><![CDATA[
@@ -202,7 +211,7 @@
         let $testset := $testfile/fots:test-set
         let $testcases := $testset/fots:test-case
         for $token in distinct-values((tokenize($testset/@covers-40, ' '), $testcases/@covers-40/tokenize(., ' ')))
-        where not($token = $changes or matches($token, 'PR[0-9]+'))
+        where not($token = $changes or matches($token, '^PR[0-9]+$'))
         return <out test-set="{string($testset/@name)}" bad-covers-value="{$token}"/>
       ]]></test>
     <result>
@@ -216,6 +225,7 @@
     <modified by="Michael Kay" on="2015-07-13" change="success is an empty element"/>
     <modified by="Michael Kay" on="2022-12-21" change="upgrade to 4.0"/>
     <modified by="Christian Gruen" on="2026-07-06" change="faster execution"/>
+    <modified by="Christian Gruen" on="2026-10-03" change="count PR tokens of changes"/>
     <environment ref="catalog"/>
     <dependency type="spec" value="XQ30+"/>
     <test><![CDATA[
@@ -237,11 +247,13 @@
           return <c t="{$t}" n="{sum($w/@n)}" names="{$w/@name}"/>
         )
         for $token in distinct-values($changesid)
-        let $c := $counts[@t = $token]
+        let $change := $changes[@id = $token]
+        let $tokens := ($token, $change/@PR ! tokenize(.) ! concat("PR", .))
+        let $c := $counts[@t = $tokens]
         let $count := xs:integer(sum($c/@n))
         where $count lt 5
-        return <out spec="{$changes[@id=$token]/../@name}" change="{$token}" tests="{$count}" names="{$c/@names}">
-        {$changes[@id=$token]/text()}
+        return <out spec="{$change[1]/../@name}" change="{$token}" tests="{$count}" names="{$c/@names}">
+        {$change[1]/text()}
         </out>
      }</r>
       ]]></test>
@@ -253,12 +265,13 @@
   <test-case name="Catalog012">
     <description> Test that all assert-xml elements contain no XML declaration </description>
     <created by="Michael Kay" on="2012-07-10"/>
+    <modified by="Christian Gruen" on="2026-10-03" change="ignore leading whitespace"/>
     <environment ref="catalog"/>
     <dependency type="spec" value="XQ10+"/>
     <test><![CDATA[
       declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
       let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
-      return $testsets//fots:test-case[.//fots:assert-xml[starts-with(., '<?xml')]]
+      return $testsets//fots:test-case[.//fots:assert-xml[starts-with(normalize-space(.), '<?xml')]]
     ]]></test>
     <result>
       <assert-empty/>
@@ -293,13 +306,15 @@
     <modified by="Michael Kay" on="2018-10-31" change="add exception for all tests added after 1 Jan 2018"/>
     <modified by="Michael Kay" on="2023-04-28" change="upgrade to 40"/>
     <modified by="Christian Gruen" on="2026-07-06" change="faster execution"/>
+    <modified by="Michael Ennen" on="2026-10-02" change="Return uncovered tests without a wrapper element"/>
+    <modified by="Christian Gruen" on="2026-10-03" change="skip application tests"/>
     <environment ref="catalog"/>
     <dependency type="spec" value="XQ30+"/>
     <test><![CDATA[
     declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
-        <tests-with-no-covers-40-attribute>{
           let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
           for $ts in $testsets/fots:test-set
+          where not(starts-with($ts/@name, 'app-' (: application tests use many features :)))
           let $set-covers := exists($ts/@covers-40)
           let $set-40 := exists($ts/fots:dependency[@type='spec' and contains(@value, '40')])
           for $test in $ts/fots:test-case
@@ -308,7 +323,6 @@
           where not(starts-with($test/@name, 'fo-test-' (: special exemption for generated tests :)))
           (:where xs:date($test/created/@on) le xs:date('2018-01-01')  (: no point keeping this requirement any longer :) :)
           return <out test="{$test/@name}" test-set="{$ts/@name}"/>
-        }</tests-with-no-covers-40-attribute>
       ]]></test>
     <result>
       <assert-empty/>
@@ -319,6 +333,7 @@
     <description> Output the test coverage data. The test always passes. </description>
     <created by="Michael Kay" on="2023-04-28"/>
     <modified by="Christian Gruen" on="2026-07-06" change="faster execution"/>
+    <modified by="Christian Gruen" on="2026-10-03" change="count PR tokens of changes"/>
     <environment ref="catalog"/>
     <dependency type="spec" value="XQ30+"/>
     <test><![CDATA[
@@ -340,9 +355,11 @@
           return <c t="{$t}" n="{sum($w/@n)}"/>
         )
         for $token in distinct-values($changesid)
-        let $count := xs:integer(sum($counts[@t = $token]/@n))
+        let $change := $changes[@id = $token]
+        let $tokens := ($token, $change/@PR ! tokenize(.) ! concat("PR", .))
+        let $count := xs:integer(sum($counts[@t = $tokens]/@n))
         order by $token
-        return <tests change="{$token}" count="{$count}" description="{$changes[@id=$token]/text()}"/>
+        return <tests change="{$token}" count="{$count}" description="{$change[1]/text()}"/>
      }</r>, map{'indent':true()})
       ]]></test>
     <result>
@@ -350,6 +367,90 @@
     </result>
   </test-case>
   
+  <test-case name="Catalog016">
+    <description>Check that all files referenced by the catalog and the test sets exist.</description>
+    <created by="Christian Gruen" on="2026-10-03"/>
+    <environment ref="catalog"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
+      let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
+      for $file in (.|$testsets)//fots:*[not(self::fots:test-set)]/@file
+      where not(contains($file, 'intentionally-missing'))
+      group by $uri := resolve-uri($file, base-uri($file/..))
+      where not(try { exists(unparsed-binary($uri)) } catch * { false() })
+      return $uri
+    ]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="Catalog017">
+    <description>Check that the spec dependencies of each test case are compatible with those of its test set.</description>
+    <created by="Christian Gruen" on="2026-10-03"/>
+    <modified by="Christian Gruen" on="2026-10-04" change="faster execution"/>
+    <environment ref="catalog"/>
+    <dependency type="spec" value="XQ30+"/>
+    <test><![CDATA[
+      declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
+      let $all := ('XP20', 'XP30', 'XP31', 'XP40', 'XQ10', 'XQ30', 'XQ31', 'XQ40', 'XT30', 'XT40')
+      let $versions := function($deps) {
+        distinct-values(
+          for $token in $deps[@type = 'spec'][not(@satisfied = 'false')]/tokenize(normalize-space(@value), ' ')
+          let $base := replace($token, '\+$', '')
+          return if (ends-with($token, '+'))
+            then $all[substring(., 1, 2) = substring($base, 1, 2) and . ge $base]
+            else $base
+        )
+      }
+      let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
+      for $testset in $testsets/fots:test-set[fots:dependency/@type = 'spec']
+      let $set-versions := $versions($testset/fots:dependency)
+      for $test in $testset/fots:test-case[fots:dependency/@type = 'spec']
+      where not($versions($test/fots:dependency) = $set-versions)
+      return string($test/@name)
+    ]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="Catalog018">
+    <description>Check that all named environments of the test sets are referenced.</description>
+    <created by="Christian Gruen" on="2026-10-03"/>
+    <environment ref="catalog"/>
+    <dependency type="spec" value="XQ10+"/>
+    <test><![CDATA[
+      declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
+      let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
+      let $refs := (.|$testsets)//fots:environment/@ref
+      for $env in $testsets/fots:test-set/fots:environment[@name]
+      where not($env/@name = $refs)
+      return string($env/@name)
+    ]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="Catalog019">
+    <description>Check that no creation or modification date lies in the future.</description>
+    <created by="Christian Gruen" on="2026-10-03"/>
+    <environment ref="catalog"/>
+    <dependency type="spec" value="XQ10+"/>
+    <test><![CDATA[
+      declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
+      let $testsets := //fots:test-set/@file/doc(resolve-uri(., base-uri(..)))
+      for $date in (.|$testsets)//(fots:created | fots:modified)/@on
+      where xs:date($date) gt current-date()
+      return concat($date/ancestor::fots:test-case/@name, ' ', $date)
+    ]]></test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
   <!--
   TEST DELETED: see bug 28639
   <test-case name="Catalog015">

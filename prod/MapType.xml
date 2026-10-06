@@ -461,7 +461,7 @@
       </result>
    </test-case>
    
-   <test-case name="MapType-058a" covers="map-general">
+   <test-case name="MapType-058a" covers-40="PR1023" covers="map-general">
       <description>Map as a function of xs:anyAtomicType. A coerced function is not a map.</description>
       <created by="Michael Kay after Christian Gruen" on="2019-09-06"/>
       <modified by="Michael Kay" on="2020-01-14" change="Test requires XQuery; change dependencies"/>
@@ -868,7 +868,7 @@ return $m
       </result>
    </test-case>
    
-   <test-case name="MapType-093">
+   <test-case name="MapType-093" covers-40="PR28">
       <description>Map type after a sequence of inserts and removes (testing caching of type information)</description>
       <created by="Michael Kay" on="2026-01-16"/>
       <modified by="Michael Kay" on="2026-04-13" change="multiple let clauses require XP40+"/>
@@ -929,7 +929,7 @@ return $m
    </test-case>
    
    
-   <test-case name="MapType-096">
+   <test-case name="MapType-096" covers-40="PR28">
       <description>Map incremental put with duplicate keys - should fail</description>
       <created by="O'Neil Delpratt" on="2026-01-20"/>
       <modified by="Michael Kay" on="2026-04-13" change="multiple let clauses require XP40+"/>
@@ -943,7 +943,7 @@ return $m
       </result>
    </test-case>
    
-   <test-case name="MapType-097">
+   <test-case name="MapType-097" covers-40="PR28">
       <description>Map incremental put with rule to replace duplicate keys</description>
       <created by="O'Neil Delpratt" on="2026-01-20"/>
       <modified by="Michael Kay" on="2026-04-13" change="multiple let clauses require XP40+"/>
@@ -958,7 +958,7 @@ return $m
    </test-case>
    
    
-   <test-case name="MapType-098">
+   <test-case name="MapType-098" covers-40="PR28">
       <description>Map incremental remove with rule to replace duplicate keys</description>
       <created by="O'Neil Delpratt" on="2026-01-20"/>
       <modified by="Michael Kay" on="2026-04-13" change="multiple let clauses require XP40+"/>
@@ -972,7 +972,7 @@ return $m
       </result>
    </test-case>
    
-   <test-case name="MapType-099">
+   <test-case name="MapType-099" covers-40="PR28">
       <description>Map incremental remove with rule to replace duplicate keys</description>
       <created by="O'Neil Delpratt" on="2026-01-20"/>
       <modified by="Michael Kay" on="2026-04-13" change="multiple let clauses require XP40+"/>
@@ -986,7 +986,7 @@ return $m
       </result>
    </test-case>
    
-   <test-case name="MapType-100">
+   <test-case name="MapType-100" covers-40="PR28">
       <description>Map incremental remove with rule to throw error for duplicate keys</description>
       <created by="O'Neil Delpratt" on="2026-01-20"/>
       <modified by="Michael Kay" on="2026-04-13" change="multiple let clauses require XP40+"/>
@@ -1000,7 +1000,7 @@ return $m
       </result>
    </test-case>
    
-   <test-case name="MapType-101">
+   <test-case name="MapType-101" covers-40="PR691">
       <description>Enum type as map key type</description>
       <created by="Michael Kay" on="2026-06-30"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
@@ -1040,5 +1040,34 @@ return $m
       </result>
    </test-case>
 
+   <test-case name="MapType-103">
+      <description>Maps are not coerced to function(*).</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>let $f as function(*) := map { 'a': 1 } return $f instance of map(*)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="MapType-104">
+      <description>Maps are not coerced to function(*).</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>declare function local:f($f as function(*)) { $f?a }; local:f(map { 'a': 1 })</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="MapType-105">
+      <description>Maps are not coerced to function(*).</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ31+"/>
+      <test>let $f as function(*)* := (map { 'a': 1 }, map { 'b': 2 }) return $f?*</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
 
 </test-set>

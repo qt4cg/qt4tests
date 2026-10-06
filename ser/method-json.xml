@@ -1870,4 +1870,71 @@ map {
       <serialization-matches><![CDATA[,\r\n\t"c"]]></serialization-matches>
     </result>
   </test-case>
+
+  <test-case name="Serialization-json-79" covers-40="PR2342">
+    <description>Test the JSON serialization parameter canonical</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>serialize({ 'b': 1, 'a': 2 }, { 'method': 'json', 'canonical': true() })</test>
+    <result>
+      <assert-eq>'{"a":2,"b":1}'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-json-80" covers-40="PR2342">
+    <description>Test the JSON serialization parameter canonical</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>serialize({ 'b': { 'd': 1, 'c': 2 }, 'a': () }, { 'method': 'json', 'canonical': true() })</test>
+    <result>
+      <assert-eq>'{"a":null,"b":{"c":2,"d":1}}'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-json-81" covers-40="PR2342">
+    <description>Test the JSON serialization parameter canonical</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>serialize([ 1e0, 15e-1, 1e21, 1e-7 ], { 'method': 'json', 'canonical': true() })</test>
+    <result>
+      <assert-eq>"[1,1.5,1e+21,1e-7]"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-json-82" covers-40="PR2342">
+    <description>Test the JSON serialization parameter canonical</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>serialize({ 'a': [ 1, 2 ] }, { 'method': 'json', 'canonical': true(), 'indent': true() })</test>
+    <result>
+      <assert-eq>'{"a":[1,2]}'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-json-83" covers-40="PR2342">
+    <description>Test the JSON serialization parameter canonical</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      serialize({ 1: 'a', '1': 'b' }, {
+        'method': 'json', 'canonical': true(), 'allow-duplicate-names': true()
+      })
+    </test>
+    <result>
+      <error code="SERE0022"/>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-json-84" covers-40="PR2342">
+    <description>Test the JSON serialization parameter canonical</description>
+    <created by="Christian Gruen" on="2026-10-04"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>serialize([ xs:double('NaN') ], { 'method': 'json', 'canonical': true() })</test>
+    <result>
+      <any-of>
+        <error code="SERE0020"/>
+        <error code="SERE0024"/>
+      </any-of>
+    </result>
+  </test-case>
 </test-set>

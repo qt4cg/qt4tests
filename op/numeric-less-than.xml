@@ -2683,9 +2683,13 @@ $arg2 = xs:short(upper bound)
 *******************************************************
 </description>
       <created by="Frans Englich" on="2008-12-04+01:00"/>
+      <modified by="Christian Gruen" on="2026-10-04" change="allow implementation limit"/>
       <test>xs:unsignedLong("100") lt xs:unsignedLong("18446744073709551615")</test>
       <result>
-         <assert-true/>
+         <any-of>
+            <assert-true/>
+            <error code="*"/>
+         </any-of>
       </result>
    </test-case>
    <test-case name="K2-NumericLT-2">
@@ -2698,9 +2702,13 @@ $arg2 = xs:short(upper bound)
 *******************************************************
 </description>
       <created by="Frans Englich" on="2008-12-04+01:00"/>
+      <modified by="Christian Gruen" on="2026-10-04" change="allow implementation limit"/>
       <test>xs:unsignedLong("18446744073709551615") lt xs:unsignedLong("100")</test>
       <result>
-         <assert-false/>
+         <any-of>
+            <assert-false/>
+            <error code="*"/>
+         </any-of>
       </result>
    </test-case>
 
@@ -3073,4 +3081,48 @@ $arg2 = xs:short(upper bound)
          <assert-true/>
       </result>
    </test-case>-->
+
+   <test-case name="op-numeric-less-than-001">
+      <description>Values at the limits of numeric precision.</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>4294967297 lt 2</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="op-numeric-less-than-002">
+      <description>Values at the limits of numeric precision.</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>2147483648 gt 2147483647</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="op-numeric-less-than-003">
+      <description>Values at the limits of numeric precision.</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>-2147483649 lt -2147483648</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="op-numeric-less-than-004">
+      <description>Values at the limits of numeric precision.</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>18446744073709551617 lt 2</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <error code="FOAR0002"/>
+         </any-of>
+      </result>
+   </test-case>
+
 </test-set>

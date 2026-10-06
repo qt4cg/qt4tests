@@ -1578,7 +1578,7 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
         </result>
     </test-case>
     
-    <test-case name="fn-transform-48a">
+    <test-case name="fn-transform-48a" covers-40="PR1059">
         <description>Transform with additional unrecognised option which is rejected in 4.0</description>
         <created by="Debbie Lockett" on="2015-04-15"/>
         <modified by="Michael Kay" on="2015-11-26" change="avoid HOF dependency in assertions"/>
@@ -3015,7 +3015,7 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
         </result>
     </test-case>
     
-    <test-case name="fn-transform-403">
+    <test-case name="fn-transform-403" covers-40="PR197">
         <description>Transform using initial-function and function-params
         for version 4.0 stylesheet with variable-arity function. Saxon bug 6817.</description>
         <created by="Michael Kay" on="2025-06-10"/>
@@ -3057,6 +3057,66 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
                 <assert>$result("output") instance of document-node()</assert>
                 <assert>$result?output/this = '42|17'</assert>
             </all-of>
+        </result>
+    </test-case>
+
+    <test-case name="fn-transform-404" covers-40="PR427">
+        <description>Transform with the default mode of the stylesheet.</description>
+        <created by="Christian Gruen" on="2026-10-03"/>
+        <dependency type="feature" value="fn-transform-XSLT30" satisfied="true"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            let $xsl := "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0' default-mode='m'>
+                <xsl:template match='/' mode='m'><m/></xsl:template>
+                <xsl:template match='/' mode='#unnamed'><unnamed/></xsl:template>
+            </xsl:stylesheet>"
+            return transform({ "stylesheet-text": $xsl, "source-node": parse-xml("<doc/>") })?output
+        ]]></test>
+        <result>
+            <assert-xml><![CDATA[<m/>]]></assert-xml>
+        </result>
+    </test-case>
+
+    <test-case name="fn-transform-405" covers-40="PR427">
+        <description>Transform with the default mode of the stylesheet.</description>
+        <created by="Christian Gruen" on="2026-10-03"/>
+        <dependency type="feature" value="fn-transform-XSLT30" satisfied="true"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            let $xsl := "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0' default-mode='m'>
+                <xsl:template match='/' mode='m'><m/></xsl:template>
+                <xsl:template match='/' mode='#unnamed'><unnamed/></xsl:template>
+            </xsl:stylesheet>"
+            return transform({
+              "stylesheet-text": $xsl,
+              "source-node": parse-xml("<doc/>"),
+              "initial-mode": QName("http://www.w3.org/1999/XSL/Transform", "unnamed")
+            })?output
+        ]]></test>
+        <result>
+            <assert-xml><![CDATA[<unnamed/>]]></assert-xml>
+        </result>
+    </test-case>
+
+    <test-case name="fn-transform-406" covers-40="PR427">
+        <description>Transform with the default mode of the stylesheet.</description>
+        <created by="Christian Gruen" on="2026-10-03"/>
+        <dependency type="feature" value="fn-transform-XSLT30" satisfied="true"/>
+        <dependency type="spec" value="XP40+ XQ40+"/>
+        <test><![CDATA[
+            let $xsl := "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0' default-mode='m'>
+                <xsl:template match='doc' mode='m'><m><xsl:apply-templates/></m></xsl:template>
+                <xsl:template match='doc' mode='#unnamed'><unnamed/></xsl:template>
+                <xsl:template match='item' mode='m'><i/></xsl:template>
+            </xsl:stylesheet>"
+            return transform({
+              "stylesheet-text": $xsl,
+              "source-node": parse-xml("<doc><item/></doc>"),
+              "delivery-format": "raw"
+            })?output
+        ]]></test>
+        <result>
+            <assert-xml><![CDATA[<m><i/></m>]]></assert-xml>
         </result>
     </test-case>
 

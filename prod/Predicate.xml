@@ -1165,7 +1165,7 @@
       </result>
    </test-case>
 
-   <test-case name="K-FilterExpr-93a">
+   <test-case name="K-FilterExpr-93a" covers-40="PR996">
       <description> A predicate whose expression EBV cannot be extracted from. </description>
       <created by="Christian Gruen" on="2024-02-08"/>
       <modified by="Christian Gruen" on="2025-05-27" change="error code added"/>
@@ -2358,12 +2358,14 @@ count((-1, 0, 1, 2147483647, 2147483648, 2147483649, 4294967295, 4294967296, 429
    <test-case name="predicate-500" covers-40="PR996">
       <description> A predicate starting with a number and ending with a string. </description>
       <created by="Christian Gruen" on="2024-02-08"/>
+      <modified by="Christian Gruen" on="2026-10-06" change="error code added"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>1[1, ""]</test>
       <result>
          <any-of>
             <assert-eq>1</assert-eq>
             <error code="XPTY0004"/>
+            <error code="FORG0006"/>
          </any-of>
       </result>
    </test-case>
@@ -2386,12 +2388,14 @@ count((-1, 0, 1, 2147483647, 2147483648, 2147483649, 4294967295, 4294967296, 429
    <test-case name="predicate-502" covers-40="PR996">
       <description> A predicate starting with a number and ending with a string. </description>
       <created by="Christian Gruen" on="2024-02-08"/>
+      <modified by="Christian Gruen" on="2026-10-06" change="error code added"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test>(1 to 1000)[reverse(1 to 1000), ""]</test>
       <result>
          <any-of>
             <assert-deep-eq>1 to 1000</assert-deep-eq>
             <error code="XPTY0004"/>
+            <error code="FORG0006"/>
          </any-of>
       </result>
    </test-case>
@@ -2399,6 +2403,7 @@ count((-1, 0, 1, 2147483647, 2147483648, 2147483649, 4294967295, 4294967296, 429
    <test-case name="predicate-503" covers-40="PR996">
       <description> A predicate starting with a number and ending with a string. </description>
       <created by="Christian Gruen" on="2024-02-08"/>
+      <modified by="Christian Gruen" on="2026-10-06" change="error code added"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[
 1[ number(<?_ 1?>), "" ]
@@ -2407,7 +2412,196 @@ count((-1, 0, 1, 2147483647, 2147483648, 2147483649, 4294967295, 4294967296, 429
          <any-of>
             <assert-eq>1</assert-eq>
             <error code="XPTY0004"/>
+            <error code="FORG0006"/>
          </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-504">
+      <description>Values at the limits of numeric precision.</description>
+      <created by="Christian Gruen" on="2026-10-03"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>("a", "b", "c")[4294967297]</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-505">
+      <description>Values at the limits of numeric precision.</description>
+      <created by="Christian Gruen" on="2026-10-03"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>("a", "b", "c")[position() = 4294967298]</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-506">
+      <description>Values at the limits of numeric precision.</description>
+      <created by="Christian Gruen" on="2026-10-03"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test><![CDATA[("a", "b", "c")[position() < -4294967294]]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-507">
+      <description>Values at the limits of numeric precision.</description>
+      <created by="Christian Gruen" on="2026-10-03"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>("a", "b", "c")[last() - 4294967296]</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-508">
+      <description>Values at the limits of numeric precision.</description>
+      <created by="Christian Gruen" on="2026-10-03"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test><![CDATA[("a", "b", "c")[position() > 4294967296]]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-509">
+      <description>Values at the limits of numeric precision.</description>
+      <created by="Christian Gruen" on="2026-10-03"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>("a", "b", "c")[position() = 2147483648 to 2147483650]</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-510">
+      <description>Values at the limits of numeric precision.</description>
+      <created by="Christian Gruen" on="2026-10-03"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>("a", "b", "c")[position() = (-4294967295, 3)]</test>
+      <result>
+         <assert-eq>"c"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-511">
+      <description>Values at the limits of numeric precision.</description>
+      <created by="Christian Gruen" on="2026-10-03"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>("a", "b", "c")[18446744073709551617]</test>
+      <result>
+         <any-of>
+            <assert-empty/>
+            <error code="FOAR0002"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-512">
+      <description>Values at the limits of numeric precision.</description>
+      <created by="Christian Gruen" on="2026-10-03"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test><![CDATA[("a", "b", "c")[position() > 9223372036854775807]]]></test>
+      <result>
+         <any-of>
+            <assert-empty/>
+            <error code="FOAR0002"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="filter-limits-011">
+      <description>Test numeric predicates at integer limits</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test><![CDATA[(1, 2, 3)[position() < xs:unsignedLong("18446744073709551615")]]]></test>
+      <result>
+         <any-of>
+            <assert-deep-eq>1, 2, 3</assert-deep-eq>
+            <error code="*"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="filter-limits-012">
+      <description>Test numeric predicates at integer limits</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test><![CDATA[(1, 2, 3)[position() > xs:unsignedLong("18446744073709551615")]]]></test>
+      <result>
+         <any-of>
+            <assert-empty/>
+            <error code="*"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="filter-limits-013">
+      <description>Test numeric predicates at integer limits</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test><![CDATA[(1, 2, 3)[position() < xs:unsignedLong("4294967297")]]]></test>
+      <result>
+         <assert-deep-eq>1, 2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="filter-limits-014">
+      <description>Test numeric predicates at integer limits</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test><![CDATA[(1, 2, 3)[position() > xs:double("NaN")]]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="filter-limits-015">
+      <description>Test numeric predicates at integer limits</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test><![CDATA[(1, 2, 3)[position() != xs:double("NaN")]]]></test>
+      <result>
+         <assert-deep-eq>1, 2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="filter-limits-016">
+      <description>Test numeric predicates at integer limits</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test><![CDATA[(1, 2, 3)[position() <= xs:float("NaN")]]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-guard-001" covers-40="PR230">
+      <description>Guarded expressions</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $items := ('a', 1)
+         return $items[. instance of xs:integer][. + 1 eq 2]
+      </test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="predicate-guard-002" covers-40="PR230">
+      <description>Guarded expressions</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $n := 0
+         return (1 to $n)[1 idiv $n eq 0]
+      </test>
+      <result>
+         <assert-empty/>
       </result>
    </test-case>
 

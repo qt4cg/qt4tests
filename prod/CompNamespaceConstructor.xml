@@ -784,10 +784,14 @@
       <description> Disallow reserved names </description>
       <created by="Michael Kay" on="2024-06-11"/>
       <modified by="Michael Kay" on="2026-03-04" change="updated from current spec"/>
+      <modified by="Michael Ennen" on="2026-10-01" change="Allow dynamic errors when reserved names parse as operators"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[<foo>{namespace mod {"123"}}</foo>]]></test>
       <result>
-         <error code="XPTY0004"/>
+         <any-of>
+            <error code="XPTY0004"/>
+            <error code="XPDY0002"/>
+         </any-of>
       </result>
    </test-case>
    
@@ -796,6 +800,7 @@
       <created by="Michael Kay" on="2024-06-11"/>
       <modified by="Michael Kay" on="2025-08-30" change="updated from current spec"/>
       <modified by="Michael Kay" on="2026-03-04" change="updated from current spec"/>
+      <modified by="Michael Ennen" on="2026-10-01" change="Allow dynamic errors when reserved names parse as operators"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="fn-load-xquery-module"/>
       <test>
@@ -808,7 +813,7 @@
                     declare variable $m:v := namespace {$kw} {{"content"}};`
          let $var := try {
                        load-xquery-module('http://m.ns/', {'content':$q})?variables?*
-                     } catch err:FOQM0003 {
+                     } catch err:FOQM0003 | err:XPDY0002 | err:XPTY0004 {
                        ()
                      }  
          return $var
@@ -820,4 +825,36 @@
    </test-case>
 
    
+   <test-case name="nscons-049" covers-40="PR2665">
+      <description>Name coerced to xs:QName or xs:string.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[<e>{ namespace { ['ns'] } { 'http://www.example.com/' } }</e>]]></test>
+      <result>
+         <assert-xml><![CDATA[<e xmlns:ns="http://www.example.com/"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="nscons-050" covers-40="PR2028">
+      <description>Computed namespace constructor with # before the prefix</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XQ40+ XP40+"/>
+      <test>name(namespace #pfx { 'urn:x' })</test>
+      <result>
+         <assert-eq>"pfx"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="nscons-051" covers-40="PR2028">
+      <description>Computed namespace constructor with # before the prefix</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         <a>{ namespace #return { 'urn:r' } }</a>
+      ]]></test>
+      <result>
+         <assert-xml><![CDATA[<a xmlns:return="urn:r"/>]]></assert-xml>
+      </result>
+   </test-case>
+
 </test-set>

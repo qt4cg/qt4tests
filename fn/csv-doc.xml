@@ -72,4 +72,149 @@
       </result>
    </test-case>
 
+   <test-case name="csv-doc-002">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <environment name="empty"/>
+      <test>count(csv-doc('parse-csv/csv-doc-1.csv')?rows)</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="csv-doc-003">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <environment name="empty"/>
+      <test>csv-doc('parse-csv/csv-doc-1.csv')?rows[3]?1</test>
+      <result>
+         <assert-eq>'Bob, Jr.'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="csv-doc-004">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <environment name="empty"/>
+      <test>csv-doc('parse-csv/csv-doc-1.csv', { 'header': true() })?columns</test>
+      <result>
+         <assert-deep-eq>'name', 'city'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="csv-doc-005">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <environment name="empty"/>
+      <test>csv-doc('parse-csv/csv-doc-1.csv', { 'header': true() })?get(2, 'city')</test>
+      <result>
+         <assert-eq>'Paris'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="csv-doc-006">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <environment name="empty"/>
+      <test>csv-doc('parse-csv/csv-doc-1.csv', { 'header': true() })?column-index?city</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="csv-doc-007">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <environment name="empty"/>
+      <test>csv-doc('parse-csv/csv-doc-2.csv', { 'separator': ';', 'header': true() })?get(1, 'value')</test>
+      <result>
+         <assert-eq>'a'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="csv-doc-008">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <environment name="empty"/>
+      <test>
+         let $source := 'parse-csv/csv-doc-1.csv'
+         let $options := { 'header': true() }
+         return deep-equal(
+           csv-doc($source, $options)?rows,
+           parse-csv(unparsed-text($source), $options)?rows
+         )
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="csv-doc-009">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <environment name="empty"/>
+      <test>count(csv-doc('parse-csv/csv-doc-1.csv', ())?rows)</test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="csv-doc-010">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <environment name="empty"/>
+      <test>csv-doc('parse-csv/csv-doc-1.csv', { 'separator': ';;' })</test>
+      <result>
+         <error code="FOCV0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="csv-doc-011">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <environment name="empty"/>
+      <test>csv-doc('parse-csv/does-not-exist.csv')</test>
+      <result>
+         <error code="FOUT1170"/>
+      </result>
+   </test-case>
+
+   <test-case name="csv-doc-012">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <test>csv-doc(':invalid:')</test>
+      <result>
+         <error code="FOUT1170"/>
+      </result>
+   </test-case>
+
+   <test-case name="csv-doc-013">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <environment name="empty"/>
+      <test><![CDATA[count(csv-doc(string(parse-xml('<a>parse-csv/csv-doc-1.csv</a>')))?rows)]]></test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="csv-doc-014">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <environment name="empty"/>
+      <test><![CDATA[csv-doc('parse-csv/csv-doc-2.csv', { 'separator': string(parse-xml('<a>;</a>')) })?rows[2]?2]]></test>
+      <result>
+         <assert-eq>'a'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="csv-doc-015">
+      <description>Evaluation of csv-doc function.</description>
+      <created by="Christian Gruen" on="2026-10-02"/>
+      <test><![CDATA[csv-doc(parse-xml('<a/>')//text())]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
 </test-set>

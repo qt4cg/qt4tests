@@ -846,7 +846,7 @@
       </result>
    </test-case>
 
-   <test-case name="hof-907a" covers-30="named-function-ref">
+   <test-case name="hof-907a" covers-40="PR2805" covers-30="named-function-ref">
       <description> apply deep-equal() to a function item  </description>
       <created by="Christian Gruen" on="2024-01-16"/>
       <dependency type="spec" value="XQ40+"/>
@@ -1018,7 +1018,7 @@
       </result>
    </test-case>
 
-   <test-case name="hof-919a" covers-30="partial-function-application">
+   <test-case name="hof-919a" covers-40="PR980" covers-30="partial-function-application">
       <description> Same as hof-919, but expecting a result for XQ40+ rather than a coercion error as with XQ3x 
       </description>
       <created by="Gunther Rademacher" on="2024-03-12"/>
@@ -1031,6 +1031,58 @@
       </test>
       <result>
          <assert-string-value>123.456~123~124.456~123.46</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="hof-920" covers-30="partial-function-application">
+      <description>Partial function application of a map or an array</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>
+         let $m := map { 'a': 1 }
+         return $m(?) instance of map(*)
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="hof-921" covers-30="partial-function-application">
+      <description>Partial function application of a map or an array</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>
+         let $a := [ 5 ]
+         return $a(?) instance of array(*)
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="hof-922" covers-30="partial-function-application">
+      <description>Partial function application of a map or an array</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>
+         let $m := map { 'a': 1 }
+         return $m(?)('a')
+      </test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="hof-923" covers-30="partial-function-application">
+      <description>Partial function application of a map or an array</description>
+      <created by="Christian Gruen" on="2026-10-04"/>
+      <dependency type="spec" value="XP31+ XQ31+"/>
+      <test>
+         let $a := [ 5 ]
+         return $a(?)(1)
+      </test>
+      <result>
+         <assert-eq>5</assert-eq>
       </result>
    </test-case>
 
@@ -1763,7 +1815,7 @@ key: z, value: (zebra)"</assert-eq>
       </result>
    </test-case>
    
-   <test-case name="xqhof11a" covers-30="dynamic-function-call">
+   <test-case name="xqhof11a" covers-40="PR1975" covers-30="dynamic-function-call">
       <description>Target of dynamic function call is empty sequence</description>
       <created by="John Snelson" on="2011-07-28"/>
       <modified by="Michael Kay" on="2025-09-08" change="results change in 4.0"/>
@@ -1784,7 +1836,7 @@ key: z, value: (zebra)"</assert-eq>
       </result>
    </test-case>
    
-   <test-case name="xqhof12a" covers-30="partial-function-application">
+   <test-case name="xqhof12a" covers-40="PR1975" covers-30="partial-function-application">
       <description>Apply multiple functions</description>
       <created by="John Snelson" on="2011-07-28"/>
       <modified by="Michael Kay" on="2025-09-08" change="results change in 4.0"/>
@@ -1958,7 +2010,7 @@ key: z, value: (zebra)"</assert-eq>
       </result>
    </test-case>
    
-   <test-case name="xqhof21-40" covers="map-constructor map-general">
+   <test-case name="xqhof21-40" covers-40="PR1182" covers="map-constructor map-general">
       <description>Function coercion applied to a map, not failing because 4.0 allows the predicate to return ()</description>
       <created by="John Snelson" on="2015-07-16"/>
       <modified by="Michael Kay" on="2024-07-22" change="4.0 allows predicate to return ()"/>
@@ -1979,7 +2031,7 @@ key: z, value: (zebra)"</assert-eq>
       </result>
    </test-case>
 
-   <test-case name="xqhof21a" covers="map-constructor map-general">
+   <test-case name="xqhof21a" covers-40="PR1182" covers="map-constructor map-general">
       <description>Same as xqhof21, but with XQ40+ expecting a result, rather than a type error as with XQ31</description>
       <created by="Gunther Rademacher" on="2024-07-23"/>
       <dependency type="spec" value="XQ40+"/>
@@ -2106,4 +2158,44 @@ key: z, value: (zebra)"</assert-eq>
       </result>
    </test-case>
    
+   <test-case name="xqhof45" covers-40="PR1023 PR1128">
+      <description>Function coercion of a function that matches the required type.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $f as fn(xs:integer) as item()* := fn($x as item()) { $x } return $f('a')</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="xqhof46" covers-40="PR1023 PR1128">
+      <description>Function coercion of a function that matches the required type.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $f as fn(xs:integer) as item()* := fn($x as item()) { $x } return $f(xs:untypedAtomic('1')) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="xqhof47" covers-40="PR1023 PR1128">
+      <description>Function coercion of a function that matches the required type.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare function local:call($f as fn(xs:double) as item()*) { $f(1) }; local:call(fn($x) { $x instance of xs:double })</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="xqhof48" covers-40="PR1023 PR1128">
+      <description>Function coercion of a function that matches the required type.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>let $f as fn(xs:string) as item()* := { '1': 'a' } return $f(1)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
 </test-set>

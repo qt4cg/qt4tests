@@ -953,7 +953,7 @@ declare option output:version  "5.0";
     </result>
   </test-case>
   
-  <test-case name="Serialization-html-37a" covers-40="PR2212">
+  <test-case name="Serialization-html-37a" covers-40="PR342 PR2212">
     <description>Test media-type and include-content-type parameters for HTML 5.0, where input had a head element already containing a meta element</description>
     <created by="Henry Zongaro" on="2012-10-26"/>
     <modified by="O'Neil Delpratt" on="2013-05-30"
@@ -1557,7 +1557,7 @@ return [ $html ]
     </result>
   </test-case>
   
-  <test-case name="Serialization-html-60" covers-30="html-output">
+  <test-case name="Serialization-html-60" covers-40="PR342" covers-30="html-output">
     <description>Test that existing meta elements with charset attribute are dropped. QT4 issue 318.</description>
     <created by="Michael Kay" on="2023-01-25"/>
     <dependency type="feature" value="serialization" satisfied="true"/>
@@ -1625,6 +1625,42 @@ return [ $html ]
     ]]></test>
     <result>
       <serialization-matches flags="i"><![CDATA[^<p>x\r\ny</p>]]></serialization-matches>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-html-64" covers-40="PR1977">
+    <description>Test the HTML output method with HTML5 as default version</description>
+    <created by="Christian Gruen" on="2026-10-01"/>
+    <modified by="Michael Ennen" on="2026-10-01" change="Allow both permitted HTML5 forms of basefont"/>
+    <dependency type="feature" value="serialization" satisfied="true"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "html";
+      declare option output:indent "no";
+      <html><body><br/><basefont/></body></html>
+    ]]></test>
+    <result>
+      <serialization-matches flags="i"><![CDATA[^<!DOCTYPE\s+html\s*><html><body><br><basefont>(</basefont>)?</body></html>$]]></serialization-matches>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-html-65" covers-40="PR342">
+    <description>Test the meta element of the HTML output method with HTML5.</description>
+    <created by="Christian Gruen" on="2026-10-03"/>
+    <dependency type="feature" value="serialization" satisfied="true"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "html";
+      declare option output:html-version "5";
+      declare option output:indent "no";
+      declare option output:include-content-type "yes";
+      declare option output:encoding "UTF-8";
+      <html><head><meta charset="ISO-8859-1"/><title>x</title></head></html>
+    ]]></test>
+    <result>
+      <serialization-matches flags="i"><![CDATA[^<!DOCTYPE\s+html\s*><html><head><meta\s+charset=['"]UTF-8['"]\s*><title>x</title></head></html>$]]></serialization-matches>
     </result>
   </test-case>
 

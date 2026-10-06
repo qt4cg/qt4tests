@@ -1127,10 +1127,14 @@
       <description> Disallow reserved names </description>
       <created by="Michael Kay" on="2024-06-11"/>
       <modified by="Michael Kay" on="2026-03-04" change="fewer names are now reserved"/>
+      <modified by="Michael Ennen" on="2026-10-01" change="Allow dynamic errors when reserved names parse as operators"/>
       <dependency type="spec" value="XQ40+"/>
       <test><![CDATA[<foo>{attribute div {"123"}}</foo>]]></test>
       <result>
-         <error code="XPTY0004"/>
+         <any-of>
+            <error code="XPTY0004"/>
+            <error code="XPDY0002"/>
+         </any-of>
       </result>
    </test-case>
    
@@ -1139,6 +1143,7 @@
       <created by="Michael Kay" on="2024-06-11"/>
       <modified by="Michael Kay" on="2025-08-30" change="updated from current spec"/>
       <modified by="Michael Kay" on="2026-03-04" change="fewer names are now reserved"/>
+      <modified by="Michael Ennen" on="2026-10-01" change="Allow dynamic errors when reserved names parse as operators"/>
       <dependency type="spec" value="XQ40+"/>
       <dependency type="feature" value="fn-load-xquery-module"/>
       <test>
@@ -1151,7 +1156,7 @@
                     declare variable $m:v := attribute {$kw} {{"content"}};`
          let $var := try {
                        load-xquery-module('http://m.ns/', {'content':$q})?variables?*
-                     } catch err:FOQM0003 {
+                     } catch err:FOQM0003 | err:XPDY0002 | err:XPTY0004 {
                        ()
                      }  
          return $var
@@ -1614,4 +1619,24 @@
          <error code="XQDY0074"/>
       </result>
    </test-case>
+   <test-case name="Constr-compattr-compname-26" covers-40="PR2665">
+      <description>Name coerced to xs:QName or xs:string.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>element x { attribute { ['abc'] } { 12 } }</test>
+      <result>
+         <assert-xml><![CDATA[<x abc="12"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compattr-compname-27" covers-40="PR2665">
+      <description>Name coerced to xs:QName or xs:string.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>element x { attribute { jtree('abc') } { 12 } }</test>
+      <result>
+         <assert-xml><![CDATA[<x abc="12"/>]]></assert-xml>
+      </result>
+   </test-case>
+
 </test-set>

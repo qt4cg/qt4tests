@@ -371,7 +371,7 @@
       </result>
    </test-case>
    
-   <test-case name="namespaceDecl-29">
+   <test-case name="namespaceDecl-29" covers-40="PR2181">
       <description> XPath 4.0 doesn't allow declarations in any order </description>
       <created by="Michael Kay" on="2025-09-16"/>
       <modified by="Gunther Rademacher" on="2025-09-20" change="fix namespace prefix and dependency"/>
@@ -387,7 +387,7 @@
       </result>
    </test-case>
    
-   <test-case name="namespaceDecl-30" covers-40="PR2181">
+   <test-case name="namespaceDecl-30" covers-40="PR2181 PR1181">
       <description> Use default namespace policy ##any </description>
       <created by="Michael Kay" on="2026-02-25"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
@@ -615,6 +615,58 @@
       ]]></test>
       <result>
          <error code="XPST0081"/>
+      </result>
+   </test-case>
+
+   <test-case name="namespaceDecl-31" covers-40="PR487">
+      <description>Predeclared namespace prefixes.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>namespace-uri-from-QName(xs:QName('output:indent'))</test>
+      <result>
+         <assert-eq>"http://www.w3.org/2010/xslt-xquery-serialization"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="namespaceDecl-32" covers-40="PR487">
+      <description>Predeclared namespace prefixes.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>xs:QName('err:FOER0000') eq QName('http://www.w3.org/2005/xqt-errors', 'FOER0000')</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="namespaceDecl-33" covers-40="PR487">
+      <description>Predeclared namespace prefixes.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>('map', 'array', 'math') ! namespace-uri-from-QName(xs:QName(. || ':x'))</test>
+      <result>
+         <assert-deep-eq>"http://www.w3.org/2005/xpath-functions/map",
+            "http://www.w3.org/2005/xpath-functions/array",
+            "http://www.w3.org/2005/xpath-functions/math"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="namespaceDecl-34" covers-40="PR487">
+      <description>Predeclared namespace prefixes.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace map = 'http://example.com/'; namespace-uri-from-QName(xs:QName('map:x'))</test>
+      <result>
+         <assert-eq>"http://example.com/"</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="namespaceDecl-35" covers-40="PR487">
+      <description>Predeclared namespace prefixes.</description>
+      <created by="Christian Gruen" on="2026-10-01"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[(<output:x/>, <err:y/>) ! namespace-uri()]]></test>
+      <result>
+         <assert-deep-eq>"http://www.w3.org/2010/xslt-xquery-serialization", "http://www.w3.org/2005/xqt-errors"</assert-deep-eq>
       </result>
    </test-case>
 </test-set>
