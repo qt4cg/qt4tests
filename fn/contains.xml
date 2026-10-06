@@ -541,8 +541,8 @@
    
    <test-case name="fn-contains-44" covers-40="PR1945">
       <description>Use contains() with Unicode case-blind collation</description>
-      <created by="Michael Kay" on="2014-12-04"/>
-      <dependency type="spec" value="XP31+ XQ31+"/>
+      <created by="Michael Kay" on="2023-07-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
       <test>fn:contains("ALPHA", "ph", "http://www.w3.org/2005/xpath-functions/collation/unicode-case-insensitive")</test>
       <result>
          <assert-true/>
@@ -551,8 +551,8 @@
    
    <test-case name="fn-contains-45" covers-40="PR1945">
       <description>Use contains() with Unicode case-blind collation</description>
-      <created by="Michael Kay" on="2014-12-04"/>
-      <dependency type="spec" value="XP31+ XQ31+"/>
+      <created by="Michael Kay" on="2023-07-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
       <test>fn:contains("KÜCHE", "ü", "http://www.w3.org/2005/xpath-functions/collation/unicode-case-insensitive")</test>
       <result>
          <assert-true/>
@@ -561,11 +561,48 @@
    
    <test-case name="fn-contains-46" covers-40="PR1945">
       <description>Use contains() with Unicode case-blind collation</description>
-      <created by="Michael Kay" on="2014-12-04"/>
-      <dependency type="spec" value="XP31+ XQ31+"/>
+      <created by="Michael Kay" on="2023-07-04"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
       <test>fn:contains("KÜCHE", "ue", "http://www.w3.org/2005/xpath-functions/collation/unicode-case-insensitive")</test>
       <result>
          <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-contains-47">
+      <description>Use contains() with a collation that depends on the source data</description>
+      <created by="Michael Kay" on="2026-09-26"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         let $data := <doc>
+            <word xml:lang="en">KITCHEN</word>
+            <word xml:lang="de">KÜCHE</word>
+            <word xml:lang="fr">CUISINE</word>
+            <word xml:lang="it">CUCINA</word>
+         </doc>
+         return $data//word[fn:contains(., "E", collation(map{'lang':@xml:lang}))]/string()]]></test>
+      <result>
+         <assert-deep-eq>"KITCHEN", "KÜCHE", "CUISINE"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-contains-48">
+      <description>Use contains() with a collation that depends on the source data</description>
+      <created by="Michael Kay" on="2026-09-26"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         let $data := <doc>
+            <word xml:lang="en">KITCHEN</word>
+            <word xml:lang="de">KÜCHE</word>
+            <word xml:lang="fr">CUISINE</word>
+            <word xml:lang="it">CUCINA</word>
+         </doc>
+         return $data//word[fn:contains(., "e", 
+                             if (position() lt 3) 
+                             then 'http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive'
+                             else 'http://www.w3.org/2005/xpath-functions/collation/codepoint')]/string()]]></test>
+      <result>
+         <assert-deep-eq>"KITCHEN", "KÜCHE"</assert-deep-eq>
       </result>
    </test-case>
    
