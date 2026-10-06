@@ -1,0 +1,186 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-drop-while" covers-40="PR2949">
+  <description>Tests for the fn:drop-while function</description>
+
+  <link type="spec" document="https://qt4cg.org/specifications/xpath-functions-40/"
+        idref="func-drop-while"/>
+
+  <dependency type="spec" value="XP40+ XQ40+"/>
+  <dependency type="feature" value="higherOrderFunctions"/>
+
+  <test-case name="drop-while-001">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while(10 to 20, fn { . le 12 })</test>
+    <result>
+      <assert-deep-eq>13 to 20</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-002">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while(10 to 20, fn { . lt 100 })</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-003">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while(10 to 20, fn { . gt 100 })</test>
+    <result>
+      <assert-deep-eq>10 to 20</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-004">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while((), boolean#1)</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-005">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while((1, 5, 2, 6), fn { . lt 4 })</test>
+    <result>
+      <assert-deep-eq>5, 2, 6</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-006">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while(10 to 20, fn($num, $pos) { $pos lt 4 })</test>
+    <result>
+      <assert-deep-eq>13 to 20</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-007">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while(1 to 5, true#0)</test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-008">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while(1 to 5, false#0)</test>
+    <result>
+      <assert-deep-eq>1 to 5</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-009">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while(1 to 5, fn { () })</test>
+    <result>
+      <assert-deep-eq>1 to 5</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-010">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while(("", " ", "A", "", "B"), fn { not(normalize-space()) })</test>
+    <result>
+      <assert-deep-eq>"A", "", "B"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-011">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test><![CDATA[parse-xml("<doc><h1/><p/><h2/><p/></doc>")/doc/*
+      => fn:drop-while(fn { not(self::h2) })
+      => count()]]></test>
+    <result>
+      <assert-eq>2</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-012">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>
+      let $input := (3, 1, 4, 1, 5, 9, 2, 6)
+      let $predicate := fn { . lt 5 }
+      return deep-equal(
+        (take-while($input, $predicate), fn:drop-while($input, $predicate)),
+        $input
+      )
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-013">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>
+      deep-equal(
+        fn:drop-while(1 to 10, fn($n, $p) { $n + $p lt 9 }),
+        subsequence-where(1 to 10, fn($n, $p) { not($n + $p lt 9) })
+      )
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-014">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>head(fn:drop-while(1 to 1000000000, fn { . lt 3 }))</test>
+    <result>
+      <assert-eq>3</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-015">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while(("a", 1, "b"), fn { . instance of xs:string })</test>
+    <result>
+      <assert-deep-eq>1, "b"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-016">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while(1 to 5, fn { . })</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-017">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while(1 to 5, fn($a, $b, $c) { true() })</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
+  <test-case name="drop-while-018">
+    <description>Evaluation of the drop-while function.</description>
+    <created by="Christian Gruen" on="2026-10-06"/>
+    <test>fn:drop-while(1 to 5, ())</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
+</test-set>
