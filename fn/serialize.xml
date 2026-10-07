@@ -4649,6 +4649,79 @@ Second line</text>
         </result>
     </test-case>
 
+    <test-case name="serialize-xml-170">
+        <description>Character mapping.</description>
+        <created by="Christian Gruen" on="2026-10-07"/>
+        <dependency type="spec" value="XQ31+"/>
+        <test><![CDATA[
+            serialize(<a>c&#x327;</a>, map {
+              'use-character-maps': map { 'c': 'C' },
+              'normalization-form': 'NFC'
+            }) => string-to-codepoints()
+        ]]></test>
+        <result>
+            <assert-deep-eq>60, 97, 62, 67, 807, 60, 47, 97, 62</assert-deep-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-171">
+        <description>Character mapping.</description>
+        <created by="Christian Gruen" on="2026-10-07"/>
+        <dependency type="spec" value="XQ31+"/>
+        <test><![CDATA[
+            serialize(<a b='c&#x327;'/>, map {
+              'use-character-maps': map { 'c': 'C' },
+              'normalization-form': 'NFC'
+            }) => string-to-codepoints()
+        ]]></test>
+        <result>
+            <assert-deep-eq>60, 97, 32, 98, 61, 34, 67, 807, 34, 47, 62</assert-deep-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-xml-172">
+        <description>Character mapping.</description>
+        <created by="Christian Gruen" on="2026-10-07"/>
+        <dependency type="spec" value="XQ31+"/>
+        <test><![CDATA[
+            serialize(<a xmlns='x'/>, map { 'use-character-maps': map { 'x': 'X' } })
+        ]]></test>
+        <result>
+            <assert-eq>'&lt;a xmlns="x"/&gt;'</assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-html-010">
+        <description>Character mapping.</description>
+        <created by="Christian Gruen" on="2026-10-07"/>
+        <dependency type="spec" value="XQ31+"/>
+        <test><![CDATA[
+            serialize(<a href='z'>z</a>, map {
+              'method': 'html',
+              'use-character-maps': map { 'z': 'Z' }
+            })
+        ]]></test>
+        <result>
+            <assert-eq>'&lt;a href="z"&gt;Z&lt;/a&gt;'</assert-eq>
+        </result>
+    </test-case>
+
+    <test-case name="serialize-html-011">
+        <description>Character mapping.</description>
+        <created by="Christian Gruen" on="2026-10-07"/>
+        <dependency type="spec" value="XQ31+"/>
+        <test><![CDATA[
+            serialize(<a href='z'>z</a>, map {
+              'method': 'html',
+              'escape-uri-attributes': false(),
+              'use-character-maps': map { 'z': 'Z' }
+            })
+        ]]></test>
+        <result>
+            <assert-eq>'&lt;a href="Z"&gt;Z&lt;/a&gt;'</assert-eq>
+        </result>
+    </test-case>
+
     <test-case name="serialize-json-347" covers-40="PR534">
         <description>The escape-solidus serialization parameter.</description>
         <created by="Christian Gruen" on="2026-10-01"/>
