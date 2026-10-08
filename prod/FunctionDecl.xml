@@ -2993,6 +2993,46 @@
          <assert-eq>1</assert-eq>
       </result>
    </test-case>
+   
+   <test-case name="function-decl-40-054" covers-40="PR2941">
+      <description>Default values of function parameters - use global variable</description>
+      <created by="Michael Kay" on="2026-10-07"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare variable $now := current-date();
+         declare function local:f($x := $now) { $x + xs:dayTimeDuration('P1D') };
+         local:f() - xs:dayTimeDuration('P1D') = current-date()
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-055" covers-40="PR2941">
+      <description>Default values of function parameters - recursion</description>
+      <created by="Michael Kay" on="2026-10-07"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:f($x := local:f(current-date())) { $x + xs:dayTimeDuration('P1D') };
+         local:f() - xs:dayTimeDuration('P2D') = current-date()
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="function-decl-40-056" covers-40="PR2941">
+      <description>Default values of function parameters - local variables in default expression</description>
+      <created by="Michael Kay" on="2026-10-07"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare function local:f($x := sum(for $i in 1 to 10 return $i*$i)) { $x + 3 };
+         local:f()
+      ]]></test>
+      <result>
+         <assert-eq>388</assert-eq>
+      </result>
+   </test-case>
  
    
    <test-case name="function-decl-40-901" covers-40="PR197">
@@ -3227,5 +3267,7 @@
          <error code="XPTY0004"/>
       </result>
    </test-case>
+   
+   
 
 </test-set>
