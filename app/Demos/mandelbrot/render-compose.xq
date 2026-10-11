@@ -12,7 +12,7 @@ import module namespace mb = 'http://basex.org/examples/mandelbrot' at 'mandelbr
  : @param  $done  escaped flag
  : @return state
  :)
-declare record state(
+declare %constructor record state(
   zx    as xs:double,
   zy    as xs:double,
   i     as xs:integer,
