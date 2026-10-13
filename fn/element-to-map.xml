@@ -2736,6 +2736,314 @@
       </result>
    </test-case>
 
+   <test-case name="element-to-map-700" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<first_x0020_name>Jane</first_x0020_name>')/*,
+             { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'first name': 'Jane' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-701" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<r><_x_>x</_x_></r>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'r': { '': 'x' } }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-702" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_x005F_xb/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'a_xb': '' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-703" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_x0F0000_/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'a' || codepoints-to-string(983040): '' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-704" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<r><a_x12_b/><a_x0020/><a_x00200_/></r>')/*,
+             { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'r': { 'a_x12_b': '', 'a_x0020': '', 'a_x00200_': '' } }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-705" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a x_x0020_y="1"/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'a': { '@x y': '1' } }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-706" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<first_x0020_name/>')/*)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'first_x0020_name': '' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-707" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_x0000_/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <error code="FOCH0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-708" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_xD800_/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <error code="FOCH0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-709" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<p:a_x0020_b xmlns:p="http://p"/>')/*,
+             { 'name-format': 'lexical', 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'p:a b': '' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-710" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_x0020_b xmlns="http://u/"/>')/*,
+             { 'name-format': 'eqname', 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'Q{http://u/}a b': '' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-711" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_x003A_b/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'a:b': '' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-712" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         let $e := parse-xml('<a_x0020_b c_x003A_d="1"><_x0031_/></a_x0020_b>')/*
+         let $o := { 'escape-names': true() }
+         return deep-equal($e, map-to-element(element-to-map($e, $o), $o))
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-713" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_x0020_b_x0020_c/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'a b c': '' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-714" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<_x0031__x0032_/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ '12': '' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-715" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_x_b/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'a_x_b': '' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-716" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<_x005F_x_/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ '_x_': '' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-717" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_x110000_/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <error code="FOCH0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-718" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_xFFFE_/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <error code="FOCH0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-719" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_x01D11E_/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'a' || codepoints-to-string(119070): '' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-720" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_X0020_/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'a_X0020_': '' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-721" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<p:_x_ xmlns:p="http://p"/>')/*,
+             { 'name-format': 'lexical', 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'p:': '' }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-722" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a xml:a_x0020_b="1"/>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'a': { '@xml:a b': '1' } }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-723" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_x0020_b xmlns="http://u/"><c_x0020_d/></a_x0020_b>')/*,
+             { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'Q{http://u/}a b': { 'c d': '' } }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-724" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a_x0020_b/>')/*,
+             { 'escape-names': true(), 'plan': { 'a_x0020_b': { 'layout': 'xml' } } })
+      ]]></test>
+      <result>
+         <assert-deep-eq><![CDATA[{ 'a b': '<a_x0020_b/>' }]]></assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-725" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a>t<b_x0020_c/></a>')/*, { 'escape-names': true() })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ 'a': [ 't', { 'b c': '' } ] }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="element-to-map-726" covers-40="PR2931">
+      <description>Escaping of names.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[
+         let $e := parse-xml('<a_x0020_b><c_x0020_d>1</c_x0020_d><c_x0020_d>2</c_x0020_d></a_x0020_b>')/*
+         let $o := { 'escape-names': true(), 'plan': element-to-map-plan($e) }
+         return deep-equal($e, map-to-element(element-to-map($e, $o), $o))
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
    <!--<test-case name="element-to-map-601" covers-40="PR1596">
       <description> Empty element with empty layout disabled </description>
       <created by="Michael Kay" on="2024-12-06"/>

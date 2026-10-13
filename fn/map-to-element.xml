@@ -613,9 +613,10 @@
    <test-case name="map-to-element-066">
       <description>Evaluation of the map-to-element function.</description>
       <created by="Christian Gruen" on="2026-08-12"/>
+      <modified by="Christian Gruen" on="2026-10-13" change="PR2931"/>
       <test>map-to-element({ 'a': { '@x': '1' } }, { 'attribute-marker': 'attr:' })</test>
       <result>
-         <error code="FOJS0009"/>
+         <assert-xml><![CDATA[<a x="1"/>]]></assert-xml>
       </result>
    </test-case>
 
@@ -1507,10 +1508,11 @@
    <test-case name="map-to-element-156">
       <description>Evaluation of the map-to-element function.</description>
       <created by="Christian Gruen" on="2026-08-12"/>
+      <modified by="Christian Gruen" on="2026-10-13" change="PR2931"/>
       <test>map-to-element({ 'a': [ '1', '2' ] },
          { 'plan': { '*': { 'layout': 'list', 'child': 'b' } } })</test>
       <result>
-         <assert-xml><![CDATA[<a><b>1</b><b>2</b></a>]]></assert-xml>
+         <error code="FOJS0009"/>
       </result>
    </test-case>
 
@@ -1529,6 +1531,730 @@
       <test>map-to-element({ 'a': 'x' }, { 'plan': { 'a': { 'layout': 'simple', 'x': 1 } } })</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-160" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'first name': 'Jane' }, { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<first_x0020_name>Jane</first_x0020_name>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-161" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'r': { '1st': 'x' } }, { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<r><_x0031_st>x</_x0031_st></r>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-162" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a_xb': 'c' }, { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<a_x005F_xb>c</a_x005F_xb>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-163" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'r': { '': 'x' } }, { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<r><_x_>x</_x_></r>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-164" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a:b': 'x' }, { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<a_x003A_b>x</a_x003A_b>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-165" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace p = 'http://p';
+         map-to-element({ 'p:a b': 'x' }, { 'name-format': 'lexical', 'escape-names': true() })</test>
+      <result>
+         <assert>name($result) = 'p:a_x0020_b' and namespace-uri($result) = 'http://p'</assert>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-166" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'Q{http://u/}a b': 'x' }, { 'escape-names': true() })</test>
+      <result>
+         <assert>local-name($result) = 'a_x0020_b' and namespace-uri($result) = 'http://u/'</assert>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-167" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@x y': '1' } }, { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<a x_x0020_y="1"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-168" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@xml:a b': '1' } }, { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<a xml:a_x0020_b="1"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-169" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>name(map-to-element(
+         { 'a' || codepoints-to-string(983040): 'x' },
+         { 'escape-names': true() }
+      ))</test>
+      <result>
+         <assert-eq>'a_x0F0000_'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-170" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@': '1' } }, { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<a _x_="1"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-171" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { 'b:c': '1' } },
+         { 'name-format': 'lexical', 'escape-names': true() })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-180" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { 'v': '1', '#v': 't' } },
+         { 'attribute-marker': '', 'content-key': 'v' })</test>
+      <result>
+         <assert-xml><![CDATA[<a v="1">t</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-181" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[let $e := parse-xml('<a v="1">t</a>')/*
+         let $o := { 'attribute-marker': '', 'content-key': 'v' }
+         return deep-equal($e, map-to-element(element-to-map($e, $o), $o))]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-182" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@x': '1', '##content': 't' } })</test>
+      <result>
+         <assert-xml><![CDATA[<a x="1">t</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-183" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': [ { '##content': xs:QName('fn:null') } ] })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-184" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@x': '1', 'y': '2' } }, { 'attribute-marker': ':' })</test>
+      <result>
+         <assert-xml><![CDATA[<a x="1"><y>2</y></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-185" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@v': 't', ':x': '1' } },
+         { 'attribute-marker': ':', 'content-key': '@v' })</test>
+      <result>
+         <assert-xml><![CDATA[<a x="1">t</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-186" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': [ { '@x': '1' }, 'y' ] }, { 'attribute-marker': ':' })</test>
+      <result>
+         <assert-xml><![CDATA[<a x="1">y</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-190" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[map-to-element({ 'a': '<b/>' },
+         { 'plan': { 'a': { 'layout': 'simple' }, '*': { 'layout': 'xml' } } })]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>&lt;b/&gt;</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-191" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': 'x' },
+         { 'plan': { 'a': { 'layout': 'list', 'child': 'b' }, '*': { 'layout': 'simple' } } })</test>
+      <result>
+         <assert-xml><![CDATA[<a>x</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-192" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': 'x' }, { 'plan': { 'a': { 'layout': 'list', 'child': 'b' } } })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-193" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { 'b': [ [], [] ] } })</test>
+      <result>
+         <assert-xml><![CDATA[<a><b/><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-194" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { 'b': [] } })</test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-195" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { 'b': [ 'x', { 'c': '1' } ] } },
+         { 'plan': { 'b': { 'layout': 'mixed' } } })</test>
+      <result>
+         <assert-xml><![CDATA[<a><b>x<c>1</c></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-196" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { 'b': [ 'x', { 'c': '1' } ] } })</test>
+      <result>
+         <assert-xml><![CDATA[<a><b>x</b><b><c>1</c></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-197" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { 'b': 'x' } }, { 'plan': { '*': { 'layout': 'simple' } } })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-200" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': '' }, { 'plan': { 'a': { 'layout': 'empty' } } })</test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-201" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': 'x' }, { 'plan': { 'a': { 'layout': 'empty' } } })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-202" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@x': '1' } }, { 'plan': { 'a': { 'layout': 'empty-plus' } } })</test>
+      <result>
+         <assert-xml><![CDATA[<a x="1"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-203" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { 'b': '1' } }, { 'plan': { 'a': { 'layout': 'empty-plus' } } })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-204" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@x': '1', '#content': 't' } },
+         { 'plan': { 'a': { 'layout': 'simple-plus' } } })</test>
+      <result>
+         <assert-xml><![CDATA[<a x="1">t</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-205" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@x': '1' } }, { 'plan': { 'a': { 'layout': 'simple-plus' } } })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-206" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '#content': 't' } }, { 'plan': { 'a': { 'layout': 'record' } } })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-207" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@x': '1', 'b': [ '1', '2' ] } },
+         { 'plan': { 'a': { 'layout': 'list-plus', 'child': 'b' } } })</test>
+      <result>
+         <assert-xml><![CDATA[<a x="1"><b>1</b><b>2</b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-208" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { 'b': [] } },
+         { 'plan': { 'a': { 'layout': 'list-plus', 'child': 'b' } } })</test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-209" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@x': '1' } },
+         { 'plan': { 'a': { 'layout': 'list-plus', 'child': 'b' } } })</test>
+      <result>
+         <assert-xml><![CDATA[<a x="1"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-210" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { 'c': [ '1' ] } },
+         { 'plan': { 'a': { 'layout': 'list-plus', 'child': 'b' } } })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-211" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { 'b': '1' } },
+         { 'plan': { 'a': { 'layout': 'list-plus', 'child': 'b' } } })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-212" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': [ 'x' ] }, { 'plan': { 'a': { 'layout': 'sequence' } } })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-213" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': [ { 'b': '1' }, { 'c': '2' } ] },
+         { 'plan': { 'a': { 'layout': 'sequence' } } })</test>
+      <result>
+         <assert-xml><![CDATA[<a><b>1</b><c>2</c></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-214" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': [ 'x' ] },
+         { 'plan': { 'a': { 'layout': 'list', 'child': 'b' }, 'b': { 'layout': 'empty' } } })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-215" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': 1 }, { 'plan': { 'a': { 'layout': 'xml' } } })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-216" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[deep-equal(
+         map-to-element({ 'a': xs:QName('fn:null') }, { 'plan': { 'a': { 'layout': 'xml' } } }),
+         parse-xml('<a xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>')/*
+      )]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-217" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[map-to-element({ 'a': '<b/><!--c-->' }, { 'plan': { 'a': { 'layout': 'xml' } } })]]></test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-218" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[map-to-element({ 'a': '<?p?><b/>' }, { 'plan': { 'a': { 'layout': 'xml' } } })]]></test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-220" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': [ 'x', { '@y': '1' } ] })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-221" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': [ { '#content': xs:QName('fn:null') }, { '@y': '1' } ] })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-222" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': [ { 'b': '1' }, { '#content': xs:QName('fn:null') } ] })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-223" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': [ { '#content': 'x' } ] })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-224" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': [ (), { 'b': '1' } ] })</test>
+      <result>
+         <assert-xml><![CDATA[<a><b>1</b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-225" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': [ 'x', () ] })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-230" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'Q{http://www.w3.org/2000/xmlns/}a': 'x' })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-231" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@x': '1', '@Q{}x': '2' } })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-232" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': {
+         '@Q{http://www.w3.org/2001/XMLSchema-instance}nil': 'true',
+         '#content': xs:QName('fn:null')
+      } })</test>
+      <result>
+         <error code="FOJS0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-233" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare default element namespace 'http://d';
+         string(namespace-uri(map-to-element({ 'a': 'x' })))</test>
+      <result>
+         <assert-eq>''</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-234" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace p = 'http://p';
+         name(map-to-element({ 'p:x': 'v' }))</test>
+      <result>
+         <assert-eq>'p:x'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-235" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test><![CDATA[deep-equal(
+         map-to-element({ 'Q{http://u/}a': { '@x': '1', 'b': '2' } }),
+         parse-xml('<a xmlns="http://u/" x="1"><b>2</b></a>')/*
+      )]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-236" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@x': () } })</test>
+      <result>
+         <assert-xml><![CDATA[<a x=""/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-240" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'root': parse-json('{ "a": 1, "b": [ 1, 2 ] }') })</test>
+      <result>
+         <assert-xml><![CDATA[<root><a>1</a><b>1</b><b>2</b></root>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-241" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'root': parse-json('[ 1, 2 ]') },
+         { 'plan': { 'root': { 'layout': 'list', 'child': 'item' } } })</test>
+      <result>
+         <assert-xml><![CDATA[<root><item>1</item><item>2</item></root>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-242" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'root': parse-json('null') })</test>
+      <result>
+         <assert-xml><![CDATA[<root/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-250" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'r': { 'a-b.c': '1', '-a': '2', '.a': '3' } },
+         { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<r><a-b.c>1</a-b.c><_x002D_a>2</_x002D_a><_x002E_a>3</_x002E_a></r>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-251" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'r': { 'a_b': '1', 'a_': '2', '_Xa': '3', '_a': '4' } },
+         { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<r><a_b>1</a_b><a_>2</a_><_Xa>3</_Xa><_a>4</_a></r>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-252" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ '_x_': 'x' }, { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<_x005F_x_>x</_x005F_x_>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-253" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a/b': 'x' }, { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<a_x002F_b>x</a_x002F_b>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-254" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>name(map-to-element(
+         { codepoints-to-string(119070): 'x' },
+         { 'escape-names': true() }
+      )) eq codepoints-to-string(119070)</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-255" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>declare namespace p = 'http://p';
+         map-to-element({ 'p:a:b': 'x' }, { 'name-format': 'lexical', 'escape-names': true() })</test>
+      <result>
+         <assert>name($result) = 'p:a_x003A_b' and namespace-uri($result) = 'http://p'</assert>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-256" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '@p:x': '1' } }, { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<a p_x003A_x="1"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-257" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'xml:a b': 'x' }, { 'escape-names': true() })</test>
+      <result>
+         <assert>name($result) = 'xml:a_x0020_b'
+            and namespace-uri($result) = 'http://www.w3.org/XML/1998/namespace'</assert>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-258" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'Q{http://u/}': 'x' }, { 'escape-names': true() })</test>
+      <result>
+         <assert>local-name($result) = '_x_' and namespace-uri($result) = 'http://u/'</assert>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-259" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { 'v w': '1' } }, { 'escape-names': true(), 'content-key': 'v w' })</test>
+      <result>
+         <assert-xml><![CDATA[<a>1</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-260" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': { '-x': '1' } }, { 'escape-names': true(), 'attribute-marker': '-' })</test>
+      <result>
+         <assert-xml><![CDATA[<a x="1"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-261" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a': [
+         { '#comment': 'c' },
+         { '#processing-instruction': { '#target': 'p', '#data': 'd' } }
+      ] }, { 'escape-names': true() })</test>
+      <result>
+         <assert-xml><![CDATA[<a><!--c--><?p d?></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="map-to-element-262" covers-40="PR2931">
+      <description>Evaluation of the map-to-element function.</description>
+      <created by="Christian Gruen" on="2026-10-13"/>
+      <test>map-to-element({ 'a b': [ 'x', 'y' ] }, {
+         'escape-names': true(),
+         'plan': { 'a_x0020_b': { 'layout': 'list', 'child': 'c_x0020_d' } }
+      })</test>
+      <result>
+         <assert-xml><![CDATA[<a_x0020_b><c_x0020_d>x</c_x0020_d><c_x0020_d>y</c_x0020_d></a_x0020_b>]]></assert-xml>
       </result>
    </test-case>
 </test-set>
