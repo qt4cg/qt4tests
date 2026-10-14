@@ -11,7 +11,7 @@
 
 	<dependency type="spec" value="XP40+"/>
 	
-	<environment name="fn-system-properties-supports-dtd">
+	<environment name="fn-system-properties-supports-dtd-validation-option">
 		<source role="." file="system-properties/supports-dtd.xml">
 			<description>A DTD validated XML file that includes examples of ID and IDREF attributes and an entity that requires expansion.</description>
 			<created by="Sheila Thomson" on="2026-08-26" />
@@ -224,7 +224,7 @@
 		</result>
 	</test-case>
 	
-	<test-case name="fn-system-properties-not-schema-aware">
+	<test-case name="fn-system-properties-schema-aware-false">
 		<description>Check that the schema-aware is set to false if the processor doesn't offer the ability to add schema components to the static context, using the schema import mechanism.</description>
 		<created by="Sheila Thomson" on="2026-06-11"/>
 		<dependency type="feature" value="schemaImport" satisfied="false" />
@@ -237,7 +237,7 @@
 	<test-case name="fn-system-properties-accepts-typed-data">
 		<description>Check that accepts-typed-data is set to true if the processor is capable of handling nodes with a type annotation other than xs:untyped and xs:untypedAtomic.</description>
 		<created by="Sheila Thomson" on="2026-06-11"/>
-		<dependency type="feature" value="typedData"/>
+		<dependency type="feature" value="typedData"/>		
 		<test>fn:system-properties()?#accepts-typed-data</test>
 		<result>
 			<assert-true />
@@ -317,7 +317,7 @@
 	<test-case name="fn-system-properties-supports-dynamic-xslt">
 		<description>Check that supports-dynamic-xslt is set to true if the processor supports use of the fn:transform function.</description>
 		<created by="Sheila Thomson" on="2026-06-11"/>
-		<dependency type="feature" value="fn-transform-XSLT"/>
+		<dependency type="feature" value="fn-transform-XSLT" />
 		<test>fn:system-properties()?#supports-dynamic-xslt</test>
 		<result>
 			<assert-true />
@@ -354,51 +354,59 @@
 		</result>
 	</test-case>
 	
-	<test-case name="fn-system-properties-supports-dtd">
-		<description>Check that supports-dtd is set to true if the processor FULLY supports validation, entity expansion and attribute typing based on DTD processing during XML parsing.</description>
-		<created by="Sheila Thomson" on="2026-06-11"/>
-		<dependency type="feature" value="dtd-validation"/>
-		<dependency type="feature" value="infoset-dtd"/>
-		<test>fn:system-properties()?#supports-dtd</test>
+	<test-case name="fn-system-properties-supports-dtd-validation">
+		<description>Check that supports-dtd-validation is set to true if the processor fully supports use of the dtd-validation option for fn:doc and fn:parse-xml.</description>
+		<created by="Sheila Thomson" on="2026-09-09"/>
+		<environment ref="fn-system-properties-supports-dtd-validation-option"/>
+		<dependency type="feature" value="dtd-validation-option"/>
+		<test>[
+			fn:system-properties()?#supports-dtd-validation, 
+			fn:doc('system-properties/supports-dtd.xml', { 'dtd-validation' : true(), 'trust-external' : true()})/employees/employee[1]/motto
+			]</test>
 		<result>
-			<assert-true />
+			<all-of>
+				<assert>$result?1 eq true()</assert>
+				<assert>$result?2 eq 'Strengthened through the challenge'</assert>
+			</all-of>
 		</result>
 	</test-case>
 	
-	<test-case name="fn-system-properties-supports-dtd-no-validation">
-		<description>Check that supports-dtd is not set to true if the processor doesn't fully support DTD validation.</description>
-		<created by="Sheila Thomson" on="2026-08-21"/>
-		<dependency type="feature" value="dtd-validation" satisfied="false" />
-		<test>fn:system-properties()?#supports-dtd</test>
+	<test-case name="fn-system-properties-supports-dtd-validation-false">
+		<description>Check that supports-dtd-validation is not set to true if the processor doesn't fully support use of the dtd-validation option for fn:doc and fn:parse-xml.</description>
+		<created by="Sheila Thomson" on="2026-09-09"/>
+		<dependency type="feature" value="dtd-validation-option" satisfied="false" />
+		<test>fn:system-properties()?#supports-dtd-validation</test>
 		<result>
 			<assert-false />
 		</result>
 	</test-case>
 	
-	<test-case name="fn-system-properties-supports-dtd-no-entity-expansion">
-		<description>Check that supports-dtd is not set to true if the processor doesn't fully support DTD entity expansion.</description>
-		<created by="Sheila Thomson" on="2026-08-21"/>
+	<test-case name="fn-system-properties-supports-dtd-attribute-typing">
+		<description>Check that supports-dtd-attribute-typing is set to true if the processor recognises ID and IDREF attributes in a document that has been validated against a DTD using fn:doc and fn:parse-xml.</description>
+		<created by="Sheila Thomson" on="2026-09-09"/>
+		<environment ref="fn-system-properties-supports-dtd-validation-option"/>
+		<dependency type="feature" value="dtd-validation-option"/>
+		<dependency type="feature" value="infoset-dtd" />
+		<test>[
+			fn:system-properties()?#supports-dtd-attribute-typing, 
+			fn:doc('system-properties/supports-dtd.xml', { 'dtd-validation' : true(), 'trust-external' : true()})/fn:id('E30561')/first/text()
+		]</test>
+		<result>
+			<all-of>
+				<assert>$result?1 eq true()</assert>
+				<assert>$result?2 eq 'Anila'</assert>
+			</all-of>
+		</result>
+	</test-case>
+	
+	<test-case name="fn-system-properties-supports-dtd-attribute-typing-false">
+		<description>Check that supports-dtd-attribute-typing is not set to true if the processor doesn't recognise ID and IDREF attributes in a document that has been validated against a DTD using fn:doc or fn:parse-xml.</description>
+		<created by="Sheila Thomson" on="2026-09-09"/>
+		<dependency type="feature" value="dtd-validation-option" satisfied="false" />
 		<dependency type="feature" value="infoset-dtd" satisfied="false" />
-		<test>fn:system-properties()?#supports-dtd</test>
+		<test>fn:system-properties()?#supports-dtd-attribute-typing</test>		
 		<result>
 			<assert-false />
-		</result>
-	</test-case>	
-	
-	<test-case name="fn-system-properties-supports-dtd-verified">
-		<description>Check that supports-dtd is set to true if the processor fully supports DTD validation, entity expansion and attribute typing.</description>
-		<created by="Sheila Thomson" on="2026-08-21"/>
-		<dependency type="feature" value="dtd-validation" satisfied="true" />
-		<dependency type="feature" value="infoset-dtd" satisfied="true" />
-		<environment ref="fn-system-properties-supports-dtd"/>
-		<test>distinct-values((
-				fn:system-properties()?#supports-dtd, 
-				/employees/employee[1]/motto = 'Strengthened through the challenge',
-				fn:idref("E21256")/parent::employee/first = 'Anila',
-				fn:doc('system-properties/supports-dtd.xml', {'dtd-validation' : true()})
-			))</test>
-		<result>
-			<assert-true />
 		</result>
 	</test-case>
 	
