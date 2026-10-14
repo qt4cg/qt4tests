@@ -355,6 +355,150 @@
       </result>
    </test-case>
 
+   <test-case name="sequence-type-60" covers-40="PR2452 PR2667">
+      <description>Item type jnode.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         [ 'x' ]/1 instance of jnode(1.0),
+         [ 'x' ]/1 instance of jnode(1e0),
+         [ 'x' ]/1 instance of jnode('1'),
+         { 1.5: 'x' }/* instance of jnode(1.5e0)
+      </test>
+      <result>
+         <assert-deep-eq>true(), true(), false(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="sequence-type-61" covers-40="PR2452 PR2667">
+      <description>Item type jnode.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         { #xml:space: 'x' }/* instance of jnode(#xml:space),
+         { 'a': 'x' }/* instance of jnode(#a),
+         { xs:untypedAtomic('a'): 'x' }/* instance of jnode(a),
+         { xs:anyURI('a'): 'x' }/* instance of jnode('a')
+      </test>
+      <result>
+         <assert-deep-eq>true(), false(), true(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="sequence-type-62" covers-40="PR2452 PR2667">
+      <description>Item type jnode.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         [ 1 ]/1 instance of jnode(-1),
+         [ 1 ]/1 instance of jnode(true()),
+         { true(): 1 }/* instance of jnode(true()),
+         { true(): 1 }/* instance of jnode(1)
+      </test>
+      <result>
+         <assert-deep-eq>false(), false(), true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="sequence-type-63" covers-40="PR2452 PR2667">
+      <description>Item type jnode.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         jtree(()) instance of jnode((), empty-sequence()),
+         { 'a': () }/a instance of jnode(a, empty-sequence()),
+         { 'a': () }/a instance of jnode(*, xs:integer),
+         { 'a': () }/a instance of jnode(*, xs:integer?)
+      </test>
+      <result>
+         <assert-deep-eq>true(), true(), false(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="sequence-type-64" covers-40="PR2452 PR2667">
+      <description>Item type jnode.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         { 'a': ({}, {}) }/a instance of jnode(*, map(*)),
+         { 'a': ({}, {}) }/a instance of jnode(*, map(*)+),
+         jtree([]) instance of jnode((), array(xs:string)),
+         jtree(1)/item::* instance of jnode(1, xs:integer)
+      </test>
+      <result>
+         <assert-deep-eq>false(), true(), true(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="sequence-type-65" covers-40="PR2452 PR2667">
+      <description>Item type jnode.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         jtree(1) instance of jnode(()),
+         [ 1 ]/1 instance of jnode(()),
+         jtree(jtree(1)) instance of jnode((), jnode((), xs:integer)),
+         { 'a': 1 }/a instance of jnode(a, jnode())
+      </test>
+      <result>
+         <assert-deep-eq>true(), false(), true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="sequence-type-66" covers-40="PR2452 PR2667">
+      <description>Item type jnode.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         { 'a': 1 }/a instance of xnode(),
+         { 'a': parse-xml('<a/>')/a }/a instance of element(),
+         { 'a': 1 }/a instance of xs:integer,
+         { 'a': 1 }/a instance of node()
+      ]]></test>
+      <result>
+         <assert-deep-eq>false(), false(), false(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="sequence-type-67" covers-40="PR2452 PR2667">
+      <description>Item type jnode.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>{ 'a': 1 }/a treat as xs:integer</test>
+      <result>
+         <error code="XPDY0050"/>
+      </result>
+   </test-case>
+
+   <test-case name="sequence-type-68" covers-40="PR2452 PR2667">
+      <description>Item type jnode.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         typeswitch ({ 'a': 1 }/a)
+           case jnode(b) return 'b'
+           case jnode(a, xs:string) return 'a-string'
+           case jnode(a) return 'a'
+           default return 'none'
+      </test>
+      <result>
+         <assert-eq>'a'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="sequence-type-69" covers-40="PR2452 PR2667">
+      <description>Item type jnode.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare type local:a as jnode(a, xs:integer);
+         { 'a': 1, 'b': 2 }/* ! (. instance of local:a)
+      </test>
+      <result>
+         <assert-deep-eq>true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="built-in-record-type-002" covers-40="PR1991 PR2566">
       <description> Test existence of built-in-record type fn:load-xquery-module-record. </description>
       <created by="Michael Kay" on="2025-05-29"/>
