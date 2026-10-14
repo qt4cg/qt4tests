@@ -7,7 +7,7 @@ module namespace lib="http://example.ns/module2";
 
 declare %public record lib:chrono (d as xs:date?, t as xs:time?);
 
-declare %public %private type lib:extended-chrono (d as xs:date?, t as xs:time?, tz as xs:duration?);
+declare %public %private record lib:extended-chrono (d as xs:date?, t as xs:time?, tz as xs:duration?);
 
 
 declare %public variable $lib:now as lib:extended-chrono := 
