@@ -12,7 +12,7 @@ declare namespace c = 'http://basex.org/examples/mandelbrot/complex';
  : @param  $im  imaginary part
  : @return complex number
  :)
-declare record c:number(
+declare %constructor record c:number(
   re  as xs:double,
   im  as xs:double
 );
