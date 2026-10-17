@@ -1423,6 +1423,7 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
         <modified by="Abel Braaksma" on="2016-09-22" change="use function-style map lookup"/>
         <modified by="Michael Kay" on="2018-05-21" change="See bug 30209 regarding empty/absent principal result document"/>
         <modified by="Christian Gruen" on="2026-07-29" change="skip empty result document"/>
+        <modified by="Christian Gruen" on="2026-10-17" change="skip result documents without content"/>
         <dependency type="feature" value="fn-transform-XSLT" satisfied="true" />
         <environment ref="multiple-result-docs"/>
         <test>fn:transform(map {"stylesheet-node":$multipledocs, "source-node":$sections,
@@ -1434,7 +1435,7 @@ return transform(map{"source-node":fn:parse-xml($in), "stylesheet-text":$style, 
                 <assert>contains(string-join(map:keys($result)), 'section1.html')</assert>
                 <assert>some $key in map:keys($result) satisfies ends-with($key,
                     'transform/sandbox/fn-transform-43/section3.html')</assert>
-                <assert><![CDATA[some $key in map:keys($result)[$result?(.) != ''] satisfies parse-xml($result?($key))//h1 = 'Header for section 2']]></assert>
+                <assert><![CDATA[some $value in map:items($result)[contains(., '<h1')] satisfies parse-xml($value)//h1 = 'Header for section 2']]></assert>
             </all-of>
         </result>
     </test-case>
