@@ -1981,4 +1981,444 @@ every $book in $in//*[Title and ISBN-13] satisfies $book/ISBN-13 follows $book/T
       </result>
    </test-case>
 
+   <test-case name="PathExpr-J-440" covers-40="PR2083">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>
+         let $j := jtree({ 'a': 1 })
+         return (count(($j/a, $j/a)), count($j/(a, a)), count($j/a | $j/a))
+      </test>
+      <result>
+         <assert-deep-eq>2, 1, 1</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-441" covers-40="PR2083">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>
+         let $j := jtree({ 'a': 1, 'b': 2, 'c': 3 })
+         return ($j/(c, a, b) =!> jkey(), ($j/c | $j/a) =!> jkey())
+      </test>
+      <result>
+         <assert-deep-eq>'a', 'b', 'c', 'a', 'c'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-442" covers-40="PR2083">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>
+         let $j := jtree({ 'a': { 'b': [ 1, 2 ] } })
+         let $n := $j/a/b/2
+         return (
+           $n/ancestor::* ! jkey(),
+           $n/ancestor::*[1] ! jkey(),
+           $n/ancestor::*[last()] is $j
+         )
+      </test>
+      <result>
+         <assert-deep-eq>'a', 'b', 'b', true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-443" covers-40="PR2083">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test><![CDATA[
+         let $j := jtree({ 'data': {
+           'a': { 'c': (1, 2), 'd': [ 3, 4 ] },
+           'b': { 'c': [ 3, 4 ], 'd': 5 }
+         } })
+         let $nodes := $j/descendant-or-self::node()
+         return (
+           count($nodes),
+           every $a in $nodes, $b in $nodes satisfies
+             count(($a is $b, $a << $b, $a >> $b)[.]) = 1
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>14, true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-444" covers-40="PR2083">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>
+         let $j := jtree({ 'data': {
+           'a': { 'c': (1, 2), 'd': [ 3, 4 ] },
+           'b': { 'c': [ 3, 4 ], 'd': 5 }
+         } })
+         let $nodes := $j//node()
+         let $sorted := distinct-ordered-nodes(reverse($nodes))
+         return count($sorted) = count($nodes) and (
+           every $i in 1 to count($nodes) satisfies $sorted[$i] is $nodes[$i]
+         )
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-445" covers-40="PR2083">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test><![CDATA[
+         let $j := jtree({ 'a': 1, 'b': 2 })
+         return ($j/a << $j/b, $j/a >> $j/b, $j << $j/a, $j/b >> $j)
+      ]]></test>
+      <result>
+         <assert-deep-eq>true(), false(), true(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-446" covers-40="PR2083">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test><![CDATA[
+         let $j := jtree([])
+         let $x := parse-xml('<x/>')
+         return ($j is $x, ($j << $x) ne ($x << $j))
+      ]]></test>
+      <result>
+         <assert-deep-eq>false(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-447" covers-40="PR2083">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test><![CDATA[
+         let $j := jtree({ 'a': 1 })
+         let $x := parse-xml('<x/>')
+         return (
+           count(($j, $x, $j/a, $x) | ()),
+           count(($j, $x/x) except $x/x)
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>3, 1</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-450" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>{ 'a': (1, 2) }/a + 1</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-451" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>{ 'a': () }/a + 1</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-452" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>{ 'a': [ 2 ] }/a * 3</test>
+      <result>
+         <assert-eq>6</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-453" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>{ 'a': (1, 2) }/a = 2, { 'a': 1 }/a eq 1, { 'a': 'x' }/a || 'y'</test>
+      <result>
+         <assert-deep-eq>true(), true(), 'xy'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-454" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>{ 'a': (1, 2) }/a eq 1</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-460" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test><![CDATA[name([ parse-xml('<a/>')/a ]/1)]]></test>
+      <result>
+         <assert-eq>'a'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-461" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test><![CDATA[name([ (parse-xml('<a/>')/a, parse-xml('<b/>')/b) ]/1)]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-462" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>name({ 'a': 1 }/a)</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-463" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>
+         map:size([ { 'a': 1, 'b': 2 } ]/1),
+         array:size({ 'a': [ 1, 2 ] }/a),
+         abs({ 'a': -1 }/a)
+      </test>
+      <result>
+         <assert-deep-eq>2, 2, 1</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-464" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>
+         let $x as map(*) := [ { 'a': 1 } ]/1
+         return ($x?a, $x instance of jnode(), [ { 'a': 1 } ]/1 instance of map(*))
+      </test>
+      <result>
+         <assert-deep-eq>1, false(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-465" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>let $x as xs:integer* := { 'a': (1, 2) }/a return $x</test>
+      <result>
+         <assert-deep-eq>1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-466" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>let $x as xs:integer := { 'a': (1, 2) }/a return $x</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-467" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>let $x as xs:integer := { 'a': () }/a return $x</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-468" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>let $x as xs:string := { 'a': 1 }/a return $x</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-469" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>
+         let $d as xs:double := { 'a': 1 }/a
+         let $p as xs:positiveInteger := { 'a': 1 }/a
+         let $s as xs:string := { 'a': xs:untypedAtomic('x') }/a
+         return ($d instance of xs:double, $p instance of xs:positiveInteger, $s instance of xs:string)
+      </test>
+      <result>
+         <assert-deep-eq>true(), true(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-470" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>map:size(jtree(jtree({ 'a': 1 })))</test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-471" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>let $c as enum('red', 'green') := { 'c': 'red' }/c return $c</test>
+      <result>
+         <assert-eq>'red'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-472" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>let $c as enum('red', 'green') := { 'c': 'blue' }/c return $c</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-473" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>let $f as fn(xs:integer) as xs:integer := { 'f': abs#1 }/f return $f(-2)</test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-474" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>let $a as array(xs:string) := { 'a': [ 'x' ] }/a return $a</test>
+      <result>
+         <assert-deep-eq>[ 'x' ]</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-475" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>let $a as array(xs:string) := { 'a': [ 1 ] }/a return $a</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-476" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:size($map as map(*)) as xs:integer {
+           map:size($map)
+         };
+         [ {}, { 'a': 1 } ]/* ! local:size(.)
+      </test>
+      <result>
+         <assert-deep-eq>0, 1</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-477" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:key($node as jnode(*, xs:integer)) {
+           jkey($node)
+         };
+         local:key({ 'a': 1 }/a), local:key#1({ 'b': 2 }/b)
+      </test>
+      <result>
+         <assert-deep-eq>'a', 'b'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-478" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:key($node as jnode(*, xs:integer)) {
+           jkey($node)
+         };
+         local:key({ 'a': 'x' }/a)
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-479" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>
+         { 'a': [ 1, 2 ] }/a castable as array(*),
+         { 'a': { 'b': 1 } }/a castable as array(*),
+         { 'a': ('1', '2') }/a castable as xs:integer,
+         { 'a': '12' }/a cast as xs:integer
+      </test>
+      <result>
+         <assert-deep-eq>true(), false(), false(), 12</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-480" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>{ 'a': ('1', '2') }/a cast as xs:integer</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-490" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>
+         ({ 'a': { 'b': 1 } }/a)?b,
+         ({ 'a': [ 1, 2 ] }/a)?*,
+         ({ 'a': [ 1 ] }/a, { 'b': [ 2 ] }/b)?1,
+         jtree(({ 'a': 3 }, { 'a': 4 }))?a
+      </test>
+      <result>
+         <assert-deep-eq>1, 1, 2, 1, 2, 3, 4</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-491" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>({ 'a': [ { 'b': 1 } ] }/a)?1 instance of jnode()</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-492" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>({ 'a': (1, 2) }/a)?*</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-493" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>{ 'a': { 'b': 1 } }/a?b</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="PathExpr-J-494" covers-40="PR2031">
+      <description>Path expressions with JNodes.</description>
+      <created by="Christian Gruen" on="2026-10-14"/>
+      <test>[ [ 1, 2 ] ]/1?*</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
 </test-set>

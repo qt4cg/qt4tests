@@ -1040,7 +1040,8 @@
       <description>Test the adaptive serialization output method - xs:dateTimeStamp</description>
       <created by="Tim Mills" on="2016-09-13"/>
       <modified by="Tim Mills" on="2016-10-05" change="See Bug 29913"/>
-      <dependency type="spec" value="XQ31+"/>
+      <modified by="Christian Gruen" on="2026-10-16" change="PR2981"/>
+      <dependency type="spec" value="XQ31"/>
       <dependency type="xsd-version" value="1.1"/>
       <test><![CDATA[
      	declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -1049,6 +1050,21 @@
       ]]></test>
       <result>
         <serialization-matches>^xs:dateTime\("2011-07-28T12:34:56-08:00"\)</serialization-matches>
+      </result>
+   </test-case>
+
+  <test-case name="Serialization-adaptive-37a" covers-40="PR2522 PR2981">
+      <description>Test the adaptive serialization output method - xs:dateTimeStamp</description>
+      <created by="Tim Mills" on="2016-09-13"/>
+      <modified by="Christian Gruen" on="2026-10-16" change="PR2522 PR2981"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+        declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+        declare option output:method "adaptive";
+        xs:dateTimeStamp("2011-07-28T12:34:56-08:00")
+      ]]></test>
+      <result>
+        <serialization-matches>^xs:dateTimeStamp\("2011-07-28T12:34:56-08:00"\)</serialization-matches>
       </result>
    </test-case>
 
@@ -2425,6 +2441,38 @@
     </test>
     <result>
       <serialization-matches><![CDATA[^#Q\{http://example\.com/ns\}local$]]></serialization-matches>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-adaptive-100" covers-40="PR2114 PR2226">
+    <description>Adaptive serialization - jnodes</description>
+    <created by="Christian Gruen" on="2026-10-14"/>
+    <dependency type="feature" value="serialization" satisfied="true"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "adaptive";
+      declare option output:indent "no";
+      jtree(())
+    </test>
+    <result>
+      <serialization-matches><![CDATA[^jtree\(\(\)\)$]]></serialization-matches>
+    </result>
+  </test-case>
+
+  <test-case name="Serialization-adaptive-101" covers-40="PR2114 PR2226">
+    <description>Adaptive serialization - jnodes</description>
+    <created by="Christian Gruen" on="2026-10-14"/>
+    <dependency type="feature" value="serialization" satisfied="true"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+      declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+      declare option output:method "adaptive";
+      declare option output:indent "no";
+      jtree({ "a": () })/a
+    </test>
+    <result>
+      <serialization-matches><![CDATA[^jnode\("a":\(\)\)$]]></serialization-matches>
     </result>
   </test-case>
 
