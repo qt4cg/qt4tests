@@ -814,7 +814,8 @@ declare function translate:function(
       let $query := $args[1]?query otherwise translate:skip('value: no query')
       let $node := `({ $query })[last() = 1]`
       let $code := `{ $node } ! jvalue()`
-      return { 'value': $code, 'node': $node, 'idiom': $code }
+      (: idiomatic comparisons atomize the JNode :)
+      return { 'value': $code, 'node': $node, 'idiom': $node }
     default return
       let $($subject, $pattern) := $expr?args?*
       (: string values of the subject :)

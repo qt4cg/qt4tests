@@ -823,9 +823,13 @@ declare function translate:code(
         case '!=' return translate:boolean('xs:boolean',
           if ($null) then `exists({ $other })` else `not({ $equal })`)
         default return
+          (: two JNodes: typed by their values, atomized by the comparison :)
+          let $nodes := every $result in $results satisfies translate:is-node($result)
           let $code := fn($v) {
-            '(let $l := ' || $l || ', $r := ' || $r || ' return ' ||
-            'if (($l, $r) instance of xs:numeric*) then ' || $v || ' else ())'
+            '(let $l := ' || (if ($nodes) then $results[1]?code else $l) ||
+            ', $r := ' || (if ($nodes) then $results[2]?code else $r) || ' return ' ||
+            'if (($l, $r) instance of ' || (if ($nodes) then 'jnode(*, xs:numeric)*' else 'xs:numeric*') ||
+            ') then ' || $v || ' else ())'
           }
           let $value := '$l ' || $expr?op || ' $r'
           return translate:boolean('xs:boolean?', $code($value), $code('jtree(' || $value || ')'))
@@ -1321,7 +1325,7 @@ declare function translate:function(
       case $literal instance of array(*) return `array:reverse({ $V(1) })`
       default return
         `{ $N(1) } ! (if (self::jnode(*, xs:string)) then string-join(reverse(characters(.))) ` ||
-        `else array:reverse(jvalue()))`
+        `else array:reverse(.))`
     })
     case 'sort' return translate:wrap('array { sort(' || $M(1) || ' ! jvalue()) }')
     case 'sort_by' return

@@ -17,6 +17,26 @@ declare variable $NL := char('\n');
 (:~ Maximum width of an input line. :)
 declare variable $WIDTH := 100;
 declare variable $TODAY := format-date(current-date(), '[Y0001]-[M01]-[D01]');
+(:~ Test cases of the existing test set. :)
+declare variable $EXISTING := if (file:exists($TARGET)) then doc($TARGET)//*:test-case;
+
+(:~
+ : Returns a test case, with the creation date of the existing test case if nothing else has changed.
+ : @param $new  new test case
+ : @return test case
+ :)
+declare function revised(
+  $new  as element()
+) as element() {
+  let $old := $EXISTING[@name = $new/@name]
+  let $content := fn($test) { $test/(* except *:created) }
+  return if (exists($old) and
+    deep-equal($content($old), $content($new), options := { 'whitespace': 'strip' })) then (
+    element { node-name($new) } { $new/@*, $new/* ! (if (self::*:created) then $old/*:created else .) }
+  ) else (
+    $new
+  )
+};
 
 (:~
  : Evaluates a query and returns errors as maps.
@@ -211,7 +231,7 @@ let $test-set :=
     <dependency type="spec" value="XQ40+"/>
     {
       for $test in $verified
-      return <test-case name="{ $test?name }">
+      return revised(<test-case name="{ $test?name }">
         <description>{ $test?case?name }: { $test?case?selector }</description>
         <created by="Christian Grün" on="{ $TODAY }"/>
         <test>{ `{ $NL }{ $test?query }{ $NL }` }</test>
@@ -231,7 +251,7 @@ let $test-set :=
               <any-of>{ for $e at $i in $test?expected return $assert($e, $test?wanted[$i]?*) }</any-of>
           }
         }</result>
-      </test-case>
+      </test-case>)
     }
   </test-set>
 let $skipped := $cases[?skip]
