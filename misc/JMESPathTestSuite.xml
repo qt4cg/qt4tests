@@ -250,10 +250,10 @@ return $in/outer/bar otherwise $in/outer/baz
   </test-case>
   <test-case name="JMESPath-boolean-1-5">
     <description>boolean.json: outer.bad || outer.foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "outer": { "foo": "foo", "bar": "bar", "baz": "baz" } }
-return $in/outer/bad otherwise $in/outer/foo
+return $in/outer/foo
 ]]></test>
     <result>
       <assert-eq>"foo"</assert-eq>
@@ -261,10 +261,10 @@ return $in/outer/bad otherwise $in/outer/foo
   </test-case>
   <test-case name="JMESPath-boolean-1-6">
     <description>boolean.json: outer.bad||outer.foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "outer": { "foo": "foo", "bar": "bar", "baz": "baz" } }
-return $in/outer/bad otherwise $in/outer/foo
+return $in/outer/foo
 ]]></test>
     <result>
       <assert-eq>"foo"</assert-eq>
@@ -294,10 +294,10 @@ return $in/outer/foo otherwise $in/outer/bad
   </test-case>
   <test-case name="JMESPath-boolean-1-9">
     <description>boolean.json: outer.bad || outer.alsobad</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "outer": { "foo": "foo", "bar": "bar", "baz": "baz" } }
-return $in/outer/bad otherwise $in/outer/alsobad
+return $in/outer/alsobad
 ]]></test>
     <result>
       <assert-empty/>
@@ -305,10 +305,10 @@ return $in/outer/bad otherwise $in/outer/alsobad
   </test-case>
   <test-case name="JMESPath-boolean-1-10">
     <description>boolean.json: outer.bad||outer.alsobad</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "outer": { "foo": "foo", "bar": "bar", "baz": "baz" } }
-return $in/outer/bad otherwise $in/outer/alsobad
+return $in/outer/alsobad
 ]]></test>
     <result>
       <assert-empty/>
@@ -316,10 +316,10 @@ return $in/outer/bad otherwise $in/outer/alsobad
   </test-case>
   <test-case name="JMESPath-boolean-2-1">
     <description>boolean.json: outer.empty_string || outer.foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "outer": { "foo": "foo", "bool": false(), "empty_list": [], "empty_string": "" } }
-return $in/outer/empty_string[empty(array:index-of([ (), false(), "", [], {} ], jvalue()))] otherwise $in/outer/foo
+return $in/outer/empty_string[. != ""] otherwise $in/outer/foo
 ]]></test>
     <result>
       <assert-eq>"foo"</assert-eq>
@@ -327,10 +327,10 @@ return $in/outer/empty_string[empty(array:index-of([ (), false(), "", [], {} ], 
   </test-case>
   <test-case name="JMESPath-boolean-2-2">
     <description>boolean.json: outer.nokey || outer.bool || outer.empty_list || outer.empty_string || outer.foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "outer": { "foo": "foo", "bool": false(), "empty_list": [], "empty_string": "" } }
-return head(($in/outer/nokey, $in/outer/bool, $in/outer/empty_list, $in/outer/empty_string)[empty(array:index-of([ (), false(), "", [], {} ], jvalue()))]) otherwise $in/outer/foo
+return ($in/outer/bool[jvalue()], $in/outer/empty_list[array:size(.) > 0], $in/outer/empty_string[. != ""])[1] otherwise $in/outer/foo
 ]]></test>
     <result>
       <assert-eq>"foo"</assert-eq>
@@ -338,54 +338,54 @@ return head(($in/outer/nokey, $in/outer/bool, $in/outer/empty_list, $in/outer/em
   </test-case>
   <test-case name="JMESPath-boolean-3-1">
     <description>boolean.json: True &amp;&amp; False</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if ($in/True) { $in/False }
+return $in/True ! jvalue() and $in/False ! jvalue()
 ]]></test>
     <result>
-      <assert-eq>false()</assert-eq>
+      <assert-false/>
     </result>
   </test-case>
   <test-case name="JMESPath-boolean-3-2">
     <description>boolean.json: False &amp;&amp; True</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if (empty(array:index-of([ (), false(), "", [], {} ], $in/False ! jvalue()))) then $in/True else $in/False
+return $in/False ! jvalue() and $in/True ! jvalue()
 ]]></test>
     <result>
-      <assert-eq>false()</assert-eq>
+      <assert-false/>
     </result>
   </test-case>
   <test-case name="JMESPath-boolean-3-3">
     <description>boolean.json: True &amp;&amp; True</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if ($in/True) { $in/True }
+return $in/True ! jvalue() and $in/True ! jvalue()
 ]]></test>
     <result>
-      <assert-eq>true()</assert-eq>
+      <assert-true/>
     </result>
   </test-case>
   <test-case name="JMESPath-boolean-3-4">
     <description>boolean.json: False &amp;&amp; False</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if ($in/False) { $in/False }
+return $in/False ! jvalue() and $in/False ! jvalue()
 ]]></test>
     <result>
-      <assert-eq>false()</assert-eq>
+      <assert-false/>
     </result>
   </test-case>
   <test-case name="JMESPath-boolean-3-5">
     <description>boolean.json: True &amp;&amp; Number</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if ($in/True) { $in/Number }
+return $in/True[not(jvalue())] otherwise $in/Number
 ]]></test>
     <result>
       <assert-eq>5</assert-eq>
@@ -393,10 +393,10 @@ return if ($in/True) { $in/Number }
   </test-case>
   <test-case name="JMESPath-boolean-3-6">
     <description>boolean.json: Number &amp;&amp; True</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if ($in/Number) { $in/True }
+return $in/True
 ]]></test>
     <result>
       <assert-eq>true()</assert-eq>
@@ -404,10 +404,10 @@ return if ($in/Number) { $in/True }
   </test-case>
   <test-case name="JMESPath-boolean-3-7">
     <description>boolean.json: Number &amp;&amp; False</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if ($in/Number) { $in/False }
+return $in/False
 ]]></test>
     <result>
       <assert-eq>false()</assert-eq>
@@ -415,10 +415,10 @@ return if ($in/Number) { $in/False }
   </test-case>
   <test-case name="JMESPath-boolean-3-8">
     <description>boolean.json: Number &amp;&amp; EmptyList</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if ($in/Number) { $in/EmptyList }
+return $in/EmptyList
 ]]></test>
     <result>
       <assert-deep-eq>jtree([])</assert-deep-eq>
@@ -426,10 +426,10 @@ return if ($in/Number) { $in/EmptyList }
   </test-case>
   <test-case name="JMESPath-boolean-3-9">
     <description>boolean.json: Number &amp;&amp; True</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if ($in/Number) { $in/True }
+return $in/True
 ]]></test>
     <result>
       <assert-eq>true()</assert-eq>
@@ -437,10 +437,10 @@ return if ($in/Number) { $in/True }
   </test-case>
   <test-case name="JMESPath-boolean-3-10">
     <description>boolean.json: EmptyList &amp;&amp; True</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if (empty(array:index-of([ (), false(), "", [], {} ], $in/EmptyList ! jvalue()))) then $in/True else $in/EmptyList
+return $in/EmptyList[array:size(.) = 0] otherwise $in/True
 ]]></test>
     <result>
       <assert-deep-eq>jtree([])</assert-deep-eq>
@@ -448,10 +448,10 @@ return if (empty(array:index-of([ (), false(), "", [], {} ], $in/EmptyList ! jva
   </test-case>
   <test-case name="JMESPath-boolean-3-11">
     <description>boolean.json: EmptyList &amp;&amp; False</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if (empty(array:index-of([ (), false(), "", [], {} ], $in/EmptyList ! jvalue()))) then $in/False else $in/EmptyList
+return $in/EmptyList[array:size(.) = 0] otherwise $in/False
 ]]></test>
     <result>
       <assert-deep-eq>jtree([])</assert-deep-eq>
@@ -459,54 +459,54 @@ return if (empty(array:index-of([ (), false(), "", [], {} ], $in/EmptyList ! jva
   </test-case>
   <test-case name="JMESPath-boolean-3-12">
     <description>boolean.json: True || False</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return $in/True otherwise $in/False
+return $in/True ! jvalue() or $in/False ! jvalue()
 ]]></test>
     <result>
-      <assert-eq>true()</assert-eq>
+      <assert-true/>
     </result>
   </test-case>
   <test-case name="JMESPath-boolean-3-13">
     <description>boolean.json: True || True</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return $in/True otherwise $in/True
+return $in/True ! jvalue() or $in/True ! jvalue()
 ]]></test>
     <result>
-      <assert-eq>true()</assert-eq>
+      <assert-true/>
     </result>
   </test-case>
   <test-case name="JMESPath-boolean-3-14">
     <description>boolean.json: False || True</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return $in/False[empty(array:index-of([ (), false(), "", [], {} ], jvalue()))] otherwise $in/True
+return $in/False ! jvalue() or $in/True ! jvalue()
 ]]></test>
     <result>
-      <assert-eq>true()</assert-eq>
+      <assert-true/>
     </result>
   </test-case>
   <test-case name="JMESPath-boolean-3-15">
     <description>boolean.json: False || False</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return $in/False otherwise $in/False
+return $in/False ! jvalue() or $in/False ! jvalue()
 ]]></test>
     <result>
-      <assert-eq>false()</assert-eq>
+      <assert-false/>
     </result>
   </test-case>
   <test-case name="JMESPath-boolean-3-16">
     <description>boolean.json: Number || EmptyList</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return $in/Number otherwise $in/EmptyList
+return $in/Number
 ]]></test>
     <result>
       <assert-eq>5</assert-eq>
@@ -514,10 +514,10 @@ return $in/Number otherwise $in/EmptyList
   </test-case>
   <test-case name="JMESPath-boolean-3-17">
     <description>boolean.json: Number || True</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return $in/Number otherwise $in/True
+return $in/Number
 ]]></test>
     <result>
       <assert-eq>5</assert-eq>
@@ -525,10 +525,10 @@ return $in/Number otherwise $in/True
   </test-case>
   <test-case name="JMESPath-boolean-3-18">
     <description>boolean.json: Number || True &amp;&amp; False</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return $in/Number otherwise (if ($in/True) { $in/False })
+return $in/Number
 ]]></test>
     <result>
       <assert-eq>5</assert-eq>
@@ -536,10 +536,10 @@ return $in/Number otherwise (if ($in/True) { $in/False })
   </test-case>
   <test-case name="JMESPath-boolean-3-19">
     <description>boolean.json: (Number || True) &amp;&amp; False</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if ($in/Number otherwise $in/True) { $in/False }
+return $in/False
 ]]></test>
     <result>
       <assert-eq>false()</assert-eq>
@@ -547,10 +547,10 @@ return if ($in/Number otherwise $in/True) { $in/False }
   </test-case>
   <test-case name="JMESPath-boolean-3-20">
     <description>boolean.json: Number || (True &amp;&amp; False)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return $in/Number otherwise (if ($in/True) { $in/False })
+return $in/Number
 ]]></test>
     <result>
       <assert-eq>5</assert-eq>
@@ -558,10 +558,10 @@ return $in/Number otherwise (if ($in/True) { $in/False })
   </test-case>
   <test-case name="JMESPath-boolean-3-21">
     <description>boolean.json: !True</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return exists(array:index-of([ (), false(), "", [], {} ], $in/True ! jvalue()))
+return not($in/True ! jvalue())
 ]]></test>
     <result>
       <assert-false/>
@@ -569,10 +569,10 @@ return exists(array:index-of([ (), false(), "", [], {} ], $in/True ! jvalue()))
   </test-case>
   <test-case name="JMESPath-boolean-3-22">
     <description>boolean.json: !False</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return exists(array:index-of([ (), false(), "", [], {} ], $in/False ! jvalue()))
+return not($in/False ! jvalue())
 ]]></test>
     <result>
       <assert-true/>
@@ -580,10 +580,10 @@ return exists(array:index-of([ (), false(), "", [], {} ], $in/False ! jvalue()))
   </test-case>
   <test-case name="JMESPath-boolean-3-23">
     <description>boolean.json: !Number</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return exists(array:index-of([ (), false(), "", [], {} ], $in/Number ! jvalue()))
+return false()
 ]]></test>
     <result>
       <assert-false/>
@@ -591,10 +591,10 @@ return exists(array:index-of([ (), false(), "", [], {} ], $in/Number ! jvalue())
   </test-case>
   <test-case name="JMESPath-boolean-3-24">
     <description>boolean.json: !EmptyList</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return exists(array:index-of([ (), false(), "", [], {} ], $in/EmptyList ! jvalue()))
+return array:size($in/EmptyList) = 0
 ]]></test>
     <result>
       <assert-true/>
@@ -602,10 +602,10 @@ return exists(array:index-of([ (), false(), "", [], {} ], $in/EmptyList ! jvalue
   </test-case>
   <test-case name="JMESPath-boolean-3-25">
     <description>boolean.json: True &amp;&amp; !False</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if (empty(array:index-of([ (), false(), "", [], {} ], $in/True ! jvalue()))) then exists(array:index-of([ (), false(), "", [], {} ], $in/False ! jvalue())) else $in/True ! jvalue()
+return $in/True ! jvalue() and not($in/False ! jvalue())
 ]]></test>
     <result>
       <assert-true/>
@@ -613,10 +613,10 @@ return if (empty(array:index-of([ (), false(), "", [], {} ], $in/True ! jvalue()
   </test-case>
   <test-case name="JMESPath-boolean-3-26">
     <description>boolean.json: True &amp;&amp; !EmptyList</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if (empty(array:index-of([ (), false(), "", [], {} ], $in/True ! jvalue()))) then exists(array:index-of([ (), false(), "", [], {} ], $in/EmptyList ! jvalue())) else $in/True ! jvalue()
+return $in/True ! jvalue() and array:size($in/EmptyList) = 0
 ]]></test>
     <result>
       <assert-true/>
@@ -624,10 +624,10 @@ return if (empty(array:index-of([ (), false(), "", [], {} ], $in/True ! jvalue()
   </test-case>
   <test-case name="JMESPath-boolean-3-27">
     <description>boolean.json: !False &amp;&amp; !EmptyList</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return exists(array:index-of([ (), false(), "", [], {} ], $in/False ! jvalue())) and exists(array:index-of([ (), false(), "", [], {} ], $in/EmptyList ! jvalue()))
+return not($in/False ! jvalue()) and array:size($in/EmptyList) = 0
 ]]></test>
     <result>
       <assert-true/>
@@ -635,10 +635,10 @@ return exists(array:index-of([ (), false(), "", [], {} ], $in/False ! jvalue()))
   </test-case>
   <test-case name="JMESPath-boolean-3-28">
     <description>boolean.json: !True &amp;&amp; False</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return if (exists(array:index-of([ (), false(), "", [], {} ], $in/True ! jvalue()))) then $in/False ! jvalue() else false()
+return not($in/True ! jvalue()) and $in/False ! jvalue()
 ]]></test>
     <result>
       <assert-false/>
@@ -646,10 +646,10 @@ return if (exists(array:index-of([ (), false(), "", [], {} ], $in/True ! jvalue(
   </test-case>
   <test-case name="JMESPath-boolean-3-29">
     <description>boolean.json: !(True &amp;&amp; False)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return exists(array:index-of([ (), false(), "", [], {} ], (if ($in/True) { $in/False }) ! jvalue()))
+return not($in/True ! jvalue() and $in/False ! jvalue())
 ]]></test>
     <result>
       <assert-true/>
@@ -657,10 +657,10 @@ return exists(array:index-of([ (), false(), "", [], {} ], (if ($in/True) { $in/F
   </test-case>
   <test-case name="JMESPath-boolean-3-30">
     <description>boolean.json: !Zero</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return exists(array:index-of([ (), false(), "", [], {} ], $in/Zero ! jvalue()))
+return false()
 ]]></test>
     <result>
       <assert-false/>
@@ -668,10 +668,10 @@ return exists(array:index-of([ (), false(), "", [], {} ], $in/Zero ! jvalue()))
   </test-case>
   <test-case name="JMESPath-boolean-3-31">
     <description>boolean.json: !!Zero</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return empty(array:index-of([ (), false(), "", [], {} ], $in/Zero ! jvalue()))
+return true()
 ]]></test>
     <result>
       <assert-true/>
@@ -679,10 +679,10 @@ return empty(array:index-of([ (), false(), "", [], {} ], $in/Zero ! jvalue()))
   </test-case>
   <test-case name="JMESPath-boolean-3-32">
     <description>boolean.json: Zero || Number</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return $in/Zero otherwise $in/Number
+return $in/Zero
 ]]></test>
     <result>
       <assert-eq>0</assert-eq>
@@ -690,10 +690,10 @@ return $in/Zero otherwise $in/Number
   </test-case>
   <test-case name="JMESPath-boolean-3-33">
     <description>boolean.json: ZeroFloat || Number</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "True": true(), "False": false(), "Number": 5, "EmptyList": [], "Zero": 0, "ZeroFloat": 0 }
-return $in/ZeroFloat otherwise $in/Number
+return $in/ZeroFloat
 ]]></test>
     <result>
       <assert-eq>0</assert-eq>
@@ -701,10 +701,10 @@ return $in/ZeroFloat otherwise $in/Number
   </test-case>
   <test-case name="JMESPath-boolean-4-1">
     <description>boolean.json: one &lt; two</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return let $l := $in/one, $r := $in/two return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l < $r else ()
+return $in/one < $in/two
 ]]></test>
     <result>
       <assert-true/>
@@ -712,10 +712,10 @@ return let $l := $in/one, $r := $in/two return if (($l, $r) instance of jnode(*,
   </test-case>
   <test-case name="JMESPath-boolean-4-2">
     <description>boolean.json: one &lt;= two</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return let $l := $in/one, $r := $in/two return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l <= $r else ()
+return $in/one <= $in/two
 ]]></test>
     <result>
       <assert-true/>
@@ -723,10 +723,10 @@ return let $l := $in/one, $r := $in/two return if (($l, $r) instance of jnode(*,
   </test-case>
   <test-case name="JMESPath-boolean-4-3">
     <description>boolean.json: one == one</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return deep-equal($in/one, $in/one)
+return $in/one = $in/one
 ]]></test>
     <result>
       <assert-true/>
@@ -734,10 +734,10 @@ return deep-equal($in/one, $in/one)
   </test-case>
   <test-case name="JMESPath-boolean-4-4">
     <description>boolean.json: one == two</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return deep-equal($in/one, $in/two)
+return $in/one = $in/two
 ]]></test>
     <result>
       <assert-false/>
@@ -745,10 +745,10 @@ return deep-equal($in/one, $in/two)
   </test-case>
   <test-case name="JMESPath-boolean-4-5">
     <description>boolean.json: one &gt; two</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return let $l := $in/one, $r := $in/two return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l > $r else ()
+return $in/one > $in/two
 ]]></test>
     <result>
       <assert-false/>
@@ -756,10 +756,10 @@ return let $l := $in/one, $r := $in/two return if (($l, $r) instance of jnode(*,
   </test-case>
   <test-case name="JMESPath-boolean-4-6">
     <description>boolean.json: one &gt;= two</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return let $l := $in/one, $r := $in/two return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l >= $r else ()
+return $in/one >= $in/two
 ]]></test>
     <result>
       <assert-false/>
@@ -767,10 +767,10 @@ return let $l := $in/one, $r := $in/two return if (($l, $r) instance of jnode(*,
   </test-case>
   <test-case name="JMESPath-boolean-4-7">
     <description>boolean.json: one != two</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return not(deep-equal($in/one, $in/two))
+return $in/one != $in/two
 ]]></test>
     <result>
       <assert-true/>
@@ -778,10 +778,10 @@ return not(deep-equal($in/one, $in/two))
   </test-case>
   <test-case name="JMESPath-boolean-4-8">
     <description>boolean.json: emptylist &lt; one</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return let $l := $in/emptylist, $r := $in/one return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l < $r else ()
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -789,10 +789,10 @@ return let $l := $in/emptylist, $r := $in/one return if (($l, $r) instance of jn
   </test-case>
   <test-case name="JMESPath-boolean-4-9">
     <description>boolean.json: emptylist &lt; nullvalue</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return let $l := $in/emptylist, $r := $in/nullvalue return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l < $r else ()
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -800,10 +800,10 @@ return let $l := $in/emptylist, $r := $in/nullvalue return if (($l, $r) instance
   </test-case>
   <test-case name="JMESPath-boolean-4-10">
     <description>boolean.json: emptylist &lt; boolvalue</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return let $l := $in/emptylist, $r := $in/boolvalue return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l < $r else ()
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -811,10 +811,10 @@ return let $l := $in/emptylist, $r := $in/boolvalue return if (($l, $r) instance
   </test-case>
   <test-case name="JMESPath-boolean-4-11">
     <description>boolean.json: one &lt; boolvalue</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return let $l := $in/one, $r := $in/boolvalue return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l < $r else ()
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -822,10 +822,10 @@ return let $l := $in/one, $r := $in/boolvalue return if (($l, $r) instance of jn
   </test-case>
   <test-case name="JMESPath-boolean-4-12">
     <description>boolean.json: one &lt; two &amp;&amp; three &gt; one</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return let $v := (let $l := $in/one, $r := $in/two return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l < $r else ()) return if ($v) then (let $l := $in/three, $r := $in/one return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l > $r else ()) else $v
+return $in/one < $in/two and $in/three > $in/one
 ]]></test>
     <result>
       <assert-true/>
@@ -833,10 +833,10 @@ return let $v := (let $l := $in/one, $r := $in/two return if (($l, $r) instance 
   </test-case>
   <test-case name="JMESPath-boolean-4-13">
     <description>boolean.json: one &lt; two || three &gt; one</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return let $v := (let $l := $in/one, $r := $in/two return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l < $r else ()) return if ($v) then $v else (let $l := $in/three, $r := $in/one return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l > $r else ())
+return $in/one < $in/two or $in/three > $in/one
 ]]></test>
     <result>
       <assert-true/>
@@ -844,10 +844,10 @@ return let $v := (let $l := $in/one, $r := $in/two return if (($l, $r) instance 
   </test-case>
   <test-case name="JMESPath-boolean-4-14">
     <description>boolean.json: one &lt; two || three &lt; one</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return let $v := (let $l := $in/one, $r := $in/two return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l < $r else ()) return if ($v) then $v else (let $l := $in/three, $r := $in/one return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l < $r else ())
+return $in/one < $in/two or $in/three < $in/one
 ]]></test>
     <result>
       <assert-true/>
@@ -855,10 +855,10 @@ return let $v := (let $l := $in/one, $r := $in/two return if (($l, $r) instance 
   </test-case>
   <test-case name="JMESPath-boolean-4-15">
     <description>boolean.json: two &lt; one || three &lt; one</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "one": 1, "two": 2, "three": 3, "emptylist": [], "boolvalue": false() }
-return let $v := (let $l := $in/two, $r := $in/one return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l < $r else ()) return if ($v) then $v else (let $l := $in/three, $r := $in/one return if (($l, $r) instance of jnode(*, xs:numeric)*) then $l < $r else ())
+return $in/two < $in/one or $in/three < $in/one
 ]]></test>
     <result>
       <assert-false/>
@@ -1079,10 +1079,10 @@ return $in/foo/*[name = "a"]
   </test-case>
   <test-case name="JMESPath-filters-2-1">
     <description>filters.json: *[?[0] == `0`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
-let $in := { "foo": [ 0, 1 ], "bar": [ 2, 3 ] }
-return $in/self::jnode(*, map(*)) ! array { jnode(*, array(*)) ! array { *[./jnode(1, xs:numeric) = 0] ! jvalue() } }
+let $in := { "foo": [ 0, 1 ], "bar": [ 2, 3 ] } => jtree()
+return $in ! array { * ! array { *[./jnode(1, xs:numeric) = 0] ! jvalue() } }
 ]]></test>
     <result>
       <assert-deep-eq>[ [], [] ]</assert-deep-eq>
@@ -2263,7 +2263,7 @@ return $in/foo/*[false()]
   </test-case>
   <test-case name="JMESPath-filters-10-1">
     <description>filters.json: reservations[].instances[?bar==`1`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -2277,7 +2277,7 @@ let $in := {
     }
   ]
 }
-return $in/jnode(reservations, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*))) then * else .) ! jvalue() })/self::jnode(*, array(*)) ! array { * ! jnode(instances, array(*)) ! array { *[jnode(bar, xs:numeric) = 1] ! jvalue() } }
+return $in/reservations ! array { * ! instances ! array { *[bar = 1] ! jvalue() } }
 ]]></test>
     <result>
       <assert-deep-eq>[ [ { "foo": 2, "bar": 1 } ] ]</assert-deep-eq>
@@ -2285,7 +2285,7 @@ return $in/jnode(reservations, array(*)) ! jtree(array { * ! (if (self::jnode(*,
   </test-case>
   <test-case name="JMESPath-filters-10-2">
     <description>filters.json: reservations[*].instances[?bar==`1`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -2299,7 +2299,7 @@ let $in := {
     }
   ]
 }
-return $in/jnode(reservations, array(*)) ! array { * ! jnode(instances, array(*)) ! array { *[jnode(bar, xs:numeric) = 1] ! jvalue() } }
+return $in/reservations ! array { * ! instances ! array { *[bar = 1] ! jvalue() } }
 ]]></test>
     <result>
       <assert-deep-eq>[ [ { "foo": 2, "bar": 1 } ] ]</assert-deep-eq>
@@ -2307,7 +2307,7 @@ return $in/jnode(reservations, array(*)) ! array { * ! jnode(instances, array(*)
   </test-case>
   <test-case name="JMESPath-filters-10-3">
     <description>filters.json: reservations[].instances[?bar==`1`][]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -2321,7 +2321,7 @@ let $in := {
     }
   ]
 }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/*[bar = 1]/(if (self::jnode(*, array(*))) then * else .)
+return $in/reservations/*/instances/*[bar = 1]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "foo": 2, "bar": 1 })</assert-deep-eq>
@@ -2362,10 +2362,10 @@ return $in/foo/*[a = 1]/b/c
   </test-case>
   <test-case name="JMESPath-filters-13-1">
     <description>filters.json: foo[?name == 'a' || name == 'b']</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "name": "a" }, { "name": "b" }, { "name": "c" } ] }
-return $in/foo/*[(name = "a" or name = "b")]
+return $in/foo/*[name = "a" or name = "b"]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "name": "a" }), jtree({ "name": "b" })</assert-deep-eq>
@@ -2373,10 +2373,10 @@ return $in/foo/*[(name = "a" or name = "b")]
   </test-case>
   <test-case name="JMESPath-filters-13-2">
     <description>filters.json: foo[?name == 'a' || name == 'e']</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "name": "a" }, { "name": "b" }, { "name": "c" } ] }
-return $in/foo/*[(name = "a" or name = "e")]
+return $in/foo/*[name = "a" or name = "e"]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "name": "a" })</assert-deep-eq>
@@ -2384,10 +2384,10 @@ return $in/foo/*[(name = "a" or name = "e")]
   </test-case>
   <test-case name="JMESPath-filters-13-3">
     <description>filters.json: foo[?name == 'a' || name == 'b' || name == 'c']</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "name": "a" }, { "name": "b" }, { "name": "c" } ] }
-return $in/foo/*[((name = "a" or name = "b") or name = "c")]
+return $in/foo/*[name = "a" or name = "b" or name = "c"]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "name": "a" }), jtree({ "name": "b" }), jtree({ "name": "c" })</assert-deep-eq>
@@ -2395,10 +2395,10 @@ return $in/foo/*[((name = "a" or name = "b") or name = "c")]
   </test-case>
   <test-case name="JMESPath-filters-14-1">
     <description>filters.json: foo[?a == `1` &amp;&amp; b == `2`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "a": 1, "b": 2 }, { "a": 1, "b": 3 } ] }
-return $in/foo/*[(a = 1 and b = 2)]
+return $in/foo/*[a = 1 and b = 2]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": 1, "b": 2 })</assert-deep-eq>
@@ -2406,10 +2406,10 @@ return $in/foo/*[(a = 1 and b = 2)]
   </test-case>
   <test-case name="JMESPath-filters-14-2">
     <description>filters.json: foo[?a == `1` &amp;&amp; b == `4`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "a": 1, "b": 2 }, { "a": 1, "b": 3 } ] }
-return $in/foo/*[(a = 1 and b = 4)]
+return $in/foo/*[a = 1 and b = 4]
 ]]></test>
     <result>
       <assert-empty/>
@@ -2417,10 +2417,10 @@ return $in/foo/*[(a = 1 and b = 4)]
   </test-case>
   <test-case name="JMESPath-filters-15-1">
     <description>filters.json: foo[?c == `3` || a == `1` &amp;&amp; b == `4`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "a": 1, "b": 2, "c": 3 }, { "a": 3, "b": 4 } ] }
-return $in/foo/*[(c = 3 or (a = 1 and b = 4))]
+return $in/foo/*[c = 3 or a = 1 and b = 4]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": 1, "b": 2, "c": 3 })</assert-deep-eq>
@@ -2428,10 +2428,10 @@ return $in/foo/*[(c = 3 or (a = 1 and b = 4))]
   </test-case>
   <test-case name="JMESPath-filters-15-2">
     <description>filters.json: foo[?b == `2` || a == `3` &amp;&amp; b == `4`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "a": 1, "b": 2, "c": 3 }, { "a": 3, "b": 4 } ] }
-return $in/foo/*[(b = 2 or (a = 3 and b = 4))]
+return $in/foo/*[b = 2 or a = 3 and b = 4]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": 1, "b": 2, "c": 3 }), jtree({ "a": 3, "b": 4 })</assert-deep-eq>
@@ -2439,10 +2439,10 @@ return $in/foo/*[(b = 2 or (a = 3 and b = 4))]
   </test-case>
   <test-case name="JMESPath-filters-15-3">
     <description>filters.json: foo[?a == `3` &amp;&amp; b == `4` || b == `2`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "a": 1, "b": 2, "c": 3 }, { "a": 3, "b": 4 } ] }
-return $in/foo/*[((a = 3 and b = 4) or b = 2)]
+return $in/foo/*[a = 3 and b = 4 or b = 2]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": 1, "b": 2, "c": 3 }), jtree({ "a": 3, "b": 4 })</assert-deep-eq>
@@ -2450,10 +2450,10 @@ return $in/foo/*[((a = 3 and b = 4) or b = 2)]
   </test-case>
   <test-case name="JMESPath-filters-15-4">
     <description>filters.json: foo[?(a == `3` &amp;&amp; b == `4`) || b == `2`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "a": 1, "b": 2, "c": 3 }, { "a": 3, "b": 4 } ] }
-return $in/foo/*[((a = 3 and b = 4) or b = 2)]
+return $in/foo/*[a = 3 and b = 4 or b = 2]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": 1, "b": 2, "c": 3 }), jtree({ "a": 3, "b": 4 })</assert-deep-eq>
@@ -2461,10 +2461,10 @@ return $in/foo/*[((a = 3 and b = 4) or b = 2)]
   </test-case>
   <test-case name="JMESPath-filters-15-5">
     <description>filters.json: foo[?((a == `3` &amp;&amp; b == `4`)) || b == `2`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "a": 1, "b": 2, "c": 3 }, { "a": 3, "b": 4 } ] }
-return $in/foo/*[((a = 3 and b = 4) or b = 2)]
+return $in/foo/*[a = 3 and b = 4 or b = 2]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": 1, "b": 2, "c": 3 }), jtree({ "a": 3, "b": 4 })</assert-deep-eq>
@@ -2472,10 +2472,10 @@ return $in/foo/*[((a = 3 and b = 4) or b = 2)]
   </test-case>
   <test-case name="JMESPath-filters-15-6">
     <description>filters.json: foo[?a == `3` &amp;&amp; (b == `4` || b == `2`)]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "a": 1, "b": 2, "c": 3 }, { "a": 3, "b": 4 } ] }
-return $in/foo/*[(a = 3 and (b = 4 or b = 2))]
+return $in/foo/*[a = 3 and (b = 4 or b = 2)]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": 3, "b": 4 })</assert-deep-eq>
@@ -2483,10 +2483,10 @@ return $in/foo/*[(a = 3 and (b = 4 or b = 2))]
   </test-case>
   <test-case name="JMESPath-filters-15-7">
     <description>filters.json: foo[?a == `3` &amp;&amp; ((b == `4` || b == `2`))]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "a": 1, "b": 2, "c": 3 }, { "a": 3, "b": 4 } ] }
-return $in/foo/*[(a = 3 and (b = 4 or b = 2))]
+return $in/foo/*[a = 3 and (b = 4 or b = 2)]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": 3, "b": 4 })</assert-deep-eq>
@@ -2494,10 +2494,10 @@ return $in/foo/*[(a = 3 and (b = 4 or b = 2))]
   </test-case>
   <test-case name="JMESPath-filters-16-1">
     <description>filters.json: foo[?a == `1` || b ==`2` &amp;&amp; c == `5`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "a": 1, "b": 2, "c": 3 }, { "a": 3, "b": 4 } ] }
-return $in/foo/*[(a = 1 or (b = 2 and c = 5))]
+return $in/foo/*[a = 1 or b = 2 and c = 5]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": 1, "b": 2, "c": 3 })</assert-deep-eq>
@@ -2505,10 +2505,10 @@ return $in/foo/*[(a = 1 or (b = 2 and c = 5))]
   </test-case>
   <test-case name="JMESPath-filters-16-2">
     <description>filters.json: foo[?(a == `1` || b ==`2`) &amp;&amp; c == `5`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "a": 1, "b": 2, "c": 3 }, { "a": 3, "b": 4 } ] }
-return $in/foo/*[((a = 1 or b = 2) and c = 5)]
+return $in/foo/*[(a = 1 or b = 2) and c = 5]
 ]]></test>
     <result>
       <assert-empty/>
@@ -2968,7 +2968,7 @@ return contains("abc", "d")
   </test-case>
   <test-case name="JMESPath-functions-1-27">
     <description>functions.json: contains(strings, 'a')</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -2984,7 +2984,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return $in/strings ! (if (self::jnode(*, xs:string)) then contains(., "a") else exists(array:index-of(jvalue(), "a")))
+return $in/strings = "a"
 ]]></test>
     <result>
       <assert-true/>
@@ -2992,7 +2992,7 @@ return $in/strings ! (if (self::jnode(*, xs:string)) then contains(., "a") else 
   </test-case>
   <test-case name="JMESPath-functions-1-28">
     <description>functions.json: contains(decimals, `1.2`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3008,7 +3008,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return $in/decimals ! (if (self::jnode(*, xs:string)) then contains(., 1.2e0) else exists(array:index-of(jvalue(), 1.2e0)))
+return $in/decimals = 1.2e0
 ]]></test>
     <result>
       <assert-true/>
@@ -3016,7 +3016,7 @@ return $in/decimals ! (if (self::jnode(*, xs:string)) then contains(., 1.2e0) el
   </test-case>
   <test-case name="JMESPath-functions-1-29">
     <description>functions.json: contains(decimals, `false`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3032,7 +3032,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return $in/decimals ! (if (self::jnode(*, xs:string)) then contains(., false()) else exists(array:index-of(jvalue(), false())))
+return exists(array:index-of($in/decimals, false()))
 ]]></test>
     <result>
       <assert-false/>
@@ -3304,7 +3304,7 @@ return string-length("")
   </test-case>
   <test-case name="JMESPath-functions-1-44">
     <description>functions.json: length(@)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3320,7 +3320,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 } => jtree()
-return $in ! (if (self::jnode(*, xs:string)) then string-length(.) else count(*))
+return map:size($in)
 ]]></test>
     <result>
       <assert-eq>12</assert-eq>
@@ -3328,7 +3328,7 @@ return $in ! (if (self::jnode(*, xs:string)) then string-length(.) else count(*)
   </test-case>
   <test-case name="JMESPath-functions-1-45">
     <description>functions.json: length(strings[0])</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3344,7 +3344,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return $in/strings/1 ! (if (self::jnode(*, xs:string)) then string-length(.) else count(*))
+return string-length($in/strings/1)
 ]]></test>
     <result>
       <assert-eq>1</assert-eq>
@@ -3352,7 +3352,7 @@ return $in/strings/1 ! (if (self::jnode(*, xs:string)) then string-length(.) els
   </test-case>
   <test-case name="JMESPath-functions-1-46">
     <description>functions.json: length(str)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3368,7 +3368,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return $in/str ! (if (self::jnode(*, xs:string)) then string-length(.) else count(*))
+return string-length($in/str)
 ]]></test>
     <result>
       <assert-eq>3</assert-eq>
@@ -3376,7 +3376,7 @@ return $in/str ! (if (self::jnode(*, xs:string)) then string-length(.) else coun
   </test-case>
   <test-case name="JMESPath-functions-1-47">
     <description>functions.json: length(array)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3392,7 +3392,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return $in/array ! (if (self::jnode(*, xs:string)) then string-length(.) else count(*))
+return array:size($in/array)
 ]]></test>
     <result>
       <assert-eq>6</assert-eq>
@@ -3400,7 +3400,7 @@ return $in/array ! (if (self::jnode(*, xs:string)) then string-length(.) else co
   </test-case>
   <test-case name="JMESPath-functions-1-48">
     <description>functions.json: length(objects)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3416,7 +3416,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return $in/objects ! (if (self::jnode(*, xs:string)) then string-length(.) else count(*))
+return map:size($in/objects)
 ]]></test>
     <result>
       <assert-eq>2</assert-eq>
@@ -3424,7 +3424,7 @@ return $in/objects ! (if (self::jnode(*, xs:string)) then string-length(.) else 
   </test-case>
   <test-case name="JMESPath-functions-1-51">
     <description>functions.json: length(strings[0])</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3440,7 +3440,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return $in/strings/1 ! (if (self::jnode(*, xs:string)) then string-length(.) else count(*))
+return string-length($in/strings/1)
 ]]></test>
     <result>
       <assert-eq>1</assert-eq>
@@ -3568,7 +3568,7 @@ return max($in/empty_list/*)
   </test-case>
   <test-case name="JMESPath-functions-1-59">
     <description>functions.json: merge(`{}`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3584,7 +3584,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return map:merge(({}), { "duplicates": "use-last" })
+return {}
 ]]></test>
     <result>
       <assert-deep-eq>{}</assert-deep-eq>
@@ -3808,7 +3808,7 @@ return min($in/strings/*)
   </test-case>
   <test-case name="JMESPath-functions-1-71">
     <description>functions.json: type('abc')</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3824,7 +3824,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return typeswitch ("abc") case empty-sequence() return "null" case xs:string return "string" case xs:boolean return "boolean" case xs:numeric return "number" case array(*) return "array" default return "object"
+return "string"
 ]]></test>
     <result>
       <assert-eq>"string"</assert-eq>
@@ -3832,7 +3832,7 @@ return typeswitch ("abc") case empty-sequence() return "null" case xs:string ret
   </test-case>
   <test-case name="JMESPath-functions-1-72">
     <description>functions.json: type(`1.0`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3848,7 +3848,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return typeswitch (1) case empty-sequence() return "null" case xs:string return "string" case xs:boolean return "boolean" case xs:numeric return "number" case array(*) return "array" default return "object"
+return "number"
 ]]></test>
     <result>
       <assert-eq>"number"</assert-eq>
@@ -3856,7 +3856,7 @@ return typeswitch (1) case empty-sequence() return "null" case xs:string return 
   </test-case>
   <test-case name="JMESPath-functions-1-73">
     <description>functions.json: type(`2`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3872,7 +3872,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return typeswitch (2) case empty-sequence() return "null" case xs:string return "string" case xs:boolean return "boolean" case xs:numeric return "number" case array(*) return "array" default return "object"
+return "number"
 ]]></test>
     <result>
       <assert-eq>"number"</assert-eq>
@@ -3880,7 +3880,7 @@ return typeswitch (2) case empty-sequence() return "null" case xs:string return 
   </test-case>
   <test-case name="JMESPath-functions-1-74">
     <description>functions.json: type(`true`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3896,7 +3896,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return typeswitch (true()) case empty-sequence() return "null" case xs:string return "string" case xs:boolean return "boolean" case xs:numeric return "number" case array(*) return "array" default return "object"
+return "boolean"
 ]]></test>
     <result>
       <assert-eq>"boolean"</assert-eq>
@@ -3904,7 +3904,7 @@ return typeswitch (true()) case empty-sequence() return "null" case xs:string re
   </test-case>
   <test-case name="JMESPath-functions-1-75">
     <description>functions.json: type(`false`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3920,7 +3920,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return typeswitch (false()) case empty-sequence() return "null" case xs:string return "string" case xs:boolean return "boolean" case xs:numeric return "number" case array(*) return "array" default return "object"
+return "boolean"
 ]]></test>
     <result>
       <assert-eq>"boolean"</assert-eq>
@@ -3928,7 +3928,7 @@ return typeswitch (false()) case empty-sequence() return "null" case xs:string r
   </test-case>
   <test-case name="JMESPath-functions-1-76">
     <description>functions.json: type(`null`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3944,7 +3944,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return typeswitch (()) case empty-sequence() return "null" case xs:string return "string" case xs:boolean return "boolean" case xs:numeric return "number" case array(*) return "array" default return "object"
+return "null"
 ]]></test>
     <result>
       <assert-eq>"null"</assert-eq>
@@ -3952,7 +3952,7 @@ return typeswitch (()) case empty-sequence() return "null" case xs:string return
   </test-case>
   <test-case name="JMESPath-functions-1-77">
     <description>functions.json: type(`[0]`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3968,7 +3968,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return typeswitch ([ 0 ]) case empty-sequence() return "null" case xs:string return "string" case xs:boolean return "boolean" case xs:numeric return "number" case array(*) return "array" default return "object"
+return "array"
 ]]></test>
     <result>
       <assert-eq>"array"</assert-eq>
@@ -3976,7 +3976,7 @@ return typeswitch ([ 0 ]) case empty-sequence() return "null" case xs:string ret
   </test-case>
   <test-case name="JMESPath-functions-1-78">
     <description>functions.json: type(`{"a": "b"}`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -3992,7 +3992,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return typeswitch ({ "a": "b" }) case empty-sequence() return "null" case xs:string return "string" case xs:boolean return "boolean" case xs:numeric return "number" case array(*) return "array" default return "object"
+return "object"
 ]]></test>
     <result>
       <assert-eq>"object"</assert-eq>
@@ -4000,7 +4000,7 @@ return typeswitch ({ "a": "b" }) case empty-sequence() return "null" case xs:str
   </test-case>
   <test-case name="JMESPath-functions-1-79">
     <description>functions.json: type(@)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4015,8 +4015,8 @@ let $in := {
   "empty_hash": {},
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
-} => jtree()
-return typeswitch ($in ! jvalue()) case empty-sequence() return "null" case xs:string return "string" case xs:boolean return "boolean" case xs:numeric return "number" case array(*) return "array" default return "object"
+}
+return "object"
 ]]></test>
     <result>
       <assert-eq>"object"</assert-eq>
@@ -4024,7 +4024,7 @@ return typeswitch ($in ! jvalue()) case empty-sequence() return "null" case xs:s
   </test-case>
   <test-case name="JMESPath-functions-1-80">
     <description>functions.json: sort(keys(objects))</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4040,7 +4040,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return array { sort(jtree(array { $in/objects/* ! jkey() })/* ! jvalue()) }
+return array { sort($in/objects/* ! jkey()) }
 ]]></test>
     <result>
       <assert-deep-eq>[ "bar", "foo" ]</assert-deep-eq>
@@ -4048,7 +4048,7 @@ return array { sort(jtree(array { $in/objects/* ! jkey() })/* ! jvalue()) }
   </test-case>
   <test-case name="JMESPath-functions-1-84">
     <description>functions.json: sort(values(objects))</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4064,7 +4064,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return array { sort(jtree(array:of-members($in/objects/*))/* ! jvalue()) }
+return array { sort($in/objects/* ! jvalue()) }
 ]]></test>
     <result>
       <assert-deep-eq>[ "bar", "baz" ]</assert-deep-eq>
@@ -4192,7 +4192,7 @@ return string-join($in/strings/*, "|")
   </test-case>
   <test-case name="JMESPath-functions-1-95">
     <description>functions.json: join('|', decimals[].to_string(@))</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4208,7 +4208,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return string-join(jtree(array { $in/decimals/*/(if (self::jnode(*, array(*))) then * else .) ! (let $v := jvalue() return jtree(if ($v instance of xs:string) then $v else if (empty($v)) then "null" else serialize($v, { "method": "json" }))) ! jvalue() })/*, "|")
+return string-join($in/decimals/* ! serialize(., { "method": "json" }), "|")
 ]]></test>
     <result>
       <assert-eq>"1.01|1.2|-1.5"</assert-eq>
@@ -4240,7 +4240,7 @@ return string-join($in/empty_list/*, "|")
   </test-case>
   <test-case name="JMESPath-functions-1-97">
     <description>functions.json: reverse(numbers)</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4256,7 +4256,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return $in/numbers ! (if (self::jnode(*, xs:string)) then string-join(reverse(characters(.))) else array:reverse(.))
+return array:reverse($in/numbers)
 ]]></test>
     <result>
       <assert-deep-eq>[ 5, 4, 3, -1 ]</assert-deep-eq>
@@ -4264,7 +4264,7 @@ return $in/numbers ! (if (self::jnode(*, xs:string)) then string-join(reverse(ch
   </test-case>
   <test-case name="JMESPath-functions-1-98">
     <description>functions.json: reverse(array)</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4280,7 +4280,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return $in/array ! (if (self::jnode(*, xs:string)) then string-join(reverse(characters(.))) else array:reverse(.))
+return array:reverse($in/array)
 ]]></test>
     <result>
       <assert-deep-eq>[ "100", "a", 5, 4, 3, -1 ]</assert-deep-eq>
@@ -4504,7 +4504,7 @@ return sum($in/decimals/*)
   </test-case>
   <test-case name="JMESPath-functions-1-110">
     <description>functions.json: sum(array[].to_number(@))</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4520,7 +4520,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return sum(jtree(array { $in/array/*/(if (self::jnode(*, array(*))) then * else .) ! (let $v := jvalue() return if ($v instance of xs:numeric) then jtree($v) else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then jtree(number($v)) else ()) ! jvalue() })/*)
+return sum($in/array/* ! number(.)[not(is-NaN(.))])
 ]]></test>
     <result>
       <assert-eq>111</assert-eq>
@@ -4552,7 +4552,7 @@ return sum(jtree([])/*)
   </test-case>
   <test-case name="JMESPath-functions-1-112">
     <description>functions.json: to_array('foo')</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4568,7 +4568,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := "foo" return if ($v instance of array(*)) then $v else [ $v ]
+return [ "foo" ]
 ]]></test>
     <result>
       <assert-deep-eq>[ "foo" ]</assert-deep-eq>
@@ -4576,7 +4576,7 @@ return let $v := "foo" return if ($v instance of array(*)) then $v else [ $v ]
   </test-case>
   <test-case name="JMESPath-functions-1-113">
     <description>functions.json: to_array(`0`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4592,7 +4592,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := 0 return if ($v instance of array(*)) then $v else [ $v ]
+return [ 0 ]
 ]]></test>
     <result>
       <assert-deep-eq>[ 0 ]</assert-deep-eq>
@@ -4600,7 +4600,7 @@ return let $v := 0 return if ($v instance of array(*)) then $v else [ $v ]
   </test-case>
   <test-case name="JMESPath-functions-1-114">
     <description>functions.json: to_array(objects)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4616,7 +4616,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := $in/objects ! jvalue() return if ($v instance of array(*)) then $v else [ $v ]
+return [ $in/objects ! jvalue() ]
 ]]></test>
     <result>
       <assert-deep-eq>[ { "foo": "bar", "bar": "baz" } ]</assert-deep-eq>
@@ -4624,7 +4624,7 @@ return let $v := $in/objects ! jvalue() return if ($v instance of array(*)) then
   </test-case>
   <test-case name="JMESPath-functions-1-115">
     <description>functions.json: to_array(`[1, 2, 3]`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4640,7 +4640,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := [ 1, 2, 3 ] return if ($v instance of array(*)) then $v else [ $v ]
+return [ 1, 2, 3 ]
 ]]></test>
     <result>
       <assert-deep-eq>[ 1, 2, 3 ]</assert-deep-eq>
@@ -4648,7 +4648,7 @@ return let $v := [ 1, 2, 3 ] return if ($v instance of array(*)) then $v else [ 
   </test-case>
   <test-case name="JMESPath-functions-1-116">
     <description>functions.json: to_array(false)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4664,7 +4664,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := $in/false ! jvalue() return if ($v instance of array(*)) then $v else [ $v ]
+return [ $in/false ! jvalue() ]
 ]]></test>
     <result>
       <assert-deep-eq>[ false() ]</assert-deep-eq>
@@ -4672,7 +4672,7 @@ return let $v := $in/false ! jvalue() return if ($v instance of array(*)) then $
   </test-case>
   <test-case name="JMESPath-functions-1-117">
     <description>functions.json: to_string('foo')</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4688,7 +4688,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := "foo" return if ($v instance of xs:string) then $v else if (empty($v)) then "null" else serialize($v, { "method": "json" })
+return "foo"
 ]]></test>
     <result>
       <assert-eq>"foo"</assert-eq>
@@ -4696,7 +4696,7 @@ return let $v := "foo" return if ($v instance of xs:string) then $v else if (emp
   </test-case>
   <test-case name="JMESPath-functions-1-118">
     <description>functions.json: to_string(`1.2`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4712,7 +4712,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := 1.2e0 return if ($v instance of xs:string) then $v else if (empty($v)) then "null" else serialize($v, { "method": "json" })
+return serialize(1.2e0, { "method": "json" })
 ]]></test>
     <result>
       <assert-eq>"1.2"</assert-eq>
@@ -4720,7 +4720,7 @@ return let $v := 1.2e0 return if ($v instance of xs:string) then $v else if (emp
   </test-case>
   <test-case name="JMESPath-functions-1-119">
     <description>functions.json: to_string(`[0, 1]`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4736,7 +4736,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := [ 0, 1 ] return if ($v instance of xs:string) then $v else if (empty($v)) then "null" else serialize($v, { "method": "json" })
+return serialize([ 0, 1 ], { "method": "json" })
 ]]></test>
     <result>
       <assert-eq>"[0,1]"</assert-eq>
@@ -4744,7 +4744,7 @@ return let $v := [ 0, 1 ] return if ($v instance of xs:string) then $v else if (
   </test-case>
   <test-case name="JMESPath-functions-1-120">
     <description>functions.json: to_number('1.0')</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4760,7 +4760,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := "1.0" return if ($v instance of xs:numeric) then $v else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then number($v) else ()
+return number("1.0")
 ]]></test>
     <result>
       <assert-eq>1</assert-eq>
@@ -4768,7 +4768,7 @@ return let $v := "1.0" return if ($v instance of xs:numeric) then $v else if ($v
   </test-case>
   <test-case name="JMESPath-functions-1-121">
     <description>functions.json: to_number('1e21')</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4784,7 +4784,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := "1e21" return if ($v instance of xs:numeric) then $v else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then number($v) else ()
+return number("1e21")
 ]]></test>
     <result>
       <assert-eq>1.0E21</assert-eq>
@@ -4792,7 +4792,7 @@ return let $v := "1e21" return if ($v instance of xs:numeric) then $v else if ($
   </test-case>
   <test-case name="JMESPath-functions-1-122">
     <description>functions.json: to_number('1.1')</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4808,7 +4808,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := "1.1" return if ($v instance of xs:numeric) then $v else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then number($v) else ()
+return number("1.1")
 ]]></test>
     <result>
       <assert-eq>1.1e0</assert-eq>
@@ -4816,7 +4816,7 @@ return let $v := "1.1" return if ($v instance of xs:numeric) then $v else if ($v
   </test-case>
   <test-case name="JMESPath-functions-1-123">
     <description>functions.json: to_number('4')</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4832,7 +4832,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := "4" return if ($v instance of xs:numeric) then $v else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then number($v) else ()
+return number("4")
 ]]></test>
     <result>
       <assert-eq>4</assert-eq>
@@ -4840,7 +4840,7 @@ return let $v := "4" return if ($v instance of xs:numeric) then $v else if ($v i
   </test-case>
   <test-case name="JMESPath-functions-1-124">
     <description>functions.json: to_number('notanumber')</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4856,7 +4856,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := "notanumber" return if ($v instance of xs:numeric) then $v else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then number($v) else ()
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -4864,7 +4864,7 @@ return let $v := "notanumber" return if ($v instance of xs:numeric) then $v else
   </test-case>
   <test-case name="JMESPath-functions-1-125">
     <description>functions.json: to_number(`false`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4880,7 +4880,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := false() return if ($v instance of xs:numeric) then $v else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then number($v) else ()
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -4888,7 +4888,7 @@ return let $v := false() return if ($v instance of xs:numeric) then $v else if (
   </test-case>
   <test-case name="JMESPath-functions-1-126">
     <description>functions.json: to_number(`null`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4904,7 +4904,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := () return if ($v instance of xs:numeric) then $v else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then number($v) else ()
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -4912,7 +4912,7 @@ return let $v := () return if ($v instance of xs:numeric) then $v else if ($v in
   </test-case>
   <test-case name="JMESPath-functions-1-127">
     <description>functions.json: to_number(`[0]`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4928,7 +4928,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := [ 0 ] return if ($v instance of xs:numeric) then $v else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then number($v) else ()
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -4936,7 +4936,7 @@ return let $v := [ 0 ] return if ($v instance of xs:numeric) then $v else if ($v
   </test-case>
   <test-case name="JMESPath-functions-1-128">
     <description>functions.json: to_number(`{"foo": 0}`)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -4952,7 +4952,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return let $v := { "foo": 0 } return if ($v instance of xs:numeric) then $v else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then number($v) else ()
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -5152,7 +5152,7 @@ return ($in/all, $in/expressions, $in/are_null)[exists(jvalue())][1]
   </test-case>
   <test-case name="JMESPath-functions-1-142">
     <description>functions.json: numbers[].to_string(@)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -5168,7 +5168,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return $in/numbers/*/(if (self::jnode(*, array(*))) then * else .) ! (let $v := jvalue() return jtree(if ($v instance of xs:string) then $v else if (empty($v)) then "null" else serialize($v, { "method": "json" })))
+return $in/numbers/* ! jtree(serialize(., { "method": "json" }))
 ]]></test>
     <result>
       <assert-deep-eq>jtree("-1"), jtree("3"), jtree("4"), jtree("5")</assert-deep-eq>
@@ -5176,7 +5176,7 @@ return $in/numbers/*/(if (self::jnode(*, array(*))) then * else .) ! (let $v := 
   </test-case>
   <test-case name="JMESPath-functions-1-143">
     <description>functions.json: array[].to_number(@)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": -1,
@@ -5192,7 +5192,7 @@ let $in := {
   "objects": { "foo": "bar", "bar": "baz" },
   "null_key": ()
 }
-return $in/array/*/(if (self::jnode(*, array(*))) then * else .) ! (let $v := jvalue() return if ($v instance of xs:numeric) then jtree($v) else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then jtree(number($v)) else ())
+return $in/array/* ! number(.)[not(is-NaN(.))] ! jtree(.)
 ]]></test>
     <result>
       <assert-deep-eq>jtree(-1), jtree(3), jtree(4), jtree(5), jtree(100)</assert-deep-eq>
@@ -5200,7 +5200,7 @@ return $in/array/*/(if (self::jnode(*, array(*))) then * else .) ! (let $v := jv
   </test-case>
   <test-case name="JMESPath-functions-2-1">
     <description>functions.json: foo[].not_null(f, e, d, c, b, a)</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -5211,7 +5211,7 @@ let $in := {
     { "f": "f", "e": "e" }
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .) ! ((f, e, d, c, b, a)[exists(jvalue())][1])
+return $in/foo/* ! (f, e, d, c, b, a)[exists(jvalue())][1]
 ]]></test>
     <result>
       <assert-deep-eq>jtree("b"), jtree("c"), jtree("d"), jtree("e"), jtree("f")</assert-deep-eq>
@@ -5257,7 +5257,7 @@ return array:of-members(sort($in/people/*, (), fn { age_str }))
   </test-case>
   <test-case name="JMESPath-functions-3-3">
     <description>functions.json: sort_by(people, &amp;to_number(age_str))</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "people": [
@@ -5268,7 +5268,7 @@ let $in := {
     { "age": 10, "age_str": "10", "bool": true(), "name": 3 }
   ]
 }
-return array:of-members(sort($in/people/*, (), fn { (let $v := age_str ! jvalue() return if ($v instance of xs:numeric) then $v else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then number($v) else ()) }))
+return array:of-members(sort($in/people/*, (), fn { number(age_str)[not(is-NaN(.))] }))
 ]]></test>
     <result>
       <assert-deep-eq>[ { "age": 10, "age_str": "10", "bool": true(), "name": 3 }, { "age": 20, "age_str": "20", "bool": true(), "name": "a", "extra": "foo" }, { "age": 30, "age_str": "30", "bool": true(), "name": "c" }, { "age": 40, "age_str": "40", "bool": false(), "name": "b", "extra": "bar" }, { "age": 50, "age_str": "50", "bool": false(), "name": "d" } ]</assert-deep-eq>
@@ -5276,7 +5276,7 @@ return array:of-members(sort($in/people/*, (), fn { (let $v := age_str ! jvalue(
   </test-case>
   <test-case name="JMESPath-functions-3-4">
     <description>functions.json: sort_by(people, &amp;age)[].name</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "people": [
@@ -5287,7 +5287,7 @@ let $in := {
     { "age": 10, "age_str": "10", "bool": true(), "name": 3 }
   ]
 }
-return jtree(array:of-members(sort($in/people/*, (), fn { age })))/*/(if (self::jnode(*, array(*))) then * else .)/name
+return sort($in/people/*, (), fn { age }) ! name
 ]]></test>
     <result>
       <assert-deep-eq>jtree(3), jtree("a"), jtree("c"), jtree("b"), jtree("d")</assert-deep-eq>
@@ -5295,7 +5295,7 @@ return jtree(array:of-members(sort($in/people/*, (), fn { age })))/*/(if (self::
   </test-case>
   <test-case name="JMESPath-functions-3-9">
     <description>functions.json: sort_by(people, &amp;age)[].extra</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "people": [
@@ -5306,7 +5306,7 @@ let $in := {
     { "age": 10, "age_str": "10", "bool": true(), "name": 3 }
   ]
 }
-return jtree(array:of-members(sort($in/people/*, (), fn { age })))/*/(if (self::jnode(*, array(*))) then * else .)/extra
+return sort($in/people/*, (), fn { age }) ! extra
 ]]></test>
     <result>
       <assert-deep-eq>jtree("foo"), jtree("bar")</assert-deep-eq>
@@ -5371,7 +5371,7 @@ return highest($in/people/*, (), fn { age_str })[1]
   </test-case>
   <test-case name="JMESPath-functions-3-15">
     <description>functions.json: max_by(people, &amp;to_number(age_str))</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "people": [
@@ -5382,7 +5382,7 @@ let $in := {
     { "age": 10, "age_str": "10", "bool": true(), "name": 3 }
   ]
 }
-return highest($in/people/*, (), fn { (let $v := age_str ! jvalue() return if ($v instance of xs:numeric) then $v else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then number($v) else ()) })[1]
+return highest($in/people/*, (), fn { number(age_str)[not(is-NaN(.))] })[1]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "age": 50, "age_str": "50", "bool": false(), "name": "d" })</assert-deep-eq>
@@ -5447,7 +5447,7 @@ return lowest($in/people/*, (), fn { age_str })[1]
   </test-case>
   <test-case name="JMESPath-functions-3-21">
     <description>functions.json: min_by(people, &amp;to_number(age_str))</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "people": [
@@ -5458,7 +5458,7 @@ let $in := {
     { "age": 10, "age_str": "10", "bool": true(), "name": 3 }
   ]
 }
-return lowest($in/people/*, (), fn { (let $v := age_str ! jvalue() return if ($v instance of xs:numeric) then $v else if ($v instance of xs:string and matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")) then number($v) else ()) })[1]
+return lowest($in/people/*, (), fn { number(age_str)[not(is-NaN(.))] })[1]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "age": 10, "age_str": "10", "bool": true(), "name": 3 })</assert-deep-eq>
@@ -7136,10 +7136,10 @@ return $in/*[last() - 2]
   </test-case>
   <test-case name="JMESPath-indices-4-1">
     <description>indices.json: reservations[].instances[].foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "reservations": [ { "instances": [ { "foo": 1 }, { "foo": 2 } ] } ] }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/(if (self::jnode(*, array(*))) then * else .)/foo
+return $in/reservations/*/instances/*/foo
 ]]></test>
     <result>
       <assert-deep-eq>jtree(1), jtree(2)</assert-deep-eq>
@@ -7147,10 +7147,10 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instance
   </test-case>
   <test-case name="JMESPath-indices-4-2">
     <description>indices.json: reservations[].instances[].bar</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "reservations": [ { "instances": [ { "foo": 1 }, { "foo": 2 } ] } ] }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/(if (self::jnode(*, array(*))) then * else .)/bar
+return $in/reservations/*/instances/*/bar
 ]]></test>
     <result>
       <assert-empty/>
@@ -7158,10 +7158,10 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instance
   </test-case>
   <test-case name="JMESPath-indices-4-3">
     <description>indices.json: reservations[].notinstances[].foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "reservations": [ { "instances": [ { "foo": 1 }, { "foo": 2 } ] } ] }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/notinstances/(if (self::jnode(*, array(*))) then * else .)/foo
+return $in/reservations/*/notinstances/foo
 ]]></test>
     <result>
       <assert-empty/>
@@ -7169,10 +7169,10 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/notinsta
   </test-case>
   <test-case name="JMESPath-indices-4-4">
     <description>indices.json: reservations[].notinstances[].foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "reservations": [ { "instances": [ { "foo": 1 }, { "foo": 2 } ] } ] }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/notinstances/(if (self::jnode(*, array(*))) then * else .)/foo
+return $in/reservations/*/notinstances/foo
 ]]></test>
     <result>
       <assert-empty/>
@@ -7180,7 +7180,7 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/notinsta
   </test-case>
   <test-case name="JMESPath-indices-5-1">
     <description>indices.json: reservations[].instances[].foo[].bar</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -7208,7 +7208,7 @@ let $in := {
     }
   ]
 }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/(if (self::jnode(*, array(*))) then * else .)/foo/(if (self::jnode(*, array(*))) then * else .)/bar
+return $in/reservations/*/instances/*/foo/(if (self::jnode(*, array(*))) then * else .)/bar
 ]]></test>
     <result>
       <assert-deep-eq>jtree(1), jtree(2), jtree(4), jtree(5), jtree(6), jtree(8)</assert-deep-eq>
@@ -7216,7 +7216,7 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instance
   </test-case>
   <test-case name="JMESPath-indices-5-2">
     <description>indices.json: reservations[].instances[].foo[].baz</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -7244,7 +7244,7 @@ let $in := {
     }
   ]
 }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/(if (self::jnode(*, array(*))) then * else .)/foo/(if (self::jnode(*, array(*))) then * else .)/baz
+return $in/reservations/*/instances/*/foo/(if (self::jnode(*, array(*))) then * else .)/baz
 ]]></test>
     <result>
       <assert-empty/>
@@ -7252,7 +7252,7 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instance
   </test-case>
   <test-case name="JMESPath-indices-5-3">
     <description>indices.json: reservations[].instances[].notfoo[].bar</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -7280,7 +7280,7 @@ let $in := {
     }
   ]
 }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/(if (self::jnode(*, array(*))) then * else .)/notfoo/(if (self::jnode(*, array(*))) then * else .)/bar
+return $in/reservations/*/instances/*/notfoo/(if (self::jnode(*, array(*))) then * else .)/bar
 ]]></test>
     <result>
       <assert-deep-eq>jtree(20), jtree(21), jtree(22), jtree(23), jtree(24), jtree(25)</assert-deep-eq>
@@ -7288,7 +7288,7 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instance
   </test-case>
   <test-case name="JMESPath-indices-5-4">
     <description>indices.json: reservations[].instances[].notfoo[].notbar</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -7316,7 +7316,7 @@ let $in := {
     }
   ]
 }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/(if (self::jnode(*, array(*))) then * else .)/notfoo/(if (self::jnode(*, array(*))) then * else .)/notbar
+return $in/reservations/*/instances/*/notfoo/(if (self::jnode(*, array(*))) then * else .)/notbar
 ]]></test>
     <result>
       <assert-deep-eq>jtree([ 7 ]), jtree([ 7 ])</assert-deep-eq>
@@ -7324,7 +7324,7 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instance
   </test-case>
   <test-case name="JMESPath-indices-5-5">
     <description>indices.json: reservations[].notinstances[].foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -7352,7 +7352,7 @@ let $in := {
     }
   ]
 }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/notinstances/(if (self::jnode(*, array(*))) then * else .)/foo
+return $in/reservations/*/notinstances/foo
 ]]></test>
     <result>
       <assert-empty/>
@@ -7360,7 +7360,7 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/notinsta
   </test-case>
   <test-case name="JMESPath-indices-5-6">
     <description>indices.json: reservations[].instances[].foo[].notbar</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -7388,7 +7388,7 @@ let $in := {
     }
   ]
 }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/(if (self::jnode(*, array(*))) then * else .)/foo/(if (self::jnode(*, array(*))) then * else .)/notbar
+return $in/reservations/*/instances/*/foo/(if (self::jnode(*, array(*))) then * else .)/notbar
 ]]></test>
     <result>
       <assert-deep-eq>jtree(3), jtree([ 7 ])</assert-deep-eq>
@@ -7396,7 +7396,7 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instance
   </test-case>
   <test-case name="JMESPath-indices-5-7">
     <description>indices.json: reservations[].instances[].bar[].baz</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -7424,7 +7424,7 @@ let $in := {
     }
   ]
 }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/(if (self::jnode(*, array(*))) then * else .)/bar/(if (self::jnode(*, array(*))) then * else .)/baz
+return $in/reservations/*/instances/*/bar/(if (self::jnode(*, array(*))) then * else .)/baz
 ]]></test>
     <result>
       <assert-deep-eq>jtree([ 1 ]), jtree([ 2 ]), jtree([ 3 ]), jtree([ 4 ])</assert-deep-eq>
@@ -7432,7 +7432,7 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instance
   </test-case>
   <test-case name="JMESPath-indices-5-8">
     <description>indices.json: reservations[].instances[].baz[].baz</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -7460,7 +7460,7 @@ let $in := {
     }
   ]
 }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/(if (self::jnode(*, array(*))) then * else .)/baz/(if (self::jnode(*, array(*))) then * else .)/baz
+return $in/reservations/*/instances/*/baz/(if (self::jnode(*, array(*))) then * else .)/baz
 ]]></test>
     <result>
       <assert-deep-eq>jtree([ 1, 2 ]), jtree([]), jtree([]), jtree([ 3, 4 ])</assert-deep-eq>
@@ -7468,7 +7468,7 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instance
   </test-case>
   <test-case name="JMESPath-indices-5-9">
     <description>indices.json: reservations[].instances[].qux[].baz</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -7496,7 +7496,7 @@ let $in := {
     }
   ]
 }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/(if (self::jnode(*, array(*))) then * else .)/qux/(if (self::jnode(*, array(*))) then * else .)/baz
+return $in/reservations/*/instances/*/qux/(if (self::jnode(*, array(*))) then * else .)/baz
 ]]></test>
     <result>
       <assert-deep-eq>jtree([]), jtree([ 1, 2, 3 ]), jtree([ 4 ]), jtree([]), jtree([]), jtree([ 1, 2, 3 ]), jtree([ 4 ]), jtree([])</assert-deep-eq>
@@ -7504,7 +7504,7 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instance
   </test-case>
   <test-case name="JMESPath-indices-5-10">
     <description>indices.json: reservations[].instances[].qux[].baz[]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -7532,7 +7532,7 @@ let $in := {
     }
   ]
 }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/(if (self::jnode(*, array(*))) then * else .)/qux/(if (self::jnode(*, array(*))) then * else .)/baz/(if (self::jnode(*, array(*))) then * else .)
+return $in/reservations/*/instances/*/qux/(if (self::jnode(*, array(*))) then * else .)/baz/(if (self::jnode(*, array(*))) then * else .)
 ]]></test>
     <result>
       <assert-deep-eq>jtree(1), jtree(2), jtree(3), jtree(4), jtree(1), jtree(2), jtree(3), jtree(4)</assert-deep-eq>
@@ -7540,7 +7540,7 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instance
   </test-case>
   <test-case name="JMESPath-indices-6-1">
     <description>indices.json: foo[]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -7549,7 +7549,7 @@ let $in := {
     [ [ "nine" ], [ "ten" ] ]
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)
+return $in/foo/*/*
 ]]></test>
     <result>
       <assert-deep-eq>jtree([ "one", "two" ]), jtree([ "three", "four" ]), jtree([ "five", "six" ]), jtree([ "seven", "eight" ]), jtree([ "nine" ]), jtree([ "ten" ])</assert-deep-eq>
@@ -7557,7 +7557,7 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)
   </test-case>
   <test-case name="JMESPath-indices-6-2">
     <description>indices.json: foo[][0]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -7566,7 +7566,7 @@ let $in := {
     [ [ "nine" ], [ "ten" ] ]
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/1
+return $in/foo/*/*/1
 ]]></test>
     <result>
       <assert-deep-eq>jtree("one"), jtree("three"), jtree("five"), jtree("seven"), jtree("nine"), jtree("ten")</assert-deep-eq>
@@ -7574,7 +7574,7 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/1
   </test-case>
   <test-case name="JMESPath-indices-6-3">
     <description>indices.json: foo[][1]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -7583,7 +7583,7 @@ let $in := {
     [ [ "nine" ], [ "ten" ] ]
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/2
+return $in/foo/*/*/2
 ]]></test>
     <result>
       <assert-deep-eq>jtree("two"), jtree("four"), jtree("six"), jtree("eight")</assert-deep-eq>
@@ -7591,7 +7591,7 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/2
   </test-case>
   <test-case name="JMESPath-indices-6-4">
     <description>indices.json: foo[][0][0]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -7600,7 +7600,7 @@ let $in := {
     [ [ "nine" ], [ "ten" ] ]
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/1/1
+return $in/foo/*/*/1/1
 ]]></test>
     <result>
       <assert-empty/>
@@ -7608,7 +7608,7 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/1/1
   </test-case>
   <test-case name="JMESPath-indices-6-5">
     <description>indices.json: foo[][2][2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -7617,7 +7617,7 @@ let $in := {
     [ [ "nine" ], [ "ten" ] ]
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/3/3
+return $in/foo/*/*/3/3
 ]]></test>
     <result>
       <assert-empty/>
@@ -7625,7 +7625,7 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/3/3
   </test-case>
   <test-case name="JMESPath-indices-6-6">
     <description>indices.json: foo[][0][0][100]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -7634,7 +7634,7 @@ let $in := {
     [ [ "nine" ], [ "ten" ] ]
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/1/1/101
+return $in/foo/*/*/1/1/101
 ]]></test>
     <result>
       <assert-empty/>
@@ -7658,7 +7658,7 @@ return $in/foo
   </test-case>
   <test-case name="JMESPath-indices-7-2">
     <description>indices.json: foo[]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -7666,7 +7666,7 @@ let $in := {
     { "bar": [ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ] }
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)
+return $in/foo/*
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "bar": [ { "qux": 2, "baz": 1 }, { "qux": 4, "baz": 3 } ] }), jtree({ "bar": [ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ] })</assert-deep-eq>
@@ -7674,7 +7674,7 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)
   </test-case>
   <test-case name="JMESPath-indices-7-3">
     <description>indices.json: foo[].bar</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -7682,7 +7682,7 @@ let $in := {
     { "bar": [ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ] }
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar
+return $in/foo/*/bar
 ]]></test>
     <result>
       <assert-deep-eq>jtree([ { "qux": 2, "baz": 1 }, { "qux": 4, "baz": 3 } ]), jtree([ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ])</assert-deep-eq>
@@ -7690,7 +7690,7 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar
   </test-case>
   <test-case name="JMESPath-indices-7-4">
     <description>indices.json: foo[].bar[]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -7698,7 +7698,7 @@ let $in := {
     { "bar": [ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ] }
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar/(if (self::jnode(*, array(*))) then * else .)
+return $in/foo/*/bar/*
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "qux": 2, "baz": 1 }), jtree({ "qux": 4, "baz": 3 }), jtree({ "qux": 6, "baz": 5 }), jtree({ "qux": 8, "baz": 7 })</assert-deep-eq>
@@ -7706,7 +7706,7 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar/(if (self::jn
   </test-case>
   <test-case name="JMESPath-indices-7-5">
     <description>indices.json: foo[].bar[].baz</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -7714,7 +7714,7 @@ let $in := {
     { "bar": [ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ] }
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar/(if (self::jnode(*, array(*))) then * else .)/baz
+return $in/foo/*/bar/*/baz
 ]]></test>
     <result>
       <assert-deep-eq>jtree(1), jtree(3), jtree(5), jtree(7)</assert-deep-eq>
@@ -7722,10 +7722,10 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar/(if (self::jn
   </test-case>
   <test-case name="JMESPath-indices-8-1">
     <description>indices.json: string[]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(string, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*))) then * else .) ! jvalue() })/self::jnode(*, array(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -7733,10 +7733,10 @@ return $in/jnode(string, array(*)) ! jtree(array { * ! (if (self::jnode(*, array
   </test-case>
   <test-case name="JMESPath-indices-8-2">
     <description>indices.json: hash[]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(hash, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*))) then * else .) ! jvalue() })/self::jnode(*, array(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -7744,10 +7744,10 @@ return $in/jnode(hash, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*
   </test-case>
   <test-case name="JMESPath-indices-8-3">
     <description>indices.json: number[]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(number, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*))) then * else .) ! jvalue() })/self::jnode(*, array(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -7755,10 +7755,10 @@ return $in/jnode(number, array(*)) ! jtree(array { * ! (if (self::jnode(*, array
   </test-case>
   <test-case name="JMESPath-indices-8-4">
     <description>indices.json: nullvalue[]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(nullvalue, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*))) then * else .) ! jvalue() })/self::jnode(*, array(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -7766,10 +7766,10 @@ return $in/jnode(nullvalue, array(*)) ! jtree(array { * ! (if (self::jnode(*, ar
   </test-case>
   <test-case name="JMESPath-indices-8-5">
     <description>indices.json: string[].foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(string, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*))) then * else .) ! jvalue() })/self::jnode(*, array(*)) ! array { * ! foo ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -7777,10 +7777,10 @@ return $in/jnode(string, array(*)) ! jtree(array { * ! (if (self::jnode(*, array
   </test-case>
   <test-case name="JMESPath-indices-8-6">
     <description>indices.json: hash[].foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(hash, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*))) then * else .) ! jvalue() })/self::jnode(*, array(*)) ! array { * ! foo ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -7788,10 +7788,10 @@ return $in/jnode(hash, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*
   </test-case>
   <test-case name="JMESPath-indices-8-7">
     <description>indices.json: number[].foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(number, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*))) then * else .) ! jvalue() })/self::jnode(*, array(*)) ! array { * ! foo ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -7799,10 +7799,10 @@ return $in/jnode(number, array(*)) ! jtree(array { * ! (if (self::jnode(*, array
   </test-case>
   <test-case name="JMESPath-indices-8-8">
     <description>indices.json: nullvalue[].foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(nullvalue, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*))) then * else .) ! jvalue() })/self::jnode(*, array(*)) ! array { * ! foo ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -7810,10 +7810,10 @@ return $in/jnode(nullvalue, array(*)) ! jtree(array { * ! (if (self::jnode(*, ar
   </test-case>
   <test-case name="JMESPath-indices-8-9">
     <description>indices.json: nullvalue[].foo[].bar</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(nullvalue, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*))) then * else .) ! jvalue() })/self::jnode(*, array(*)) ! jtree(array { * ! foo ! jvalue() })/self::jnode(*, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*))) then * else .) ! jvalue() })/self::jnode(*, array(*)) ! array { * ! bar ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -8052,10 +8052,10 @@ return "1`"
   </test-case>
   <test-case name="JMESPath-literal-1-22">
     <description>literal.json: `"\\"`.{a:`"b"`}</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "name": "a" }, { "name": "b" } ], "bar": { "baz": "qux" } }
-return jtree("\") ! { "a": "b" }
+return { "a": "b" }
 ]]></test>
     <result>
       <assert-deep-eq>{ "a": "b" }</assert-deep-eq>
@@ -9023,7 +9023,7 @@ return $in/foo ! [ includeme ! jvalue(), array { bar/baz/*/none ! jvalue() } ]
   </test-case>
   <test-case name="JMESPath-multiselect-4-5">
     <description>multiselect.json: foo.[includeme, bar.baz[].common]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": {
@@ -9032,7 +9032,7 @@ let $in := {
     "includeme": true()
   }
 }
-return $in/foo ! [ includeme ! jvalue(), array { bar/baz/*/(if (self::jnode(*, array(*))) then * else .)/common ! jvalue() } ]
+return $in/foo ! [ includeme ! jvalue(), array { bar/baz/*/common ! jvalue() } ]
 ]]></test>
     <result>
       <assert-deep-eq>[ true(), [ "first", "second" ] ]</assert-deep-eq>
@@ -9040,7 +9040,7 @@ return $in/foo ! [ includeme ! jvalue(), array { bar/baz/*/(if (self::jnode(*, a
   </test-case>
   <test-case name="JMESPath-multiselect-5-1">
     <description>multiselect.json: reservations[*].instances[*].{id: id, name: name}</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -9048,7 +9048,7 @@ let $in := {
     { "instances": [ { "id": "id3", "name": "third" }, { "id": "id4", "name": "fourth" } ] }
   ]
 }
-return $in/jnode(reservations, array(*)) ! array { * ! jnode(instances, array(*)) ! array { * ! (if (exists(jvalue())) then { "id": id ! jvalue(), "name": name ! jvalue() } else ()) } }
+return $in/reservations ! array { * ! instances ! array { * ! { "id": id ! jvalue(), "name": name ! jvalue() } } }
 ]]></test>
     <result>
       <assert-deep-eq>[ [ { "id": "id1", "name": "first" }, { "id": "id2", "name": "second" } ], [ { "id": "id3", "name": "third" }, { "id": "id4", "name": "fourth" } ] ]</assert-deep-eq>
@@ -9056,7 +9056,7 @@ return $in/jnode(reservations, array(*)) ! array { * ! jnode(instances, array(*)
   </test-case>
   <test-case name="JMESPath-multiselect-5-2">
     <description>multiselect.json: reservations[].instances[].{id: id, name: name}</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -9064,7 +9064,7 @@ let $in := {
     { "instances": [ { "id": "id3", "name": "third" }, { "id": "id4", "name": "fourth" } ] }
   ]
 }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/(if (self::jnode(*, array(*))) then * else .) ! jtree({ "id": id ! jvalue(), "name": name ! jvalue() })
+return $in/reservations/*/instances/* ! jtree({ "id": id ! jvalue(), "name": name ! jvalue() })
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "id": "id1", "name": "first" }), jtree({ "id": "id2", "name": "second" }), jtree({ "id": "id3", "name": "third" }), jtree({ "id": "id4", "name": "fourth" })</assert-deep-eq>
@@ -9072,7 +9072,7 @@ return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instance
   </test-case>
   <test-case name="JMESPath-multiselect-5-3">
     <description>multiselect.json: reservations[].instances[].[id, name]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "reservations": [
@@ -9080,7 +9080,7 @@ let $in := {
     { "instances": [ { "id": "id3", "name": "third" }, { "id": "id4", "name": "fourth" } ] }
   ]
 }
-return $in/reservations/*/(if (self::jnode(*, array(*))) then * else .)/instances/(if (self::jnode(*, array(*))) then * else .) ! jtree([ id ! jvalue(), name ! jvalue() ])
+return $in/reservations/*/instances/* ! jtree([ id ! jvalue(), name ! jvalue() ])
 ]]></test>
     <result>
       <assert-deep-eq>jtree([ "id1", "first" ]), jtree([ "id2", "second" ]), jtree([ "id3", "third" ]), jtree([ "id4", "fourth" ])</assert-deep-eq>
@@ -9104,7 +9104,7 @@ return $in/foo
   </test-case>
   <test-case name="JMESPath-multiselect-6-2">
     <description>multiselect.json: foo[]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -9112,7 +9112,7 @@ let $in := {
     { "bar": [ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ] }
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)
+return $in/foo/*
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "bar": [ { "qux": 2, "baz": 1 }, { "qux": 4, "baz": 3 } ] }), jtree({ "bar": [ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ] })</assert-deep-eq>
@@ -9120,7 +9120,7 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)
   </test-case>
   <test-case name="JMESPath-multiselect-6-3">
     <description>multiselect.json: foo[].bar</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -9128,7 +9128,7 @@ let $in := {
     { "bar": [ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ] }
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar
+return $in/foo/*/bar
 ]]></test>
     <result>
       <assert-deep-eq>jtree([ { "qux": 2, "baz": 1 }, { "qux": 4, "baz": 3 } ]), jtree([ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ])</assert-deep-eq>
@@ -9136,7 +9136,7 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar
   </test-case>
   <test-case name="JMESPath-multiselect-6-4">
     <description>multiselect.json: foo[].bar[]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -9144,7 +9144,7 @@ let $in := {
     { "bar": [ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ] }
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar/(if (self::jnode(*, array(*))) then * else .)
+return $in/foo/*/bar/*
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "qux": 2, "baz": 1 }), jtree({ "qux": 4, "baz": 3 }), jtree({ "qux": 6, "baz": 5 }), jtree({ "qux": 8, "baz": 7 })</assert-deep-eq>
@@ -9152,7 +9152,7 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar/(if (self::jn
   </test-case>
   <test-case name="JMESPath-multiselect-6-5">
     <description>multiselect.json: foo[].bar[].[baz, qux]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -9160,7 +9160,7 @@ let $in := {
     { "bar": [ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ] }
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar/(if (self::jnode(*, array(*))) then * else .) ! jtree([ baz ! jvalue(), qux ! jvalue() ])
+return $in/foo/*/bar/* ! jtree([ baz ! jvalue(), qux ! jvalue() ])
 ]]></test>
     <result>
       <assert-deep-eq>jtree([ 1, 2 ]), jtree([ 3, 4 ]), jtree([ 5, 6 ]), jtree([ 7, 8 ])</assert-deep-eq>
@@ -9168,7 +9168,7 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar/(if (self::jn
   </test-case>
   <test-case name="JMESPath-multiselect-6-6">
     <description>multiselect.json: foo[].bar[].[baz]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -9176,7 +9176,7 @@ let $in := {
     { "bar": [ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ] }
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar/(if (self::jnode(*, array(*))) then * else .) ! jtree([ baz ! jvalue() ])
+return $in/foo/*/bar/* ! jtree([ baz ! jvalue() ])
 ]]></test>
     <result>
       <assert-deep-eq>jtree([ 1 ]), jtree([ 3 ]), jtree([ 5 ]), jtree([ 7 ])</assert-deep-eq>
@@ -9184,7 +9184,7 @@ return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar/(if (self::jn
   </test-case>
   <test-case name="JMESPath-multiselect-6-7">
     <description>multiselect.json: foo[].bar[].[baz, qux][]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -9192,7 +9192,7 @@ let $in := {
     { "bar": [ { "qux": 6, "baz": 5 }, { "qux": 8, "baz": 7 } ] }
   ]
 }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/bar/(if (self::jnode(*, array(*))) then * else .) ! jtree([ baz ! jvalue(), qux ! jvalue() ])/(if (self::jnode(*, array(*))) then * else .)
+return $in/foo/*/bar/* ! jtree([ baz ! jvalue(), qux ! jvalue() ])/*
 ]]></test>
     <result>
       <assert-deep-eq>jtree(1), jtree(2), jtree(3), jtree(4), jtree(5), jtree(6), jtree(7), jtree(8)</assert-deep-eq>
@@ -9211,7 +9211,7 @@ return $in/foo ! [ array { baz/*/bar ! jvalue() }, qux/1 ! jvalue() ]
   </test-case>
   <test-case name="JMESPath-multiselect-8-1">
     <description>multiselect.json: foo.[baz[*].[bar, boo], qux[0]]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": {
@@ -9219,7 +9219,7 @@ let $in := {
     "qux": [ "zero" ]
   }
 }
-return $in/foo ! [ array { baz/* ! jtree([ bar ! jvalue(), boo ! jvalue() ]) ! jvalue() }, qux/1 ! jvalue() ]
+return $in/foo ! [ array { baz/* ! [ bar ! jvalue(), boo ! jvalue() ] }, qux/1 ! jvalue() ]
 ]]></test>
     <result>
       <assert-deep-eq>[ [ [ "a", "c" ], [ "d", "f" ] ], "zero" ]</assert-deep-eq>
@@ -9227,7 +9227,7 @@ return $in/foo ! [ array { baz/* ! jtree([ bar ! jvalue(), boo ! jvalue() ]) ! j
   </test-case>
   <test-case name="JMESPath-multiselect-9-1">
     <description>multiselect.json: foo.[baz[*].not_there || baz[*].bar, qux[0]]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": {
@@ -9235,7 +9235,7 @@ let $in := {
     "qux": [ "zero" ]
   }
 }
-return $in/foo ! [ ((jtree(array { baz/*/not_there ! jvalue() }))[empty(array:index-of([ (), false(), "", [], {} ], jvalue()))] otherwise jtree(array { baz/*/bar ! jvalue() })) ! jvalue(), qux/1 ! jvalue() ]
+return $in/foo ! [ (array { baz/*/not_there ! jvalue() }[array:size(.) > 0] otherwise array { baz/*/bar ! jvalue() }), qux/1 ! jvalue() ]
 ]]></test>
     <result>
       <assert-deep-eq>[ [ "a", "d" ], "zero" ]</assert-deep-eq>
@@ -9243,10 +9243,10 @@ return $in/foo ! [ ((jtree(array { baz/*/not_there ! jvalue() }))[empty(array:in
   </test-case>
   <test-case name="JMESPath-multiselect-10-1">
     <description>multiselect.json: [[*],*]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" } => jtree()
-return $in ! (if (exists(jvalue())) then [ self::jnode(*, array(*)) ! array { * ! jvalue() }, self::jnode(*, map(*)) ! array { * ! jvalue() } ] else ())
+return $in ! [ (), array { * ! jvalue() } ]
 ]]></test>
     <result>
       <assert-deep-eq>[ (), [ "object" ] ]</assert-deep-eq>
@@ -9542,7 +9542,7 @@ return $in ! jtree({ "a": foo/bar ! jvalue(), "b": foo/other ! jvalue() })/b
   </test-case>
   <test-case name="JMESPath-pipe-2-9">
     <description>pipe.json: foo.bam || foo.bar | baz</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": {
@@ -9553,7 +9553,7 @@ let $in := {
     "other4": { "notbaz": [ "d", "e", "f" ] }
   }
 }
-return ($in/foo/bam otherwise $in/foo/bar)/baz
+return $in/foo/bar/baz
 ]]></test>
     <result>
       <assert-eq>"one"</assert-eq>
@@ -9580,7 +9580,7 @@ return $in/foo/not_there otherwise $in/foo/bar
   </test-case>
   <test-case name="JMESPath-pipe-3-1">
     <description>pipe.json: foo[*].bar[*] | [0][0]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -9588,7 +9588,7 @@ let $in := {
     { "bar": [ { "baz": "three" }, { "baz": "four" } ] }
   ]
 }
-return $in/jnode(foo, array(*)) ! jtree(array { * ! jnode(bar, array(*)) ! array { * ! jvalue() } })/1/1
+return $in/foo ! jtree(array { * ! bar ! array { * ! jvalue() } })/1/1
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "baz": "one" })</assert-deep-eq>
@@ -9596,10 +9596,10 @@ return $in/jnode(foo, array(*)) ! jtree(array { * ! jnode(bar, array(*)) ! array
   </test-case>
   <test-case name="JMESPath-slice-1-1">
     <description>slice.json: bar[0:10]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "bar": { "baz": 1 } }
-return $in/jnode(bar, array(*)) ! jtree(array { *[1 to 10] ! jvalue() })/self::jnode(*, array(*)) ! array { * ! jvalue() }
+return $in/jnode(bar, array(*)) ! array { *[1 to 10] ! jvalue() }
 ]]></test>
     <result>
       <assert-empty/>
@@ -9739,10 +9739,10 @@ return $in/foo/(2 to 9)
   </test-case>
   <test-case name="JMESPath-slice-1-14">
     <description>slice.json: foo[0:10:2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "bar": { "baz": 1 } }
-return $in/jnode(foo, array(*)) ! jtree(array { slice(*, 1, 10, 2) ! jvalue() })/*
+return $in/jnode(foo, array(*)) ! slice(*, 1, 10, 2)
 ]]></test>
     <result>
       <assert-deep-eq>jtree(0), jtree(2), jtree(4), jtree(6), jtree(8)</assert-deep-eq>
@@ -9761,10 +9761,10 @@ return $in/foo/*[6 to last()]
   </test-case>
   <test-case name="JMESPath-slice-1-16">
     <description>slice.json: foo[5::2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "bar": { "baz": 1 } }
-return $in/jnode(foo, array(*)) ! jtree(array { slice(*, 6, step := 2) ! jvalue() })/*
+return $in/jnode(foo, array(*)) ! slice(*, 6, step := 2)
 ]]></test>
     <result>
       <assert-deep-eq>jtree(5), jtree(7), jtree(9)</assert-deep-eq>
@@ -9772,10 +9772,10 @@ return $in/jnode(foo, array(*)) ! jtree(array { slice(*, 6, step := 2) ! jvalue(
   </test-case>
   <test-case name="JMESPath-slice-1-17">
     <description>slice.json: foo[::2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "bar": { "baz": 1 } }
-return $in/jnode(foo, array(*)) ! jtree(array { slice(*, step := 2) ! jvalue() })/*
+return $in/jnode(foo, array(*)) ! slice(*, step := 2)
 ]]></test>
     <result>
       <assert-deep-eq>jtree(0), jtree(2), jtree(4), jtree(6), jtree(8)</assert-deep-eq>
@@ -9783,10 +9783,10 @@ return $in/jnode(foo, array(*)) ! jtree(array { slice(*, step := 2) ! jvalue() }
   </test-case>
   <test-case name="JMESPath-slice-1-18">
     <description>slice.json: foo[::-1]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "bar": { "baz": 1 } }
-return $in/jnode(foo, array(*)) ! jtree(array { slice(*, step := -1) ! jvalue() })/*
+return $in/jnode(foo, array(*)) ! slice(*, step := -1)
 ]]></test>
     <result>
       <assert-deep-eq>jtree(9), jtree(8), jtree(7), jtree(6), jtree(5), jtree(4), jtree(3), jtree(2), jtree(1), jtree(0)</assert-deep-eq>
@@ -9794,10 +9794,10 @@ return $in/jnode(foo, array(*)) ! jtree(array { slice(*, step := -1) ! jvalue() 
   </test-case>
   <test-case name="JMESPath-slice-1-19">
     <description>slice.json: foo[1::2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "bar": { "baz": 1 } }
-return $in/jnode(foo, array(*)) ! jtree(array { slice(*, 2, step := 2) ! jvalue() })/*
+return $in/jnode(foo, array(*)) ! slice(*, 2, step := 2)
 ]]></test>
     <result>
       <assert-deep-eq>jtree(1), jtree(3), jtree(5), jtree(7), jtree(9)</assert-deep-eq>
@@ -9805,10 +9805,10 @@ return $in/jnode(foo, array(*)) ! jtree(array { slice(*, 2, step := 2) ! jvalue(
   </test-case>
   <test-case name="JMESPath-slice-1-20">
     <description>slice.json: foo[10:0:-1]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "bar": { "baz": 1 } }
-return $in/jnode(foo, array(*)) ! jtree(array { slice(*, 11, 2, -1) ! jvalue() })/*
+return $in/jnode(foo, array(*)) ! slice(*, 11, 2, -1)
 ]]></test>
     <result>
       <assert-deep-eq>jtree(9), jtree(8), jtree(7), jtree(6), jtree(5), jtree(4), jtree(3), jtree(2), jtree(1)</assert-deep-eq>
@@ -9816,10 +9816,10 @@ return $in/jnode(foo, array(*)) ! jtree(array { slice(*, 11, 2, -1) ! jvalue() }
   </test-case>
   <test-case name="JMESPath-slice-1-21">
     <description>slice.json: foo[10:5:-1]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "bar": { "baz": 1 } }
-return $in/jnode(foo, array(*)) ! jtree(array { slice(*, 11, 7, -1) ! jvalue() })/*
+return $in/jnode(foo, array(*)) ! slice(*, 11, 7, -1)
 ]]></test>
     <result>
       <assert-deep-eq>jtree(9), jtree(8), jtree(7), jtree(6)</assert-deep-eq>
@@ -9827,10 +9827,10 @@ return $in/jnode(foo, array(*)) ! jtree(array { slice(*, 11, 7, -1) ! jvalue() }
   </test-case>
   <test-case name="JMESPath-slice-1-22">
     <description>slice.json: foo[8:2:-2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "bar": { "baz": 1 } }
-return $in/jnode(foo, array(*)) ! jtree(array { slice(*, 9, 4, -2) ! jvalue() })/*
+return $in/jnode(foo, array(*)) ! slice(*, 9, 4, -2)
 ]]></test>
     <result>
       <assert-deep-eq>jtree(8), jtree(6), jtree(4)</assert-deep-eq>
@@ -9849,10 +9849,10 @@ return $in/foo/(1 to 20)
   </test-case>
   <test-case name="JMESPath-slice-1-24">
     <description>slice.json: foo[10:-20:-1]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "bar": { "baz": 1 } }
-return $in/jnode(foo, array(*)) ! jtree(array { reverse(*[last() - 18 to 11]) ! jvalue() })/*
+return $in/jnode(foo, array(*)) ! reverse(*[last() - 18 to 11])
 ]]></test>
     <result>
       <assert-deep-eq>jtree(9), jtree(8), jtree(7), jtree(6), jtree(5), jtree(4), jtree(3), jtree(2), jtree(1), jtree(0)</assert-deep-eq>
@@ -9882,10 +9882,10 @@ return $in/foo/*[last() - 3 to last() - 1]
   </test-case>
   <test-case name="JMESPath-slice-1-27">
     <description>slice.json: foo[:-5:-1]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "bar": { "baz": 1 } }
-return $in/jnode(foo, array(*)) ! jtree(array { slice(*, end := -4, step := -1) ! jvalue() })/*
+return $in/jnode(foo, array(*)) ! slice(*, end := -4, step := -1)
 ]]></test>
     <result>
       <assert-deep-eq>jtree(9), jtree(8), jtree(7), jtree(6)</assert-deep-eq>
@@ -9938,14 +9938,14 @@ return $in/foo/(1 to 2)/a/b
   </test-case>
   <test-case name="JMESPath-slice-2-4">
     <description>slice.json: bar[::-1].a.b</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [ { "a": 1 }, { "a": 2 }, { "a": 3 } ],
   "bar": [ { "a": { "b": 1 } }, { "a": { "b": 2 } }, { "a": { "b": 3 } } ],
   "baz": 50
 }
-return $in/jnode(bar, array(*)) ! jtree(array { slice(*, step := -1) ! jvalue() })/*/a/b
+return $in/jnode(bar, array(*)) ! slice(*, step := -1) ! a/b
 ]]></test>
     <result>
       <assert-deep-eq>jtree(3), jtree(2), jtree(1)</assert-deep-eq>
@@ -9968,14 +9968,14 @@ return $in/bar/(1 to 2)/a/b
   </test-case>
   <test-case name="JMESPath-slice-2-6">
     <description>slice.json: baz[:2].a</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [ { "a": 1 }, { "a": 2 }, { "a": 3 } ],
   "bar": [ { "a": { "b": 1 } }, { "a": { "b": 2 } }, { "a": { "b": 3 } } ],
   "baz": 50
 }
-return $in/jnode(baz, array(*)) ! jtree(array { *[1 to 2] ! jvalue() })/self::jnode(*, array(*)) ! array { * ! a ! jvalue() }
+return $in/jnode(baz, array(*)) ! array { *[1 to 2] ! a ! jvalue() }
 ]]></test>
     <result>
       <assert-empty/>
@@ -10005,10 +10005,10 @@ return $in/(1 to 2)/a
   </test-case>
   <test-case name="JMESPath-slice-3-3">
     <description>slice.json: [::-1].a</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "a": 1 }, { "a": 2 }, { "a": 3 } ]
-return $in/self::jnode(*, array(*)) ! jtree(array { slice(*, step := -1) ! jvalue() })/*/a
+return $in/self::jnode(*, array(*)) ! slice(*, step := -1) ! a
 ]]></test>
     <result>
       <assert-deep-eq>jtree(3), jtree(2), jtree(1)</assert-deep-eq>
@@ -10093,10 +10093,10 @@ return $in/*/1
   </test-case>
   <test-case name="JMESPath-syntax-7-1">
     <description>syntax.json: []</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/self::jnode(*, array(*)) ! jtree(array { * ! (if (self::jnode(*, array(*))) then * else .) ! jvalue() })/self::jnode(*, array(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -10115,10 +10115,10 @@ return $in/1
   </test-case>
   <test-case name="JMESPath-syntax-8-2">
     <description>syntax.json: [*]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/self::jnode(*, array(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -10137,10 +10137,10 @@ return $in/* ! jtree([ ./"0" ! jvalue() ])
   </test-case>
   <test-case name="JMESPath-syntax-8-5">
     <description>syntax.json: [*].bar</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/self::jnode(*, array(*)) ! array { * ! bar ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -10148,10 +10148,10 @@ return $in/self::jnode(*, array(*)) ! array { * ! bar ! jvalue() }
   </test-case>
   <test-case name="JMESPath-syntax-8-6">
     <description>syntax.json: [*][0]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/self::jnode(*, array(*)) ! array { * ! ./1 ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -10236,10 +10236,10 @@ return $in ! { "\": { " ": array { * ! jvalue() } } }
   </test-case>
   <test-case name="JMESPath-syntax-12-1">
     <description>syntax.json: foo || bar</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/foo otherwise $in/bar
+return $in/bar
 ]]></test>
     <result>
       <assert-empty/>
@@ -10247,10 +10247,10 @@ return $in/foo otherwise $in/bar
   </test-case>
   <test-case name="JMESPath-syntax-12-6">
     <description>syntax.json: foo.[a || b]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/foo ! [ (a otherwise b) ! jvalue() ]
+return $in/foo ! [ b ! jvalue() ]
 ]]></test>
     <result>
       <assert-empty/>
@@ -10258,10 +10258,10 @@ return $in/foo ! [ (a otherwise b) ! jvalue() ]
   </test-case>
   <test-case name="JMESPath-syntax-13-1">
     <description>syntax.json: foo[?bar==`"baz"`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/jnode(foo, array(*)) ! array { *[jnode(bar, xs:string) = "baz"] ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -10269,10 +10269,10 @@ return $in/jnode(foo, array(*)) ! array { *[jnode(bar, xs:string) = "baz"] ! jva
   </test-case>
   <test-case name="JMESPath-syntax-13-2">
     <description>syntax.json: foo[? bar == `"baz"` ]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/jnode(foo, array(*)) ! array { *[jnode(bar, xs:string) = "baz"] ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -10280,10 +10280,10 @@ return $in/jnode(foo, array(*)) ! array { *[jnode(bar, xs:string) = "baz"] ! jva
   </test-case>
   <test-case name="JMESPath-syntax-13-8">
     <description>syntax.json: foo[?a.b.c==d.e.f]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/jnode(foo, array(*)) ! array { *[deep-equal(a/b/c ! jvalue(), d/e/f ! jvalue())] ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -10291,10 +10291,10 @@ return $in/jnode(foo, array(*)) ! array { *[deep-equal(a/b/c ! jvalue(), d/e/f !
   </test-case>
   <test-case name="JMESPath-syntax-13-9">
     <description>syntax.json: foo[?bar==`[0, 1, 2]`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/jnode(foo, array(*)) ! array { *[deep-equal(bar ! jvalue(), [ 0, 1, 2 ])] ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -10302,10 +10302,10 @@ return $in/jnode(foo, array(*)) ! array { *[deep-equal(bar ! jvalue(), [ 0, 1, 2
   </test-case>
   <test-case name="JMESPath-syntax-13-10">
     <description>syntax.json: foo[?bar==`["a", "b", "c"]`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/jnode(foo, array(*)) ! array { *[deep-equal(bar ! jvalue(), [ "a", "b", "c" ])] ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -10313,10 +10313,10 @@ return $in/jnode(foo, array(*)) ! array { *[deep-equal(bar ! jvalue(), [ "a", "b
   </test-case>
   <test-case name="JMESPath-syntax-13-12">
     <description>syntax.json: foo[?bar==`["foo\`bar"]`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/jnode(foo, array(*)) ! array { *[deep-equal(bar ! jvalue(), [ "foo`bar" ])] ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -10324,10 +10324,10 @@ return $in/jnode(foo, array(*)) ! array { *[deep-equal(bar ! jvalue(), [ "foo`ba
   </test-case>
   <test-case name="JMESPath-syntax-13-16">
     <description>syntax.json: [?"\\"&gt;`"foo"`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/self::jnode(*, array(*)) ! array { *[(let $l := ./"\" ! jvalue(), $r := "foo" return if (($l, $r) instance of xs:numeric*) then $l > $r else ())] ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -10335,10 +10335,10 @@ return $in/self::jnode(*, array(*)) ! array { *[(let $l := ./"\" ! jvalue(), $r 
   </test-case>
   <test-case name="JMESPath-syntax-13-17">
     <description>syntax.json: [?"\\" &gt; `"foo"`]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "type": "object" }
-return $in/self::jnode(*, array(*)) ! array { *[(let $l := ./"\" ! jvalue(), $r := "foo" return if (($l, $r) instance of xs:numeric*) then $l > $r else ())] ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -10379,10 +10379,10 @@ return $in/"\"
   </test-case>
   <test-case name="JMESPath-syntax-16-1">
     <description>syntax.json: *||*|*|*</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := []
-return (($in/self::jnode(*, map(*)) ! jtree(array { * ! jvalue() }))[empty(array:index-of([ (), false(), "", [], {} ], jvalue()))] otherwise $in/self::jnode(*, map(*)) ! jtree(array { * ! jvalue() }))/self::jnode(*, map(*)) ! jtree(array { * ! jvalue() })/self::jnode(*, map(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -10390,21 +10390,21 @@ return (($in/self::jnode(*, map(*)) ! jtree(array { * ! jvalue() }))[empty(array
   </test-case>
   <test-case name="JMESPath-syntax-16-2">
     <description>syntax.json: *[]||[*]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := []
-return (jtree(array { $in/*/(if (self::jnode(*, array(*))) then * else .) ! jvalue() }))[empty(array:index-of([ (), false(), "", [], {} ], jvalue()))] otherwise jtree(array { $in/* ! jvalue() })
+return array { $in/* ! jvalue() }
 ]]></test>
     <result>
-      <assert-deep-eq>jtree([])</assert-deep-eq>
+      <assert-deep-eq>[]</assert-deep-eq>
     </result>
   </test-case>
   <test-case name="JMESPath-syntax-16-3">
     <description>syntax.json: [*.*]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
-let $in := [] => jtree()
-return $in ! (if (exists(jvalue())) then [ self::jnode(*, map(*)) ! array { jnode(*, map(*)) ! array { * ! jvalue() } } ] else ())
+let $in := []
+return [ () ]
 ]]></test>
     <result>
       <assert-deep-eq>[ () ]</assert-deep-eq>
@@ -10412,10 +10412,10 @@ return $in ! (if (exists(jvalue())) then [ self::jnode(*, map(*)) ! array { jnod
   </test-case>
   <test-case name="JMESPath-unicode-1-1">
     <description>unicode.json: foo[]."✓"</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "foo": [ { "✓": "✓" }, { "✓": "✗" } ] }
-return $in/foo/*/(if (self::jnode(*, array(*))) then * else .)/"✓"
+return $in/foo/*/"✓"
 ]]></test>
     <result>
       <assert-deep-eq>jtree("✓"), jtree("✗")</assert-deep-eq>
@@ -10573,7 +10573,7 @@ return $in/foo/*
   </test-case>
   <test-case name="JMESPath-wildcard-2-2">
     <description>wildcard.json: foo.*.*</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": {
@@ -10582,7 +10582,7 @@ let $in := {
     "first-3": { "second-1": "val" }
   }
 }
-return $in/jnode(foo, map(*)) ! array { jnode(*, map(*)) ! array { * ! jvalue() } }
+return $in/foo ! array { * ! array { * ! jvalue() } }
 ]]></test>
     <result>
       <assert-deep-eq>[ [ "val" ], [ "val" ], [ "val" ] ]</assert-deep-eq>
@@ -10590,7 +10590,7 @@ return $in/jnode(foo, map(*)) ! array { jnode(*, map(*)) ! array { * ! jvalue() 
   </test-case>
   <test-case name="JMESPath-wildcard-2-3">
     <description>wildcard.json: foo.*.*.*</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": {
@@ -10599,7 +10599,7 @@ let $in := {
     "first-3": { "second-1": "val" }
   }
 }
-return $in/jnode(foo, map(*)) ! array { jnode(*, map(*)) ! array { jnode(*, map(*)) ! array { * ! jvalue() } } }
+return $in/foo ! array { * ! array { * ! () } }
 ]]></test>
     <result>
       <assert-deep-eq>[ [], [], [] ]</assert-deep-eq>
@@ -10607,7 +10607,7 @@ return $in/jnode(foo, map(*)) ! array { jnode(*, map(*)) ! array { jnode(*, map(
   </test-case>
   <test-case name="JMESPath-wildcard-2-4">
     <description>wildcard.json: foo.*.*.*.*</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": {
@@ -10616,7 +10616,7 @@ let $in := {
     "first-3": { "second-1": "val" }
   }
 }
-return $in/jnode(foo, map(*)) ! array { jnode(*, map(*)) ! array { jnode(*, map(*)) ! array { jnode(*, map(*)) ! array { * ! jvalue() } } } }
+return $in/foo ! array { * ! array { * ! () } }
 ]]></test>
     <result>
       <assert-deep-eq>[ [], [], [] ]</assert-deep-eq>
@@ -10657,10 +10657,10 @@ return $in/*/sub1
   </test-case>
   <test-case name="JMESPath-wildcard-4-3">
     <description>wildcard.json: *.*</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
-let $in := { "top1": { "sub1": { "foo": "one" } }, "top2": { "sub1": { "foo": "one" } } }
-return $in/self::jnode(*, map(*)) ! array { jnode(*, map(*)) ! array { * ! jvalue() } }
+let $in := { "top1": { "sub1": { "foo": "one" } }, "top2": { "sub1": { "foo": "one" } } } => jtree()
+return $in ! array { * ! array { * ! jvalue() } }
 ]]></test>
     <result>
       <assert-deep-eq>[ [ { "foo": "one" } ], [ { "foo": "one" } ] ]</assert-deep-eq>
@@ -10668,10 +10668,10 @@ return $in/self::jnode(*, map(*)) ! array { jnode(*, map(*)) ! array { * ! jvalu
   </test-case>
   <test-case name="JMESPath-wildcard-4-4">
     <description>wildcard.json: *.*.foo[]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "top1": { "sub1": { "foo": "one" } }, "top2": { "sub1": { "foo": "one" } } }
-return $in/*/*/foo/(if (self::jnode(*, array(*))) then * else .)
+return $in/*/*/foo
 ]]></test>
     <result>
       <assert-deep-eq>jtree("one"), jtree("one")</assert-deep-eq>
@@ -10906,7 +10906,7 @@ return $in/foo/1/1
   </test-case>
   <test-case name="JMESPath-wildcard-9-1">
     <description>wildcard.json: foo[*].bar[*].kind</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -10915,7 +10915,7 @@ let $in := {
     { "bar": "string" }
   ]
 }
-return $in/jnode(foo, array(*)) ! array { * ! jnode(bar, array(*)) ! array { * ! kind ! jvalue() } }
+return $in/foo ! array { * ! jnode(bar, array(*)) ! array { * ! kind ! jvalue() } }
 ]]></test>
     <result>
       <assert-deep-eq>[ [ "basic", "intermediate" ], [ "advanced", "expert" ] ]</assert-deep-eq>
@@ -11161,7 +11161,7 @@ return $in/foo/*/3/3
   </test-case>
   <test-case name="JMESPath-wildcard-14-9">
     <description>wildcard.json: bar[*]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -11170,7 +11170,7 @@ let $in := {
     [ [ "nine" ], [ "ten" ] ]
   ]
 }
-return $in/jnode(bar, array(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11178,7 +11178,7 @@ return $in/jnode(bar, array(*)) ! array { * ! jvalue() }
   </test-case>
   <test-case name="JMESPath-wildcard-14-10">
     <description>wildcard.json: bar[*].baz[*]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "foo": [
@@ -11187,7 +11187,7 @@ let $in := {
     [ [ "nine" ], [ "ten" ] ]
   ]
 }
-return $in/jnode(bar, array(*)) ! array { * ! jnode(baz, array(*)) ! array { * ! jvalue() } }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11195,10 +11195,10 @@ return $in/jnode(bar, array(*)) ! array { * ! jnode(baz, array(*)) ! array { * !
   </test-case>
   <test-case name="JMESPath-wildcard-15-1">
     <description>wildcard.json: string[*]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(string, array(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11206,10 +11206,10 @@ return $in/jnode(string, array(*)) ! array { * ! jvalue() }
   </test-case>
   <test-case name="JMESPath-wildcard-15-2">
     <description>wildcard.json: hash[*]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(hash, array(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11217,10 +11217,10 @@ return $in/jnode(hash, array(*)) ! array { * ! jvalue() }
   </test-case>
   <test-case name="JMESPath-wildcard-15-3">
     <description>wildcard.json: number[*]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(number, array(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11228,10 +11228,10 @@ return $in/jnode(number, array(*)) ! array { * ! jvalue() }
   </test-case>
   <test-case name="JMESPath-wildcard-15-4">
     <description>wildcard.json: nullvalue[*]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(nullvalue, array(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11239,10 +11239,10 @@ return $in/jnode(nullvalue, array(*)) ! array { * ! jvalue() }
   </test-case>
   <test-case name="JMESPath-wildcard-15-5">
     <description>wildcard.json: string[*].foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(string, array(*)) ! array { * ! foo ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11250,10 +11250,10 @@ return $in/jnode(string, array(*)) ! array { * ! foo ! jvalue() }
   </test-case>
   <test-case name="JMESPath-wildcard-15-6">
     <description>wildcard.json: hash[*].foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(hash, array(*)) ! array { * ! foo ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11261,10 +11261,10 @@ return $in/jnode(hash, array(*)) ! array { * ! foo ! jvalue() }
   </test-case>
   <test-case name="JMESPath-wildcard-15-7">
     <description>wildcard.json: number[*].foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(number, array(*)) ! array { * ! foo ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11272,10 +11272,10 @@ return $in/jnode(number, array(*)) ! array { * ! foo ! jvalue() }
   </test-case>
   <test-case name="JMESPath-wildcard-15-8">
     <description>wildcard.json: nullvalue[*].foo</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(nullvalue, array(*)) ! array { * ! foo ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11283,10 +11283,10 @@ return $in/jnode(nullvalue, array(*)) ! array { * ! foo ! jvalue() }
   </test-case>
   <test-case name="JMESPath-wildcard-15-9">
     <description>wildcard.json: nullvalue[*].foo[*].bar</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "string": "string", "hash": { "foo": "bar", "bar": "baz" }, "number": 23, "nullvalue": () }
-return $in/jnode(nullvalue, array(*)) ! array { * ! jnode(foo, array(*)) ! array { * ! bar ! jvalue() } }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11294,7 +11294,7 @@ return $in/jnode(nullvalue, array(*)) ! array { * ! jnode(foo, array(*)) ! array
   </test-case>
   <test-case name="JMESPath-wildcard-16-1">
     <description>wildcard.json: string.*</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "string": "string",
@@ -11303,7 +11303,7 @@ let $in := {
   "array": [ 1, 2, 3 ],
   "nullvalue": ()
 }
-return $in/jnode(string, map(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11328,7 +11328,7 @@ return $in/hash/*
   </test-case>
   <test-case name="JMESPath-wildcard-16-3">
     <description>wildcard.json: number.*</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "string": "string",
@@ -11337,7 +11337,7 @@ let $in := {
   "array": [ 1, 2, 3 ],
   "nullvalue": ()
 }
-return $in/jnode(number, map(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11345,7 +11345,7 @@ return $in/jnode(number, map(*)) ! array { * ! jvalue() }
   </test-case>
   <test-case name="JMESPath-wildcard-16-4">
     <description>wildcard.json: array.*</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "string": "string",
@@ -11354,7 +11354,7 @@ let $in := {
   "array": [ 1, 2, 3 ],
   "nullvalue": ()
 }
-return $in/jnode(array, map(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>
@@ -11362,7 +11362,7 @@ return $in/jnode(array, map(*)) ! array { * ! jvalue() }
   </test-case>
   <test-case name="JMESPath-wildcard-16-5">
     <description>wildcard.json: nullvalue.*</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := {
   "string": "string",
@@ -11371,7 +11371,7 @@ let $in := {
   "array": [ 1, 2, 3 ],
   "nullvalue": ()
 }
-return $in/jnode(nullvalue, map(*)) ! array { * ! jvalue() }
+return ()
 ]]></test>
     <result>
       <assert-empty/>

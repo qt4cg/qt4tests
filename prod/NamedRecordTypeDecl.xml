@@ -1377,6 +1377,115 @@
          <assert-false/>
       </result>
    </test-case>
+
+   <test-case name="recordTypeDecl-096" covers-40="PR737">
+      <description>Subtyping of recursive record types: identical declarations are distinct</description>
+      <created by="Christian Gruen" on="2026-10-20"/>
+      <test><![CDATA[
+         declare record local:list(value as item()*, next as local:list?);
+         declare record local:list2(value as item()*, next as local:list2?);
+         declare function local:f() as local:list { { 'value': 1 } };
+         local:f#0 instance of fn() as local:list2
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-097" covers-40="PR737">
+      <description>Subtyping of recursive record types: structural record type with the same fields</description>
+      <created by="Christian Gruen" on="2026-10-20"/>
+      <test><![CDATA[
+         declare record local:list(value as item()*, next as local:list?);
+         declare function local:f() as local:list { { 'value': 1 } };
+         local:f#0 instance of fn() as record(value as item()*, next as local:list?)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-098" covers-40="PR737">
+      <description>Subtyping of recursive record types: structural record type with different field types</description>
+      <created by="Christian Gruen" on="2026-10-20"/>
+      <test><![CDATA[
+         declare record local:list(value as item()*, next as local:list?);
+         declare record local:list2(value as item()*, next as local:list2?);
+         declare function local:f() as local:list { { 'value': 1 } };
+         local:f#0 instance of fn() as record(value as item()*, next as local:list2?)
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-099" covers-40="PR737">
+      <description>Subtyping of recursive record types: transitivity</description>
+      <created by="Christian Gruen" on="2026-10-20"/>
+      <test><![CDATA[
+         declare record local:list(value as item()*, next as local:list?);
+         declare function local:f() as local:list { { 'value': 1 } };
+         local:f#0 instance of fn() as record(value, next)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-100" covers-40="PR737">
+      <description>Subtyping of recursive record types: transitivity in nested field types</description>
+      <created by="Christian Gruen" on="2026-10-20"/>
+      <test><![CDATA[
+         declare record local:list(value as item()*, next as local:list?);
+         declare function local:f() as local:list { { 'value': 1 } };
+         local:f#0 instance of fn() as record(value as item()*, next as record(value, next)?)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-101" covers-40="PR737">
+      <description>Subtyping of recursive record types: function parameters</description>
+      <created by="Christian Gruen" on="2026-10-20"/>
+      <test><![CDATA[
+         declare record local:list(value as item()*, next as local:list?);
+         declare record local:list2(value as item()*, next as local:list2?);
+         declare function local:f($list as local:list) { $list?value };
+         local:f#1 instance of fn(local:list2) as item()*
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-102" covers-40="PR737">
+      <description>Subtyping of mutually recursive record types</description>
+      <created by="Christian Gruen" on="2026-10-20"/>
+      <test><![CDATA[
+         declare record local:yin(yan as local:yan?);
+         declare record local:yan(yin as local:yin?);
+         declare function local:f() as local:yin { {} };
+         local:f#0 instance of fn() as record(yan as local:yan?)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-103" covers-40="PR737">
+      <description>Subtyping of mutually recursive record types</description>
+      <created by="Christian Gruen" on="2026-10-20"/>
+      <test><![CDATA[
+         declare record local:yin(yan as local:yan?);
+         declare record local:yan(yin as local:yin?);
+         declare function local:f() as local:yin { {} };
+         local:f#0 instance of fn() as local:yan
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
    
  
    

@@ -382,13 +382,138 @@ declare function translate:unescape(
  : Translates a JSONPath query.
  : @param $ast syntax tree
  : @param $mode mode ("idiomatic", "mixed", "strict")
+ : @param $input input
  : @return code
  :)
 declare function translate:translate(
   $ast as map(*),
-  $mode as xs:string
+  $mode as xs:string,
+  $input as item()? := ()
 ) as xs:string {
-  translate:query-code($ast, $mode)
+  translate:query-code(translate:annotate($ast, [ $input ], $input), $mode)
+};
+
+(:~
+ : Adds the kinds of the selected values to the queries that are evaluated on known inputs.
+ : @param $expr expression
+ : @param $inputs inputs (the input, or the candidates of a filter)
+ : @param $root input of absolute queries
+ : @return annotated expression
+ :)
+declare function translate:annotate(
+  $expr as map(*),
+  $inputs as array(*),
+  $root as item()?
+) as map(*) {
+  let $annotate := translate:annotate(?, $inputs, $root)
+  return switch ($expr?type)
+    case 'query' return
+      let $start := if ($expr?root = '$') then [ $root ] else $inputs
+      let $segs := $expr?segs?*
+      (: filters: candidates are the children of the nodes selected by the previous segments :)
+      let $annotated := for $seg at $s in $segs
+        let $nodes := translate:selected(subsequence($segs, 1, $s - 1), $start)
+        let $candidates := translate:children(
+          if ($seg?desc) then translate:descendants($nodes) else $nodes, { 'type': 'wildcard' })
+        return map:put($seg, 'sels', array:for-each($seg?sels, fn($sel) {
+          if ($sel?type = 'filter') then map:put($sel, 'expr', translate:annotate($sel?expr, $candidates, $root))
+          else $sel
+        }))
+      (: singular queries: one value for each input, if all inputs have one :)
+      let $singular := every $seg in $segs satisfies (
+        not($seg?desc) and count($seg?sels?*) = 1 and $seg?sels?*?type = ('name', 'index')
+      )
+      let $present := $singular and array:size($start) > 0 and (
+        every $i in 1 to array:size($start) satisfies
+          array:size(translate:selected($segs, [ $start?($i) ])) = 1
+      )
+      return map:merge((
+        $expr,
+        {
+          'segs': array { $annotated },
+          'kinds': distinct-values(array:for-each(translate:selected($segs, $start), translate:kind#1)?*),
+          'present': $present
+        }
+      ), { 'duplicates': 'use-last' })
+    case 'or' case 'and' return map:put($expr, 'ops', array:for-each($expr?ops, $annotate))
+    case 'not' case 'test' return map:put($expr, 'expr', $annotate($expr?expr))
+    case 'cmp' return map:put(map:put($expr, 'left', $annotate($expr?left)), 'right', $annotate($expr?right))
+    case 'function' return map:put($expr, 'args', array:for-each($expr?args, $annotate))
+    default return $expr
+};
+
+(:~
+ : Returns the values selected by segments; filters and slices select all children.
+ : @param $segs segments
+ : @param $inputs inputs
+ : @return selected values
+ :)
+declare function translate:selected(
+  $segs as map(*)*,
+  $inputs as array(*)
+) as array(*) {
+  fold-left($segs, $inputs, fn($values, $seg) {
+    let $nodes := if ($seg?desc) then translate:descendants($values) else $values
+    return array:join($seg?sels?* ! translate:children($nodes, .))
+  })
+};
+
+(:~
+ : Returns the children of values that are selected by a selector.
+ : @param $values values
+ : @param $sel selector
+ : @return children
+ :)
+declare function translate:children(
+  $values as array(*),
+  $sel as map(*)
+) as array(*) {
+  array:join(
+    for member $value in $values
+    return switch () {
+      case $sel?type = 'name' return
+        if ($value instance of map(*) and map:contains($value, $sel?value)) then [ $value?($sel?value) ] else []
+      case $sel?type = 'index' return if ($value instance of array(*)) then (
+        let $size := array:size($value)
+        let $pos := if ($sel?value >= 0) then $sel?value + 1 else $size + $sel?value + 1
+        return if ($pos = 1 to $size) then [ $value?($pos) ] else []
+      ) else []
+      case $value instance of array(*) return $value
+      case $value instance of map(*) return array:build(map:keys($value), fn($key) { $value?($key) })
+      default return []
+    }
+  )
+};
+
+(:~
+ : Returns values and their descendants.
+ : @param $values values
+ : @return values and descendants
+ :)
+declare function translate:descendants(
+  $values as array(*)
+) as array(*) {
+  array:join(
+    for member $value in $values
+    return array:join(([ $value ], translate:descendants(translate:children([ $value ], { 'type': 'wildcard' }))))
+  )
+};
+
+(:~
+ : Returns the JSON kind of a value.
+ : @param $value value
+ : @return kind
+ :)
+declare function translate:kind(
+  $value as item()?
+) as xs:string {
+  typeswitch ($value)
+    case empty-sequence() return 'null'
+    case xs:string return 'string'
+    case xs:numeric return 'number'
+    case xs:boolean return 'boolean'
+    case array(*) return 'array'
+    default return 'object'
 };
 
 (:~
@@ -663,7 +788,20 @@ declare function translate:comparison(
   let $l := translate:operand($expr?left, $mode)
   let $r := translate:operand($expr?right, $mode)
   let $literal := ('string', 'number', 'boolean', 'null')
-  return if ($mode = 'idiomatic') then (
+  return if ($l?nothing or $r?nothing) then (
+    (: an operand that yields nothing: equal only to nothing, unordered :)
+    let $other := if ($l?nothing) then ($r, $expr?right) else ($l, $expr?left)
+    let $equal := switch () {
+      case $other[1]?nothing return true()
+      case $other[2]?type = $literal return false()
+      default return ()
+    }
+    return switch ($expr?op) {
+      case '<' case '>' return 'false()'
+      case '!=' return if (exists($equal)) then `{ not($equal) }()` else `exists({ $other[1]?node })`
+      default return if (exists($equal)) then `{ $equal }()` else `empty({ $other[1]?node })`
+    }
+  ) else if ($mode = 'idiomatic') then (
     $l?idiom || ' ' || (if ($expr?op = '==') then '=' else $expr?op) || ' ' || $r?idiom
   ) else if ($expr?left?type = 'query' and $expr?right?type = $literal) then (
     translate:typed($expr?left, $mode, $expr?op, $expr?right, $r?value)
@@ -793,26 +931,55 @@ declare function translate:function(
   return if (count($args) != $arity) then translate:skip('arity: ' || $name) else
   switch ($name)
     case 'length' return
-      let $code := if (exists($args[1]?query)) then (
-        (: JNodes: string length, or number of members or entries; plain paths need no parentheses :)
-        let $query := $args[1]?query
-        let $nodes := if (matches($query, '\s')) then `({ $query })` else $query
-        return `{ $nodes } ! (if (self::jnode(*, xs:string)) then string-length(.) ` ||
-          'else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ())'
-      ) else (
-        '(for $v in ' || $args[1]?value || ' return ' ||
-        'if ($v instance of xs:string) then string-length($v) ' ||
-        'else if ($v instance of array(*)) then array:size($v) ' ||
-        'else if ($v instance of map(*)) then map:size($v) else ())'
-      )
-      return { 'value': $code, 'node': `{ $code } ! jtree(.)`, 'idiom': $code }
+      let $arg := $expr?args?*[1]
+      (: JNodes of queries and value(); plain paths need no parentheses :)
+      let $query := $args[1]?query
+      let $nodes := switch () {
+        case exists($query) return if (matches($query, '\s')) then `({ $query })` else $query
+        case $arg?type = 'function' and $arg?name = 'value' return $args[1]?node
+        default return ()
+      }
+      (: kinds of the selected values, and their presence for each input :)
+      let $query-ast := if ($arg?type = 'query') then $arg else $arg?args?*[1]
+      let $kinds := $query-ast?kinds
+      let $present := $arg?type = 'query' and $arg?present
+      (: kinds of values with a length :)
+      let $lengths := $kinds[. = ('string', 'array', 'object')]
+      let $function := if (count($lengths) = 1) then (
+        { 'string': 'string-length', 'array': 'array:size', 'object': 'map:size' }($lengths)
+      ) else ()
+      let $code := switch () {
+        (: no values with a length (or no values at all): nothing :)
+        case exists($nodes) and map:contains($query-ast, 'kinds') and empty($lengths) return
+          '()'
+        (: values of a single kind: function call; missing values yield nothing :)
+        case exists($nodes) and exists($function) and count($kinds) = 1 return
+          if ($present or $nodes = '.') then `{ $function }({ $nodes })` else `{ $nodes } ! { $function }(.)`
+        (: other values are skipped by a type test :)
+        case exists($nodes) and exists($function) return
+          let $type := { 'string': 'xs:string', 'array': 'array(*)', 'object': 'map(*)' }($lengths)
+          let $typed := (if ($nodes = '.') then '' else `{ $nodes }/`) || `self::jnode(*, { $type })`
+          return `{ $typed } ! { $function }(.)`
+        case exists($nodes) return
+          (: string length, or number of members or entries; the context needs no simple map :)
+          (: only values with a length: no type test for arrays and maps :)
+          let $containers := if (map:contains($query-ast, 'kinds') and (every $kind in $kinds satisfies
+            $kind = ('string', 'array', 'object'))) then 'count(*)' else 'self::jnode(*, (array(*) | map(*))) ! count(*)'
+          return (if ($nodes = '.') then '' else `{ $nodes } ! `) ||
+            `(if (self::jnode(*, xs:string)) then string-length(.) else { $containers })`
+        (: literals and other functions: the type is known statically :)
+        case $arg?type = 'string' return `string-length({ $args[1]?value })`
+        default return '()'
+      }
+      return { 'value': $code, 'node': `{ $code } ! jtree(.)`, 'idiom': $code, 'nothing': $code = '()' }
     case 'count' return
       let $code := 'count(' || ($args[1]?query otherwise translate:skip('count: no query')) || ')'
       return { 'value': $code, 'node': `jtree({ $code })`, 'idiom': $code }
     case 'value' return
       (: the single selected node, or nothing :)
       let $query := $args[1]?query otherwise translate:skip('value: no query')
-      let $node := `({ $query })[last() = 1]`
+      (: single steps need no parentheses :)
+      let $node := (if (matches($query, '^[^\s/()\[]+$')) then $query else `({ $query })`) || '[last() = 1]'
       let $code := `{ $node } ! jvalue()`
       (: idiomatic comparisons atomize the JNode :)
       return { 'value': $code, 'node': $node, 'idiom': $node }
