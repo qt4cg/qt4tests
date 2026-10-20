@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-generate" covers-40="PR2350">
+  <description>Tests for the fn:generate() function</description>
+
+  <dependency type="spec" value="XP40+ XQ40+"/>
+
+  <test-case name="generate-01">
+    <description>Simple integer sequence</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <test>generate(3, fn{.+1}) => subsequence(1, 10)</test>
+    <result>
+      <assert-deep-eq>3, 4, 5, 6, 7, 8, 9, 10, 11, 12</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-02">
+    <description>Random number sequence</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <test>generate(random-number-generator(), fn{?next()})?number => take-while(fn{. lt 0.9})</test>
+    <result>
+      <assert-type>xs:double+</assert-type>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-03">
+    <description>Fibonnaci sequence</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <test>(generate([1,1], fn{[?2, ?1+?2]})?1) [ 1 to 10 ]</test>
+    <result>
+      <assert-deep-eq>1, 1, 2, 3, 5, 8, 13, 21, 34, 55</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-04">
+    <description>Select ancestors</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <test><![CDATA[     
+      let $node := parse-xml("<a><b><c><d/></c></b></a>")//d
+      return generate($node, fn{..}) ! name()      
+    ]]></test>
+    <result>
+      <assert-deep-eq>"d", "c", "b", "a", ""</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  
+
+</test-set>
