@@ -1518,10 +1518,10 @@ return $in/*[jnode(a, xs:numeric) = 1.1e-2]
   </test-case>
   <test-case name="JSONPath-filter-equals-special-nothing">
     <description>filter, equals, special nothing: $.values[?length(@.a) == value($..c)]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "c": "cd", "values": [ { "a": "ab" }, { "c": "d" }, { "a": () } ] }
-return $in/values/*[deep-equal(a ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) ! jtree(.), ($in//c)[last() = 1])]
+return $in/values/*[deep-equal(a/self::jnode(*, xs:string) ! string-length(.) ! jtree(.), ($in//c)[last() = 1])]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "c": "d" }), jtree({ "a": () })</assert-deep-eq>
@@ -1540,10 +1540,10 @@ return $in/*[deep-equal(a, b)]
   </test-case>
   <test-case name="JSONPath-filter-equals-empty-node-list-and-special-nothing">
     <description>filter, equals, empty node list and special nothing: $[?@.a == length(@.b)]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "a": 1 }, { "b": 2 }, { "c": 3 } ]
-return $in/*[deep-equal(a, b ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) ! jtree(.))]
+return $in/*[empty(a)]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "b": 2 }), jtree({ "c": 3 })</assert-deep-eq>
@@ -2843,10 +2843,10 @@ return $in/*[count((a, d)) > 1]
   </test-case>
   <test-case name="JSONPath-functions-length-string-data">
     <description>functions, length, string data: $[?length(@.a)&gt;=2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "a": "ab" }, { "a": "d" } ]
-return $in/*[a ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) >= 2]
+return $in/*[string-length(a) >= 2]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": "ab" })</assert-deep-eq>
@@ -2854,10 +2854,10 @@ return $in/*[a ! (if (self::jnode(*, xs:string)) then string-length(.) else if (
   </test-case>
   <test-case name="JSONPath-functions-length-string-data-unicode">
     <description>functions, length, string data, unicode: $[?length(@)==2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ "☺", "☺☺", "☺☺☺", "ж", "жж", "жжж", "磨", "阿美", "形声字" ]
-return $in/*[. ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) = 2]
+return $in/*[string-length(.) = 2]
 ]]></test>
     <result>
       <assert-deep-eq>jtree("☺☺"), jtree("жж"), jtree("阿美")</assert-deep-eq>
@@ -2865,10 +2865,10 @@ return $in/*[. ! (if (self::jnode(*, xs:string)) then string-length(.) else if (
   </test-case>
   <test-case name="JSONPath-functions-length-array-data">
     <description>functions, length, array data: $[?length(@.a)&gt;=2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "a": [ 1, 2, 3 ] }, { "a": [ 1 ] } ]
-return $in/*[a ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) >= 2]
+return $in/*[array:size(a) >= 2]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": [ 1, 2, 3 ] })</assert-deep-eq>
@@ -2876,10 +2876,10 @@ return $in/*[a ! (if (self::jnode(*, xs:string)) then string-length(.) else if (
   </test-case>
   <test-case name="JSONPath-functions-length-missing-data">
     <description>functions, length, missing data: $[?length(@.a)&gt;=2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "d": "f" } ]
-return $in/*[a ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) >= 2]
+return $in/*[false()]
 ]]></test>
     <result>
       <assert-empty/>
@@ -2887,10 +2887,10 @@ return $in/*[a ! (if (self::jnode(*, xs:string)) then string-length(.) else if (
   </test-case>
   <test-case name="JSONPath-functions-length-number-arg">
     <description>functions, length, number arg: $[?length(1)&gt;=2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "d": "f" } ]
-return $in/*[(for $v in 1 return if ($v instance of xs:string) then string-length($v) else if ($v instance of array(*)) then array:size($v) else if ($v instance of map(*)) then map:size($v) else ()) >= 2]
+return $in/*[false()]
 ]]></test>
     <result>
       <assert-empty/>
@@ -2898,10 +2898,10 @@ return $in/*[(for $v in 1 return if ($v instance of xs:string) then string-lengt
   </test-case>
   <test-case name="JSONPath-functions-length-true-arg">
     <description>functions, length, true arg: $[?length(true)&gt;=2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "d": "f" } ]
-return $in/*[(for $v in true() return if ($v instance of xs:string) then string-length($v) else if ($v instance of array(*)) then array:size($v) else if ($v instance of map(*)) then map:size($v) else ()) >= 2]
+return $in/*[false()]
 ]]></test>
     <result>
       <assert-empty/>
@@ -2909,10 +2909,10 @@ return $in/*[(for $v in true() return if ($v instance of xs:string) then string-
   </test-case>
   <test-case name="JSONPath-functions-length-false-arg">
     <description>functions, length, false arg: $[?length(false)&gt;=2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "d": "f" } ]
-return $in/*[(for $v in false() return if ($v instance of xs:string) then string-length($v) else if ($v instance of array(*)) then array:size($v) else if ($v instance of map(*)) then map:size($v) else ()) >= 2]
+return $in/*[false()]
 ]]></test>
     <result>
       <assert-empty/>
@@ -2920,10 +2920,10 @@ return $in/*[(for $v in false() return if ($v instance of xs:string) then string
   </test-case>
   <test-case name="JSONPath-functions-length-null-arg">
     <description>functions, length, null arg: $[?length(null)&gt;=2]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "d": "f" } ]
-return $in/*[(for $v in () return if ($v instance of xs:string) then string-length($v) else if ($v instance of array(*)) then array:size($v) else if ($v instance of map(*)) then map:size($v) else ()) >= 2]
+return $in/*[false()]
 ]]></test>
     <result>
       <assert-empty/>
@@ -2931,10 +2931,10 @@ return $in/*[(for $v in () return if ($v instance of xs:string) then string-leng
   </test-case>
   <test-case name="JSONPath-functions-length-arg-is-a-function-expression">
     <description>functions, length, arg is a function expression: $.values[?length(@.a)==length(value($..c))]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := { "c": "cd", "values": [ { "a": "ab" }, { "a": "d" } ] }
-return $in/values/*[a ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) = (for $v in ($in//c)[last() = 1] ! jvalue() return if ($v instance of xs:string) then string-length($v) else if ($v instance of array(*)) then array:size($v) else if ($v instance of map(*)) then map:size($v) else ())]
+return $in/values/*[string-length(a) = ($in//c)[last() = 1] ! string-length(.)]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": "ab" })</assert-deep-eq>
@@ -2942,10 +2942,10 @@ return $in/values/*[a ! (if (self::jnode(*, xs:string)) then string-length(.) el
   </test-case>
   <test-case name="JSONPath-functions-length-arg-is-special-nothing">
     <description>functions, length, arg is special nothing: $[?length(value(@.a))&gt;0]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "a": "ab" }, { "c": "d" }, { "a": () } ]
-return $in/*[(for $v in (a)[last() = 1] ! jvalue() return if ($v instance of xs:string) then string-length($v) else if ($v instance of array(*)) then array:size($v) else if ($v instance of map(*)) then map:size($v) else ()) > 0]
+return $in/*[a[last() = 1]/self::jnode(*, xs:string) ! string-length(.) > 0]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": "ab" })</assert-deep-eq>
@@ -3423,10 +3423,10 @@ return $in/*[self::jnode(*, xs:string)[matches(., "a[\].]c")]]
   </test-case>
   <test-case name="JSONPath-functions-value-single-value-nodelist">
     <description>functions, value, single-value nodelist: $[?value(@.*)==4]</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ [ 4 ], { "foo": 4 }, [ 5 ], { "foo": 5 }, 4 ]
-return $in/*[(*)[last() = 1] = 4]
+return $in/*[*[last() = 1] = 4]
 ]]></test>
     <result>
       <assert-deep-eq>jtree([ 4 ]), jtree({ "foo": 4 })</assert-deep-eq>
@@ -3434,10 +3434,10 @@ return $in/*[(*)[last() = 1] = 4]
   </test-case>
   <test-case name="JSONPath-functions-value-multi-value-nodelist">
     <description>functions, value, multi-value nodelist: $[?value(@.*)==4]</description>
-    <created by="Christian Grün" on="2026-10-19"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ [ 4, 4 ], { "foo": 4, "bar": 4 } ]
-return $in/*[(*)[last() = 1] = 4]
+return $in/*[*[last() = 1] = 4]
 ]]></test>
     <result>
       <assert-empty/>
@@ -3805,10 +3805,10 @@ return $in/*[count(*) = 1]
   </test-case>
   <test-case name="JSONPath-whitespace-functions-spaces-in-a-relative-singular-selector">
     <description>whitespace, functions, spaces in a relative singular selector: $[?length(@ .a .b) == 3]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "a": { "b": "foo" } }, {} ]
-return $in/*[a/b ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) = 3]
+return $in/*[a/b ! string-length(.) = 3]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": { "b": "foo" } })</assert-deep-eq>
@@ -3818,10 +3818,10 @@ return $in/*[a/b ! (if (self::jnode(*, xs:string)) then string-length(.) else if
     <description>whitespace, functions, newlines in a relative singular selector: $[?length(@
 .a
 .b) == 3]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "a": { "b": "foo" } }, {} ]
-return $in/*[a/b ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) = 3]
+return $in/*[a/b ! string-length(.) = 3]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": { "b": "foo" } })</assert-deep-eq>
@@ -3829,10 +3829,10 @@ return $in/*[a/b ! (if (self::jnode(*, xs:string)) then string-length(.) else if
   </test-case>
   <test-case name="JSONPath-whitespace-functions-tabs-in-a-relative-singular-selector">
     <description>whitespace, functions, tabs in a relative singular selector: $[?length(@	.a	.b) == 3]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "a": { "b": "foo" } }, {} ]
-return $in/*[a/b ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) = 3]
+return $in/*[a/b ! string-length(.) = 3]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": { "b": "foo" } })</assert-deep-eq>
@@ -3840,10 +3840,10 @@ return $in/*[a/b ! (if (self::jnode(*, xs:string)) then string-length(.) else if
   </test-case>
   <test-case name="JSONPath-whitespace-functions-returns-in-a-relative-singular-selector">
     <description>whitespace, functions, returns in a relative singular selector: $[?length(@&#xD;.a&#xD;.b) == 3]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "a": { "b": "foo" } }, {} ]
-return $in/*[a/b ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) = 3]
+return $in/*[a/b ! string-length(.) = 3]
 ]]></test>
     <result>
       <assert-deep-eq>jtree({ "a": { "b": "foo" } })</assert-deep-eq>
@@ -3851,10 +3851,10 @@ return $in/*[a/b ! (if (self::jnode(*, xs:string)) then string-length(.) else if
   </test-case>
   <test-case name="JSONPath-whitespace-functions-spaces-in-an-absolute-singular-selector">
     <description>whitespace, functions, spaces in an absolute singular selector: $..[?length(@)==length($ [0] .a)]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "a": "foo" }, {} ]
-return $in//*[. ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) = $in/1/a ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ())]
+return $in//*[(if (self::jnode(*, xs:string)) then string-length(.) else count(*)) = string-length($in/1/a)]
 ]]></test>
     <result>
       <assert-eq>"foo"</assert-eq>
@@ -3864,10 +3864,10 @@ return $in//*[. ! (if (self::jnode(*, xs:string)) then string-length(.) else if 
     <description>whitespace, functions, newlines in an absolute singular selector: $..[?length(@)==length($
 [0]
 .a)]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "a": "foo" }, {} ]
-return $in//*[. ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) = $in/1/a ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ())]
+return $in//*[(if (self::jnode(*, xs:string)) then string-length(.) else count(*)) = string-length($in/1/a)]
 ]]></test>
     <result>
       <assert-eq>"foo"</assert-eq>
@@ -3875,10 +3875,10 @@ return $in//*[. ! (if (self::jnode(*, xs:string)) then string-length(.) else if 
   </test-case>
   <test-case name="JSONPath-whitespace-functions-tabs-in-an-absolute-singular-selector">
     <description>whitespace, functions, tabs in an absolute singular selector: $..[?length(@)==length($	[0]	.a)]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "a": "foo" }, {} ]
-return $in//*[. ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) = $in/1/a ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ())]
+return $in//*[(if (self::jnode(*, xs:string)) then string-length(.) else count(*)) = string-length($in/1/a)]
 ]]></test>
     <result>
       <assert-eq>"foo"</assert-eq>
@@ -3886,10 +3886,10 @@ return $in//*[. ! (if (self::jnode(*, xs:string)) then string-length(.) else if 
   </test-case>
   <test-case name="JSONPath-whitespace-functions-returns-in-an-absolute-singular-selector">
     <description>whitespace, functions, returns in an absolute singular selector: $..[?length(@)==length($&#xD;[0]&#xD;.a)]</description>
-    <created by="Christian Grün" on="2026-10-18"/>
+    <created by="Christian Grün" on="2026-10-20"/>
     <test><![CDATA[
 let $in := [ { "a": "foo" }, {} ]
-return $in//*[. ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ()) = $in/1/a ! (if (self::jnode(*, xs:string)) then string-length(.) else if (self::jnode(*, (array(*) | map(*)))) then count(*) else ())]
+return $in//*[(if (self::jnode(*, xs:string)) then string-length(.) else count(*)) = string-length($in/1/a)]
 ]]></test>
     <result>
       <assert-eq>"foo"</assert-eq>

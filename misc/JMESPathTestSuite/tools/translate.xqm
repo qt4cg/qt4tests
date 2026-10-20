@@ -38,6 +38,9 @@ declare variable $translate:FUNCTIONS := {
 (:~ Values that are false in JMESPath (members are compared with deep-equal). :)
 declare variable $translate:FALSY := [ (), false(), "", [], {} ];
 
+(:~ Pattern for strings that can be converted to numbers. :)
+declare variable $translate:NUMBER := '^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$';
+
 (:~
  : Rejects an expression.
  : @param $reason reason
@@ -516,15 +519,17 @@ declare function translate:literal-value(
  : @param $ast syntax tree
  : @param $mode mode ("idiomatic", "mixed", "strict")
  : @param $atomic atomic result expected
+ : @param $input input
  : @return record with the code, the code of the projected nodes (if the result is a projection),
  :   or the code of the selected node (if the result is a path)
  :)
 declare function translate:translate(
   $ast as map(*),
   $mode as xs:string,
-  $atomic as xs:boolean := false()
+  $atomic as xs:boolean := false(),
+  $input as item()? := ()
 ) as map(*) {
-  let $result := translate:code($ast, '$in', $mode)
+  let $result := translate:code(translate:annotate($ast, [ $input ]), '$in', $mode)
   return switch () {
     case $result?multi return {
       'code': translate:value-code($result),
@@ -542,6 +547,216 @@ declare function translate:translate(
 };
 
 (:~
+ : Adds the known values and kinds of values to the expressions that are evaluated on known inputs.
+ : @param $expr expression
+ : @param $inputs inputs (the input, or the members of a projection)
+ : @return annotated expression
+ :)
+declare function translate:annotate(
+  $expr as map(*),
+  $inputs as array(*)
+) as map(*) {
+  let $evaluable := translate:evaluable($expr)
+  let $values := array:for-each($inputs, translate:known($expr, ?))
+  let $kinds := fn($values) { distinct-values(array:for-each($values, translate:kind#1)?*) }
+  let $known := map:merge((
+    $expr,
+    {
+      'known': if (array:size($inputs) = 1) then $values?1 else (),
+      'kinds': if ($evaluable) then $kinds($values) else (),
+      'values': if ($evaluable) then $values else ()
+    }
+  ), { 'duplicates': 'use-last' })
+  return switch ($expr?type)
+    case 'function' return
+      (: expression references are evaluated on the members of the array argument :)
+      let $array := $expr?args?*[?type != 'expref'][1]
+      let $members := if (exists($array)) then translate:members($array, $inputs, 'array(*)') else ()
+      return map:put($known, 'args', array:for-each($expr?args, fn($arg) {
+        if ($arg?type = 'expref') then (
+          map:put($arg, 'expr', translate:annotate($arg?expr, $members otherwise []))
+        ) else (
+          translate:annotate($arg, $inputs)
+        )
+      }))
+    case 'comparator' case 'and' case 'or' return
+      map:put(map:put($known, 'left', translate:annotate($expr?left, $inputs)),
+        'right', translate:annotate($expr?right, $inputs))
+    case 'not' return
+      map:put($known, 'expr', translate:annotate($expr?expr, $inputs))
+    case 'pipe' return
+      map:put($known, 'left', translate:annotate($expr?left, $inputs))
+    case 'subexpression' case 'index_expression' return
+      (: each step is evaluated on the values of the previous steps :)
+      let $children := $expr?children?*
+      return map:put($known, 'children', array {
+        for $child at $c in $children
+        let $values := fold-left(subsequence($children, 1, $c - 1), $inputs, fn($values, $previous) {
+          if (translate:evaluable($previous)) then array:for-each($values, translate:known($previous, ?)) else []
+        })
+        return translate:annotate($child, $values)
+      })
+    case 'list' return
+      map:put(map:put($known, 'context-kinds', $kinds($inputs)),
+        'items', array:for-each($expr?items, translate:annotate(?, $inputs)))
+    case 'hash' return
+      map:put(map:put($known, 'context-kinds', $kinds($inputs)), 'pairs', array:for-each($expr?pairs,
+        fn($pair) { map:put($pair, 'value', translate:annotate($pair?value, $inputs)) }))
+    case 'flatten' return
+      let $members := translate:members($expr?expr, $inputs, 'array(*)')
+      return map:merge((
+        $known,
+        {
+          'expr': translate:annotate($expr?expr, $inputs),
+          'member-kinds': if (exists($members)) then $kinds($members) else (),
+          'members-known': exists($members)
+        }
+      ), { 'duplicates': 'use-last' })
+    case 'projection' case 'filter_projection' case 'value_projection' return
+      let $type := if ($expr?type = 'value_projection') then 'map(*)' else 'array(*)'
+      let $members := translate:members($expr?left, $inputs, $type) otherwise []
+      let $annotated := map:put(map:put($known, 'left', translate:annotate($expr?left, $inputs)),
+        'right', translate:annotate($expr?right, $members))
+      return if (exists($expr?cond)) then (
+        map:put($annotated, 'cond', translate:annotate($expr?cond, $members))
+      ) else $annotated
+    default return $known
+};
+
+(:~
+ : Returns the members of the arrays or maps that an expression selects from known inputs.
+ : @param $expr expression
+ : @param $inputs inputs
+ : @param $type type of the projected values (array(*) or map(*))
+ : @return members, or an empty sequence if they are unknown
+ :)
+declare function translate:members(
+  $expr as map(*),
+  $inputs as array(*),
+  $type as xs:string
+) as array(*)? {
+  (: projections: the code iterates over the results of the innermost projection :)
+  if (translate:projected($expr)) then (
+    if ($type = 'array(*)') then translate:leaves($expr, $inputs) else ()
+  ) else if ($expr?type = 'function' and $expr?name = ('sort', 'sort_by', 'reverse')) then (
+    (: reordered arrays: the same members, in a different order :)
+    if ($type = 'array(*)') then translate:members($expr?args?*[1], $inputs, $type) else ()
+  ) else if (translate:evaluable($expr)) then array:join(
+    for member $input in $inputs
+    let $value := translate:known($expr, $input)
+    return switch () {
+      case $type = 'array(*)' and $value instance of array(*) return $value
+      case $type = 'map(*)' and $value instance of map(*) return
+        array:build(map:keys($value), fn($key) { $value?($key) })
+      default return []
+    }
+  )
+};
+
+(:~
+ : Checks if an expression is a projection or flattening, which yields a sequence of JNodes.
+ : @param $expr expression
+ : @return result of check
+ :)
+declare function translate:projected(
+  $expr as map(*)
+) as xs:boolean {
+  $expr?type = ('projection', 'filter_projection', 'value_projection', 'flatten')
+};
+
+(:~
+ : Returns the results of a projection or flattening on known inputs; filters are ignored.
+ : @param $expr expression
+ : @param $inputs inputs
+ : @return results, or an empty sequence if they are unknown
+ :)
+declare function translate:leaves(
+  $expr as map(*),
+  $inputs as array(*)
+) as array(*)? {
+  if ($expr?type = 'flatten') then (
+    translate:members($expr?expr, $inputs, 'array(*)') ! array:join(
+      for member $item in . return if ($item instance of array(*)) then $item else [ $item ]
+    )
+  ) else (
+    let $type := if ($expr?type = 'value_projection') then 'map(*)' else 'array(*)'
+    let $right := $expr?right
+    let $items := translate:members($expr?left, $inputs, $type)
+    let $projected := translate:projected($right)
+    where exists($items) and ($projected or translate:evaluable($right))
+    let $results := for member $item in $items return (
+      if ($projected) then translate:leaves($right, [ $item ]) else [ translate:known($right, $item) ]
+    )
+    where count($results) = array:size($items)
+    return array:join($results)
+  )
+};
+
+(:~
+ : Checks if the value of an expression can be computed from a known input.
+ : @param $expr expression
+ : @return result of check
+ :)
+declare function translate:evaluable(
+  $expr as map(*)
+) as xs:boolean {
+  switch ($expr?type)
+    case 'current' case 'field' case 'index' case 'literal' return true()
+    case 'subexpression' case 'index_expression' return
+      every $child in $expr?children?* satisfies translate:evaluable($child)
+    case 'flatten' return translate:evaluable($expr?expr)
+    case 'list' return every $item in $expr?items?* satisfies translate:evaluable($item)
+    default return false()
+};
+
+(:~
+ : Returns the JMESPath kind of a value.
+ : @param $value value
+ : @return kind
+ :)
+declare function translate:kind(
+  $value as item()?
+) as xs:string {
+  typeswitch ($value)
+    case empty-sequence() return 'null'
+    case xs:string return 'string'
+    case xs:numeric return 'number'
+    case xs:boolean return 'boolean'
+    case array(*) return 'array'
+    default return 'object'
+};
+
+(:~
+ : Returns the value that a path of fields and indexes selects from the input.
+ : @param $expr expression
+ : @param $input input
+ : @return value, or an empty sequence if it is unknown or null
+ :)
+declare function translate:known(
+  $expr as map(*),
+  $input as item()?
+) as item()? {
+  switch ($expr?type)
+    case 'current' return $input
+    case 'literal' return $expr?value
+    case 'field' return if ($input instance of map(*)) then $input?($expr?name) else ()
+    case 'index' return if ($input instance of array(*)) then (
+      let $size := array:size($input)
+      let $pos := if ($expr?value >= 0) then $expr?value + 1 else $size + $expr?value + 1
+      return if ($pos = 1 to $size) then $input?($pos) else ()
+    ) else ()
+    case 'subexpression' case 'index_expression' return
+      fold-left($expr?children?*, $input, fn($value, $child) { translate:known($child, $value) })
+    case 'flatten' return
+      let $value := translate:known($expr?expr, $input)
+      return if ($value instance of array(*)) then array:join(
+        for member $m in $value return if ($m instance of array(*)) then $m else [ $m ]
+      ) else ()
+    case 'list' return if (exists($input)) then array:join($expr?items?* ! [ translate:known(., $input) ]) else ()
+    default return ()
+};
+
+(:~
  : Appends a step to a base expression.
  : @param $base base expression
  : @param $step step
@@ -554,7 +769,7 @@ declare function translate:step(
   $slash as xs:boolean
 ) as xs:string {
   if ($base = '.') then $step
-  else if ($step = '.') then $base
+  else if ($step = '.' or $base = '()') then $base
   else $base || (if ($slash) then '/' else ' ! ') || $step
 };
 
@@ -634,6 +849,27 @@ declare function translate:guard(
 };
 
 (:~
+ : Restricts the JNodes of a translation result to values of a type.
+ : @param $result translation result
+ : @param $type type of the values
+ : @return code
+ :)
+declare function translate:guarded(
+  $result as map(*),
+  $type as xs:string
+) as xs:string {
+  (: known kinds: no type check, or no result :)
+  let $kinds := if ($result?array) then 'array' else $result?kinds
+  let $kind := { 'array(*)': 'array', 'map(*)': 'object' }($type)
+  return switch () {
+    case empty($kinds) or empty($kind) return translate:guard($result?code, $type)
+    case every $k in $kinds satisfies $k = $kind return $result?code
+    case not($kinds = $kind) return '()'
+    default return translate:guard($result?code, $type)
+  }
+};
+
+(:~
  : Returns a translation result for a value that is computed for each item of a base expression.
  : @param $base base expression
  : @param $value code that yields the value
@@ -643,10 +879,11 @@ declare function translate:mapped(
   $base as xs:string,
   $value as xs:string
 ) as map(*) {
-  translate:wrap(
+  (: array constructors: no type check is needed for the resulting JNodes :)
+  if ($base = '()') then map:put(translate:wrap('()', '()'), 'truth', false()) else map:put(translate:wrap(
     translate:step($base, $value, false()),
     translate:step($base, `jtree({ $value })`, false())
-  )
+  ), 'array', starts-with($value, 'array {'))
 };
 
 (:~
@@ -675,7 +912,32 @@ declare function translate:truth(
   switch () {
     case exists($result?truth) return translate:literal($result?truth)
     case exists($result?type) return $result?value
-    default return translate:true(translate:value-code($result))
+    default return translate:truthy($result, true()) otherwise translate:true(translate:value-code($result))
+  }
+};
+
+(:~
+ : Returns code that checks the JMESPath truthiness of a translation result with values of a single known kind.
+ : @param $result translation result
+ : @param $truthy check if the value is truthy (otherwise: falsy)
+ : @return code, or an empty sequence if the kind is unknown
+ :)
+declare function translate:truthy(
+  $result as map(*),
+  $truthy as xs:boolean
+) as xs:string? {
+  let $kinds := $result?kinds
+  where count($kinds) = 1
+  let $value := translate:value-code($result)
+  (: JNodes are atomized or coerced to their values, but have no effective boolean value :)
+  let $coerced := if (translate:is-node($result)) then $result?code else $value
+  return switch ($kinds) {
+    case 'boolean' return if ($truthy) then $value else `not({ $value })`
+    case 'number' return translate:literal($truthy)
+    case 'null' return translate:literal(not($truthy))
+    case 'string' return `{ $coerced } { if ($truthy) then '!=' else '=' } ""`
+    case 'array' return `array:size({ $coerced }) { if ($truthy) then '>' else '=' } 0`
+    default return `map:size({ $coerced }) { if ($truthy) then '>' else '=' } 0`
   }
 };
 
@@ -689,7 +951,8 @@ declare function translate:value-code(
 ) as xs:string {
   switch () {
     case exists($result?value) return $result?value
-    case $result?multi return 'array { ' || translate:step($result?code, 'jvalue()', false()) || ' }'
+    (: computed values of projected JNodes: no JNodes are created :)
+    case $result?multi return 'array { ' || ($result?items otherwise translate:step($result?code, 'jvalue()', false())) || ' }'
     default return translate:step($result?code, 'jvalue()', false())
   }
 };
@@ -737,7 +1000,7 @@ declare function translate:code(
   $mode as xs:string
 ) as map(*) {
   let $strict := $mode = 'strict'
-  return switch ($expr?type)
+  let $result := switch ($expr?type)
     case 'current' return
       translate:rec($c)
     (: fields and indexes: the context yields at most one JNode, so the path operator can be used :)
@@ -766,10 +1029,22 @@ declare function translate:code(
       translate:projection($expr, $c, $mode)
     case 'flatten' return
       let $code := translate:code($expr?expr, $c, $mode)
-      let $member := '(if (self::jnode(*, array(*))) then * else .)'
-      return if ($strict) then (
-        translate:mapped(translate:guard($code?code, 'array(*)'),
-          'array { * ! ' || $member || ' ! jvalue() }')
+      (: known members: arrays are flattened, other values are kept :)
+      let $kinds := $expr?member-kinds
+      let $member := switch () {
+        case $expr?members-known and not($kinds = 'array') return '.'
+        case exists($kinds) and (every $kind in $kinds satisfies $kind = 'array') return '*'
+        default return '(if (self::jnode(*, array(*))) then * else .)'
+      }
+      return if ($strict and $member = '.') then (
+        (: no nested arrays: the array is unchanged :)
+        map:put(translate:rec(translate:guarded($code, 'array(*)')), 'array', true())
+      ) else if ($strict) then (
+        translate:mapped(translate:guarded($code, 'array(*)'),
+          'array { ' || translate:step(translate:step('*', $member, false()), 'jvalue()', false()) || ' }')
+      ) else if ($member = '.' and exists($code?members) and not($code?multi)) then (
+        (: selected members without nested arrays: kept in their order :)
+        { 'code': $code?members, 'multi': true(), 'members': $code?members }
       ) else {
         'code': translate:step(
           if ($code?multi) then $code?code else translate:step($code?code, '*', true()),
@@ -778,15 +1053,24 @@ declare function translate:code(
         'multi': true()
       }
     case 'list' case 'hash' return
-      let $value := if ($expr?type = 'list') then (
-        '[ ' || string-join($expr?items?* ! translate:value(., '.', $mode), ', ') || ' ]'
+      let $list := $expr?type = 'list'
+      let $exprs := if ($list) then $expr?items?* else $expr?pairs?*?value
+      let $values := $exprs ! translate:value(., '.', $mode)
+      let $value := if ($list) then (
+        '[ ' || string-join($values, ', ') || ' ]'
       ) else (
-        '{ ' || string-join($expr?pairs?* ! (
-          translate:string(?key) || ': ' || translate:value(?value, '.', $mode)
-        ), ', ') || ' }'
+        '{ ' || string-join(for $pair at $p in $expr?pairs?* return
+          translate:string($pair?key) || ': ' || $values[$p], ', ') || ' }'
       )
+      (: null context: no result; a context that is known to exist needs no check :)
+      let $exists := exists($expr?context-kinds) and not($expr?context-kinds = 'null')
+      let $check := $strict and not($exists)
+      (: constant values need no context :)
+      let $constant := $exists and (every $p in 1 to count($exprs) satisfies
+        ($exprs[$p]?type = 'literal' or $values[$p] = '()'))
       let $code := fn($v) {
-        translate:step($c, if ($strict) then '(if (exists(jvalue())) then ' || $v || ' else ())'
+        if ($constant) then $v else
+        translate:step($c, if ($check) then '(if (exists(jvalue())) then ' || $v || ' else ())'
           else $v, false())
       }
       return translate:wrap($code($value), $code('jtree(' || $value || ')'))
@@ -816,23 +1100,47 @@ declare function translate:code(
         (every $result in $results satisfies translate:is-node($result))) then (
         `deep-equal({ $results[1]?code }, { $results[2]?code })`
       ) else ()
+      (: atomic values of the same known kind: general comparison :)
+      let $atomic := if ((every $result in $results satisfies
+        count($result?kinds) = 1 and $result?kinds = ('string', 'number', 'boolean')) and
+        $results[1]?kinds = $results[2]?kinds) then (
+        $results ! (if (translate:is-node(.)) then ?code else translate:value-code(.))
+      ) else ()
       let $equal := ($typed, $nodes, `deep-equal({ $l }, { $r })`)[1]
       return switch ($expr?op)
-        case '==' return translate:boolean('xs:boolean',
-          if ($null) then `empty({ $other })` else $equal)
-        case '!=' return translate:boolean('xs:boolean',
-          if ($null) then `exists({ $other })` else `not({ $equal })`)
+        case '==' return translate:boolean('xs:boolean', switch () {
+          case $null return `empty({ $other })`
+          case exists($atomic) return string-join($atomic, ' = ')
+          default return $equal
+        })
+        case '!=' return translate:boolean('xs:boolean', switch () {
+          case $null return `exists({ $other })`
+          case exists($atomic) return string-join($atomic, ' != ')
+          default return `not({ $equal })`
+        })
         default return
-          (: two JNodes: typed by their values, atomized by the comparison :)
-          let $nodes := every $result in $results satisfies translate:is-node($result)
-          let $code := fn($v) {
-            '(let $l := ' || (if ($nodes) then $results[1]?code else $l) ||
-            ', $r := ' || (if ($nodes) then $results[2]?code else $r) || ' return ' ||
-            'if (($l, $r) instance of ' || (if ($nodes) then 'jnode(*, xs:numeric)*' else 'xs:numeric*') ||
-            ') then ' || $v || ' else ())'
+          let $known := $operands ! (if (?type = 'literal') then ?value else ?known)
+          return switch () {
+          (: known numbers: plain comparison :)
+          case count($known[. instance of xs:numeric]) = 2 return
+            translate:boolean('xs:boolean', string-join(for $result in $results return
+              if (translate:is-node($result)) then $result?code else translate:value-code($result),
+              ` { $expr?op } `))
+          (: a known value other than a number: null :)
+          case exists($known[not(. instance of xs:numeric)]) return
+            map:put(translate:wrap('()', '()'), 'truth', false())
+          default return
+            (: two JNodes: typed by their values, atomized by the comparison :)
+            let $nodes := every $result in $results satisfies translate:is-node($result)
+            let $code := fn($v) {
+              '(let $l := ' || (if ($nodes) then $results[1]?code else $l) ||
+              ', $r := ' || (if ($nodes) then $results[2]?code else $r) || ' return ' ||
+              'if (($l, $r) instance of ' || (if ($nodes) then 'jnode(*, xs:numeric)*' else 'xs:numeric*') ||
+              ') then ' || $v || ' else ())'
+            }
+            let $value := '$l ' || $expr?op || ' $r'
+            return translate:boolean('xs:boolean?', $code($value), $code('jtree(' || $value || ')'))
           }
-          let $value := '$l ' || $expr?op || ' $r'
-          return translate:boolean('xs:boolean?', $code($value), $code('jtree(' || $value || ')'))
     case 'or' case 'and' return
       let $type := $expr?type
       let $operands := (
@@ -852,9 +1160,24 @@ declare function translate:code(
       return switch () {
         case count($results) = 1 return
           $results
-        case every $result in $results satisfies $result?type = 'xs:boolean' return
-          (: booleans: logical operator :)
-          translate:boolean('xs:boolean', `({ string-join($results?value, ` { $type } `) })`)
+        case every $result in $results satisfies ($result?type = 'xs:boolean' or
+          (empty($result?type) and $result?kinds = 'boolean' and count($result?kinds) = 1)) return
+          (: booleans, or values that are known to be booleans: logical operator :)
+          (: parentheses of nested operators are only kept for or operands of and :)
+          let $operands := $results ! (
+            let $code := translate:value-code(.)
+            return if (exists(?logical) and not($type = 'and' and ?logical = 'or')) then translate:unwrap($code) else $code
+          )
+          let $value := string-join($operands, ` { $type } `)
+          return map:put(translate:boolean('xs:boolean', `({ $value })`, `jtree({ $value })`), 'logical', $type)
+        case $type = 'or' and (every $result in $results satisfies ($result?multi or $result?array)) return
+          (: arrays: first non-empty one, or the last one :)
+          (: identical operands: the operand itself :)
+          let $values := distinct-values($results ! translate:value-code(.))
+          let $value := string-join((
+            $values[position() < last()] ! `{ . }[array:size(.) > 0]`, $values[last()]
+          ), ' otherwise ')
+          return map:put(translate:wrap(`({ $value })`, `jtree({ $value })`), 'array', true())
         case $type = 'or' and $mode = 'idiomatic' and
           (every $result in $results[position() < last()] satisfies translate:is-node($result)) return
           (: idiomatic: first existing operand; all but the last one must be paths :)
@@ -888,10 +1211,26 @@ declare function translate:code(
           ) else (
             `({ string-join($candidates, ', ') })`
           )
-          let $first := translate:predicate($sequence, `[{ translate:true('jvalue()') }]`)
-          return translate:rec(
-            `({ if (count($nodes) > 2) then `head({ $first })` else $first } otherwise { $nodes[last()] })`
+          (: candidates of the same known kind: simpler truthiness check :)
+          let $kinds := distinct-values($results[position() < last()] ! (if (count(?kinds) = 1) then ?kinds else ''))
+          let $check := translate:truthy({ 'code': '.', 'kinds': $kinds[not($kinds = '')] }, true())
+          (: candidates of different known kinds: a check for each candidate :)
+          let $checks := $results[position() < last()] ! (
+            if (count(?kinds) = 1) then translate:truthy({ 'code': '.', 'kinds': ?kinds }, true()) else ()
           )
+          let $first := switch () {
+            case exists($check) or count($checks) != count($candidates) or count($candidates) = 1 return
+              let $found := translate:predicate($sequence, `[{ $check otherwise translate:true('jvalue()') }]`)
+              return if (count($nodes) > 2) then `head({ $found })` else $found
+            default return
+              `({ string-join(for $node at $n in $candidates return translate:predicate($node, `[{ $checks[$n] }]`), ', ') })[1]`
+          }
+          return translate:rec(`({ $first } otherwise { $nodes[last()] })`)
+        case $type = 'and' and translate:is-node($results[1]) and count($results[1]?kinds) = 1 and
+          $results[1]?kinds != 'null' return
+          (: first operand of a known kind, which exists: kept if falsy, otherwise the second operand :)
+          let $falsy := translate:truthy({ 'code': '.', 'kinds': $results[1]?kinds }, false())
+          return translate:rec(`({ translate:predicate($results[1]?code, `[{ $falsy }]`) } otherwise { translate:single($results[2]) })`)
         case $mode = 'idiomatic' and translate:is-node($results[1]) return
           (: idiomatic: second operand if the first exists :)
           translate:rec(`(if ({ translate:unwrap($results[1]?code) }) {{ { translate:single($results[2]) } }})`)
@@ -900,7 +1239,7 @@ declare function translate:code(
           let $l := translate:single($results[1])
           let $r := translate:single($results[2])
           let $if := fn($a) {
-            `if ({ translate:unwrap(translate:truth(translate:rec($a))) }) then { $r } else { $a }`
+            `if ({ translate:unwrap(translate:truth(map:put(translate:rec($a), 'kinds', $results[1]?kinds))) }) then { $r } else { $a }`
           }
           return translate:rec(
             if (translate:plain($l)) then `({ $if($l) })` else `(let $a := { $l } return { $if('$a') })`
@@ -913,7 +1252,7 @@ declare function translate:code(
         case exists($result?negation) return $result?negation
         case exists($result?truth) return translate:literal(not($result?truth))
         case exists($result?type) return `not({ translate:unwrap($result?value) })`
-        default return translate:false(translate:value-code($result))
+        default return translate:truthy($result, false()) otherwise translate:false(translate:value-code($result))
       }
       let $negation := translate:truth($result)
       return map:put(translate:boolean('xs:boolean', $value), 'negation', $negation)
@@ -921,6 +1260,18 @@ declare function translate:code(
       translate:function($expr, $c, $mode)
     default return
       translate:skip('expression: ' || $expr?type)
+  (: kinds of values that are known statically :)
+  let $kinds := $expr?kinds
+  return if (exists($kinds)) then (
+    (: numbers are always truthy, null is falsy :)
+    let $truth := switch () {
+      case exists($result?truth) return $result?truth
+      case every $kind in $kinds satisfies $kind = 'number' return true()
+      case every $kind in $kinds satisfies $kind = 'null' return false()
+      default return ()
+    }
+    return map:merge(($result, { 'kinds': $kinds, 'truth': $truth }), { 'duplicates': 'use-last' })
+  ) else $result
 };
 
 (:~
@@ -971,7 +1322,7 @@ declare function translate:projection(
   let $left := translate:code($expr?left, $c, $mode)
   let $right := translate:code($expr?right, '.', $mode)
   let $filter := if ($type = 'filter_projection') then (
-    '[' || translate:bool($expr?cond, $mode) || ']'
+    '[' || translate:unwrap(translate:bool($expr?cond, $mode)) || ']'
   ) else ''
   return if ($mode = 'strict') then (
     let $guard := if ($type = 'value_projection') then 'map(*)' else 'array(*)'
@@ -982,19 +1333,30 @@ declare function translate:projection(
     ) else (
       translate:step('*' || $filter, $value, false())
     )
-    return translate:mapped(translate:guard($left?code, $guard),
+    let $slice := $left?slice
+    return if (exists($slice) and $filter = '' and $type != 'value_projection' and $slice?items != '()') then (
+      (: projected slice: members of the slice, without an intermediate array :)
+      translate:mapped($slice?base, `array {{ { translate:step($slice?items, $value, false()) } }}`)
+    ) else translate:mapped(translate:guarded($left, $guard),
       'array { ' || $members || ' }')
   ) else (
-    let $elems := if ($left?multi and $type != 'value_projection') then $left?code
-      else translate:step(translate:single($left), '*', true())
+    (: selected members: the projection is applied with the simple map operator, which keeps their order :)
+    let $ordered := exists($left?members) and $filter = '' and $type != 'value_projection'
+    let $elems := switch () {
+      case $left?multi and $type != 'value_projection' return $left?code
+      case $ordered return $left?members
+      default return translate:step(translate:single($left), '*', true())
+    }
     return {
-      'code': if (translate:is-path($expr?right, $mode)) then (
+      'code': if (translate:is-path($expr?right, $mode) and not($ordered)) then (
         (: path: continue the steps from the projected elements :)
         translate:code($expr?right, translate:predicate($elems, $filter), $mode)?code
       ) else (
         translate:step(translate:predicate($elems, $filter), $right?code, false())
       ),
-      'multi': true()
+      'multi': true(),
+      (: computed values: code without JNodes :)
+      'items': $right?value ! translate:step(translate:predicate($elems, $filter), ., false())
     }
   )
 };
@@ -1131,8 +1493,13 @@ declare function translate:slice-code(
   ) else (
     (: a call of fn:slice, or positional predicates :)
     let $items := (if ($k = 1) then () else translate:slice-call($start, $end, $k, $mode != 'idiomatic')) otherwise $members
-    return translate:mapped(translate:guard($c, 'array(*)'),
-      if ($items = '()') then '[]' else `array {{ { $items } ! jvalue() }}`)
+    let $base := translate:guard($c, 'array(*)')
+    let $result := translate:mapped($base, if ($items = '()') then '[]' else `array {{ { $items } ! jvalue() }}`)
+    (: selected members, in the order of the slice :)
+    return map:merge(($result, {
+      'members': if ($items = '()') then '()' else translate:step($base, $items, false()),
+      'slice': { 'base': $base, 'items': $items }
+    }), { 'duplicates': 'use-last' })
   )
 };
 
@@ -1179,8 +1546,11 @@ declare function translate:bool(
       (if ($expr?op = '==') then '=' else $expr?op) || ' ' ||
       translate:operand($expr?right, $mode)
     case 'and' case 'or' return
-      '(' || translate:bool($expr?left, $mode) || ' ' || $expr?type || ' ' ||
-      translate:bool($expr?right, $mode) || ')'
+      (: parentheses are only needed for or operands of and :)
+      string-join(($expr?left, $expr?right) ! (
+        let $code := translate:bool(., $mode)
+        return if ($expr?type = 'and' and ?type = 'or') then `({ $code })` else $code
+      ), ` { $expr?type } `)
     case 'not' return
       `not({ translate:unwrap(translate:bool($expr?expr, $mode)) })`
     default return
@@ -1276,7 +1646,9 @@ declare function translate:function(
       return {
         'node': translate:single($result),
         'value': translate:value-code($result),
-        'atomic': $result?value otherwise translate:single($result)
+        'atomic': $result?value otherwise translate:single($result),
+        'members': $result?members, 'items': $result?items,
+        'projected': if ($result?multi) then $result?code else ()
       }
     }
   )
@@ -1284,31 +1656,45 @@ declare function translate:function(
   let $V := fn($i) { $args[$i]?value otherwise translate:skip('value expected: ' || $name) }
   let $N := fn($i) { $args[$i]?node otherwise translate:skip('value expected: ' || $name) }
   let $A := fn($i) { $args[$i]?atomic otherwise translate:skip('value expected: ' || $name) }
-  let $M := fn($i) { translate:step($N($i), '*', true()) }
+  let $M := fn($i) { $args[$i]?members otherwise translate:step($N($i), '*', true()) }
+  (: atomized members: values or projected JNodes are used directly :)
+  let $S := fn($i) { $args[$i]?items otherwise $args[$i]?projected otherwise $M($i) }
+  let $I := fn($i) { $args[$i]?items otherwise translate:step($S($i), 'jvalue()', false()) }
   let $E := fn($i) { $args[$i]?expref otherwise translate:skip('expref expected: ' || $name) }
   let $K := fn($i) { $args[$i]?key otherwise translate:skip('expref expected: ' || $name) }
-  (: literal arguments: the type is known statically :)
-  let $literal := $expr?args?*[1][?type = 'literal']?value
+  (: JNodes are coerced to their values :)
+  let $C := fn($i) { if ($expr?args?*[$i]?type = 'literal') then $V($i) else $N($i) }
+  (: literal arguments and values of known inputs: the kinds of the values are known statically :)
+  let $literal := $expr?args?*[1] ! (if (?type = 'literal') then ?value else ?known)
+  let $kinds := $expr?args?*[1] ! (if (?type = 'literal') then translate:kind(?value) else ?kinds)
+  let $kind := if (count($kinds) = 1) then $kinds else ()
+  let $values := $expr?args?*[1] ! (if (?type = 'literal') then [ ?value ] else ?values)
   return switch ($name)
     case 'abs' return translate:wrap('abs(' || $A(1) || ')')
     case 'avg' case 'max' case 'min' return
-      translate:wrap($name || '(' || $M(1) || ')', $name || '(' || $M(1) || ') ! jtree(.)')
+      translate:wrap($name || '(' || $S(1) || ')', $name || '(' || $S(1) || ') ! jtree(.)')
     case 'ceil' return translate:wrap('ceiling(' || $A(1) || ')')
     case 'floor' return translate:wrap('floor(' || $A(1) || ')')
-    case 'contains' return translate:boolean('xs:boolean', switch () {
-      case $literal instance of xs:string return `contains({ $V(1) }, { $A(2) })`
-      case $literal instance of array(*) return `exists(array:index-of({ $V(1) }, { $V(2) }))`
+    case 'contains' return
+      let $search := $expr?args?*[2][?type = 'literal']?value
+      return translate:boolean('xs:boolean', switch () {
+      case $kind = 'string' return `contains({ $C(1) }, { $A(2) })`
+      (: atomic members of the same kind as the searched literal: general comparison :)
+      case $literal instance of array(*) and $search instance of xs:anyAtomicType and
+        (every $member in $literal?* satisfies translate:kind($member) = translate:kind($search)) return
+        `{ $C(1) } = { $V(2) }`
+      case $kind = 'array' return `exists(array:index-of({ $C(1) }, { $V(2) }))`
       default return `{ $N(1) } ! (if (self::jnode(*, xs:string)) then contains(., { $A(2) }) ` ||
-        `else exists(array:index-of(jvalue(), { $V(2) })))`
+        `else exists(array:index-of(., { $V(2) })))`
     })
     case 'ends_with' return translate:boolean('xs:boolean', 'ends-with(' || $A(1) || ', ' || $A(2) || ')')
     case 'starts_with' return translate:boolean('xs:boolean', 'starts-with(' || $A(1) || ', ' || $A(2) || ')')
-    case 'join' return translate:wrap('string-join(' || $M(2) || ', ' || $A(1) || ')')
-    case 'keys' return translate:wrap(`array {{ { $M(1) } ! jkey() }}`)
+    case 'join' return translate:wrap('string-join(' || $S(2) || ', ' || $A(1) || ')')
+    case 'keys' return map:put(translate:wrap(`array {{ { $M(1) } ! jkey() }}`), 'items', $M(1) || ' ! jkey()')
     case 'length' return translate:wrap(switch () {
-      case $literal instance of xs:string return `string-length({ $V(1) })`
-      case $literal instance of array(*) return `array:size({ $V(1) })`
-      case $literal instance of map(*) return `map:size({ $V(1) })`
+      case $kind = 'string' return `string-length({ $C(1) })`
+      case $kind = 'array' return `array:size({ $C(1) })`
+      case $kind = 'object' return `map:size({ $C(1) })`
       default return $N(1) || ' ! (if (self::jnode(*, xs:string)) then string-length(.) else count(*))'
     })
     case 'map' return translate:wrap('array:build(' || $M(2) || ', fn { ' || $E(1) || ' })')
@@ -1316,43 +1702,69 @@ declare function translate:function(
       (if ($name = 'max_by') then 'highest' else 'lowest') || '(' || $M(1) ||
       ', (), fn { ' || $K(2) || ' })[1]')
     case 'merge' return translate:wrap(
-      'map:merge((' || string-join((1 to count($args)) ! $V(.), ', ') ||
-      '), { "duplicates": "use-last" })')
+      if (count($args) = 1) then $V(1) else
+      'map:merge((' || string-join((1 to count($args)) ! $V(.), ', ') || '), { "duplicates": "use-last" })')
     case 'not_null' return translate:rec(
-      '((' || string-join((1 to count($args)) ! $N(.), ', ') || ')[exists(jvalue())][1])')
+      '(' || string-join((1 to count($args)) ! $N(.), ', ') || ')[exists(jvalue())][1]')
     case 'reverse' return translate:wrap(switch () {
-      case $literal instance of xs:string return `string-join(reverse(characters({ $V(1) })))`
-      case $literal instance of array(*) return `array:reverse({ $V(1) })`
+      case $kind = 'string' return `string-join(reverse(characters({ $C(1) })))`
+      case $kind = 'array' return `array:reverse({ $C(1) })`
       default return
         `{ $N(1) } ! (if (self::jnode(*, xs:string)) then string-join(reverse(characters(.))) ` ||
         `else array:reverse(.))`
     })
-    case 'sort' return translate:wrap('array { sort(' || $M(1) || ' ! jvalue()) }')
+    case 'sort' return translate:wrap(`array {{ sort({ $I(1) }) }}`)
     case 'sort_by' return
-      translate:wrap('array:of-members(sort(' || $M(1) || ', (), fn { ' || $K(2) || ' }))')
-    case 'sum' return translate:wrap('sum(' || $M(1) || ')')
-    case 'to_array' return
-      let $value := 'if ($v instance of array(*)) then $v else [ $v ]'
-      let $let := '(let $v := ' || $V(1) || ' return '
-      return translate:wrap($let || $value || ')', $let || 'jtree(' || $value || '))')
-    case 'to_number' return
-      let $number := 'matches($v, "^-?[0-9]+(\.[0-9]+)?([eE][+\-]?[0-9]+)?$")'
-      let $code := fn($wrap) {
-        '(let $v := ' || $V(1) || ' return if ($v instance of xs:numeric) then ' || $wrap('$v') ||
-        ' else if ($v instance of xs:string and ' || $number || ') then ' ||
-        $wrap('number($v)') || ' else ())'
-      }
-      return translate:wrap($code(fn($v) { $v }), $code(fn($v) { 'jtree(' || $v || ')' }))
-    case 'to_string' return
-      let $value := 'if ($v instance of xs:string) then $v ' ||
-        'else if (empty($v)) then "null" else serialize($v, { "method": "json" })'
-      let $let := '(let $v := ' || $V(1) || ' return '
-      return translate:wrap($let || $value || ')', $let || 'jtree(' || $value || '))')
+      (: sorted JNodes, which are projected in their order :)
+      let $sorted := 'sort(' || $M(1) || ', (), fn { ' || $K(2) || ' })'
+      return map:put(translate:wrap(`array:of-members({ $sorted })`), 'members', $sorted)
+    case 'sum' return translate:wrap('sum(' || $S(1) || ')')
+    case 'to_array' return switch () {
+      case $kind = 'array' return translate:wrap($V(1))
+      case exists($kinds) and not($kinds = 'array') return translate:wrap(`[ { $V(1) } ]`)
+      default return
+        let $value := 'if ($v instance of array(*)) then $v else [ $v ]'
+        let $let := '(let $v := ' || $V(1) || ' return '
+        return translate:wrap($let || $value || ')', $let || 'jtree(' || $value || '))')
+    }
+    case 'to_number' return switch () {
+      case $kind = 'number' return translate:wrap($V(1))
+      case $kind = 'string' and exists($literal) return
+        if (matches($literal, $translate:NUMBER)) then translate:wrap(`number({ $V(1) })`)
+        else translate:wrap('()', '()')
+      case exists($kinds) and not($kinds = ('number', 'string')) return translate:wrap('()', '()')
+      (: strings that are numbers in JMESPath, or no numbers at all: conversion without NaN :)
+      case exists($values) and (every $value in $values?*[. instance of xs:string] satisfies
+        matches($value, $translate:NUMBER) or is-NaN(number($value))) return
+        let $value := `number({ $C(1) })[not(is-NaN(.))]`
+        return translate:wrap($value, $value || ' ! jtree(.)')
+      default return
+        let $number := `matches($v, "{ $translate:NUMBER }")`
+        let $code := fn($wrap) {
+          '(let $v := ' || $V(1) || ' return if ($v instance of xs:numeric) then ' || $wrap('$v') ||
+          ' else if ($v instance of xs:string and ' || $number || ') then ' ||
+          $wrap('number($v)') || ' else ())'
+        }
+        return translate:wrap($code(fn($v) { $v }), $code(fn($v) { 'jtree(' || $v || ')' }))
+    }
+    case 'to_string' return switch () {
+      case $kind = 'string' return translate:wrap($V(1))
+      case $kind = 'null' return translate:wrap('"null"')
+      case exists($kinds) and not($kinds = ('string', 'null')) return
+        translate:wrap(`serialize({ $C(1) }, {{ "method": "json" }})`)
+      default return
+        let $value := 'if ($v instance of xs:string) then $v ' ||
+          'else if (empty($v)) then "null" else serialize($v, { "method": "json" })'
+        let $let := '(let $v := ' || $V(1) || ' return '
+        return translate:wrap($let || $value || ')', $let || 'jtree(' || $value || '))')
+    }
     case 'type' return translate:wrap(
+      (: known kind: name of the kind :)
+      if (exists($kind)) then translate:string($kind) else
       'typeswitch (' || $V(1) || ') case empty-sequence() return "null" ' ||
       'case xs:string return "string" case xs:boolean return "boolean" ' ||
       'case xs:numeric return "number" case array(*) return "array" default return "object"')
-    case 'values' return translate:wrap('array:of-members(' || $M(1) || ')')
+    case 'values' return map:put(translate:wrap('array:of-members(' || $M(1) || ')'), 'members', $M(1))
     default return translate:skip('function: ' || $name)
 };
 

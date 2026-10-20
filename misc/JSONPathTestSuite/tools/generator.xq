@@ -181,7 +181,7 @@ let $cases := (
     let $nodes := $none or $null or $sequence
     let $results := (
       for $mode in ('idiomatic', 'mixed', 'strict')
-      let $code := translate:translate($ast, $mode)
+      let $code := translate:translate($ast, $mode, $input)
       (: the array of all selected values is verified, and the result of the test query :)
       let $array-query := query($input, `array:of-members({ $code })`)
       let $query := if ($nodes) then query($input, $code) else $array-query

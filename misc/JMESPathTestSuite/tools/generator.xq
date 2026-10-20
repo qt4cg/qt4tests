@@ -128,7 +128,7 @@ let $cases := (
     let $wanted := eval(`[ ({ translate:literal($result) }) ]`)
     let $results := (
       for $mode in ('idiomatic', 'mixed', 'strict')
-      let $translation := translate:translate($ast, $mode, $result instance of xs:anyAtomicType)
+      let $translation := translate:translate($ast, $mode, $result instance of xs:anyAtomicType, $input)
       (: projections without null values: sequence of JNodes :)
       let $sequence := exists($translation?nodes) and
         exists($result[. instance of array(*)][array:size(.) = count(?*)])
