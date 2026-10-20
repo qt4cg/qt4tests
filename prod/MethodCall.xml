@@ -174,5 +174,62 @@
          <error code="XPTY0004"/>
       </result>
    </test-case>
+
+   <test-case name="method-907" covers-40="PR1926">
+      <description>wildcard is not allowed as method name</description>
+      <created by="Christian Gruen" on="2026-10-20"/>
+      <test>
+         let $rectangle := { 'length': 3, 'width': 2, 'area': fn() { 6 } }
+         return $rectangle =?> *()
+      </test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="method-908" covers-40="PR2273">
+      <description>method call applied to a sequence of maps</description>
+      <created by="Christian Gruen" on="2026-10-20"/>
+      <test>
+         let $rectangle := {
+           'height': 3,
+           'width': 4,
+           'area': fn($rect) { $rect?height × $rect?width },
+           'resize': fn($rect, $factor) {
+             $rect => map:put('height', $rect?height × $factor)
+                   => map:put('width', $rect?width × $factor)
+           }
+         }
+         return ((1 to 2) ! $rectangle =?> resize(.)) =?> area()
+      </test>
+      <result>
+         <assert-deep-eq>12, 48</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="method-909" covers-40="PR2273">
+      <description>method call applied to an empty sequence</description>
+      <created by="Christian Gruen" on="2026-10-20"/>
+      <test>() =?> area()</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="method-910" covers-40="PR2273">
+      <description>map entry with a sequence of methods</description>
+      <created by="Christian Gruen" on="2026-10-20"/>
+      <test>
+         let $rectangle := {
+           'height': 3,
+           'width': 4,
+           'size': (fn($rect) { $rect?height }, fn($rect) { $rect?width })
+         }
+         return $rectangle =?> size()
+      </test>
+      <result>
+         <assert-deep-eq>3, 4</assert-deep-eq>
+      </result>
+   </test-case>
    
 </test-set>
