@@ -43,6 +43,147 @@
     </result>
   </test-case>
   
+  <test-case name="generate-05">
+    <description>Callback uses integer position</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <test><![CDATA[     
+      generate(1, fn($i, $p){$i*2[$p lt 10]})     
+    ]]></test>
+    <result>
+      <assert-deep-eq>1, 2, 4, 8, 16, 32, 64, 128, 256, 512</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-06">
+    <description>Zero-arity callback</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <test><![CDATA[     
+      generate(1, fn(){12}) [1 to 10]    
+    ]]></test>
+    <result>
+      <assert-deep-eq>1, 12, 12, 12, 12, 12, 12, 12, 12, 12</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-07">
+    <description>Zero-arity callback</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <test><![CDATA[     
+      generate(1, fn(){12}) [100]    
+    ]]></test>
+    <result>
+      <assert-eq>12</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-08">
+    <description>Zero-arity callback generating new nodes, use subsequence() to terminate</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[     
+      generate(1, fn(){<e/>}) => subsequence(10, 20) => distinct-ordered-nodes() => count()    
+    ]]></test>
+    <result>
+      <assert-eq>20</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-09">
+    <description>Use slice() to terminate</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[     
+      generate(1, fn{.+1}) => slice(end := 20) => count()   
+    ]]></test>
+    <result>
+      <assert-eq>20</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-10">
+    <description>Bad first arg</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[     
+      generate((), fn{.+1})  
+    ]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-11">
+    <description>Bad first arg</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[     
+      generate((1 to 5), fn{.+1})  
+    ]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-12">
+    <description>Map as first arg</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[     
+      generate({'a':0}, fn($map, $pos){map:merge(($map, {'a':$pos}), {'duplicates':'combine'})})[12]  
+    ]]></test>
+    <result>
+      <assert-deep-eq>{'a': (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)}</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-13">
+    <description>Incremental evaluation of bang operator</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[     
+      (generate(0, fn{.+2}) ! (., .+1)) => subsequence(1, 9)
+    ]]></test>
+    <result>
+      <assert-deep-eq>0 to 8</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-14">
+    <description>Incremental evaluation of index-of</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[     
+      (generate(1, fn{.*2}) => index-of(256))[1] 
+    ]]></test>
+    <result>
+      <assert-eq>9</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-15">
+    <description>Incremental evaluation of index-where</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[     
+      (generate(1, fn{.*2}) => index-where(fn{. gt 256}))[2] 
+    ]]></test>
+    <result>
+      <assert-eq>11</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="generate-16">
+    <description>Termination using position() test</description>
+    <created by="Michael Kay" on="2026-04-21"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[     
+      (generate(1, fn{.*2}) => index-where(fn{. gt 256}))[position() lt 3] 
+    ]]></test>
+    <result>
+      <assert-deep-eq>10, 11</assert-deep-eq>
+    </result>
+  </test-case>
+  
   
 
 </test-set>
