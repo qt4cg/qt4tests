@@ -3331,26 +3331,30 @@ return $in/*[self::jnode(*, xs:string)[matches(., "a.b")]]
     <description>functions, search, dot matcher on \u2028: $[?search(@, '.')]</description>
     <created by="Christian Grün" on="2026-10-18"/>
     <modified by="Michael Kay" on="2026-10-21" change="Clarify string literals, make them XPath-compatible"/>
-    <test><![CDATA[
+    <test>
       let $in := [ char(0x2028), char(0xD)||char(0x2028), char(0xD), true(), [], {} ]
       return $in/*[self::jnode(*, xs:string)[matches(., ".")]]
-]]></test>
+    </test>
     <result>
       <assert-deep-eq>jtree(char(0x2028)), jtree(char(0xD)||char(0x2028))</assert-deep-eq>
     </result>
   </test-case>
+  
   <test-case name="JSONPath-functions-search-dot-matcher-on-u2029">
     <description>functions, search, dot matcher on \u2029: $[?search(@, '.')]</description>
     <created by="Christian Grün" on="2026-10-18"/>
-    <modified by="Michael Kay" on="2026-10-21" change="Clarify string literals, make them XPath-compatible"/>
-    <test>
-      let $in := [ " ", char(0xD)||char(0xA), char(0xD), char(0xA), true(), [], {} ]
-      return $in/*[self::jnode(*, xs:string)[matches(., ".")]]
-      </test>
+    <test><![CDATA[
+let $in := [ " ", "&#xD; 
+", "&#xD;", "
+", true(), [], {} ]
+return $in/*[self::jnode(*, xs:string)[matches(., ".")]]
+]]></test>
     <result>
-      <assert-deep-eq>jtree(" "), jtree(char(0xD)||char(0xA))</assert-deep-eq>
+      <assert-deep-eq>jtree(" "), jtree("&amp;#xD; 
+")</assert-deep-eq>
     </result>
   </test-case>
+  
   <test-case name="JSONPath-functions-search-arg-is-a-function-expression">
     <description>functions, search, arg is a function expression: $.values[?search(@, value($..['regex']))]</description>
     <created by="Christian Grün" on="2026-10-18"/>
