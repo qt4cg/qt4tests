@@ -2436,6 +2436,301 @@ return $run('../docs/bib.xml', fn($uri) { exists(doc($uri)/*/*) })
 }</assert-deep-eq>
     </result>
   </test-case>
+
+  <test-case name="fn-load-xquery-module-590" covers-40="PR1333 PR2213 PR2796">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:xml external;
+    declare function x:f() { parse-xml($x:xml, { "trust-external": true() })/a/string() };',
+  'variables': {
+    QName('urn:x', 'xml'): "<!DOCTYPE a [<!ENTITY foo SYSTEM 'parse-xml/foo.entity'>]><a>&amp;foo;</a>"
+  }
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    ]]></test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-591" covers-40="PR1333 PR2213 PR2796">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:xml external;
+    declare function x:f() {
+      parse-xml($x:xml, { "dtd-validation": true(), "trust-external": true() })/a/string()
+    };',
+  'variables': {
+    QName('urn:x', 'xml'): "<!DOCTYPE a SYSTEM 'parse-xml/a.dtd'><a>foo</a>"
+  }
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    ]]></test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-592" covers-40="PR1333 PR2213 PR2796">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:xml external;
+    declare function x:f() {
+      parse-xml($x:xml, { "xinclude": true(), "trust-external": true() })/a/string()
+    };',
+  'variables': {
+    QName('urn:x', 'xml'): "<a xmlns:xi='http://www.w3.org/2001/XInclude'>" ||
+      "<xi:include href='parse-xml/foo.entity' parse='text'/></a>"
+  }
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    ]]></test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-593" covers-40="PR1333 PR2213 PR2796">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { exists(doc("../docs/bib.xml", { "trust-external": true() })/*/*) };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-594" covers-40="PR1333 PR2213 PR2796">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { doc-available("../docs/bib.xml", { "trust-external": true() }) };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <any-of>
+        <assert-false/>
+        <error code="FODC0016"/>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-595" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { parse-xml("<a>foo</a>")/a/string() };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    ]]></test>
+    <result>
+      <assert-eq>'foo'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-596" covers-40="PR1333 PR2213 PR2796">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:xml external;
+    declare function x:f() { parse-xml($x:xml)/a/string() };',
+  'variables': {
+    QName('urn:x', 'xml'): "<!DOCTYPE a [<!ENTITY foo SYSTEM 'parse-xml/foo.entity'>]><a>&amp;foo;</a>"
+  },
+  'trusted': true()
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    ]]></test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-597" covers-40="PR1333 PR2213 PR2796">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:xml external;
+    declare function x:f() { parse-xml($x:xml, { "trust-external": true() })/a/string() };',
+  'variables': {
+    QName('urn:x', 'xml'): "<!DOCTYPE a [<!ENTITY foo SYSTEM 'parse-xml/foo.entity'>]><a>&amp;foo;</a>"
+  },
+  'trusted': true()
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    ]]></test>
+    <result>
+      <assert-eq>'baz'</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-598" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { exists(uri-collection("../docs/")) };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-599" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { unparsed-text-available("../docs/bib.xml") };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <any-of>
+        <assert-false/>
+        <error code="FODC0016"/>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-600" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { string-length(string(unparsed-binary("../docs/bib.xml"))) };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-601" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { exists(csv-doc("parse-csv/bom-none.csv")?rows) };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-602" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { exists(html-doc("../misc/HtmlTestSuite/files/test-0000.html")/*/*) };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-603" covers-40="PR1333 PR2213">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { exists(doc(resolve-uri("../docs/bib.xml"))/*/*) };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-604" covers-40="PR1333 PR2213 PR2796">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare function x:f() { exists(apply(doc#1, [ "../docs/bib.xml" ])/*/*) };'
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-605" covers-40="PR1333 PR2213 PR2796">
+    <description>Loads a module with the 'trusted' option.</description>
+    <created by="Christian Gruen" on="2026-10-22"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+let $module := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare variable $x:parse external;
+    declare variable $x:xml external;
+    declare function x:f() { $x:parse($x:xml, { "trust-external": true() })/a/string() };',
+  'variables': {
+    QName('urn:x', 'parse'): parse-xml#2,
+    QName('urn:x', 'xml'): "<!DOCTYPE a [<!ENTITY foo SYSTEM 'parse-xml/foo.entity'>]><a>&amp;foo;</a>"
+  }
+})
+return $module?functions?(QName('urn:x', 'f'))?0()
+    ]]></test>
+    <result>
+      <assert-eq>'baz'</assert-eq>
+    </result>
+  </test-case>
   
   
   <test-case name="fn-load-xquery-module-901">
