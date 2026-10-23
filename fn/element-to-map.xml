@@ -2700,12 +2700,13 @@
       </result>
    </test-case>
    <test-case name="element-to-map-597" covers-40="PR2903">
-      <description>Errors in the conversion plan.</description>
+      <description>Entries with invalid keys in the conversion plan are ignored.</description>
       <created by="Christian Gruen" on="2026-09-18"/>
+      <modified by="Christian Gruen" on="2026-10-23" change="Use a valid plan entry, see qt4tests#490"/>
       <test><![CDATA[
          let $e := parse-xml('<a>1</a>')/a
          return deep-equal(
-             element-to-map($e, { 'plan': { 'xml:a': { 'layout': 'unknown' } } }),
+             element-to-map($e, { 'plan': { 'xml:a': { 'layout': 'xml' } } }),
              element-to-map($e)
          )
       ]]></test>
@@ -2730,6 +2731,17 @@
       <test><![CDATA[
          element-to-map(parse-xml('<a><b/></a>')/a,
              { 'plan': { 'a': { 'layout': 'record', 'type': 'integer' }, '*': { 'layout': 'xml' } } })
+      ]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="element-to-map-600" covers-40="PR2903">
+      <description>Errors in the conversion plan, entry for an absent element.</description>
+      <created by="Christian Gruen" on="2026-10-23"/>
+      <test><![CDATA[
+         element-to-map(parse-xml('<a>1</a>')/a,
+             { 'plan': { 'b': { 'layout': 'unknown' } } })
       ]]></test>
       <result>
          <error code="XPTY0004"/>
