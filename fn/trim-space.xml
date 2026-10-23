@@ -255,9 +255,18 @@
       <assert-eq>"x"</assert-eq>
     </result>
   </test-case>
+  
+  <test-case name="trim-space-028" covers-40="PR2975">
+    <description>Evaluation of the trim-space#1 function: array can be cast to xs:string.</description>
+    <created by="Michael Kay" on="2026-10-23"/>
+    <test>fn:trim-space([ " a " ])</test>
+    <result>
+      <assert-eq>"a"</assert-eq>
+    </result>
+  </test-case>
 
   <test-case name="trim-space-030" covers-40="PR2975">
-    <description>Evaluation of the trim-space function.</description>
+    <description>Evaluation of the trim-space#0 function.</description>
     <created by="Christian Gruen" on="2026-10-13"/>
     <test>"  abc  " ! fn:trim-space()</test>
     <result>
@@ -266,7 +275,7 @@
   </test-case>
 
   <test-case name="trim-space-031" covers-40="PR2975">
-    <description>Evaluation of the trim-space function.</description>
+    <description>Evaluation of the trim-space#0 function.</description>
     <created by="Christian Gruen" on="2026-10-13"/>
     <test><![CDATA[parse-xml("<r><a> x </a><b>  </b><c>y </c></r>")/*/*/fn:trim-space()]]></test>
     <result>
@@ -275,7 +284,7 @@
   </test-case>
 
   <test-case name="trim-space-032" covers-40="PR2975">
-    <description>Evaluation of the trim-space function.</description>
+    <description>Evaluation of the trim-space#0 function.</description>
     <created by="Christian Gruen" on="2026-10-13"/>
     <test><![CDATA[parse-xml("<r><a> x </a><a> </a><a>y</a></r>")//a[fn:trim-space()] => count()]]></test>
     <result>
@@ -284,7 +293,7 @@
   </test-case>
 
   <test-case name="trim-space-033" covers-40="PR2975">
-    <description>Evaluation of the trim-space function.</description>
+    <description>Evaluation of the trim-space#0 function.</description>
     <created by="Christian Gruen" on="2026-10-13"/>
     <test>("  abc  ", " d ") ! fn:trim-space(options := { 'side': 'end' })</test>
     <result>
@@ -293,7 +302,7 @@
   </test-case>
 
   <test-case name="trim-space-034" covers-40="PR2975">
-    <description>Evaluation of the trim-space function.</description>
+    <description>Evaluation of the trim-space#0 function.</description>
     <created by="Christian Gruen" on="2026-10-13"/>
     <test>(1, xs:untypedAtomic(" 2 "), xs:NCName("x")) ! fn:trim-space()</test>
     <result>
@@ -302,7 +311,7 @@
   </test-case>
 
   <test-case name="trim-space-035" covers-40="PR2975">
-    <description>Evaluation of the trim-space function.</description>
+    <description>Evaluation of the trim-space#0 function with no context item.</description>
     <created by="Christian Gruen" on="2026-10-13"/>
     <test>let $f := fn:trim-space#0 return " abc " ! $f()</test>
     <result>
@@ -311,7 +320,7 @@
   </test-case>
 
   <test-case name="trim-space-036" covers-40="PR2975">
-    <description>Evaluation of the trim-space function.</description>
+    <description>Evaluation of the trim-space#0 function.</description>
     <created by="Christian Gruen" on="2026-10-13"/>
     <test>" abc " ! (let $f := fn:trim-space#0 return $f())</test>
     <result>
@@ -320,7 +329,7 @@
   </test-case>
 
   <test-case name="trim-space-037" covers-40="PR2975">
-    <description>Evaluation of the trim-space function.</description>
+    <description>Evaluation of the trim-space#0 function with no context item.</description>
     <created by="Christian Gruen" on="2026-10-13"/>
     <test>fn:trim-space()</test>
     <result>
@@ -329,20 +338,133 @@
   </test-case>
 
   <test-case name="trim-space-038" covers-40="PR2975">
-    <description>Evaluation of the trim-space function.</description>
+    <description>Evaluation of the trim-space#0 function with invalid context item.</description>
     <created by="Christian Gruen" on="2026-10-13"/>
+    <modified by="Michael Kay" on="2026-10-23" change="change expected error"/>
     <test>[ "a", "b" ] ! fn:trim-space()</test>
     <result>
-      <error code="XPTY0004"/>
+      <error code="FOTY0014"/>
     </result>
   </test-case>
 
   <test-case name="trim-space-039" covers-40="PR2975">
-    <description>Evaluation of the trim-space function.</description>
+    <description>Evaluation of the trim-space#0 function with invalid context item.</description>
     <created by="Christian Gruen" on="2026-10-13"/>
+    <modified by="Michael Kay" on="2026-10-23" change="change expected error"/>
     <test>{ 'a': 1 } ! fn:trim-space()</test>
     <result>
-      <error code="FOTY0013"/>
+      <error code="FOTY0014"/>
+    </result>
+  </test-case>
+  
+  <test-case name="trim-space-040" covers-40="PR2975">
+    <description>Evaluation of the trim-space#0 function: default is string(.) not data(.).</description>
+    <created by="Michael Kay" on="2026-10-23"/>
+    <test>[ "a" ] ! fn:trim-space()</test>
+    <result>
+      <error code="FOTY0014"/>
+    </result>
+  </test-case>
+  
+  <test-case name="trim-space-041" covers-40="PR2975">
+    <description>Evaluation of trim-space omitting first argument but supplying options</description>
+    <created by="Michael Kay" on="2026-10-23"/>
+    <test>" a " -> fn:trim-space(options := {'side':'start'})</test>
+    <result>
+      <assert-eq>"a "</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="trim-space-042" covers-40="PR2975">
+    <description>Evaluation of trim-space omitting first argument but supplying options</description>
+    <created by="Michael Kay" on="2026-10-23"/>
+    <test>" a " -> fn:trim-space(options := {'side':'end'})</test>
+    <result>
+      <assert-eq>" a"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="trim-space-043" covers-40="PR2975">
+    <description>Evaluation of trim-space omitting first argument but supplying options</description>
+    <created by="Michael Kay" on="2026-10-23"/>
+    <test>fn:trim-space(options := {'side':'end'})</test>
+    <result>
+      <error code="XPDY0002"/>
+    </result>
+  </test-case>
+  
+  <test-case name="trim-space-044" covers-40="PR2975">
+    <description>Evaluation of trim-space omitting first argument but supplying options</description>
+    <created by="Michael Kay" on="2026-10-23"/>
+    <test>["a"] -> fn:trim-space(options := {'side':'end'})</test>
+    <result>
+      <error code="FOTY0014"/>
+    </result>
+  </test-case>
+  
+  <test-case name="trim-space-045" covers-40="PR2975">
+    <description>Partial application of trim-space applying options</description>
+    <created by="Michael Kay" on="2026-10-23"/>
+    <test>
+      let $trim := fn:trim-space(?, options := {'side':'both'})
+      return $trim('  abc  ')</test>
+    <result>
+      <assert-eq>"abc"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="trim-space-046" covers-40="PR2975">
+    <description>Partial application of trim-space applying options</description>
+    <created by="Michael Kay" on="2026-10-23"/>
+    <test>
+      let $trim := fn:trim-space(?, {'side':'both'})
+      return $trim('  abc  ')</test>
+    <result>
+      <assert-eq>"abc"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="trim-space-047" covers-40="PR2975">
+    <description>Partial application of trim-space applying options</description>
+    <created by="Michael Kay" on="2026-10-23"/>
+    <test>
+      let $trim := fn:partial-apply(fn:trim-space#2, {2: {'side':'both'}})
+      return $trim('  abc  ')</test>
+    <result>
+      <assert-eq>"abc"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="trim-space-048" covers-40="PR2975">
+    <description>Named function reference trim-space#1</description>
+    <created by="Michael Kay" on="2026-10-23"/>
+    <test>
+      let $f := fn:trim-space#1
+      return $f([ " a " ])</test>
+    <result>
+      <assert-eq>"a"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="trim-space-049" covers-40="PR2975">
+    <description>Named function reference trim-space#2</description>
+    <created by="Michael Kay" on="2026-10-23"/>
+    <test>
+      let $f := fn:trim-space#2
+      return $f([ " a " ], {'side':'end'})</test>
+    <result>
+      <assert-eq>" a"</assert-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="trim-space-050" covers-40="PR2975">
+    <description>Partial apply of trim-space omitting first argument but supplying options</description>
+    <created by="Michael Kay" on="2026-10-23"/>
+    <test>
+      let $f := (" z " -> fn:trim-space(options := ?))
+      return $f({'side':'end'}) || $f({'side':'start'})</test>
+    <result>
+      <assert-eq>" zz "</assert-eq>
     </result>
   </test-case>
 
