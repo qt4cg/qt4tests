@@ -442,7 +442,10 @@
    </test-case>
 
    <test-case name="fn-string-22">
-      <description>Evaluation of string() applied to a node that cannot be atomized because it has element-only content. This succeeds, because although getting the typed value of such a node is an error, the string value is well defined. Note, we assume construction from PSVI, therefore insignificant whitespace is stripped.</description>
+      <description>Evaluation of string() applied to a node that cannot be atomized 
+         because it has element-only content. This succeeds, because although getting 
+         the typed value of such a node is an error, the string value is well defined. 
+         Note, we assume construction from PSVI, therefore insignificant whitespace is stripped.</description>
       <created by="Michael Kay" on="2011-06-28"/>
       <environment ref="qname"/>
       <dependency type="feature" value="schemaValidation"/>
@@ -627,63 +630,6 @@
       </result>
    </test-case>
 
-   <test-case name="K-StringFunc-1">
-      <description>K-StringFunc-1 `string(1, 2)`. </description>
-      <created by="Frans Englich" on="2007-11-26"/>
-      <test>string(1, 2)</test>
-      <result>
-         <error code="XPST0017"/>
-      </result>
-   </test-case>
-
-   <test-case name="K-StringFunc-2">
-      <description>K-StringFunc-2 ensures that no arguments isn't flagged as invalid. </description>
-      <created by="Frans Englich" on="2007-11-26"/>
-      <test>if(true()) then true() else string()</test>
-      <result>
-         <any-of>
-            <assert-true/>
-            <error code="XPDY0002"/>
-         </any-of>
-      </result>
-   </test-case>
-
-   <test-case name="K-StringFunc-3">
-      <description>K-StringFunc-3 `string(1) eq "1"`. </description>
-      <created by="Frans Englich" on="2007-11-26"/>
-      <test>string(1) eq "1"</test>
-      <result>
-         <assert-true/>
-      </result>
-   </test-case>
-
-   <test-case name="K-StringFunc-4">
-      <description>K-StringFunc-4 `string(()) eq ""`. </description>
-      <created by="Frans Englich" on="2007-11-26"/>
-      <test>string(()) eq ""</test>
-      <result>
-         <assert-true/>
-      </result>
-   </test-case>
-
-   <test-case name="K-StringFunc-5">
-      <description>K-StringFunc-5 xs:string. </description>
-      <created by="Frans Englich" on="2007-11-26"/>
-      <test>string-length(string(xs:string(current-time()))) gt 2</test>
-      <result>
-         <assert-true/>
-      </result>
-   </test-case>
-
-   <test-case name="K-StringFunc-6">
-      <description>K-StringFunc-6 `string( (1, 2) )`. </description>
-      <created by="Frans Englich" on="2007-11-26"/>
-      <test>string( (1, 2) )</test>
-      <result>
-         <error code="XPTY0004"/>
-      </result>
-   </test-case>
-
    <test-case name="fn-string-40">
       <description>Values at the limits of numeric precision.</description>
       <created by="Christian Gruen" on="2026-10-04"/>
@@ -788,5 +734,99 @@
          <error code="XPTY0004"/>
       </result>
    </test-case>
+   
+   <test-case name="fn-string-60">
+      <description>Fails if context value contains multiple items.</description>
+      <created by="Michael Kay" on="2026-10-24"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>("A", "B", "C") -> string()</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-string-61">
+      <description>string#0 captures the context item</description>
+      <created by="Michael Kay" on="2026-10-24"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $f := ("A", "B", "C") ! string#0
+         return "X" ! $f()
+      </test>
+      <result>
+         <assert-deep-eq>("A", "B", "C")</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="fn-string-62">
+      <description>string#1 does not capture the context item</description>
+      <created by="Michael Kay" on="2026-10-24"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $f := ("A", "B", "C") ! string#1
+         return ("X", "Y", "Z") =!> $f()
+      </test>
+      <result>
+         <assert-deep-eq>("X", "Y", "Z")</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="K-StringFunc-1">
+      <description>K-StringFunc-1 `string(1, 2)`. </description>
+      <created by="Frans Englich" on="2007-11-26"/>
+      <test>string(1, 2)</test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="K-StringFunc-2">
+      <description>K-StringFunc-2 ensures that no arguments isn't flagged as invalid. </description>
+      <created by="Frans Englich" on="2007-11-26"/>
+      <test>if(true()) then true() else string()</test>
+      <result>
+         <any-of>
+            <assert-true/>
+            <error code="XPDY0002"/>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="K-StringFunc-3">
+      <description>K-StringFunc-3 `string(1) eq "1"`. </description>
+      <created by="Frans Englich" on="2007-11-26"/>
+      <test>string(1) eq "1"</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="K-StringFunc-4">
+      <description>K-StringFunc-4 `string(()) eq ""`. </description>
+      <created by="Frans Englich" on="2007-11-26"/>
+      <test>string(()) eq ""</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="K-StringFunc-5">
+      <description>K-StringFunc-5 xs:string. </description>
+      <created by="Frans Englich" on="2007-11-26"/>
+      <test>string-length(string(xs:string(current-time()))) gt 2</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="K-StringFunc-6">
+      <description>K-StringFunc-6 `string( (1, 2) )`. </description>
+      <created by="Frans Englich" on="2007-11-26"/>
+      <test>string( (1, 2) )</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
 
 </test-set>

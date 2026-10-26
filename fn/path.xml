@@ -696,6 +696,84 @@
       <result>
          <error code="XPTY0004"/>
       </result>
+   </test-case>  
+   
+   <test-case name="path067">
+      <description>Function reference path#0</description>
+      <created by="Michael Kay" on="2026-10-25"/>
+      <environment ref="pathdata"/>
+      <test>
+         let $f := (//*:test-case/@name) ! fn:path#0
+         return $f[1]()</test>
+      <result>
+         <all-of>
+            <assert-string-value>/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-set[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-case[1]/@name</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path068">
+      <description>Function reference path#1</description>
+      <created by="Michael Kay" on="2026-10-25"/>
+      <environment ref="pathdata"/>
+      <test>
+         let $f := (//*:test-case/@name) ! fn:path#1
+         return $f[1](//*:test-case[2]/@name)</test>
+      <result>
+         <all-of>
+            <assert-string-value>/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-set[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-case[2]/@name</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path069" covers-40="PR2049">
+      <description>Function reference path#2</description>
+      <created by="Michael Kay" on="2026-10-25"/>
+      <environment ref="pathdata"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $f := (//*:test-case/@name) ! fn:path#2
+         return $f[1](//*:test-case[2]/@name, map{"lexical": true()})</test>
+      <result>
+         <all-of>
+            <assert-string-value>/test-set[1]/test-case[2]/@name</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path070" covers-40="PR2049">
+      <description>Partial function application supplying options</description>
+      <created by="Michael Kay" on="2026-10-25"/>
+      <environment ref="pathdata"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $f := (//*:test-case[1]/@name) ! fn:path(?, options := {"lexical": true()})
+         return //*:test-case[2]/@name ! $f(.)</test>
+      <result>
+         <all-of>
+            <assert-string-value>/test-set[1]/test-case[2]/@name</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="path071" covers-40="PR2049">
+      <description>Partial function application not supplying options</description>
+      <created by="Michael Kay" on="2026-10-25"/>
+      <environment ref="pathdata"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $f := (//*:test-case[1]/@name) ! fn:path(options := ?)
+         return //*:test-case[2]/@name ! $f({"lexical": true()})</test>
+      <result>
+         <all-of>
+            <assert-string-value>/test-set[1]/test-case[1]/@name</assert-string-value>
+            <assert-type>xs:string</assert-type>
+         </all-of>
+      </result>
    </test-case>
    
    <test-case name="path100" covers-40="PR2149">
