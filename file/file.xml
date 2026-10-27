@@ -584,6 +584,25 @@
     </result>
   </test-case>
 
+  <test-case name="EXPath-file-append3-010" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:append("test.txt", "a", { "method": "text", "byte-order-mark": true() }),
+        file:append("test.txt", "b", { "method": "text", "byte-order-mark": true() })
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test.txt")) eq
+          xs:hexBinary("EFBBBF6162")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
   <test-case name="EXPath-file-appendText2-001">
     <description>Use file:append-text with two arguments</description>
     <created by="Michael Kay" on="2012-06-11"/>
@@ -709,13 +728,14 @@
     </result>
   </test-case>
 
-  <test-case name="EXPath-file-appendText3-002">
+  <test-case name="EXPath-file-appendText3-002" covers-40="PR3002">
     <description>Use file:append-text with three arguments: UTF-16 encoding</description>
     <created by="Michael Kay" on="2012-06-11"/>
     <modified by="Christian Gruen" on="2013-11-20" change="Alternative without BOM added"/>
     <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
     <modified by="Michael Kay" on="2021-08-30" change="Alternative little-endian result with a single BOM"/>
     <modified by="Michael Kay" on="2021-08-30" change="Alternative big-endian result with no BOM"/>
+    <modified by="Christian Gruen" on="2026-10-27" change="PR3002"/>
     <environment ref="EXPath-file"/>
     <test>
         file:delete("test3.txt"), 
@@ -728,7 +748,7 @@
         <assert-empty/>
         <any-of>
           <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test3.txt")) eq
-                  xs:hexBinary("FEFF0061FEFF0062FEFF0063")</assert>
+                  xs:hexBinary("FEFF006100620063")</assert>
           <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test3.txt")) eq
             xs:hexBinary("FFFE610062006300")</assert>
           <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test3.txt")) eq
@@ -877,6 +897,41 @@
       </test>
     <result>
       <error code="Q{http://expath.org/ns/file}unknown-encoding"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-appendTextLines3-010" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("atl.txt"),
+        file:append-text-lines("atl.txt", ("a", "b"), "UTF-16"),
+        file:append-text-lines("atl.txt", "c", "UTF-16")
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>deep-equal(Q{http://expath.org/ns/file}read-text-lines("atl.txt", "UTF-16"),
+          ("a", "b", "c"))</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-appendTextLines3-011" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("atl.txt"),
+        file:append-text-lines("atl.txt", lines := ("x", "y"))
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>deep-equal(Q{http://expath.org/ns/file}read-text-lines("atl.txt"), ("x", "y"))</assert>
+      </all-of>
     </result>
   </test-case>
 
@@ -1135,6 +1190,64 @@
     </test>
     <result>
       <error code="Q{http://expath.org/ns/file}cyclic"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-copy-010" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dirsource", true()),
+      file:create-dir("dirsource"),
+      file:append-text("dirsource/london.txt", "london"),
+      file:copy("dirsource/london.txt", "dirsource")
+    </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("dirsource/london.txt") eq "london"</assert>
+        <assert>count(Q{http://expath.org/ns/file}list("dirsource", true())) eq 1</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-copy-011" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dirparent", true()),
+      file:create-dir("dirparent/dirsource"),
+      file:append-text("dirparent/dirsource/london.txt", "london"),
+      file:copy("dirparent/dirsource", "dirparent")
+    </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("dirparent/dirsource/london.txt") eq "london"</assert>
+        <assert>count(Q{http://expath.org/ns/file}list("dirparent", true())) eq 2</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-copy-012" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dirsource", true()),
+      file:delete("dirnew", true()),
+      file:create-dir("dirsource"),
+      file:append-text("dirsource/london.txt", "london"),
+      file:copy("dirsource", "dirnew/sub/dircopy")
+    </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("dirnew/sub/dircopy/london.txt") eq "london"</assert>
+        <assert>Q{http://expath.org/ns/file}exists("dirsource/london.txt")</assert>
+      </all-of>
     </result>
   </test-case>
 
@@ -2131,6 +2244,64 @@
     </test>
     <result>
       <error code="Q{http://expath.org/ns/file}cyclic"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-move-010" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dirsource", true()),
+      file:create-dir("dirsource"),
+      file:append-text("dirsource/london.txt", "london"),
+      file:move("dirsource/london.txt", "dirsource")
+    </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("dirsource/london.txt") eq "london"</assert>
+        <assert>count(Q{http://expath.org/ns/file}list("dirsource", true())) eq 1</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-move-011" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dirparent", true()),
+      file:create-dir("dirparent/dirsource"),
+      file:append-text("dirparent/dirsource/london.txt", "london"),
+      file:move("dirparent/dirsource", "dirparent")
+    </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("dirparent/dirsource/london.txt") eq "london"</assert>
+        <assert>count(Q{http://expath.org/ns/file}list("dirparent", true())) eq 2</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-move-012" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dirsource", true()),
+      file:delete("dirnew", true()),
+      file:create-dir("dirsource"),
+      file:append-text("dirsource/london.txt", "london"),
+      file:move("dirsource", "dirnew/sub/dirmoved")
+    </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("dirnew/sub/dirmoved/london.txt") eq "london"</assert>
+        <assert>not(Q{http://expath.org/ns/file}exists("dirsource"))</assert>
+      </all-of>
     </result>
   </test-case>
 
@@ -3311,6 +3482,22 @@
     </result>
   </test-case>
 
+  <test-case name="EXPath-file-writeTextLines3-010" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:write-text-lines("wtl.txt", lines := ("x", "y"))
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>deep-equal(Q{http://expath.org/ns/file}read-text-lines("wtl.txt"), ("x", "y"))</assert>
+      </all-of>
+    </result>
+  </test-case>
+
   <test-case name="EXPath-file-writeBinary2-001">
     <description>Use file:write-binary with two arguments</description>
     <created by="Michael Kay" on="2012-06-11"/>
@@ -3479,6 +3666,43 @@
     </result>
   </test-case>
 
+  <test-case name="EXPath-file-writeBinary3-010" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"),
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("05")), 0)
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test.bin")) eq
+          xs:hexBinary("0501020304")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeBinary3-011" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.bin"),
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("05")), ())
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test.bin")) eq
+          xs:hexBinary("05")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
   <test-case name="EXPath-file-name1-001">
     <description>Use file:name on a text file</description>
     <created by="John Lumley" on="2013-12-02"/>
@@ -3562,6 +3786,18 @@
       </test>
     <result>
       <assert-eq>""</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-name1-010" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:name("file:///tmp/my%20file.txt")
+      </test>
+    <result>
+      <assert-eq>"my file.txt"</assert-eq>
     </result>
   </test-case>
 
@@ -4228,6 +4464,75 @@
       </test>
     <result>
       <error code="Q{http://expath.org/ns/file}is-relative"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-resolvePath-010" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:resolve-path("missing/")
+      </test>
+    <result>
+      <any-of>
+        <assert>matches($result, "^/.*/missing/$")</assert>
+        <assert>matches($result, "^[A-Za-z]:\\.*sandpit\\missing\\$")</assert>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-resolvePath-011" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:resolve-path("dir5/./../missing/../test.txt") eq file:resolve-path("test.txt")
+      </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-resolvePath-012" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:resolve-path(file:resolve-path("dir5/") || "../test.txt") eq
+          file:resolve-path("test.txt")
+      </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-resolvePath-013" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        let $dir := file:resolve-path("dir5/")
+        let $base := substring($dir, 1, string-length($dir) - 1)
+        return file:resolve-path("test.txt", $base) eq file:resolve-path("test.txt")
+      </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-resolvePath-014" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:resolve-path("test.txt", file:resolve-path("missing/")) eq
+          file:resolve-path("missing/test.txt")
+      </test>
+    <result>
+      <assert-true/>
     </result>
   </test-case>
 
