@@ -26,16 +26,17 @@
       </result>
    </test-case>
    
-   <test-case name="recordTypeDecl-002">
+   <test-case name="recordTypeDecl-002" covers-40="PR2979">
       <description>local record type, used in instance of with occurrence indicator</description>
       <created by="Michael Kay" on="2026-07-06"/>
+      <modified by="Christian Gruen" on="2026-10-27" change="PR2979"/>
       <test><![CDATA[
          declare record local:R ('first name', "last name");
       	let $r as local:R* := ({'first name':1, 'last name':2}, {'first name':11, 'last name':22})
       	return $r instance of local:R+
       ]]></test>
       <result>
-         <assert-true/>
+         <error code="XPST0003"/>
       </result>
    </test-case>
    
@@ -289,42 +290,45 @@
       </result>
    </test-case>
    
-   <test-case name="recordTypeDecl-023" covers-40="PR1908">
+   <test-case name="recordTypeDecl-023" covers-40="PR1908 PR2979">
       <description>Field name supplied as string literal</description>
       <created by="Michael Kay" on="2026-06-30"/>
+      <modified by="Christian Gruen" on="2026-10-27" change="PR2979"/>
       <test><![CDATA[
          declare record complex ("real-part" as xs:double, "imag part" as xs:double);
          let $v as complex := {"real-part": 0, "imag part": 1}
       	return `{$v?real-part} + {$v?'imag part'}i`
       ]]></test>
       <result>
-         <assert-eq>"0 + 1i"</assert-eq>
+         <error code="XPST0003"/>
       </result>
    </test-case>
    
-   <test-case name="recordTypeDecl-024" covers-40="PR1908">
+   <test-case name="recordTypeDecl-024" covers-40="PR1908 PR2979">
       <description>Field name supplied as string literal; constructor function</description>
       <created by="Michael Kay" on="2026-06-30"/>
+      <modified by="Christian Gruen" on="2026-10-27" change="PR2979"/>
       <test><![CDATA[
          declare record complex ("real-part" as xs:double, "imag part" as xs:double);
          let $v := complex(0, 1)
       	return `{$v?real-part} + {$v?'imag part'}i`
       ]]></test>
       <result>
-         <assert-eq>"0 + 1i"</assert-eq>
+         <error code="XPST0003"/>
       </result>
    </test-case>
    
-   <test-case name="recordTypeDecl-025" covers-40="PR1908">
+   <test-case name="recordTypeDecl-025" covers-40="PR1908 PR2979">
       <description>Field name supplied as string literal; constructor function</description>
       <created by="Michael Kay" on="2026-06-30"/>
+      <modified by="Christian Gruen" on="2026-10-27" change="PR2979"/>
       <test><![CDATA[
          declare record complex ("real part" as xs:double, i as xs:double?);
          let $v := complex(0, i:=1)
       	return `{$v?"real part"} + {$v?i}i`
       ]]></test>
       <result>
-         <assert-eq>"0 + 1i"</assert-eq>
+         <error code="XPST0003"/>
       </result>
    </test-case>
    
@@ -591,9 +595,10 @@
       </result>
    </test-case>
    
-   <test-case name="recordTypeDecl-042" covers-40="PR1908">
+   <test-case name="recordTypeDecl-042" covers-40="PR1908 PR2979">
       <description>Forward reference in JNode type</description>
       <created by="Michael Kay" on="2026-06-30"/>
+      <modified by="Christian Gruen" on="2026-10-27" change="PR2979"/>
       <test><![CDATA[
          declare function local:f() as jnode(*, record(a as local:integer+, b as local:boolean+))* {
              [{'a': local:integer(32), 'b': local:boolean(true())}, 
@@ -607,8 +612,7 @@
       	local:f()?a
       ]]></test>
       <result>
-         <error code="XPTY0004"/> 
-         <!-- A JNode wrapping a map cannot be coerced to a JNode type expecting a record -->
+         <assert-deep-eq>{ 'v': 32 }, { 'v': 23 }</assert-deep-eq>
       </result>
    </test-case>
    
@@ -1484,6 +1488,129 @@
       ]]></test>
       <result>
          <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-110" covers-40="PR2979">
+      <description>Labeled and simple record types</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <test><![CDATA[
+         declare %constructor record local:point(x, y);
+         1
+      ]]></test>
+      <result>
+         <error code="XQST0045"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-111" covers-40="PR2979">
+      <description>Labeled and simple record types</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <test><![CDATA[
+         declare %private record local:point(x, y := 0);
+         local:point(1)?y
+      ]]></test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-112" covers-40="PR2979">
+      <description>Labeled and simple record types</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <test><![CDATA[
+         declare type local:point as record(x, y);
+         { 'x': 1, 'y': 2 } instance of local:point
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-113" covers-40="PR2979">
+      <description>Labeled and simple record types</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <test><![CDATA[
+         declare record local:point(x, y);
+         { 'x': 1, 'y': 2 } instance of local:point
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-114" covers-40="PR2979">
+      <description>Labeled and simple record types</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <test><![CDATA[
+         declare record local:point(x, y);
+         local:point(1, 2) instance of record(x, y)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-115" covers-40="PR2979">
+      <description>Labeled and simple record types</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <test><![CDATA[
+         declare record local:point(x as xs:integer, y as xs:integer);
+         local:point(1, 2) instance of record(x as xs:decimal, y as xs:decimal)
+      ]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-116" covers-40="PR2979">
+      <description>Labeled and simple record types</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <test><![CDATA[
+         declare record local:point(x, y);
+         local:point(1, 2) instance of record(x)
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-117" covers-40="PR2979">
+      <description>Labeled and simple record types</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <test><![CDATA[
+         declare record local:a(x);
+         declare record local:b(x);
+         local:a(1) instance of local:b
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-118" covers-40="PR2979">
+      <description>Labeled and simple record types</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <test><![CDATA[
+         declare record local:point(y, x);
+         let $p as local:point := { 'x': 1, 'y': 2 }
+         return map:keys($p)
+      ]]></test>
+      <result>
+         <assert-deep-eq>'y', 'x'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-119" covers-40="PR2979">
+      <description>Labeled and simple record types</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <test><![CDATA[
+         declare record local:point(x, y);
+         let $p as local:point := { 'x': 1, 'y': 2 }
+         return $p instance of record(*)
+      ]]></test>
+      <result>
+         <assert-true/>
       </result>
    </test-case>
    
