@@ -149,6 +149,23 @@
       </result>
    </test-case>
    
+   <test-case name="parse-qname-101">
+      <description>Function item parse-QName#1: static context captured in the function item</description>
+      <created by="Michael Kay" on="2026-10-27"/>
+		<dependency type="spec" value="XP40+ XQ40+"/>
+		<test>
+			declare namespace X = 'urn:x';
+			let $module := load-xquery-module('urn:x', {
+								  'content': 'module namespace x = "urn:x"; declare variable $x:qqq := fn:parse-QName#1;'
+								  })
+         return $module?variables?#X:qqq('x:xxx')
+                    ! (fn:prefix-from-QName(.), fn:namespace-uri-from-QName(.), fn:local-name-from-QName(.))
+      </test>
+   	<result>
+   		<assert-deep-eq>"x", "urn:x", "xxx"</assert-deep-eq>
+   	</result>
+   </test-case>
+   
    <test-case name="parse-qname-901">
       <description>prefix:local format: undeclared prefix</description>
       <created by="Michael Kay" on="2022-10-13"/>
