@@ -1646,19 +1646,57 @@
       <description>English BC/AD</description>
       <created by="Michael Kay, Saxonica" on="2011-07-01"/>
       <modified by="Christian Gruen" on="2026-10-10" change="-0055 is 56 BC: XSD 1.1 has a year zero, the AD calendar has none"/>
+      <modified by="Michael Kay" on="2026-10-27" change="default calendar is implementation-defined, so split the test"/>
       <environment>
          <param name="d1" as="xs:date" select="xs:date('1990-12-01')"/>
-         <param name="d2" as="xs:date" select="xs:date('-0055-12-01')"/>
       </environment>
       <dependency type="language" value="en"/>
       <dependency type="limits" value="year_lt_0"/>
-      <test> format-date($d1, '[Y][EN]', 'en', (), ()), format-date($d2, '[Y][EN]', 'en', (), ()) </test>
+      <test> format-date($d1, '[Y][EN]', 'en', (), ()) </test>
       <result>
          <any-of>
-            <assert-deep-eq>"1990AD", "56BC"</assert-deep-eq>
-            <assert-deep-eq>"1990CE", "56BCE"</assert-deep-eq>
-            <assert-deep-eq>"1990A.D.", "56B.C."</assert-deep-eq>
-            <assert-deep-eq>"1990C.E.", "56B.C.E."</assert-deep-eq>
+            <assert-deep-eq>"1990AD"</assert-deep-eq>
+            <assert-deep-eq>"1990CE"</assert-deep-eq>
+            <assert-deep-eq>"1990A.D."</assert-deep-eq>
+            <assert-deep-eq>"1990C.E."</assert-deep-eq>
+         </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="format-date-en142">
+      <description>BC dates with AD calendar (fork of -en141)</description>
+      <created by="Michael Kay, Saxonica" on="2026-10-27"/>
+      <environment>
+         <param name="d1" as="xs:date" select="xs:date('-0055-12-01')"/>
+      </environment>
+      <dependency type="language" value="en"/>
+      <dependency type="limits" value="year_lt_0"/>
+      <test> format-date($d1, '[Y][EN]', 'en', 'AD', ()) </test>
+      <result>
+         <any-of>
+            <assert-deep-eq>"56BC"</assert-deep-eq>
+            <assert-deep-eq>"56BCE"</assert-deep-eq>
+            <assert-deep-eq>"56B.C."</assert-deep-eq>
+            <assert-deep-eq>"56B.C.E."</assert-deep-eq>
+         </any-of>
+      </result>
+   </test-case>
+   
+   <test-case name="format-date-en143">
+      <description>BC dates with ISO calendar (fork of -en141)</description>
+      <created by="Michael Kay, Saxonica" on="2026-10-27"/>
+      <environment>
+         <param name="d1" as="xs:date" select="xs:date('-0055-12-01')"/>
+      </environment>
+      <dependency type="language" value="en"/>
+      <dependency type="limits" value="year_lt_0"/>
+      <test> format-date($d1, '[Y][EN]', 'en', 'ISO', ()) </test>
+      <result>
+         <any-of>
+            <assert-deep-eq>"55BC"</assert-deep-eq>
+            <assert-deep-eq>"55BCE"</assert-deep-eq>
+            <assert-deep-eq>"55B.C."</assert-deep-eq>
+            <assert-deep-eq>"55B.C.E."</assert-deep-eq>
          </any-of>
       </result>
    </test-case>
