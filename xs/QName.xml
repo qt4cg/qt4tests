@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="xs-QName">
+   <description>Tests xs:QName constructor function</description>
+
+   <test-case name="xs-QName-001">
+      <description>Static call of xs:QName#1.</description>
+      <created by="Michael Kay" on="2026-10-27"/>
+      <test>xs:QName("x") ! [fn:prefix-from-QName(.), fn:namespace-uri-from-QName(.), fn:local-name-from-QName(.)]</test>
+   	<result>
+   		<assert-deep-eq>[(), "", "x"]</assert-deep-eq>
+   	</result>
+   </test-case>
+	
+	<test-case name="xs-QName-002">
+      <description>Static call of xs:qname#1.</description>
+      <created by="Michael Kay" on="2026-10-27"/>
+		<dependency type="spec" value="XQ31+ XP40+"/>
+      <test>
+      	declare namespace p = "http://www.example.ns/001";
+      	xs:QName("p:x") ! [fn:prefix-from-QName(.), fn:namespace-uri-from-QName(.), fn:local-name-from-QName(.)]</test>
+   	<result>
+   		<assert-deep-eq>["p", "http://www.example.ns/001", "x"]</assert-deep-eq>
+   	</result>
+   </test-case>
+	
+	<test-case name="xs-QName-003">
+      <description>Static call of xs:qname#0.</description>
+      <created by="Michael Kay" on="2026-10-27"/>
+		<dependency type="spec" value="XP40+ XQ40+"/>
+		<test>"x" ! xs:QName() ! [fn:prefix-from-QName(.), fn:namespace-uri-from-QName(.), fn:local-name-from-QName(.)]</test>
+   	<result>
+   		<assert-deep-eq>[(), "", "x"]</assert-deep-eq>
+   	</result>
+   </test-case>
+	
+	<test-case name="xs-QName-004">
+      <description>Static call of xs:qname#0.</description>
+      <created by="Michael Kay" on="2026-10-27"/>
+		<dependency type="spec" value="XP40+ XQ40+"/>
+		<test>
+			declare namespace p = "http://www.example.ns/001";
+			"p:x" ! xs:QName() ! [fn:prefix-from-QName(.), fn:namespace-uri-from-QName(.), fn:local-name-from-QName(.)]</test>
+   	<result>
+   		<assert-deep-eq>["p", "http://www.example.ns/001", "x"]</assert-deep-eq>
+   	</result>
+   </test-case>
+	
+	<test-case name="xs-QName-005">
+      <description>Function item xs:qname#1: static context captured in the function item</description>
+      <created by="Michael Kay" on="2026-10-27"/>
+		<dependency type="spec" value="XP40+ XQ40+"/>
+		<test>
+			declare namespace X = 'urn:x';
+			declare namespace x = 'urn:decoy';
+			let $module := load-xquery-module('urn:x', {
+								  'content': 'module namespace x = "urn:x"; declare variable $x:qqq := xs:QName#1;'
+								  })
+         return $module?variables?#X:qqq('x:xxx')
+                    ! [fn:prefix-from-QName(.), fn:namespace-uri-from-QName(.), fn:local-name-from-QName(.)]
+      </test>
+   	<result>
+   		<assert-deep-eq>["x", "urn:x", "xxx"]</assert-deep-eq>
+   	</result>
+   </test-case>
+
+</test-set>
