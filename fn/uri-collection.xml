@@ -6,10 +6,36 @@
    <link type="spec" document="FuncOps" section-number="14.8.4" idref="func-uri-collection"/>
    <dependency type="spec" value="XP30+ XQ30+"/>
 
+   <environment name="simple-collection-1">
+      <collection uri="http://www.w3.org/2010/09/qt-fots-catalog/collection1">
+         <source file="../docs/bib.xml">
+            <description>Data for the the XML Query XMP use cases</description>
+            <created by="XQuery WG" on="2005-02-11"/>
+         </source>
+         <source file="../docs/reviews.xml">
+            <description>Data for the the XML Query XMP use cases</description>
+            <created by="XQuery WG" on="2005-02-11"/>
+         </source>
+      </collection>
+      <static-base-uri uri="http://www.w3.org/2010/09/qt-fots-catalog/"/>
+   </environment>
+
    <test-case name="fn-uri-collection-1">
       <description> Evaluation of an fn:uri-collection function with wrong arity.  Inspired by fn-collection-1. </description>
       <created by="Josh Spiegel" on="2012-10-02"/>
+      <modified by="Christian Gruen" on="2026-10-27" change="PR2918"/>
+      <dependency type="spec" value="XP30 XP31 XQ30 XQ31"/>
       <test>fn:uri-collection("argument1","argument2")</test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-uri-collection-1a" covers-40="PR2918">
+      <description>Evaluation of uri-collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:uri-collection("argument1", {}, "argument3")</test>
       <result>
          <error code="XPST0017"/>
       </result>
@@ -78,6 +104,63 @@
       <test>uri-collection(())</test>
       <result>
          <error code="FODC0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="uri-collection-010" covers-40="PR2918">
+      <description>Evaluation of uri-collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>uri-collection((), {})</test>
+      <result>
+         <error code="FODC0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="uri-collection-011" covers-40="PR2918">
+      <description>Evaluation of uri-collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="simple-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>uri-collection(xs:anyURI("collection1"), ())</test>
+      <result>
+         <all-of>
+            <assert>count($result) = 2</assert>
+            <assert-type>xs:anyURI*</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="uri-collection-012" covers-40="PR2918">
+      <description>Evaluation of uri-collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="simple-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>uri-collection("collection1", { "match": "BIB\.XML$", "match-flags": "i" }) ! ends-with(., "bib.xml")</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="uri-collection-013" covers-40="PR2918">
+      <description>Evaluation of uri-collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="simple-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>uri-collection("collection1", { "match": "[" })</test>
+      <result>
+         <error code="FORX0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="uri-collection-014" covers-40="PR2918">
+      <description>Evaluation of uri-collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="simple-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>uri-collection("collection1", { "recursive": "yes" })</test>
+      <result>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
 

@@ -90,7 +90,19 @@
    <test-case name="fn-collection-1">
       <description> Evaluation of an fn:collection function with wrong arity. </description>
       <created by="Carmelo Montanez" on="2005-12-02"/>
+      <modified by="Christian Gruen" on="2026-10-27" change="PR2918"/>
+      <dependency type="spec" value="XP20 XP30 XP31 XQ10 XQ30 XQ31"/>
       <test>fn:collection("argument1","argument2")</test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-collection-1a" covers-40="PR2918">
+      <description>Evaluation of collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>fn:collection("argument1", {}, "argument3")</test>
       <result>
          <error code="XPST0017"/>
       </result>
@@ -457,6 +469,136 @@
          </any-of>
       </result>
    </test-case>
+
+   <test-case name="collection-020" covers-40="PR2918">
+      <description>Evaluation of collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="simple-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>collection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", {})</test>
+      <result>
+         <any-of>
+            <all-of>
+               <assert>count($result) = 2</assert>
+               <assert-type>document-node()*</assert-type>
+            </all-of>
+            <error code="FODC0003"/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="collection-021" covers-40="PR2918">
+      <description>Evaluation of collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="simple-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>collection(xs:anyURI("http://www.w3.org/2010/09/qt-fots-catalog/collection1"), ())</test>
+      <result>
+         <any-of>
+            <all-of>
+               <assert>count($result) = 2</assert>
+               <assert-type>document-node()*</assert-type>
+            </all-of>
+            <error code="FODC0003"/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="collection-022" covers-40="PR2918">
+      <description>Evaluation of collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="default-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <dependency type="feature" value="non_empty_sequence_collection"/>
+      <test>collection((), {})</test>
+      <result>
+         <all-of>
+            <assert>count($result) = 2</assert>
+            <assert-type>document-node()*</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="collection-023" covers-40="PR2918">
+      <description>Evaluation of collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="simple-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         collection("collection1", { "stable": true() }) |
+         collection("collection1", { "stable": true() })
+      </test>
+      <result>
+         <any-of>
+            <all-of>
+               <assert>count($result) = 2</assert>
+               <assert-type>document-node()*</assert-type>
+            </all-of>
+            <error code="FODC0003"/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="collection-024" covers-40="PR2918">
+      <description>Evaluation of collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="simple-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <dependency type="feature" value="non_empty_sequence_collection"/>
+      <test>collection("collection1", { "match": "bib\.xml$" }) ! local-name(*)</test>
+      <result>
+         <assert-eq>"bib"</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="collection-025" covers-40="PR2918">
+      <description>Evaluation of collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="simple-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <dependency type="feature" value="non_empty_sequence_collection"/>
+      <test>collection("collection1", { "match": "REVIEWS\.XML$", "match-flags": "i" }) ! local-name(*)</test>
+      <result>
+         <assert-eq>"reviews"</assert-eq>
+      </result>
+   </test-case>
+   <test-case name="collection-026" covers-40="PR2918">
+      <description>Evaluation of collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="simple-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <dependency type="feature" value="non_empty_sequence_collection"/>
+      <test>collection("collection1", { "match": "REVIEWS\.XML$" })</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   <test-case name="collection-027" covers-40="PR2918">
+      <description>Evaluation of collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="simple-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>collection("collection1", { "match": "[" })</test>
+      <result>
+         <error code="FORX0002"/>
+      </result>
+   </test-case>
+   <test-case name="collection-028" covers-40="PR2918">
+      <description>Evaluation of collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="simple-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>collection("collection1", { "stable": "maybe" })</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="collection-029" covers-40="PR2918">
+      <description>Evaluation of collection function.</description>
+      <created by="Christian Gruen" on="2026-10-27"/>
+      <environment ref="simple-collection-1"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>collection("collection1", "options")</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
    <test-case name="collection-900" covers-30="fn-collection">
       <description>Unknown collection URI</description>
       <created by="Michael Kay" on="2010-12-21"/>
