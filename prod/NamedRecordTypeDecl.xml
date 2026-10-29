@@ -1614,7 +1614,144 @@
       </result>
    </test-case>
    
- 
+   <test-case name="recordTypeDecl-120" covers-40="PR2979">
+      <description>Labeled record types in different modules are different types</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <test><![CDATA[
+         declare namespace lib='http://www.example.com/test/recordTypeDecl';
+         declare %private record lib:point(x as xs:integer, y as xs:integer);
+         let $src := 
+             "module namespace lib='http://www.example.com/test/recordTypeDecl';
+              declare %private record lib:point(x as xs:integer, y as xs:integer);
+              declare %public variable $lib:origin := lib:point(0, 0);"
+         let $module := load-xquery-module('http://www.example.com/test/recordTypeDecl', {'content':$src})
+         let $origin := $module?variables?#lib:origin
+         return $origin instance of lib:point
+      ]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-121" covers-40="PR2979">
+      <description>Static method</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <test><![CDATA[
+         declare record local:rectangle(x, y, %static area := fn{?x * ?y});
+         local:rectangle(4, 5) =?> area()
+      ]]></test>
+      <result>
+         <assert-eq>20</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-122" covers-40="PR2979">
+      <description>Static field not settable using constructor</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <test><![CDATA[
+         declare record local:rectangle(x, y, %static area := fn{?x * ?y});
+         local:rectangle(4, 5, fn{?x * ?y}) =?> area()
+      ]]></test>
+      <result>
+         <error code="XXXX9999"/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-123" covers-40="PR2979">
+      <description>Static field not settable using constructor</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <test><![CDATA[
+         declare record local:rectangle(x := 0, y := 0, %static area := fn{?x * ?y});
+         local:rectangle(area := fn{?x * ?y}) =?> area()
+      ]]></test>
+      <result>
+         <error code="XXXX9999"/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-124" covers-40="PR2979">
+      <description>Coercion applies default values</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <test><![CDATA[
+         declare record local:point(x, y, z := 17);
+         let $result as local:point := {3, 4}
+         return $result?z
+      ]]></test>
+      <result>
+         <assert-eq>17</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-125" covers-40="PR2979">
+      <description>Coercion cannot set static fields</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <test><![CDATA[
+         declare record local:point(x, y, %static z := 17);
+         let $result as local:point := {3, 4, 93}
+         return $result?z
+      ]]></test>
+      <result>
+         <error code="XXXX9999"/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-126" covers-40="PR2979">
+      <description>Default value can be variable</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <test><![CDATA[
+         declare record local:point(x, y, z := current-date());
+         let $result as local:point := {3, 4}
+         return $result?z
+      ]]></test>
+      <result>
+         <assert>matches(string(.), '^2...-'</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-126" covers-40="PR2979">
+      <description>Default value can be variable</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <test><![CDATA[
+         declare record local:point(x, y, z := current-date());
+         let $result as local:point := {3, 4}
+         return $result?z
+      ]]></test>
+      <result>
+         <assert>matches(string(.), '^2...-'</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-126" covers-40="PR2979">
+      <description>Default value can be variable</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <environment>
+         <param name="z" select="101" declared="true"/>
+      </environment>
+      <test><![CDATA[
+         declare variable $z external;
+         declare record local:point(x, y, z := $z);
+         let $result as local:point := {3, 4}
+         return $result?z
+      ]]></test>
+      <result>
+         <assert-eq>101</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-127" covers-40="PR2979">
+      <description>Default value cannot depend on focus</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <test><![CDATA[
+         declare context item as xs:integer := 101;
+         declare record local:point(x, y, z := .);
+         let $result as local:point := {3, 4}
+         return $result?z
+      ]]></test>
+      <result>
+         <error code="XPDY0002"/>
+      </result>
+   </test-case>
+   
    
  
 

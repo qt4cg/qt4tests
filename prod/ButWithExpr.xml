@@ -162,6 +162,37 @@
          <assert-true/>
       </result>
    </test-case>
+   
+   <test-case name="butWith-015">
+      <description>Applied to user-defined record type</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record local:point(x, y);
+         local-point(3, 4) but with {'y':5}
+      </test>
+      <result>
+         <all-of>
+            <assert-deep-eq>{'x':3, 'y':5}</assert-deep-eq>
+            <assert-type>record(*)</assert-type>
+      </result>
+   </test-case>
+   
+   
+   
+   
+   
+   <test-case name="recordTypeDecl-123" covers-40="PR2979">
+      <description>Static field not settable using constructor</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <test><![CDATA[
+         declare record local:rectangle(x := 0, y := 0, %static area := fn{?x * ?y});
+         local:rectangle(area := fn{?x * ?y}) =?> area()
+      ]]></test>
+      <result>
+         <error code="XXXX9999"/>
+      </result>
+   </test-case>
 
    <test-case name="butWith-901">
       <description>Field name not in record definition</description>
@@ -259,6 +290,19 @@
       <test>parts-of-dateTime(xs:date('2026-09-13')) but with { 'year': 2027 }?year</test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="butWith-912">
+      <description>Disallow update of static fields</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record local:rectangle(x, y, %static area := fn{?x * ?y});
+         local-point(3, 4) but with {'area': fn{?x + ?y}}
+      </test>
+      <result>
+         <error code="XXXX9999"/>
       </result>
    </test-case>
 
