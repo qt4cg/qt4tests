@@ -1,4 +1,4 @@
-(: Name: module1.xq :)
+(: Name: module2.xq :)
 (: Description: A library declaring public and private item type aliases. :)
 (: Author: Michael Kay :)
 (: Date: 2026-06-30 :)
