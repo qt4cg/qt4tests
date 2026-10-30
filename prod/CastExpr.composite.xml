@@ -628,6 +628,21 @@
          </all-of>
       </result>
    </test-case>
+   
+   <test-case name="cast-record-009">
+      <description>Casting a map to a labeled record type with a default value defined</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record coord (x as xs:integer, y as xs:integer := 17);
+         {"x": 1} cast as coord</test>
+      <result>
+         <all-of>
+            <assert-deep-eq>{"x": 1, "y": 17}</assert-deep-eq>
+            <assert-type>record(x as xs:integer, y as xs:integer)</assert-type>
+         </all-of>
+      </result>
+   </test-case>
 
    <test-case name="cast-record-901" covers-40="PR2855">
       <description>Casting to a wildcard array, map, or record type</description>
@@ -680,6 +695,42 @@
       <test>{'year': 2026, 'month': 9, 'day': 9} cast as fn:dateTime-pseudo-record</test>
       <result>
          <error code="XPST0051"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-907">
+      <description>Casting a map to a labeled record type with an invalid default value defined</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record coord (x as xs:integer, y as xs:integer := "zero");
+         {"x": 1} cast as coord</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-908">
+      <description>Casting a map to a labeled record type: optional fields must come last</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record coord (x as xs:integer, y as xs:integer := 2, z as xs:integer);
+         {"x": 1, "z": 3} cast as coord</test>
+      <result>
+         <error code="XXXX9999"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cast-record-909">
+      <description>Casting a map to a labeled record type: default must not be context-sensitive</description>
+      <created by="Michael Kay" on="2026-10-29"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record coord (x as xs:integer, y as xs:integer := string(.), z as xs:integer);
+         99 ! {"x": 1, "z": 3} cast as coord</test>
+      <result>
+         <error code="XPDY0002"/>
       </result>
    </test-case>
    
