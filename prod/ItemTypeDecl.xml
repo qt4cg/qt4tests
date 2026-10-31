@@ -886,12 +886,13 @@
    <test-case name="itemTypeDecl-058" covers-40="PR2759">
       <description>Constructor function is visible to fn:function-lookup</description>
       <created by="Christian Gruen" on="2026-07-10"/>
+      <modified by="Michael Kay" on="2026-10-30" change="No constructor function generated"/>
       <test><![CDATA[
          declare type local:count as xs:integer;
          function-lookup(xs:QName('local:count'), 1)('42')
       ]]></test>
       <result>
-         <assert-eq>42</assert-eq>
+         <assert-empty/>
       </result>
    </test-case>
 
@@ -908,15 +909,16 @@
    </test-case>
 
    <test-case name="itemTypeDecl-060" covers-40="PR2759">
-      <description>Constructor function, overlapping arity with a user-defined function</description>
+      <description>Type alias, overlapping name with a user-defined function</description>
       <created by="Christian Gruen" on="2026-07-10"/>
+      <modified by="Michael Kay" on="2026-10-30" change="No constructor function generated, therefore no clash"/>
       <test><![CDATA[
          declare type local:foo as xs:integer;
          declare function local:foo($x) { $x };
-         1
+         local:foo(1)
       ]]></test>
       <result>
-         <error code="XQST0034"/>
+         <assert-eq>1</assert-eq>
       </result>
    </test-case>
 
@@ -947,21 +949,23 @@
    <test-case name="itemTypeDecl-063" covers-40="PR2713 PR2759">
       <description>constructor function for an item type in no namespace</description>
       <created by="Christian Gruen" on="2026-07-14"/>
+      <modified by="Michael Kay" on="2026-10-30" change="No constructor function is generated"/>
       <test><![CDATA[
          declare type color as enum('red', 'green', 'blue');
          color('red')
       ]]></test>
       <result>
-         <assert-eq>'red'</assert-eq>
+         <error code="XPST0017"/>
       </result>
    </test-case>
 
    <test-case name="itemTypeDecl-064" covers-40="PR2713 PR2759">
       <description>constructor function in no namespace is found before the default function namespace</description>
       <created by="Christian Gruen" on="2026-07-14"/>
+      <modified by="Michael Kay" on="2026-10-30" change="Use declare record to get a constructor function"/>
       <test><![CDATA[
-         declare type count as xs:integer;
-         count('42')
+         declare record count (value as xs:integer);
+         count(42)?value
       ]]></test>
       <result>
          <assert-eq>42</assert-eq>

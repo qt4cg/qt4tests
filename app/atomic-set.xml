@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="app-AtomicSet">
+   <description>Tests a library of functions for manipulating atomic sets,
+      as featured in the XQuery 4.0 specification
+   </description>
+   
+   <dependency type="spec" value="XQ40+"/>
+
+   <test-case name="atomic-set-001">
+      <description>Constructs an atomic set, test size()</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         set:of((1,3,7,9)) =?> size()
+      </test>
+      <result>
+         <assert-eq>4</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-002">
+      <description>Constructs an atomic set, test values()</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         set:of((1,3,7,9)) =?> values()
+      </test>
+      <result>
+         <assert-permutation>1, 3, 7, 9</assert-permutation>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-003">
+      <description>Constructs an empty atomic set.</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         set:of(()) =?> empty()
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-004">
+      <description>set:contains()</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         let $s := set:of(("a", "b", "c"))
+         return ($s =?> contains("a"), $s =?> contains("z"))
+      </test>
+      <result>
+         <assert-deep-eq>true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-005">
+      <description>set:contains-all()</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         let $s := set:of(("a", "b", "c"))
+         return ($s =?> contains-all(set:of(("a", "c"))), 
+                 $s =?> contains-all(set:of(("a", "z")))
+                )
+      </test>
+      <result>
+         <assert-deep-eq>true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-006">
+      <description>set:add()</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         set:of(("a", "b", "c")) =?> add("d") =?> add("e") =?> size()
+      </test>
+      <result>
+         <assert-deep-eq>5</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-007">
+      <description>set:add()</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         set:of(("a", "b", "c")) =?> add("d") =?> add("c") =?> size()
+      </test>
+      <result>
+         <assert-deep-eq>4</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-008">
+      <description>set:remove()</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         let $s := set:of(("a", "b", "c")) =?> remove("b")
+         return ($s =?> size(), $s =?> contains("a"), $s =?> contains("c"))
+      </test>
+      <result>
+         <assert-deep-eq>2, true(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-009">
+      <description>set:remove()</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         let $s := set:of(("a", "b", "c")) =?> remove("z")
+         return ($s =?> size(), $s =?> contains("a"), $s =?> contains("c"))
+      </test>
+      <result>
+         <assert-deep-eq>3, true(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-010">
+      <description>set:union()</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         let $s := set:of(1 to 5) =?> union(set:of(3 to 7))
+         return ($s =?> size(), $s =?> contains-all(set:of(1 to 7)))
+      </test>
+      <result>
+         <assert-deep-eq>7, true()</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-011">
+      <description>set:intersect()</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         let $s := set:of(1 to 5) =?> intersect(set:of(3 to 7))
+         return ($s =?> size(), $s =?> contains-all(set:of(3 to 5)))
+      </test>
+      <result>
+         <assert-deep-eq>3, true()</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-012">
+      <description>set:except()</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         let $s := set:of(1 to 10) =?> except(set:of(3 to 7))
+         return ($s =?> size(), $s =?> contains-all(set:of((1, 2, 8, 9, 10))))
+      </test>
+      <result>
+         <assert-deep-eq>5, true()</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-013">
+      <description>Disallows NaN</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         set:of((1, 3, 7, number('NaN'))) =?> size()
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-014">
+      <description>Disallows NaN</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         set:of((1, 3, 7)) =?> add(number('NaN')) =?> size()
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="atomic-set-015">
+      <description>instance of</description>
+      <created by="Michael Kay" on="2026-10-30"/>      
+      <module uri="http://qt4cg.org/atomic-set" file="AtomicSet/atomic-set.xq"/>
+      <test>
+         import module namespace set = "http://qt4cg.org/atomic-set";
+         set:of((1,3,7,9)) instance of set:atomic-set
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+
+   
+</test-set>
