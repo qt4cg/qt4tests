@@ -391,7 +391,7 @@ return try {
         file:delete('examples', true())
       </test>
       <result>
-         <assert-deep-eq>Deletes the file or directory example and
+         <assert-deep-eq>Deletes the file or directory examples and
             all its contents, including files and directories, recursively.</assert-deep-eq>
       </result>
    </test-case>
@@ -404,7 +404,7 @@ return try {
         file:list('.')
       </test>
       <result>
-         <assert-deep-eq>Returns the names of all files in the
+         <assert-deep-eq>Returns the names of all files and directories in the
             .</assert-deep-eq>
       </result>
    </test-case>
@@ -642,6 +642,18 @@ file:write(
       </result>
    </test-case>
 
+   <test-case name="fo-test-file-write-binary-003">
+      <description>Test case for file:write-binary</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-03"/>
+      <environment ref="global"/>
+      <test>
+        file:write-binary('data.bin', xs:hexBinary('45'), 0)
+      </test>
+      <result>
+         <assert-deep-eq>Overwrites the first byte with 0x45.</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-file-write-text-001">
       <description>Test case for file:write-text</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-03"/>
@@ -752,6 +764,18 @@ file:write(
       </result>
    </test-case>
 
+   <test-case name="fo-test-file-name-008">
+      <description>Test case for file:name</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-03"/>
+      <environment ref="global"/>
+      <test>
+        file:name('file:///tmp/my%20file.txt')
+      </test>
+      <result>
+         <assert-deep-eq>'my file.txt'</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="fo-test-file-parent-001">
       <description>Test case for file:parent</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-03"/>
@@ -799,7 +823,7 @@ file:write(
           
       </test>
       <result>
-         <assert-deep-eq>Returns the paths to large videos found in a specific directory.</assert-deep-eq>
+         <assert-deep-eq>Returns the paths to the videos found in a specific directory.</assert-deep-eq>
       </result>
    </test-case>
 
@@ -827,7 +851,7 @@ return $file
           
       </test>
       <result>
-         <assert-deep-eq>Returns the paths to all files that have been modified in the last hour.</assert-deep-eq>
+         <assert-deep-eq>Returns the paths to all files and directories that have been modified in the last hour.</assert-deep-eq>
       </result>
    </test-case>
 
@@ -887,7 +911,7 @@ file:descendants('.', {
       </test>
       <result>
          <assert-deep-eq>Returns / on a UNIX-based system.
-            On a Windows system, the result depends on the current root directory.</assert-deep-eq>
+            On a Windows system, the result depends on the current drive.</assert-deep-eq>
       </result>
    </test-case>
 
@@ -900,7 +924,7 @@ file:descendants('.', {
       </test>
       <result>
          <assert-deep-eq>Returns file:///temp on a UNIX-based system.
-          On a Windows system, the result depends on the current root directory.</assert-deep-eq>
+          On a Windows system, the result depends on the current drive.</assert-deep-eq>
       </result>
    </test-case>
 
@@ -924,7 +948,7 @@ file:descendants('.', {
         file:resolve-path('INF', 'C:/Windows/')
       </test>
       <result>
-         <assert-deep-eq>'C:/Windows/INF/'</assert-deep-eq>
+         <assert-deep-eq>'C:\Windows\INF\'</assert-deep-eq>
       </result>
    </test-case>
 
@@ -936,7 +960,7 @@ file:descendants('.', {
         file:resolve-path('data.bin', 'C:/Temp')
       </test>
       <result>
-         <assert-deep-eq>'C:/data.bin'</assert-deep-eq>
+         <assert-deep-eq>'C:\data.bin'</assert-deep-eq>
       </result>
    </test-case>
 
@@ -948,7 +972,7 @@ file:descendants('.', {
         file:resolve-path('data.bin', 'C:/Temp/')
       </test>
       <result>
-         <assert-deep-eq>'C:/Temp/data.bin'</assert-deep-eq>
+         <assert-deep-eq>'C:\Temp\data.bin'</assert-deep-eq>
       </result>
    </test-case>
 
@@ -957,7 +981,31 @@ file:descendants('.', {
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-03"/>
       <environment ref="global"/>
       <test>
+        file:resolve-path('C:/missing/')
+      </test>
+      <result>
+         <assert-deep-eq>'C:\missing\'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-file-resolve-path-005">
+      <description>Test case for file:resolve-path</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-03"/>
+      <environment ref="global"/>
+      <test>
         file:resolve-path('hilda/notes.txt', '/home/')
+      </test>
+      <result>
+         <assert-deep-eq>'/home/hilda/notes.txt'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-file-resolve-path-006">
+      <description>Test case for file:resolve-path</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-03"/>
+      <environment ref="global"/>
+      <test>
+        file:resolve-path('../hilda/./notes.txt', '/home/sam/')
       </test>
       <result>
          <assert-deep-eq>'/home/hilda/notes.txt'</assert-deep-eq>
@@ -1005,10 +1053,10 @@ file:descendants('.', {
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-03"/>
       <environment ref="global"/>
       <test>
-        file:write-text(file:temp-dir() || 'todos.txt', 'get on going')
+        file:write-text(file:temp-dir() || 'todos.txt', 'get going')
       </test>
       <result>
-         <assert-deep-eq>Write a text string to a file in the temporary-file directory.</assert-deep-eq>
+         <assert-deep-eq>Writes a string to a file in the temporary-file directory.</assert-deep-eq>
       </result>
    </test-case>
 
