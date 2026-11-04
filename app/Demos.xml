@@ -227,4 +227,147 @@
          </all-of>
       </result>
    </test-case>
+
+   <test-case name="calculator">
+      <description>A calculator that tokenizes, parses and evaluates arithmetic expressions.</description>
+      <created by="Christian Gruen" on="2026-11-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test file="Demos/calculator/calculator.xq"/>
+      <result>
+         <assert-deep-eq>
+            '1 + 2 * 3 &#xDF4; (+ 1 (* 2 3)) = 7',
+            '(1 + 2) * 3 &#xDF4; (* (+ 1 2) 3) = 9',
+            '2 ^ 3 ^ 2 &#xDF4; (^ 2 (^ 3 2)) = 512',
+            '10 - 4 - 3 &#xDF4; (- (- 10 4) 3) = 3',
+            '-x + 10 / 4 &#xDF4; (+ (- x) (/ 10 4)) = 0.5',
+            'pi * r ^ 2 &#xDF4; (* pi (^ r 2)) = 12.56636',
+            '0xFF % 7 &#xDF4; (% 255 7) = 3',
+            '17.5 % 4 &#xDF4; (% 17.5 4) = 1.5',
+            '1 / (x - 2) &#xDF4; FOAR0001',
+            'y + 1 &#xDF4; Unknown variable: y',
+            '(1 + 2 &#xDF4; Missing closing parenthesis',
+            '3 $ 4 &#xDF4; Unexpected character: $'
+         </assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="build-order">
+      <description>Compute the build order of modules and report dependency problems.</description>
+      <created by="Christian Gruen" on="2026-11-02"/>
+      <environment>
+         <source role="." file="Demos/build-order/modules.xml">
+            <description>Modules and their dependencies.</description>
+            <created by="Christian Gruen" on="2026-11-02"/>
+         </source>
+      </environment>
+      <dependency type="spec" value="XQ40+"/>
+      <test file="Demos/build-order/build-order.xq"/>
+      <result>
+         <assert-xml file="Demos/build-order/build-order-result.xml"/>
+      </result>
+   </test-case>
+
+   <test-case name="sales-report">
+      <description>Summarize CSV sales data by region and month.</description>
+      <created by="Christian Gruen" on="2026-11-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test file="Demos/sales-report/sales-report.xq"/>
+      <result>
+         <assert-xml file="Demos/sales-report/sales-report-result.xml"/>
+      </result>
+   </test-case>
+
+   <test-case name="json-explorer">
+      <description>Navigate a JSON package lock file with path expressions.</description>
+      <created by="Christian Gruen" on="2026-11-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test file="Demos/json-explorer/json-explorer.xq"/>
+      <result>
+         <assert-deep-eq>
+            'Dependency tree:',
+            '  express 4.19.2',
+            '    body-parser 1.20.2',
+            '      debug 2.6.9',
+            '        ms 2.0.0',
+            '      qs 6.11.0',
+            '    debug 2.6.9',
+            '      ms 2.0.0',
+            '  lodash 4.17.21',
+            '  left-pad 1.3.0',
+            'Licenses:',
+            '  BSD-3-Clause: qs',
+            '  MIT: ansi-styles, body-parser, chalk, debug, express, lodash, ms',
+            '  WTFPL: left-pad',
+            'Dependents of debug:',
+            '  express requires 2.6.9',
+            '  body-parser requires 2.6.9',
+            'Deprecated:',
+            '  left-pad: use String.prototype.padStart()',
+            'Unused:',
+            '  chalk',
+            '  ansi-styles'
+         </assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="life">
+      <description>Run the Game of Life on a torus until a pattern repeats.</description>
+      <created by="Christian Gruen" on="2026-11-02"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test file="Demos/life/life.xq"/>
+      <result>
+         <assert-deep-eq>
+            '.#......',
+            '..#.....',
+            '###.....',
+            '........',
+            '........',
+            '........',
+            '........',
+            '........',
+            'Generation 32 repeats generation 0 (period 32).'
+         </assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="diff-unified">
+      <description>Compute the differences of two texts and render them in the unified diff format.</description>
+      <created by="Christian Gruen" on="2026-11-02"/>
+      <module uri="http://qt4cg.org/demos/diff" location="Demos/diff/diff.xqm" file="Demos/diff/diff.xqm"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test file="Demos/diff/unified.xq"/>
+      <result>
+         <assert-deep-eq>
+            '--- old',
+            '+++ new',
+            '@@ -1,3 +1,3 @@',
+            ' Pancakes for four people',
+            '-Ingredients: flour, milk, eggs, sugar, salt',
+            '+Ingredients: flour, milk, eggs, sugar, salt, butter',
+            ' Mix the flour with the sugar and the salt.',
+            '@@ -5,3 +5,3 @@',
+            ' Combine both mixtures and stir until smooth.',
+            '-Let the batter rest for ten minutes.',
+            '+Let the batter rest for thirty minutes.',
+            ' Heat a pan with a little butter.',
+            '@@ -9,4 +9,4 @@',
+            ' Bake each side until golden.',
+            '-Keep the pancakes warm in the oven.',
+            ' Serve with jam or maple syrup.',
+            '+Sprinkle with powdered sugar.',
+            ' Enjoy your meal!'
+         </assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="diff-markup">
+      <description>Compute the differences of two texts and render them as markup, with word-level changes.</description>
+      <created by="Christian Gruen" on="2026-11-02"/>
+      <module uri="http://qt4cg.org/demos/diff" location="Demos/diff/diff.xqm" file="Demos/diff/diff.xqm"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test file="Demos/diff/markup.xq"/>
+      <result>
+         <assert-xml file="Demos/diff/markup-result.xml"/>
+      </result>
+   </test-case>
 </test-set>

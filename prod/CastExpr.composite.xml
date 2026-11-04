@@ -713,21 +713,23 @@
    <test-case name="cast-record-908">
       <description>Casting a map to a labeled record type: optional fields must come last</description>
       <created by="Michael Kay" on="2026-10-29"/>
+      <modified by="Christian Gruen" on="2026-10-31" change="fixed error code"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
          declare record coord (x as xs:integer, y as xs:integer := 2, z as xs:integer);
          {"x": 1, "z": 3} cast as coord</test>
       <result>
-         <error code="XXXX9999"/>
+         <error code="XQST0148"/>
       </result>
    </test-case>
    
    <test-case name="cast-record-909">
       <description>Casting a map to a labeled record type: default must not be context-sensitive</description>
       <created by="Michael Kay" on="2026-10-29"/>
+      <modified by="Christian Gruen" on="2026-10-31" change="optional field moved to the end (XQST0148)"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
-         declare record coord (x as xs:integer, y as xs:integer := string(.), z as xs:integer);
+         declare record coord (x as xs:integer, z as xs:integer, y as xs:integer := string(.));
          99 ! {"x": 1, "z": 3} cast as coord</test>
       <result>
          <error code="XPDY0002"/>
@@ -737,12 +739,13 @@
    <test-case name="cast-record-910">
       <description>Casting a map to a labeled record type: cannot override a static field</description>
       <created by="Michael Kay" on="2026-10-29"/>
+      <modified by="Christian Gruen" on="2026-10-31" change="fixed error code"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
          declare record coord (x as xs:integer, y as xs:integer, %static z as xs:integer := 25);
          {"x": 1, "y": 2, "z": 3} cast as coord</test>
       <result>
-         <error code="XXXX9999"/>
+         <error code="XPTY0004"/>
       </result>
    </test-case>
    

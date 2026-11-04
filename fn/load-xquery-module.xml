@@ -3292,4 +3292,84 @@ return $module/variables/QName('urn:x', 'v')
     </result>
   </test-case>
 
+  <test-case name="fn-load-xquery-module-940" covers-40="PR1333 PR2934">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-11-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $m1 := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare record x:p(a);
+    declare function x:is($r) { $r instance of x:p };'
+})?functions
+let $m2 := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare record x:p(a);'
+})?functions
+return $m1?(QName('urn:x', 'is'))?1($m2?(QName('urn:x', 'p'))?1(0))
+    </test>
+    <result>
+      <assert-false/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-941" covers-40="PR1333 PR2934">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-11-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $m := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare record x:p(a);
+    declare function x:is($r) { $r instance of x:p };'
+})?functions
+return $m?(QName('urn:x', 'is'))?1($m?(QName('urn:x', 'p'))?1(0))
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-942" covers-40="PR1333 PR2934">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-11-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $m1 := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare record x:p(a);
+    declare function x:take($r as x:p) { $r instance of x:p };'
+})?functions
+let $m2 := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare record x:p(a);'
+})?functions
+return $m1?(QName('urn:x', 'take'))?1($m2?(QName('urn:x', 'p'))?1(0))
+    </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="fn-load-xquery-module-943" covers-40="PR1333 PR2934 PR2979">
+    <description>Loads a module.</description>
+    <created by="Christian Gruen" on="2026-11-02"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test>
+let $m1 := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare record x:p(a, %static s := 1);
+    declare function x:take($r as x:p) { $r?a };'
+})?functions
+let $m2 := load-xquery-module('urn:x', {
+  'content': 'module namespace x = "urn:x";
+    declare record x:p(a, %static s := 1);'
+})?functions
+return $m1?(QName('urn:x', 'take'))?1($m2?(QName('urn:x', 'p'))?1(0))
+    </test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
 </test-set>
