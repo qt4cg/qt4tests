@@ -2445,14 +2445,17 @@ return $run('../docs/bib.xml', fn($uri) { exists(doc($uri)/*/*) })
     <created by="Christian Gruen" on="2026-10-22"/>
     <dependency type="spec" value="XQ40+"/>
     <test><![CDATA[
+let $src := 'module namespace x = "urn:x";
+             declare variable $x:xml external;
+             declare function x:f() { 
+                parse-xml($x:xml, { "trust-external": true() })/a/string() 
+             };'
 let $module := load-xquery-module('urn:x', {
-  'content': 'module namespace x = "urn:x";
-    declare variable $x:xml external;
-    declare function x:f() { parse-xml($x:xml, { "trust-external": true() })/a/string() };',
-  'variables': {
-    QName('urn:x', 'xml'): "<!DOCTYPE a [<!ENTITY foo SYSTEM 'parse-xml/foo.entity'>]><a>&amp;foo;</a>"
-  }
-})
+      'content': $src,
+      'variables': {
+             QName('urn:x', 'xml'): "<!DOCTYPE a [<!ENTITY foo SYSTEM 'parse-xml/foo.entity'>]><a>&amp;foo;</a>"
+      }
+    })
 return $module?functions?(QName('urn:x', 'f'))?0()
     ]]></test>
     <result>

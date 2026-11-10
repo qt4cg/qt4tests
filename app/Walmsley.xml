@@ -10,7 +10,7 @@
       <source role="." file="Walmsley/catalog.xml" uri="http://www.w3.org/2010/09/qt-fots-catalog/Walmsley/catalog.xml"/>
       <source file="Walmsley/render.xsl" uri="http://www.w3.org/2010/09/qt-fots-catalog/Walmsley/render.xsl"/>
       <resource file="Walmsley/product.json" media-type="application/json"
-         uri="http://www.w3.org/2010/09/qt-fots-catalog/Walmsley/product.json"/>
+         uri="httpd1e78807j://www.w3.org/2010/09/qt-fots-catalog/Walmsley/product.json"/>
    </environment>
    <dependency type="spec" value="XQ31+"/>
    <test-case name="d1e11215" covers="fn-sort">
@@ -2935,15 +2935,19 @@ parse-json('{
    <test-case name="d1e78807j" covers="fn-load-xquery-module">
       <description>load-xquery-module complex</description>
       <created by="Priscilla Walmsley" on="2015-07-14"/>
+      <modified by="Michael Kay" on="2026-11-07"
+         change="Dropped the reference to environment ref=all. The environment defines a
+                fictitious static base URI, which made the location hints (supplied as relative URIs)
+                very hard to resolve."/>
       <dependency type="feature" value="higherOrderFunctions"/>
       <dependency type="feature" value="fn-load-xquery-module" satisfied="true"/>
-      <environment ref="all"/>
-      <module uri="http://datypic.com/prod" location="http://www.w3.org/2010/09/qt-fots-catalog/Walmsley/lib2.xqm" file="Walmsley/lib2.xqm"/>
+      <!--<environment ref="all"/>-->
+      <module uri="http://datypic.com/prod" file="Walmsley/lib2.xqm"/>
       <test>
          declare namespace prod = "http://datypic.com/prod";
          let $library := load-xquery-module("http://datypic.com/prod",
-                                             map {"context-item" : doc("catalog.xml")/catalog,
-                                                  "location-hints" : "lib2.xqm",
+                                             map {"context-item" : doc("Walmsley/catalog.xml")/catalog,
+                                                  "location-hints" : "Walmsley/lib2.xqm",
                                                   "variables" : map{xs:QName("prod:label") : "Product Count"}
                                                  })
          let $prodsVariableValue := $library?variables?(xs:QName("prod:prods"))
