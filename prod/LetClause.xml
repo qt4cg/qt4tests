@@ -3035,8 +3035,12 @@
    <test-case name="let-map-016" covers-40="PR2055">
       <description> Deconstruct map. </description>
       <created by="Michael Kay" on="2025-06-29"/>
+      <modified by="Michael Kay" on="2026-11-06" change="Make the map dynamic"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
-      <test>let ${ $x as xs:integer, $y as xs:string, $z as xs:date? }:= {'x':1,'y':'two'} return ($x, $y, $z)</test>
+      <test>
+         let $map := {'x':1,'y':'two', if (current-date() lt xs:date('1900-01-01')) { {'z': 42} } }
+         let ${ $x as xs:integer, $y as xs:string, $z as xs:integer? }:= {'x':1,'y':'two'} 
+         return ($x, $y, $z)</test>
       <result>
          <assert-deep-eq>1, "two"</assert-deep-eq>
       </result>
@@ -3045,8 +3049,12 @@
    <test-case name="let-map-017" covers-40="PR2055">
       <description> Deconstruct map. </description>
       <created by="Michael Kay" on="2025-06-29"/>
+      <modified by="Michael Kay" on="2026-11-06" change="Make the map dynamic"/>
       <dependency type="spec" value="XQ40+ XP40+"/>
-      <test>let ${ $x, $y, $z } as map(xs:string, xs:integer*) := {'x':3, 'y':4, 'z':5} return string-join(($x, $y, $z), '-')</test>
+      <test>
+         let $map := map:build(("x3", "y4", "z5"), substring(?, 1, 1), fn{xs:integer(substring(., 2, 1))})
+         let ${ $x, $y, $z } as map(xs:string, xs:integer*) := $map 
+         return string-join(($x, $y, $z), '-')</test>
       <result>
          <assert-deep-eq>"3-4-5"</assert-deep-eq>
       </result>

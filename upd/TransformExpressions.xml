@@ -7,6 +7,8 @@
 
    <dependency type="feature" value="XQUpdate"/>
 
+   <dependency type="spec" value="XQUF10+"/>
+
    <test-case name="id-transform-expr-001">
       <description>Evaluates a transform expression with modify clause set to empty
                   sequence.</description>
@@ -359,18 +361,41 @@
       <modified by="Michael Kay"
                 on="2021-04-18"
                 change="converted from original XQUTS test id-transform-expr-014"/>
-      <modified by="Christian Gruen" on="2026-09-26" change="updating return clause is allowed"/>
+      <modified by="Christian Gruen" on="2026-11-10" change="restricted to XQUF 1.0, see #506"/>
       <environment>
          <source role="$input-context"
                  file="TestSources/employeesNIST.xml"
                  mutable="true"
                  declared="true"/>
       </environment>
+      <dependency type="spec" value="XQUF10"/>
       <test update="true"><![CDATA[
          declare variable $input-context external; 
          let $var := $input-context/employees[1] 
          return copy $newVar := $var 
                 modify delete node $newVar/employee[1] 
+                return delete node $newVar/employee[2]]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-014a">
+      <description>Evaluates a transform expression where the return expression contains an
+                  updating expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <environment>
+         <source role="$input-context"
+                 file="TestSources/employeesNIST.xml"
+                 mutable="true"
+                 declared="true"/>
+      </environment>
+      <dependency type="spec" value="XQUF30+"/>
+      <test update="true"><![CDATA[
+         declare variable $input-context external;
+         let $var := $input-context/employees[1]
+         return copy $newVar := $var
+                modify delete node $newVar/employee[1]
                 return delete node $newVar/employee[2]]]></test>
       <result>
          <assert-empty/>
@@ -1687,11 +1712,25 @@
       </result>
    </test-case>
    <test-case name="id-transform-expr-065">
-      <description>A text node inserted before a text node that is deleted remains: adjacent text nodes are merged only after all primitives are applied.</description>
+      <description>A text node inserted before a text node that is deleted 
+         remains: adjacent text nodes are merged only after all primitives are applied.
+      </description>
       <created by="Joe Wicentowski" on="2026-09-25"/>
-      <test><![CDATA[copy $c := <a>t<b/></a> modify (insert node 'x' before $c/text(), delete node $c/text()) return $c]]></test>
+      <modified by="Michael Kay" on="2026-11-10" change="
+         This test exposes a conflict between the XQUpdate spec and the XDM data model. XQUpdate says
+         that adjacent text nodes exist transiently, but XDM says that adjacent text nodes cannot exist.
+         Since an implementation cannot conform to both specs, alternative results are provided
+         that conform to one or the other."/>
+      <test><![CDATA[
+         copy $c := <a>t<b/></a> 
+         modify (insert node 'x' before $c/text(), 
+                 delete node $c/text()) 
+         return $c]]></test>
       <result>
-         <assert-xml><![CDATA[<a>x<b/></a>]]></assert-xml>
+         <any-of>
+            <assert-xml><![CDATA[<a>x<b/></a>]]></assert-xml> <!-- reflecting XQUpdate -->
+            <assert-xml><![CDATA[<a>xt<b/></a>]]></assert-xml> <!-- reflecting XDM -->
+         </any-of>
       </result>
    </test-case>
    <test-case name="id-transform-expr-066">

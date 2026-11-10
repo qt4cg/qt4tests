@@ -611,6 +611,12 @@ it put its sooty foot.</fn:non-match></fn:analyze-string-result>]]></assert-xml>
       <test>analyze-string('ab', '((a)|b)+')</test>
       <result>
          <all-of>
+            <assert-xml><![CDATA[
+               <analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions">
+                  <match>
+                     <group nr="2">a</group><group nr="1">b</group>
+                  </match>
+               </analyze-string-result>]]></assert-xml>
             <assert>string($result) = 'ab'</assert>
             <assert>$result/fn:match/fn:group[@nr = 1] = 'b'</assert>
          </all-of>
@@ -638,6 +644,40 @@ it put its sooty foot.</fn:non-match></fn:analyze-string-result>]]></assert-xml>
       <test>analyze-string(codepoints-to-string((119070, 98)), '(?=(b))')</test>
       <result>
          <assert>$result//fn:lookahead-group/@position = 2</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="analyzeString-044">
+      <description>
+         Nested matches including a zero-length match. 
+         See also matching-segments-039.
+      </description>
+      <created by="Michael Kay" on="2026-11-01"/>
+      <test>analyze-string("a", "(a(b?))")</test>
+      <result>
+         <assert-xml normalize-space="true"><![CDATA[
+<analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions">
+   <match>
+      <group nr="1">a<group nr="2"/></group>
+   </match>
+</analyze-string-result>]]></assert-xml>
+      </result>
+   </test-case>
+   
+   <test-case name="analyzeString-045">
+      <description>
+         Non-Nested matches including a zero-length match (different result from -044). 
+         See also matching-segments-040.</description>
+      <created by="Michael Kay" on="2026-11-01"/>
+      <test>analyze-string("a", "(a)(b?)")</test>
+      <result>
+         <assert-xml normalize-space="true"><![CDATA[
+<analyze-string-result xmlns="http://www.w3.org/2005/xpath-functions">
+   <match>
+      <group nr="1">a</group>
+      <group nr="2"/>
+   </match>
+</analyze-string-result>]]></assert-xml>
       </result>
    </test-case>
 </test-set>
