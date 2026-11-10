@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-SwitchExpression">
+   <description>XQuery Update - Switch Expressions</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <dependency type="spec" value="XQUF30+"/>
+
+   <test-case name="upd-switch-expr-001">
+      <description>Evaluation of an updating switch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           switch (1)
+             case 1 return insert node <b/> into .
+             default return insert node <c/> into .
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-switch-expr-002">
+      <description>Evaluation of an updating switch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           switch (2)
+             case 1 return insert node <b/> into .
+             default return insert node <c/> into .
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-switch-expr-003">
+      <description>Evaluation of an updating switch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           switch (2)
+             case 1 return insert node <b/> into .
+             default return ()
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-switch-expr-004">
+      <description>Evaluation of an updating switch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a><b/><c/><d/></a> transform with {
+           for $node in *
+           return switch (name($node))
+             case 'b' return delete node $node
+             case 'c' case 'd' return rename node $node as 'x'
+             default return ()
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/><x/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-switch-expr-005">
+      <description>Evaluation of an updating switch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a n="2"/> transform with {
+           switch (@n)
+             case '1' return ()
+             case '2' return replace value of node @n with 3
+             default return delete node @n
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a n="3"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-switch-expr-006">
+      <description>Evaluation of an updating switch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:mark(
+           $node as element()
+         ) {
+           switch (count($node/*))
+             case 0 return insert node attribute empty { 'yes' } into $node
+             default return ()
+         };
+         <a><b/><c><d/></c></a> transform with { for $node in * return local:mark($node) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b empty="yes"/><c><d/></c></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-switch-expr-007">
+      <description>Evaluation of an updating switch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a/>
+         return switch (1)
+           case 1 return delete node $a
+           default return ()]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-switch-expr-008">
+      <description>Evaluation of an updating switch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           switch (())
+             case () return insert node <b/> into .
+             default return insert node <c/> into .
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-switch-expr-009">
+      <description>Evaluation of an updating switch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           switch ('1')
+             case 1 return insert node <b/> into .
+             default return insert node <c/> into .
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-switch-expr-010">
+      <description>Evaluation of an updating switch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           switch (1)
+             case 1 return
+               switch (2)
+                 case 2 return insert node <b/> into .
+                 default return ()
+             default return ()
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-switch-expr-020">
+      <description>Evaluation of an updating switch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           switch (delete node .)
+             case 1 return ()
+             default return ()
+         }]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-switch-expr-021">
+      <description>Evaluation of an updating switch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           switch (1)
+             case (delete node .) return ()
+             default return ()
+         }]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-switch-expr-022">
+      <description>Evaluation of an updating switch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a/>
+         let $x := switch (1)
+           case 1 return delete node $a
+           default return ()
+         return $x]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+</test-set>

@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-UpdatingFunctionCall">
+   <description>XQuery Update - Dynamic Updating Function Invocation</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <dependency type="spec" value="XQUF30+"/>
+
+   <test-case name="upd-invoke-updating-001">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) { delete node $node }
+         return <a><b/></a> transform with { invoke updating $f(b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-002">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a><b/></a> transform with {
+           invoke updating %updating function($node) { delete node $node }(b)
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-003">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:delete(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         <a><b/></a> transform with { invoke updating local:delete#1(b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-004">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:delete(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         let $f := local:delete#1
+         return <a><b/></a> transform with { invoke updating $f(b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-005">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:insert(
+           $target as element(),
+           $node   as node()
+         ) {
+           insert node $node into $target
+         };
+         let $f := local:insert(?, <c/>)
+         return <a><b/></a> transform with { invoke updating $f(b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b><c/></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-006">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:insert(
+           $target as element(),
+           $node   as node()
+         ) {
+           insert node $node into $target
+         };
+         <a><b/></a> transform with { invoke updating local:insert(b, ?)(<c/>) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b><c/></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-007">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := function($node) { delete node $node }
+         return <a><b/></a> transform with { invoke updating $f(b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-008">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := function() { () }
+         return <a/> transform with { invoke updating $f() }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-009">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function() { () }
+         return <a/> transform with { invoke updating $f() }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-010">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $functions := (
+           %updating function($node) { rename node $node as 'x' },
+           %updating function($node) { insert node <y/> into $node }
+         )
+         return <a><b/></a> transform with {
+           for $f in $functions
+           return invoke updating $f(b)
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x><y/></x></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-011">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $functions := (
+           %updating function($node) { rename node $node as 'x' },
+           %updating function($node) { insert node <y/> into $node }
+         )
+         return <a><b/></a> transform with {
+           invoke updating ($functions[2])(b)
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b><y/></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-012">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) { delete node $node }
+         return <a><b/><c/></a> transform with {
+           invoke updating $f(b),
+           invoke updating $f(c)
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-013">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node, $name) { rename node $node as $name }
+         return <a><b/></a> transform with {
+           invoke updating $f(b, concat('x', 'y'))
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><xy/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-014">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) {
+           if ($node/self::b)
+           then rename node $node as 'x'
+           else ()
+         }
+         return <a><b/><c/></a> transform with {
+           for $node in *
+           return invoke updating $f($node)
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-015">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) { delete node $node }
+         return invoke updating $f(<a/>)]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-016">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($name as xs:string, $node) {
+           rename node $node as $name
+         }
+         return <a x="y"><b/></a> transform with { invoke updating $f(@x, b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="y"><y/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-017">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) { delete node $node }
+         return <a><b/></a> transform with { invoke (: c :) updating (: c :) $f(b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-018">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $delete := %updating function($node) { delete node $node }
+         let $rename := %updating function($node) { rename node $node as 'x' }
+         return <a><b/></a> transform with {
+           invoke updating (if (false()) then $delete else $rename)(b)
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-019">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[count(<invoke><updating/></invoke>/updating)]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-020">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><invoke/><updating/></a> transform with { delete node invoke }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><updating/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-030">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) { delete node $node }
+         return <a><b/></a> transform with {
+           let $x := invoke updating $f(b)
+           return ()
+         }]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-031">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) { delete node $node }
+         return count(invoke updating $f(<a/>))]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-032">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare function local:f(
+           $f as function(*)
+         ) {
+           invoke updating $f(<a/>)
+         };
+         1]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-033">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) { delete node $node }
+         return <a><b/></a> transform with { invoke updating $f(?) }]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-034">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) { delete node $node }
+         return <a><b/></a> transform with { invoke updating $f(b, b) }]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-035">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node as element()) { delete node $node }
+         return <a b=""/> transform with { invoke updating $f(@b) }]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-036">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) { rename node $node as 'x' }
+         return <a><b/></a> transform with {
+           invoke updating $f(b),
+           invoke updating $f(b)
+         }]]></test>
+      <result>
+         <error code="XUDY0015"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-037">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $x := <x/>
+         let $f := %updating function($node) { insert node <y/> into $x }
+         return <a/> transform with { invoke updating $f(.) }]]></test>
+      <result>
+         <error code="XUDY0014"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-038">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { invoke updating 'a'() }]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-039">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { invoke updating <x/>() }]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-040">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function() { () }
+         return <a/> transform with { invoke updating ($f, $f)() }]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-041">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) { delete node $node }
+         return <a><b/></a> transform with { invoke updating $f() }]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-invoke-updating-042">
+      <description>Evaluation of a dynamic updating function call.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) { delete node $node }
+         return <a><b/></a> transform with { invoke updating $f(error()) }]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+</test-set>
