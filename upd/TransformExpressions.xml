@@ -1687,11 +1687,25 @@
       </result>
    </test-case>
    <test-case name="id-transform-expr-065">
-      <description>A text node inserted before a text node that is deleted remains: adjacent text nodes are merged only after all primitives are applied.</description>
+      <description>A text node inserted before a text node that is deleted 
+         remains: adjacent text nodes are merged only after all primitives are applied.
+      </description>
       <created by="Joe Wicentowski" on="2026-09-25"/>
-      <test><![CDATA[copy $c := <a>t<b/></a> modify (insert node 'x' before $c/text(), delete node $c/text()) return $c]]></test>
+      <modified by="Michael Kay" on="2026-11-10" change="
+         This test exposes a conflict between the XQUpdate spec and the XDM data model. XQUpdate says
+         that adjacent text nodes exist transiently, but XDM says that adjacent text nodes cannot exist.
+         Since an implementation cannot conform to both specs, alternative results are provided
+         that conform to one or the other."/>
+      <test><![CDATA[
+         copy $c := <a>t<b/></a> 
+         modify (insert node 'x' before $c/text(), 
+                 delete node $c/text()) 
+         return $c]]></test>
       <result>
-         <assert-xml><![CDATA[<a>x<b/></a>]]></assert-xml>
+         <any-of>
+            <assert-xml><![CDATA[<a>x<b/></a>]]></assert-xml> <!-- reflecting XQUpdate -->
+            <assert-xml><![CDATA[<a>xt<b/></a>]]></assert-xml> <!-- reflecting XDM -->
+         </any-of>
       </result>
    </test-case>
    <test-case name="id-transform-expr-066">
