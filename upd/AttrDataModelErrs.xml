@@ -328,4 +328,100 @@
          <error code="XUDY0021"/>
       </result>
    </test-case>
+
+   <test-case name="attribute-errors-q20">
+      <description>Evaluation of attribute updates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a x="1" y="2"/>
+         modify replace node $c/@x with (attribute y { 1 }, attribute y { 2 })
+         return $c]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="attribute-errors-q21">
+      <description>Evaluation of attribute updates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a x="1"/>
+         modify (
+           rename node $c/@x as 'y',
+           insert node attribute y { 2 } into $c
+         )
+         return $c]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="attribute-errors-q22">
+      <description>Evaluation of attribute updates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a x="1" y="2"/>
+         modify (
+           rename node $c/@x as 'z',
+           rename node $c/@y as 'z'
+         )
+         return $c]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="attribute-errors-q23">
+      <description>Evaluation of attribute updates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a x="1"/>
+         modify (
+           delete node $c/@x,
+           insert node attribute x { 2 } into $c
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="2"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="attribute-errors-q24">
+      <description>Evaluation of attribute updates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a x="1"/>
+         modify (
+           replace node $c/@x with attribute y { 1 },
+           insert node attribute x { 2 } into $c
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="2" y="1"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="attribute-errors-q25">
+      <description>Evaluation of attribute updates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a xmlns:p="u" p:x="1"/>
+         modify insert node attribute { QName('u', 'q:x') } { 2 } into $c
+         return $c]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="attribute-errors-q26">
+      <description>Evaluation of attribute updates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a xmlns:p="u" p:x="1"/>
+         modify insert node attribute { QName('v', 'q:x') } { 2 } into $c
+         return count($c/@*)]]></test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
 </test-set>

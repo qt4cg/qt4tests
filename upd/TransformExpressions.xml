@@ -1781,4 +1781,705 @@
          <error code="XUTY0012"/>
       </result>
    </test-case>
+
+   <test-case name="id-transform-expr-080">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $c := <x/>
+         return copy $c := $c modify () return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<x/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-081">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify ''
+         return $c]]></test>
+      <result>
+         <error code="XUST0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-082">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify $c
+         return $c]]></test>
+      <result>
+         <error code="XUST0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-083">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>X</a>
+         modify (delete node $c/text(), 'a')
+         return $c]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-084">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         text {
+           copy $c := <a/>
+           modify (delete node $c, <b/>)
+           return $c
+         }]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-085">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $d := copy $e := <a/> modify () return $e
+         return $e]]></test>
+      <result>
+         <error code="XPST0008"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-086">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := $c
+         modify ()
+         return $c]]></test>
+      <result>
+         <error code="XPST0008"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-087">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>[. = 'x']
+         modify ()
+         return $c]]></test>
+      <result>
+         <error code="XUTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-088">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := (<a/>, <b/>)
+         modify ()
+         return $c]]></test>
+      <result>
+         <error code="XUTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-089">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := 'a'
+         modify ()
+         return $c]]></test>
+      <result>
+         <error code="XUTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-090">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $x := <x/>
+         return copy $c := <a/>
+                modify insert node <b/> into $x
+                return $c]]></test>
+      <result>
+         <error code="XUDY0014"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-091">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $x := <x><y/></x>
+         return copy $c := $x
+                modify delete node $x/y
+                return $c]]></test>
+      <result>
+         <error code="XUDY0014"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-092">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $a := <a/>, $b := <b/>
+         modify insert node <c/> into $b
+         return $a]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-093">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $a := <a/>, $b := <b/>
+         modify (
+           insert node $b into $a,
+           rename node $b as 'c'
+         )
+         return ($a, $b)]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a><c/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-094">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $a := <a/>, $b := $a
+         modify rename node $a as 'x'
+         return ($a, $b, $a is $b)]]></test>
+      <result>
+         <assert-deep-eq><![CDATA[<x/>, <a/>, false()]]></assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-095">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a/>
+         let $b := copy $c := $a modify insert node <x/> into $c return $c
+         return ($a, $b)]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/><a><x/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-096">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a/>
+         return (copy $c := $a modify () return $c) is $a]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-097">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a/>
+         let $c := (
+           copy $c := $a modify () return $c,
+           copy $c := $a modify () return $c
+         )
+         return $c[1] is $c[2]]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-098">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>/b
+         modify ()
+         return exists($c/..)]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-099">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>/b
+         modify insert node <c/> into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<b><c/></b>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-100">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a b="1"/>/@b
+         modify replace value of node $c with '2'
+         return string($c)]]></test>
+      <result>
+         <assert-string-value>2</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-101">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a b="1"/>/@b
+         modify rename node $c as 'x'
+         return name($c)]]></test>
+      <result>
+         <assert-string-value>x</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-102">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>x</a>/text()
+         modify replace value of node $c with 'y'
+         return string($c)]]></test>
+      <result>
+         <assert-string-value>y</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-103">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><!--x--></a>/comment()
+         modify replace value of node $c with 'y'
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<!--y-->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-104">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><?x y?></a>/processing-instruction()
+         modify rename node $c as 'z'
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<?z y?>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-105">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { <a/> }
+         modify rename node $c/a as 'b'
+         return $c instance of document-node(element(b))]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-106">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify rename node $c as 'b'
+         return $c instance of element(b)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-107">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare function local:f() {
+           copy $c := <x/> modify () return 1
+         };
+         local:f()]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-108">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare function local:f($n as element()) as element() {
+           copy $c := $n
+           modify insert node <y/> into $c
+           return $c
+         };
+         local:f(local:f(<x/>))]]></test>
+      <result>
+         <assert-xml><![CDATA[<x><y/><y/></x>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-109">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $a := <a/>
+         modify insert node (
+           copy $b := <b/>
+           modify insert node <c/> into $b
+           return $b
+         ) into $a
+         return $a]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b><c/></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-110">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         for $i in 1 to 3
+         return copy $c := <a/>
+                modify insert node attribute n { $i } into $c
+                return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a n="1"/><a n="2"/><a n="3"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-111">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $e := <e><a/></e>
+         return copy $c := $e
+                modify rename node $c/a as 'x'
+                return (count($c/x), count($e/x))]]></test>
+      <result>
+         <assert-deep-eq>1, 0</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-112">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify if (true()) then insert node <b/> into $c else ()
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-113">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/><c/></a>
+         modify for $n in $c/* return rename node $n as concat('x', name($n))
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><xb/><xc/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-114">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node <b/> into $c
+         return copy $d := $c
+                modify insert node <c/> into $d/b
+                return ($c, $d)]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a><a><b><c/></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-115">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare copy-namespaces no-preserve, inherit;
+         let $a := <x:a xmlns:x="u" xmlns:y="v"><b xmlns:z="w" z:q=""><y:c/></b></x:a>
+         let $b := copy $b := $a/b modify () return $b
+         return string-join(for $p in in-scope-prefixes($b) order by $p return $p, ',')]]></test>
+      <result>
+         <assert-string-value>xml,z</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-116">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare copy-namespaces preserve, inherit;
+         let $a := <x:a xmlns:x="u" xmlns:y="v"><b xmlns:z="w" z:q=""><y:c/></b></x:a>
+         let $b := copy $b := $a/b modify () return $b
+         return string-join(for $p in in-scope-prefixes($b) order by $p return $p, ',')]]></test>
+      <result>
+         <assert-string-value>x,xml,y,z</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-117">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a xmlns:p="u"/>
+         modify ()
+         return namespace-uri-for-prefix('p', $c)]]></test>
+      <result>
+         <assert-string-value>u</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-118">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>{ for $i in 1 to 1000 return <b/> }</a>
+         modify for $b in $c/b[position() mod 2 = 0] return rename node $b as 'c'
+         return (count($c/b), count($c/c))]]></test>
+      <result>
+         <assert-deep-eq>500, 500</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-120">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>1</a>
+         modify ()
+         return $c + 1]]></test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-121">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify ()
+         return ()]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-122">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $a := <a><b/></a>, $b := $a/b
+         modify rename node $b as 'c'
+         return ($a, $b)]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a><c/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-123">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $a := <a/>, $b := <b/>
+         modify (
+           rename node $a as 'x',
+           rename node $b as 'y'
+         )
+         return ($a, $b)]]></test>
+      <result>
+         <assert-xml><![CDATA[<x/><y/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-124">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $a := <a/>
+         modify ()
+         return copy $b := <b/>
+                modify rename node $a as 'x'
+                return $b]]></test>
+      <result>
+         <error code="XUDY0014"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-125">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify error(QName('http://www.w3.org/2005/xqt-errors', 'FOER0000'))
+         return $c]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-126">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify (if (true()) then () else delete node $c)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-127">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify (if (false()) then () else delete node $c)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-128">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <x/>[
+           copy $c := .
+           modify rename node $c as 'y'
+           return name($c) = 'y'
+         ]]]></test>
+      <result>
+         <assert-xml><![CDATA[<x/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-129">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         for $i in (3, 1, 2)
+         order by (copy $c := <a/> modify insert node text { $i } into $c return $c)
+         return $i]]></test>
+      <result>
+         <assert-deep-eq>1, 2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-130">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         count(
+           copy $c := <a/>
+           modify insert node <b/> into $c
+           return $c/b
+         )]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-131">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node attribute x { 1 } into $c
+         return $c/@x instance of attribute(x, xs:untypedAtomic)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-132">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node <b>1</b> into $c
+         return $c/b instance of element(b, xs:untyped)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-133">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify ()
+         return copy $d := $c modify rename node $d as 'b' return ($c, $d)]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/><b/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-134">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify ()
+         return $c/b/root() is $c]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-135">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a><b/></a>
+         return copy $c := $a/b modify () return root($c) is root($a/b)]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="id-transform-expr-136">
+      <description>Evaluation of a transform expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify (insert node <b/> into $c, ())
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
 </test-set>

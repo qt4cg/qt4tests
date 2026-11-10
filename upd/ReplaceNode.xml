@@ -640,4 +640,669 @@
          <assert-empty/>
       </result>
    </test-case>
+
+   <test-case name="id-replace-expr-050">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><r>a</r></n>
+         modify replace node $c/r with <r>b</r>
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><r>b</r></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-051">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/><c><d/><d/><d/></c></a>
+         modify replace node $c/c with <c/>
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-052">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a att0="0"/>
+         modify replace node $c/@att0 with (attribute att1 { '1' }, attribute att2 { '2' })
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a att1="1" att2="2"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-053">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b att0="0"/><c/></a>
+         modify replace node $c/b/@att0 with attribute att1 { '1' }
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b att1="1"/><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-054">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a id="0" id2="0"/>
+         modify replace node $c/@id with (attribute b { '1' }, attribute c { '2' })
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a b="1" c="2" id2="0"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-055">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a/></n>
+         modify (
+           replace node $c/a with element last { },
+           insert node <b/> before $c/a
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><b/><last/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-056">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a/></n>
+         modify (
+           insert node <b/> before $c/a,
+           replace node $c/a with element last { }
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><b/><last/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-057">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a/></n>
+         modify (
+           insert node <b/> after $c/a,
+           replace node $c/a with <c/>
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><c/><b/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-058">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify replace node $c/b with ()
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-059">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>{ for $i in 1 to 1000 return <b>X</b> }</a>
+         modify for $b in $c/b return replace node $b with ()
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-060">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <e a=""/>
+         modify replace node $c/@a with ()
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<e/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-061">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <e a="" b=""/>
+         modify replace node $c/@b with ()
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<e a=""/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-062">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify replace node $c/b with (<X/>, <X/>)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><X/><X/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-063">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a/><n><a/><n/><a/></n><a/><n/><a/></n>
+         modify for $a in $c//a return replace node $a with <b/>
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><b/><n><b/><n/><b/></n><b/><n/><b/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-064">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a/><a/><a/><a/><a/></n>
+         modify (
+           replace node $c/a[1] with <b/>,
+           replace node $c/a[2] with <b/>,
+           insert node <c/> into $c/a[3],
+           replace node $c/a[4] with <b/>,
+           replace node $c/a[5] with <b/>
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><b/><b/><a><c/></a><b/><b/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-065">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>X<b/>Y</a>
+         modify replace node $c/b with <c>Z</c>
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>X<c>Z</c>Y</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-066">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify replace node $c/b with (text { 'x' }, <!--y-->, <?z?>)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>x<!--y--><?z?></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-067">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>x<!--y--><?z?></a>
+         modify (
+           replace node $c/text() with <b/>,
+           replace node $c/comment() with <c/>,
+           replace node $c/processing-instruction() with <d/>
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/><c/><d/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-068">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <_>a</_>
+         modify replace node $c/text() with $c || 'b'
+         return data($c)]]></test>
+      <result>
+         <assert-string-value>ab</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-069">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify (
+           replace node $c/b with <newB/>,
+           delete node $c/b
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><newB/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-070">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify (
+           delete node $c/b,
+           replace node $c/b with <newB/>
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><newB/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-071">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><A><B/></A></n>
+         modify (
+           replace node $c/A with <newA/>,
+           replace value of node $c/A/B with 'newContentForB'
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><newA/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-072">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><A/></n>
+         modify (
+           replace node $c/A with <newA/>,
+           replace value of node $c/A with 'newContentForA'
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><newA/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-073">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><A/></n>
+         modify (
+           replace node $c/A with <newA/>,
+           rename node $c/A as 'renamedA'
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><newA/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-074">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <r xmlns="u"><a/></r>
+         modify replace node $c/*:a with (<a xmlns=""/>, <b xmlns="u"/>)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<r xmlns="u"><a xmlns=""/><b/></r>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-075">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <r><a/></r>
+         modify replace node $c/a with (<p:a xmlns:p="x"/>, <p:b xmlns:p="y"/>)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<r><p:a xmlns:p="x"/><p:b xmlns:p="y"/></r>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-076">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <r><a/></r>
+         modify (
+           replace node $c/a with <p:a xmlns:p="w"/>,
+           insert node attribute { QName('u', 'p:x') } { } into $c/a
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<r><p:a xmlns:p="w"/></r>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-077">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify replace node $c with <b/>
+         return $c]]></test>
+      <result>
+         <error code="XUDY0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-078">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify replace node 'x' with <b/>
+         return $c]]></test>
+      <result>
+         <error code="XUTY0008"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-079">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { <a/> }
+         modify replace node $c with <b/>
+         return $c]]></test>
+      <result>
+         <error code="XUTY0008"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-080">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify replace node $c/b with attribute x { }
+         return $c]]></test>
+      <result>
+         <error code="XUTY0010"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-081">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a x=""/>
+         modify replace node $c/@x with <b/>
+         return $c]]></test>
+      <result>
+         <error code="XUTY0011"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-082">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a x=""/>
+         modify replace node $c/@x with (attribute y { }, 'z')
+         return $c]]></test>
+      <result>
+         <error code="XUTY0011"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-083">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify (
+           replace node $c/b with <c/>,
+           replace node $c/b with <d/>
+         )
+         return $c]]></test>
+      <result>
+         <error code="XUDY0016"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-084">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a x=""/>
+         modify (
+           replace node $c/@x with attribute y { },
+           replace node $c/@x with attribute z { }
+         )
+         return $c]]></test>
+      <result>
+         <error code="XUDY0016"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-085">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a x="" y=""/>
+         modify replace node $c/@x with attribute y { }
+         return $c]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-200">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify replace node $c/b with document { <x/>, <y/> }
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/><y/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-201">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify replace node $c/b with (1, 2)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>1 2</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-202">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b><c/></b></a>
+         modify replace node $c/b with $c/b
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b><c/></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-203">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b><c/></b></a>
+         modify replace node $c/b with $c/b/c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-204">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify replace node $c/b with $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><a><b/></a></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-205">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a x="1"/>
+         modify replace node $c/@x with attribute x { 2 }
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="2"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-206">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a x="1" y="2"/>
+         modify (
+           replace node $c/@x with attribute y { 1 },
+           delete node $c/@y
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a y="1"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-207">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { <a/> }
+         modify replace node $c/a with <b/>
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<b/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-208">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { <a/> }
+         modify replace node $c/a with ()
+         return count($c/node())]]></test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-209">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { <a/> }
+         modify replace node $c/a with 'x'
+         return ($c/node() instance of text(), string($c))]]></test>
+      <result>
+         <assert-deep-eq>true(), "x"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-210">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>x<b/>y</a>
+         modify replace node $c/b with ''
+         return (count($c/text()), string($c))]]></test>
+      <result>
+         <assert-deep-eq>1, "xy"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-211">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify replace node $c/b with <b xmlns="u"/>
+         return namespace-uri($c/*)]]></test>
+      <result>
+         <assert-string-value>u</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-212">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify (
+           replace node $c/b with <c/>,
+           insert node <x/> after $c/b,
+           delete node $c/b
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/><x/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-213">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify (
+           replace node $c/b with <c/>,
+           rename node $c/b as 'd'
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-replace-expr-214">
+      <description>Evaluation of a replace expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify replace node $c/b with true#0
+         return $c]]></test>
+      <result>
+         <error code="XQTY0105"/>
+      </result>
+   </test-case>
 </test-set>

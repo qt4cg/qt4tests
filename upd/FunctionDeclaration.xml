@@ -453,4 +453,139 @@
          <assert-empty/>
       </result>
    </test-case>
+
+   <test-case name="id-function-declaration-110">
+      <description>Evaluation of an updating function declaration.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare updating function local:ins($n as element()) {
+           insert node <x/> into $n
+         };
+         copy $c := <a/>
+         modify local:ins($c)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-111">
+      <description>Evaluation of an updating function declaration.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare updating function local:mark($n as element()) {
+           insert node attribute depth { count($n/ancestor::*) } into $n,
+           for $e in $n/* return local:mark($e)
+         };
+         copy $c := <a><b><c/></b><d/></a>
+         modify local:mark($c)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a depth="0"><b depth="1"><c depth="2"/></b><d depth="1"/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-112">
+      <description>Evaluation of an updating function declaration.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare updating function local:f() { () };
+         copy $c := <a/>
+         modify local:f()
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-113">
+      <description>Evaluation of an updating function declaration.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare updating function local:f() { 1 };
+         ()]]></test>
+      <result>
+         <error code="XUST0002"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-114">
+      <description>Evaluation of an updating function declaration.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare updating function local:f($n) { delete node $n };
+         let $x := local:f(<a/>)
+         return ()]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-115">
+      <description>Evaluation of an updating function declaration.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare updating function local:f($n) { delete node $n };
+         local:f(local:f(<a/>))]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-116">
+      <description>Evaluation of an updating function declaration.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare updating function local:f($n) { delete node $n };
+         declare function local:g($n) { local:f($n) };
+         ()]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-117">
+      <description>Evaluation of an updating function declaration.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare updating function local:f($n as element()) {
+           rename node $n as 'b'
+         };
+         copy $c := <a/>
+         modify local:f($c)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<b/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-118">
+      <description>Evaluation of an updating function declaration.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare updating function local:f($n as element()) {
+           rename node $n as 'b'
+         };
+         copy $c := <a/>
+         modify (local:f($c), local:f($c))
+         return $c]]></test>
+      <result>
+         <error code="XUDY0015"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-function-declaration-119">
+      <description>Evaluation of an updating function declaration.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare updating function local:f($n as element()) {
+           rename node $n as 'b'
+         };
+         copy $c := <a/>
+         modify local:f('x')
+         return $c]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
 </test-set>
