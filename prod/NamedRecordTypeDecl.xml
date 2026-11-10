@@ -1864,6 +1864,533 @@
          <error code="XPST0003"/>
       </result>
    </test-case>
+
+   <test-case name="recordTypeDecl-140" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <module uri="http://example.ns/module5" file="RecordTypeDecl/module5.xq"/>
+      <module uri="http://example.ns/module6" file="RecordTypeDecl/module6.xq"/>
+      <test>
+         import module namespace lib5="http://example.ns/module5";
+         import module namespace lib6="http://example.ns/module6";
+         let $d := lib5:d(1, 2, 3, 4)
+         return (
+           $d instance of lib6:c,
+           $d instance of lib5:a,
+           map:keys($d)
+         )
+      </test>
+      <result>
+         <assert-deep-eq>true(), true(), 'x', 'y', 'z', 'w'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-141" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <module uri="http://example.ns/module5" file="RecordTypeDecl/module5.xq"/>
+      <module uri="http://example.ns/module6" file="RecordTypeDecl/module6.xq"/>
+      <test>
+         import module namespace lib6="http://example.ns/module6";
+         ({ 'x': 1, 'y': 2 } cast as lib6:b) instance of lib6:b
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-142" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <module uri="http://example.ns/module7" file="RecordTypeDecl/module7.xq"/>
+      <module uri="http://example.ns/module8" file="RecordTypeDecl/module8.xq"/>
+      <test>
+         import module namespace lib7="http://example.ns/module7";
+         1
+      </test>
+      <result>
+         <error code="XQST0155"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-150" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:point(x as xs:double, y as xs:double);
+         declare record local:point3d extends local:point(z as xs:double := 0);
+         let $p := local:point3d(1, 2)
+         return (
+           $p instance of local:point3d,
+           $p instance of local:point,
+           $p?z = 0,
+           local:point(1, 2) instance of local:point3d
+         )
+      </test>
+      <result>
+         <assert-deep-eq>true(), true(), true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-151" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:point(x as xs:double, y as xs:double);
+         declare record local:point3d extends local:point(z as xs:double := 0);
+         declare record local:place extends local:point3d(name as xs:string);
+         let $p := local:place(1, 2, 'Origin', 5)
+         return (map:keys($p), $p?z, $p?name)
+      </test>
+      <result>
+         <assert-deep-eq>'x', 'y', 'z', 'name', 5e0, 'Origin'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-152" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:c extends local:b(c := 3);
+         declare record local:b extends local:a(b := 2);
+         declare record local:a(a := 1);
+         let $c := local:c()
+         return ($c instance of local:a, map:keys($c), $c?*)
+      </test>
+      <result>
+         <assert-deep-eq>true(), 'a', 'b', 'c', 1, 2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-153" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:p(x);
+         declare record local:q extends local:p(y);
+         declare function local:f($p as local:p) { $p };
+         local:f(local:q(1, 2)) instance of local:q
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-154" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:point(x as xs:double, y as xs:double);
+         declare record local:unit-point extends local:point()
+           where ?x * ?x + ?y * ?y = 1;
+         let $p := local:unit-point(0, 1)
+         return (
+           $p instance of local:unit-point,
+           $p instance of local:point,
+           try { local:unit-point(1, 1) } catch * { 'error' }
+         )
+      </test>
+      <result>
+         <assert-deep-eq>true(), true(), 'error'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-155" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a(x as xs:integer) where ?x ge 0;
+         declare record local:b extends local:a(y as xs:integer) where ?y ge ?x;
+         (
+           local:b(1, 2)?y,
+           try { local:b(-1, 2) } catch * { 'error' },
+           try { local:b(2, 1) } catch * { 'error' }
+         )
+      </test>
+      <result>
+         <assert-deep-eq>2, 'error', 'error'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-156" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test><![CDATA[
+         declare record local:shape(
+           %fixed area as fn(local:shape) as xs:double := fn { 0 }
+         );
+         declare record local:circle extends local:shape(
+           radius as xs:double,
+           %fixed area := fn { math:pi() * ?radius * ?radius }
+         );
+         declare record local:square extends local:shape(
+           side as xs:double,
+           %fixed area := fn { ?side * ?side }
+         );
+         (local:circle(1), local:square(2)) =?> area()
+      ]]></test>
+      <result>
+         <assert-deep-eq>3.141592653589793e0, 4e0</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-157" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a(x, %fixed f as xs:integer := 1);
+         declare record local:b extends local:a(y, %fixed f as xs:byte := 2);
+         let $b := local:b(1, 2)
+         return (map:keys($b), $b?f, local:a(1)?f)
+      </test>
+      <result>
+         <assert-deep-eq>'x', 'f', 'y', 2, 1</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-158" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a(x := 1);
+         declare record local:b extends local:a(y);
+         let $b := local:b(2)
+         return (map:keys($b), $b?*)
+      </test>
+      <result>
+         <assert-deep-eq>'x', 'y', 1, 2</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-160" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare type local:a as record(x);
+         declare record local:b extends local:a(y);
+         1
+      </test>
+      <result>
+         <error code="XQST0155"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-161" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:b extends local:unknown(y);
+         1
+      </test>
+      <result>
+         <error code="XQST0155"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-162" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:b extends xs:string(y);
+         1
+      </test>
+      <result>
+         <error code="XQST0155"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-163" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a extends local:a(x);
+         1
+      </test>
+      <result>
+         <error code="XQST0155"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-164" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a extends local:b(x);
+         declare record local:b extends local:a(y);
+         1
+      </test>
+      <result>
+         <error code="XQST0155"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-165" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a(x);
+         declare record local:b extends local:a(x);
+         1
+      </test>
+      <result>
+         <error code="XPST0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-166" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a(%fixed x := 1);
+         declare record local:b extends local:a(x);
+         1
+      </test>
+      <result>
+         <error code="XPST0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-167" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a(%fixed x as xs:integer := 1);
+         declare record local:b extends local:a(%fixed x as xs:string := '');
+         1
+      </test>
+      <result>
+         <error code="XQST0155"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-170" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test><![CDATA[
+         declare record local:a(x, %fixed name := fn { 'a' });
+         declare record local:b extends local:a(y);
+         declare record local:c extends local:b(z, %fixed name := fn { 'c' });
+         declare record local:d extends local:c(w);
+         let $d := local:d(1, 2, 3, 4)
+         return (
+           map:keys($d),
+           $d =?> name(),
+           local:b(1, 2) =?> name(),
+           $d instance of local:a
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>'x', 'name', 'y', 'z', 'w', 'c', 'a', true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-171" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test><![CDATA[
+         declare record local:shape(
+           %fixed area as fn(local:shape) as xs:double := fn { 0 },
+           %fixed describe := fn { `area: { . =?> area() }` }
+         );
+         declare record local:square extends local:shape(
+           side as xs:double,
+           %fixed area := fn { ?side * ?side }
+         );
+         declare record local:cube extends local:square(
+           %fixed area := fn { 6 * ?side * ?side }
+         );
+         (local:shape(), local:square(2), local:cube(2)) =?> describe()
+      ]]></test>
+      <result>
+         <assert-deep-eq>'area: 0', 'area: 4', 'area: 24'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-172" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a(%fixed next as local:a? := ());
+         declare record local:b extends local:a(%fixed next as local:b? := ());
+         (local:b() instance of local:a, local:a() instance of local:b)
+      </test>
+      <result>
+         <assert-deep-eq>true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-173" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test><![CDATA[
+         declare record local:shape(
+           %fixed area as fn(local:shape) as xs:double := fn { 0 }
+         );
+         declare record local:square extends local:shape(
+           side as xs:double,
+           %fixed area := fn { ?side * ?side }
+         );
+         declare record local:group extends local:shape(
+           members as local:shape*,
+           %fixed area := fn { sum(?members =?> area()) }
+         );
+         local:group((
+           local:square(1),
+           local:group((local:square(2), local:square(3))),
+           local:shape()
+         )) =?> area()
+      ]]></test>
+      <result>
+         <assert-deep-eq>14e0</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-174" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:point(x as xs:double, y as xs:double);
+         declare record local:point3d extends local:point(z as xs:double := 0);
+         declare record local:place extends local:point3d(name as xs:string);
+         let $p := local:place(name := 'Origin', y := 2, x := 1)
+         return ($p?x, $p?y, $p?z, $p?name)
+      </test>
+      <result>
+         <assert-deep-eq>1e0, 2e0, 0e0, 'Origin'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-175" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a(x as xs:integer) where ?x ge 0;
+         declare record local:b extends local:a(y as xs:integer);
+         declare record local:c extends local:b(z as xs:integer) where ?x + ?y = ?z;
+         (
+           local:c(1, 2, 3) instance of local:a,
+           try { local:c(-1, 2, 1) } catch * { 'error' },
+           try { local:c(1, 2, 4) } catch * { 'error' },
+           local:b(0, -5)?y
+         )
+      </test>
+      <result>
+         <assert-deep-eq>true(), 'error', 'error', -5</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-176" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:p(x);
+         declare record local:q extends local:p(y);
+         declare record local:r extends local:p(y);
+         (local:q(1, 2) instance of local:r, local:r(1, 2) instance of local:q)
+      </test>
+      <result>
+         <assert-deep-eq>false(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-177" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:p(x);
+         declare record local:q extends local:p(y);
+         (
+           fn() as local:q { local:q(1, 2) } instance of fn() as local:p,
+           fn($p as local:p) { $p } instance of fn(local:q) as item()*,
+           fn($q as local:q) { $q } instance of fn(local:p) as item()*
+         )
+      </test>
+      <result>
+         <assert-deep-eq>true(), true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-180" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a extends local:c(x);
+         declare record local:b extends local:a(y);
+         declare record local:c extends local:b(z);
+         1
+      </test>
+      <result>
+         <error code="XQST0155"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-181" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a(x);
+         declare record local:b extends local:a(y := 1, z);
+         1
+      </test>
+      <result>
+         <error code="XQST0148"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-182" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a(%fixed f as xs:decimal := 1);
+         declare record local:b extends local:a(%fixed f as xs:integer := 2);
+         declare record local:c extends local:b(%fixed f as xs:decimal := 3);
+         1
+      </test>
+      <result>
+         <error code="XQST0155"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-183" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a(%fixed f as xs:integer := 1);
+         declare record local:b extends local:a(%fixed f := 'x');
+         local:b()
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-184" covers-40="PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:a(x);
+         declare record local:b extends local:a(y);
+         declare record local:c extends local:b(x);
+         1
+      </test>
+      <result>
+         <error code="XPST0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-190" covers-40="PR2979 PR3037">
+      <description>Evaluation of derived record types.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         declare record local:shape(%fixed kind := 'shape', name as xs:string);
+         declare record local:circle extends local:shape(%fixed kind := 'circle', radius as xs:double);
+         let $c := local:circle('c', 2)
+         return (local:shape('s')?kind, map:keys($c), $c?kind)
+      </test>
+      <result>
+         <assert-deep-eq>'shape', 'kind', 'name', 'radius', 'circle'</assert-deep-eq>
+      </result>
+   </test-case>
    
    
  
