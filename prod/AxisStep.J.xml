@@ -2441,6 +2441,62 @@
       </result>
    </test-case>
 
+   <test-case name="JAxes-420" covers-40="PR3069">
+      <description>Axis steps with JNodes.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $j := jtree({ 'c': [ 44 ] })/c
+         return ($j << $j/item::*, $j/item::* << $j/*)
+      ]]></test>
+      <result>
+         <assert-deep-eq>true(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="JAxes-421" covers-40="PR3069">
+      <description>Axis steps with JNodes.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $j := jtree({ 'c': [ 44 ] })/c
+         return ($j/* | $j/item::*) ! jvalue()
+      </test>
+      <result>
+         <assert-deep-eq>[ 44 ], 44</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="JAxes-422" covers-40="PR3069">
+      <description>Axis steps with JNodes.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $j := jtree([ [ 'a' ], [ 'b' ] ])
+         return ($j/*/* union $j/*/item::* union $j/*) ! jvalue()
+      </test>
+      <result>
+         <assert-deep-eq>[ 'a' ], [ 'a' ], 'a', [ 'b' ], [ 'b' ], 'b'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="JAxes-423" covers-40="PR3069">
+      <description>Axis steps with JNodes.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         let $j := jtree({ 'c': [ 44 ], 'd': 1 })/c
+         return (
+           count($j/item::*/following-sibling::*),
+           $j/item::*/following::* ! jvalue(),
+           count($j/*/preceding::*)
+         )
+      </test>
+      <result>
+         <assert-deep-eq>0, 44, 1, 0</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="JAxes-901">
       <description> Obsolete syntax </description>
       <created by="Michael Kay" on="2026-02-10"/>
