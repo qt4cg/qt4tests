@@ -148,9 +148,10 @@
    <test-case name="fn-jvalue-902">
       <description> Requires JNode </description>
       <created by="Michael Kay" on="2025-08-08"/>
+      <modified by="Christian Gruen" on="2026-11-11" change="PR3065"/>
       <test><![CDATA[parse-xml("<a/>") => fn:jvalue()]]></test>
       <result>
-         <error code="XPTY0004"/>
+         <assert-type>document-node(element(a))</assert-type>
       </result>
    </test-case>
    
@@ -166,24 +167,80 @@
    <test-case name="fn-jvalue-904">
       <description> Context item not a JNode </description>
       <created by="Michael Kay" on="2025-08-08"/>
+      <modified by="Christian Gruen" on="2026-11-11" change="PR3065"/>
       <test><![CDATA[parse-xml("<a/>") ! fn:jvalue()]]></test>
       <result>
-         <error code="XPTY0004"/>
+         <assert-type>document-node(element(a))</assert-type>
       </result>
    </test-case>
    
    <test-case name="fn-jvalue-905">
       <description> Context item not a JNode </description>
       <created by="Michael Kay" on="2026-10-25"/>
+      <modified by="Christian Gruen" on="2026-11-11" change="PR3065"/>
       <test><![CDATA[
          let $f := parse-xml("<a/>") ! fn:jvalue#0
          return $f()
       ]]></test>
       <result>
+         <assert-type>document-node(element(a))</assert-type>
+      </result>
+   </test-case>
+
+   <test-case name="fn-jvalue-070" covers-40="PR3065">
+      <description>Evaluation of fn:jvalue function.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         let $data := { "a": 1, "b": [ 2, 3 ] }
+         return ($data/a, $data?b?*, $data/b/*) ! jvalue()
+      </test>
+      <result>
+         <assert-deep-eq>1, 2, 3, 2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-jvalue-071" covers-40="PR3065">
+      <description>Evaluation of fn:jvalue function.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>
+         jvalue(1),
+         jvalue("a"),
+         jvalue([ 2 ]),
+         jvalue({ "b": 3 }),
+         jvalue(abs#1)(-4)
+      </test>
+      <result>
+         <assert-deep-eq>1, "a", [ 2 ], { "b": 3 }, 4</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-jvalue-072" covers-40="PR3065">
+      <description>Evaluation of fn:jvalue function.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>("a", "b", "c")[jvalue() = "b"]</test>
+      <result>
+         <assert-deep-eq>"b"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-jvalue-073" covers-40="PR3065">
+      <description>Evaluation of fn:jvalue function.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>(1, jtree([ 2 ])/1, jtree(3)) ! jvalue()</test>
+      <result>
+         <assert-deep-eq>1, 2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-jvalue-906" covers-40="PR3065">
+      <description>Evaluation of fn:jvalue function.</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <test>jvalue((1, 2))</test>
+      <result>
          <error code="XPTY0004"/>
       </result>
    </test-case>
-   
+
    
 
 
