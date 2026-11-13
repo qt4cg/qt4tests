@@ -28,47 +28,47 @@ module namespace set = "http://qt4cg.org/atomic-set";
    
    declare %public record set:atomic-set (
        _data        as map(xs:anyAtomicType, xs:boolean),
-       %static values := 
+       %fixed values := 
               fn($this as set:atomic-set) as xs:anyAtomicType* {
                 map:keys($this?_data) 
               },
               
-       %static size :=
+       %fixed size :=
               fn($this as set:atomic-set) as xs:integer { 
                 map:size($this?_data) 
               },
               
-       %static empty :=
+       %fixed empty :=
               fn($this as set:atomic-set) as xs:boolean { 
                 map:empty($this?_data) 
               },
               
-       %static contains :=
+       %fixed contains :=
               fn($this as set:atomic-set,
                  $value as xs:anyAtomicType) as xs:boolean { 
                 map:contains($this?_data, $value) 
               },
               
-       %static contains-all :=
+       %fixed contains-all :=
               fn($this as set:atomic-set, 
                  $value as set:atomic-set) as xs:boolean {
                 every($value =?> values(), 
                       map:contains($this?_data, ?)) 
               },
               
-       %static add := 
+       %fixed add := 
               fn($this as set:atomic-set, 
                  $value as xs:anyAtomicType) as set:atomic-set {
                 $this but with {'_data': map:put($this?_data, $value, true())} 
               },
               
-       %static remove :=
+       %fixed remove :=
               fn($this as set:atomic-set, 
                  $value as xs:anyAtomicType) as set:atomic-set {
                 $this but with {'_data': map:remove($this?_data, $value)} 
               },
               
-       %static union :=        
+       %fixed union :=        
               fn($this as set:atomic-set, 
                  $other as set:atomic-set) as set:atomic-set {
                 $this but with {'_data': map:merge(($this?_data, $other?_data),
@@ -76,7 +76,7 @@ module namespace set = "http://qt4cg.org/atomic-set";
                                }
               },
               
-       %static intersect :=        
+       %fixed intersect :=        
               fn($this as set:atomic-set, 
                  $other as set:atomic-set) as set:atomic-set {
                 $this but with {'_data': map:filter($this?_data, 
@@ -84,7 +84,7 @@ module namespace set = "http://qt4cg.org/atomic-set";
                                }
               },
               
-       %static except :=        
+       %fixed except :=        
               fn($this as set:atomic-set, 
                  $other as set:atomic-set) as set:atomic-set {
                 $this but with {'_data': map:remove($this?_data, 
