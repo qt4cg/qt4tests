@@ -330,10 +330,47 @@
   <test-case name="fn-load-xquery-module-022">
     <description>Global functions from a module imported by the loaded module are not included in the result of load-xquery-module().</description>
     <created by="Debbie Lockett" on="2015-06-01"/>
+    <dependency type="spec" value="XP31 XQ31"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/import-func/module" file="load-xquery-module/import-func-module.xqm"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/valid/module" file="load-xquery-module/valid-module.xqm"/>
     <test>
       let $module := fn:load-xquery-module("http://www.w3.org/fots/fn/load-xquery-module/import-func/module")
+      return
+      $module("functions")(QName("http://www.w3.org/fots/fn/load-xquery-module/valid/module", "func1"))
+    </test>
+    <result>
+      <assert-empty/>
+    </result>
+  </test-case>
+  
+  <test-case name="fn-load-xquery-module-022a">
+    <description>Global functions from a module imported by the loaded module are not included in the result of load-xquery-module().</description>
+    <created by="Debbie Lockett" on="2015-06-01"/>
+    <modified by="Michael Kay" on="2026-11-13" 
+      change="Query fails in 4.0: the loaded module is untrusted, so it cannot load further modules"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/import-func/module" file="load-xquery-module/import-func-module.xqm"/>
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/valid/module" file="load-xquery-module/valid-module.xqm"/>
+    <test>
+      let $module := fn:load-xquery-module("http://www.w3.org/fots/fn/load-xquery-module/import-func/module")
+      return
+      $module("functions")(QName("http://www.w3.org/fots/fn/load-xquery-module/valid/module", "func1"))
+    </test>
+    <result>
+      <error code="FODC0016"/>
+    </result>
+  </test-case>
+  
+  <test-case name="fn-load-xquery-module-022b">
+    <description>Global functions from a module imported by the loaded module are not included in the result of load-xquery-module().</description>
+    <created by="Debbie Lockett" on="2015-06-01"/>
+    <modified by="Michael Kay" on="2026-11-13" change="In 4.0 the loaded module needs to be trusted"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/import-func/module" file="load-xquery-module/import-func-module.xqm"/>
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/valid/module" file="load-xquery-module/valid-module.xqm"/>
+    <test>
+      let $module := fn:load-xquery-module("http://www.w3.org/fots/fn/load-xquery-module/import-func/module",
+                                           {'trusted': true()})
       return
       $module("functions")(QName("http://www.w3.org/fots/fn/load-xquery-module/valid/module", "func1"))
     </test>
@@ -376,7 +413,7 @@
     <module uri="http://www.w3.org/TestModules/module2" file="../prod/ModuleImport/module2-lib.xq"/>
     <test>
       let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/import/module",
-       $module := fn:load-xquery-module($module-ns),
+       $module := fn:load-xquery-module($module-ns, {'trusted': true()}),
        $mod1-ns := "http://www.w3.org/TestModules/module1"
       return
       let $fns := $module("functions")
@@ -399,7 +436,7 @@
     <module uri="http://www.w3.org/TestModules/module2" file="../prod/ModuleImport/module2-lib.xq"/>
     <test>
       let $module-ns := "http://www.w3.org/fots/fn/load-xquery-module/import/module",
-       $module := fn:load-xquery-module($module-ns),
+       $module := fn:load-xquery-module($module-ns, {'trusted': true()}),
        $mod1-ns := "http://www.w3.org/TestModules/module1",
        $mod2-ns := "http://www.w3.org/TestModules/module2"
       return
@@ -414,10 +451,13 @@
   <test-case name="fn-load-xquery-module-025">
     <description>Global variables from a module imported by the loaded module are not included in the result of load-xquery-module(). </description>
     <created by="Debbie Lockett" on="2015-06-01"/>
+    <modified by="Michael Kay" on="2026-11-13"
+      change="Needs trusted=true in 4.0; we rely on the fact that in 3.1, processors must ignore unknown options"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/import-vars/module" file="load-xquery-module/import-vars-module.xqm"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/valid/module" file="load-xquery-module/valid-module.xqm"/>
     <test>
-      let $module := fn:load-xquery-module("http://www.w3.org/fots/fn/load-xquery-module/import-vars/module")
+      let $module := fn:load-xquery-module("http://www.w3.org/fots/fn/load-xquery-module/import-vars/module",
+                         map {'trusted': true()})
       return
       $module("variables")(QName("http://www.w3.org/fots/fn/load-xquery-module/valid/module", "var1"))
     </test>
@@ -430,13 +470,17 @@
     <description>Loads a module, supplies value for external variable declared in transitively-imported library module,
       which is used in variable in main module.</description>
     <created by="Debbie Lockett" on="2015-06-01"/>
+    <modified by="Michael Kay" on="2026-11-13"
+      change="Needs trusted=true in 4.0; we rely on the fact that in 3.1, processors must ignore unknown options"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/import-vars/module" file="load-xquery-module/import-vars2-module.xqm"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/external-vars/module" file="load-xquery-module/external-vars2-module.xqm"/>
     <test>      
       let $qn-var1 := QName("http://www.w3.org/fots/fn/load-xquery-module/external-vars/module", "var1")
       return
       let $module := fn:load-xquery-module("http://www.w3.org/fots/fn/load-xquery-module/import-vars/module", 
-      map {"variables" : map { $qn-var1 : "that" }})
+                                  map {"variables" : map { $qn-var1 : "that" },
+                                       "trusted": true()
+                                      })
       return
       $module("variables")(QName("http://www.w3.org/fots/fn/load-xquery-module/import-vars/module", "var1"))
     </test>
@@ -449,6 +493,8 @@
     <description>Loads a module, supplies value for external variable declared in indirectly imported module,
       which is used in variable in main module.</description>
     <created by="Debbie Lockett" on="2015-06-01"/>
+    <modified by="Michael Kay" on="2026-11-13"
+      change="Needs trusted=true in 4.0; we rely on the fact that in 3.1, processors must ignore unknown options"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/import/module" file="load-xquery-module/import2-module.xqm"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/middle/module" file="load-xquery-module/middle-module.xqm"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/external-vars/module" file="load-xquery-module/external-vars2-module.xqm"/>
@@ -456,7 +502,9 @@
       let $qn-var1 := QName("http://www.w3.org/fots/fn/load-xquery-module/external-vars/module", "var1")
       return
       let $module := fn:load-xquery-module("http://www.w3.org/fots/fn/load-xquery-module/import/module", 
-      map {"variables" : map { $qn-var1 : "that" }})
+                                   map {"variables" : map { $qn-var1 : "that" },
+                                        "trusted" : true()
+                                        })
       return
       $module("variables")(QName("http://www.w3.org/fots/fn/load-xquery-module/import/module", "var1"))
     </test>
@@ -469,6 +517,8 @@
     <description>Loads a module containing a function using variables from an imported module.</description>
     <created by="Debbie Lockett" on="2015-06-01"/>
     <modified by="Debbie Lockett" on="2015-09-04" change="Use XPath syntax in test"/>
+    <modified by="Michael Kay" on="2026-11-13"
+      change="Needs trusted=true in 4.0; we rely on the fact that in 3.1, processors must ignore unknown options"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/import-vars/module" file="load-xquery-module/import-vars3-module.xqm"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/external-vars/module" file="load-xquery-module/external-vars-module.xqm"/>
     <test>      
@@ -476,7 +526,8 @@
        $module-ext := "http://www.w3.org/fots/fn/load-xquery-module/external-vars/module"
       return
       let $module := fn:load-xquery-module($module-ns, 
-      map {"variables" : map {QName($module-ext, "var3") : map{}}})
+                              map {"variables" : map {QName($module-ext, "var3") : map{}},
+                                   "trusted": true()})
       return
       $module("functions")(QName($module-ns, "and"))(0)()
     </test>
@@ -489,9 +540,12 @@
     <description>Error loading a module which attempts to import itself directly</description>
     <created by="Debbie Lockett" on="2015-06-01"/>
     <modified by="Michael Kay" on="2015-07-14" change="Not an error. XQ 4.12.4 Cycles: implementations must resolve cycles..."/>
+    <modified by="Michael Kay" on="2026-11-13"
+      change="Needs trusted=true in 4.0; we rely on the fact that in 3.1, processors must ignore unknown options"/>
     <module uri="http://www.w3.org/fots/fn/load-xquery-module/import-self/module" file="load-xquery-module/import-self-module.xqm"/>
     <test>      
-      let $module := fn:load-xquery-module("http://www.w3.org/fots/fn/load-xquery-module/import-self/module")
+      let $module := fn:load-xquery-module("http://www.w3.org/fots/fn/load-xquery-module/import-self/module",
+                              map{"trusted": true()})
       return
       $module("variables")(QName("http://www.w3.org/fots/fn/load-xquery-module/import-self/module", "var1"))
     </test>
@@ -504,10 +558,13 @@
     <description>Loads a module which imports itself circularly.</description>
     <created by="Debbie Lockett" on="2015-06-01"/>
     <modified by="Michael Kay" on="2015-07-13" change="make the test query actually call the function"/>
+    <modified by="Michael Kay" on="2026-11-13"
+      change="Needs trusted=true in 4.0; we rely on the fact that in 3.1, processors must ignore unknown options"/>
     <module uri="http://www.w3.org/TestModules/test1" file="../prod/ModuleImport/test1c1-lib.xq"/>
     <module uri="http://www.w3.org/TestModules/test2" file="../prod/ModuleImport/test2c1-lib.xq"/>
     <test>      
-      let $module := fn:load-xquery-module("http://www.w3.org/TestModules/test1")
+      let $module := fn:load-xquery-module("http://www.w3.org/TestModules/test1",
+                           map{"trusted": true()})
       return
       $module("functions")(QName("http://www.w3.org/TestModules/test1", "ok"))(0)()
     </test>
@@ -1633,12 +1690,13 @@ return $module?functions?(QName('urn:x', 'f'))?0()
     <modified by="Michael Kay" on="2026-10-15" change="Prevent aggressive optimization"/>
     <dependency type="spec" value="XQ40+"/>
     <test>
-let $module := load-xquery-module('urn:x', {
-  'content': 'module namespace x = "urn:x";
-    declare function x:f() { exists(doc("../docs/bib.xml")/*/*) };',
-  'trusted': true()
-})
-return $module?functions?(QName('urn:x', 'f'))?0()
+      let $module := load-xquery-module('urn:x', {
+        'content': 'module namespace x = "urn:x";
+                    declare function x:f() { exists(doc("../docs/bib.xml")/*/*) };
+                   ',
+        'trusted': true()
+      })
+      return $module?functions?(QName('urn:x', 'f'))?0()
     </test>
     <result>
       <assert-true/>
@@ -1771,12 +1829,13 @@ return $module?functions?(QName('urn:x', 'f'))?0()
     <modified by="Michael Kay" on="2026-10-15" change="Prevent aggressive optimization"/>
     <dependency type="spec" value="XQ40+"/>
     <test>
-let $module := load-xquery-module('urn:x', {
-  'content': 'module namespace x = "urn:x";
-    declare function x:f($callback) { $callback() };'
-})
-let $callback := fn() { exists(doc('../docs/bib.xml')/*/*) }
-return $module?functions?(QName('urn:x', 'f'))?1($callback)
+      let $module := load-xquery-module('urn:x', {
+        'content': 'module namespace x = "urn:x";
+                    declare function x:f($callback) { $callback() };
+                   '
+      })
+      let $callback := fn() { exists(doc('../docs/bib.xml')/*/*) }
+      return $module?functions?(QName('urn:x', 'f'))?1($callback)
     </test>
     <result>
       <assert-true/>
@@ -1895,11 +1954,12 @@ return empty($names) or empty($f($names[1]))
     <modified by="Christian Gruen" on="2026-10-27" change="PR2998"/>
     <dependency type="spec" value="XQ40+"/>
     <test>
-let $module := load-xquery-module('urn:x', {
-  'content': 'module namespace x = "urn:x";
-    declare function x:f() { available-environment-variables() };'
-})
-return empty($module?functions?(QName('urn:x', 'f'))?0())
+      let $module := load-xquery-module('urn:x', {
+        'content': 'module namespace x = "urn:x";
+                    declare function x:f() { available-environment-variables() };
+                   '
+      })
+      return empty($module?functions?(QName('urn:x', 'f'))?0())
     </test>
     <result>
       <assert-true/>
@@ -2261,12 +2321,13 @@ return empty($module?functions?(QName('urn:x', 'point')))
     <created by="Christian Gruen" on="2026-10-21"/>
     <dependency type="spec" value="XQ40+"/>
     <test>
-let $module := load-xquery-module('urn:x', {
-  'content': 'module namespace x = "urn:x";
-    declare type x:answer as enum("yes", "no");'
-})
-let $answer := $module?functions?(QName('urn:x', 'answer'))?1
-return ($answer('yes'), try { $answer('maybe') } catch err:FORG0001 { 'invalid' })
+      let $module := load-xquery-module('urn:x', {
+        'content': 'module namespace x = "urn:x";
+                    declare type x:answer as enum("yes", "no");
+                   '
+      })
+      let $answer := $module?functions?(QName('urn:x', 'answer'))?1
+      return ($answer('yes'), try { $answer('maybe') } catch err:FORG0001 { 'invalid' })
     </test>
     <result>
       <assert-deep-eq>'yes', 'invalid'</assert-deep-eq>
@@ -2296,16 +2357,20 @@ return $module?functions?(QName('urn:x', 'f'))?0()
   <test-case name="fn-load-xquery-module-571" covers-40="PR1333 PR2213">
     <description>Loads a module with the 'trusted' option.</description>
     <created by="Christian Gruen" on="2026-10-21"/>
+    <modified by="Michael Kay" on="2026-11-12" change="add module element to test metadata"/>
     <dependency type="spec" value="XQ40+"/>
+    <module uri="http://www.w3.org/fots/fn/load-xquery-module/valid/module" 
+            file="load-xquery-module/valid-module.xqm"/>
     <test>
-let $module := load-xquery-module('urn:x', {
-  'content': 'module namespace x = "urn:x";
-    import module namespace vm = "http://www.w3.org/fots/fn/load-xquery-module/valid/module"
-      at "load-xquery-module/valid-module.xqm";
-    declare function x:f() { vm:func1() };',
-  'trusted': true()
-})
-return $module?functions?(QName('urn:x', 'f'))?0()
+      let $module := load-xquery-module('urn:x', {
+        'content': 'module namespace x = "urn:x";
+                    import module namespace vm = "http://www.w3.org/fots/fn/load-xquery-module/valid/module"
+                           at "load-xquery-module/valid-module.xqm";
+                    declare function x:f() { vm:func1() };
+                   ',
+        'trusted': true()
+      })
+      return $module?functions?(QName('urn:x', 'f'))?0()
     </test>
     <result>
       <assert-eq>'func1'</assert-eq>
@@ -2375,63 +2440,66 @@ return $module?functions?(QName('urn:x', 'f'))?1($callback)
     <modified by="Christian Gruen" on="2026-10-27" change="PR2979"/>
     <dependency type="spec" value="XQ40+"/>
     <test>
-let $c := 'module namespace c = "urn:c";
-  declare function c:read($uri) { exists(doc($uri)/*/*) };'
-let $b := 'module namespace b = "urn:b";
-  declare variable $b:c-source external;
-  declare variable $b:books external;
-  declare function b:books() { $b:books };
-  declare function b:read($uri, $trusted := true()) {
-    let $c := load-xquery-module("urn:c", { "content": $b:c-source, "trusted": $trusted })
-    return try {
-      $c?functions?(QName("urn:c", "read"))?1($uri)
-    } catch err:FODC0016 {
-      "denied"
+  let $c := 'module namespace c = "urn:c";
+             declare function c:read($uri) { exists(doc($uri)/*/*) };
+            '
+  let $b := 'module namespace b = "urn:b";
+              declare variable $b:c-source external;
+              declare variable $b:books external;
+              declare function b:books() { $b:books };
+              declare function b:read($uri, $trusted := true()) {
+                let $c := load-xquery-module("urn:c", { "content": $b:c-source, "trusted": $trusted })
+                return try {
+                  $c?functions?(QName("urn:c", "read"))?1($uri)
+                } catch err:FODC0016 {
+                  "denied"
+                }
+              };
+              declare function b:call($callback, $uri) { $callback($uri) };
+            '
+  let $a := 'module namespace a = "urn:a";
+              declare variable $a:b-source external;
+              declare variable $a:c-source external;
+              declare variable $a:books := count(//book);
+              declare record a:result(books, direct, nested, untrusted, callback);
+              declare function a:run($uri, $callback) {
+                let $b := load-xquery-module("urn:b", {
+                  "content": $a:b-source,
+                  "variables": {
+                    QName("urn:b", "c-source"): $a:c-source,
+                    QName("urn:b", "books"): $a:books
+                  }
+                })
+                let $c := load-xquery-module("urn:c", { "content": $a:c-source, "trusted": true() })
+                let $read := $b?functions?(QName("urn:b", "read"))
+                return a:result(
+                  $b?functions?(QName("urn:b", "books"))?0(),
+                  $c?functions?(QName("urn:c", "read"))?1($uri),
+                  $read?1($uri),
+                  $read?2($uri, false()),
+                  $b?functions?(QName("urn:b", "call"))?2($callback, $uri)
+                )
+              };
+             '
+  let $module := load-xquery-module('urn:a', {
+    'content': $a,
+    'trusted': true(),
+    'context-value': doc('../docs/bib.xml'),
+    'variables': {
+      QName('urn:a', 'b-source'): $b,
+      QName('urn:a', 'c-source'): $c
     }
-  };
-  declare function b:call($callback, $uri) { $callback($uri) };'
-let $a := 'module namespace a = "urn:a";
-  declare variable $a:b-source external;
-  declare variable $a:c-source external;
-  declare variable $a:books := count(//book);
-  declare record a:result(books, direct, nested, untrusted, callback);
-  declare function a:run($uri, $callback) {
-    let $b := load-xquery-module("urn:b", {
-      "content": $a:b-source,
-      "variables": {
-        QName("urn:b", "c-source"): $a:c-source,
-        QName("urn:b", "books"): $a:books
-      }
-    })
-    let $c := load-xquery-module("urn:c", { "content": $a:c-source, "trusted": true() })
-    let $read := $b?functions?(QName("urn:b", "read"))
-    return a:result(
-      $b?functions?(QName("urn:b", "books"))?0(),
-      $c?functions?(QName("urn:c", "read"))?1($uri),
-      $read?1($uri),
-      $read?2($uri, false()),
-      $b?functions?(QName("urn:b", "call"))?2($callback, $uri)
-    )
-  };'
-let $module := load-xquery-module('urn:a', {
-  'content': $a,
-  'trusted': true(),
-  'context-value': doc('../docs/bib.xml'),
-  'variables': {
-    QName('urn:a', 'b-source'): $b,
-    QName('urn:a', 'c-source'): $c
-  }
-})
-let $run := $module?functions?(QName('urn:a', 'run'))?2
-return $run('../docs/bib.xml', fn($uri) { exists(doc($uri)/*/*) })
-    </test>
-    <result>
-      <assert-deep-eq>{
-  'books': 4,
-  'direct': true(),
-  'nested': 'denied',
-  'untrusted': 'denied',
-  'callback': true()
+  })
+  let $run := $module?functions?(QName('urn:a', 'run'))?2
+  return $run('../docs/bib.xml', fn($uri) { exists(doc($uri)/*/*) })
+      </test>
+      <result>
+        <assert-deep-eq>{
+    'books': 4,
+    'direct': true(),
+    'nested': 'denied',
+    'untrusted': 'denied',
+    'callback': true()
 }</assert-deep-eq>
     </result>
   </test-case>
@@ -2441,18 +2509,18 @@ return $run('../docs/bib.xml', fn($uri) { exists(doc($uri)/*/*) })
     <created by="Christian Gruen" on="2026-10-22"/>
     <dependency type="spec" value="XQ40+"/>
     <test><![CDATA[
-let $src := 'module namespace x = "urn:x";
-             declare variable $x:xml external;
-             declare function x:f() { 
-                parse-xml($x:xml, { "trust-external": true() })/a/string() 
-             };'
-let $module := load-xquery-module('urn:x', {
-      'content': $src,
-      'variables': {
-             QName('urn:x', 'xml'): "<!DOCTYPE a [<!ENTITY foo SYSTEM 'parse-xml/foo.entity'>]><a>&amp;foo;</a>"
-      }
-    })
-return $module?functions?(QName('urn:x', 'f'))?0()
+      let $src := 'module namespace x = "urn:x";
+                   declare variable $x:xml external;
+                   declare function x:f() { 
+                      parse-xml($x:xml, { "trust-external": true() })/a/string() 
+                   };'
+      let $module := load-xquery-module('urn:x', {
+            'content': $src,
+            'variables': {
+                   QName('urn:x', 'xml'): "<!DOCTYPE a [<!ENTITY foo SYSTEM 'parse-xml/foo.entity'>]><a>&amp;foo;</a>"
+            }
+          })
+      return $module?functions?(QName('urn:x', 'f'))?0()
     ]]></test>
     <result>
       <error code="FODC0016"/>
@@ -2602,11 +2670,12 @@ return $module?functions?(QName('urn:x', 'f'))?0()
     <created by="Christian Gruen" on="2026-10-22"/>
     <dependency type="spec" value="XQ40+"/>
     <test>
-let $module := load-xquery-module('urn:x', {
-  'content': 'module namespace x = "urn:x";
-    declare function x:f() { exists(uri-collection("../docs/")) };'
-})
-return $module?functions?(QName('urn:x', 'f'))?0()
+      let $module := load-xquery-module('urn:x', {
+        'content': 'module namespace x = "urn:x";
+                    declare function x:f() { exists(uri-collection("../docs/")) };
+                   '
+      })
+      return $module?functions?(QName('urn:x', 'f'))?0()
     </test>
     <result>
       <error code="FODC0016"/>
@@ -2651,11 +2720,12 @@ return $module?functions?(QName('urn:x', 'f'))?0()
     <created by="Christian Gruen" on="2026-10-22"/>
     <dependency type="spec" value="XQ40+"/>
     <test>
-let $module := load-xquery-module('urn:x', {
-  'content': 'module namespace x = "urn:x";
-    declare function x:f() { exists(csv-doc("parse-csv/bom-none.csv")?rows) };'
-})
-return $module?functions?(QName('urn:x', 'f'))?0()
+      let $module := load-xquery-module('urn:x', {
+        'content': 'module namespace x = "urn:x";
+                    declare function x:f() { exists(csv-doc("parse-csv/bom-none.csv")?rows) };
+                   '
+      })
+      return $module?functions?(QName('urn:x', 'f'))?0()
     </test>
     <result>
       <error code="FODC0016"/>

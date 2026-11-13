@@ -15,8 +15,11 @@ declare %public function sub:isSubtype($a as xs:string, $b as xs:string) as xs:b
                        } instance of function() as %TYPE1%
                      };"
     let $final-module := $module => replace("%TYPE0%", $a) => replace("%TYPE1%", $b)
-    let $functions := load-xquery-module('http://www.w3.org/qt4cg/compare-inline', map{'content':$final-module})?functions
-    let $cmp := $functions(fn:QName('http://www.w3.org/qt4cg/compare-inline', 'compareTypes'))?0
+    let $functions := load-xquery-module('http://www.w3.org/qt4cg/compare-inline', 
+                                          { 'content': $final-module,
+                                            'trusted': true()
+                                          }) ? functions
+    let $cmp := $functions ? #Q{http://www.w3.org/qt4cg/compare-inline}compareTypes ? 0
     return $cmp()
 };
 
@@ -36,8 +39,11 @@ declare %public function sub:isSubtypeSA($a as xs:string, $b as xs:string) as xs
                        } instance of function() as %TYPE1%
                      };"
     let $final-module := $module => replace("%TYPE0%", $a) => replace("%TYPE1%", $b)
-    let $functions := load-xquery-module('http://www.w3.org/qt4cg/compare-inline', map{'content':$final-module})?functions
-    let $cmp := $functions(fn:QName('http://www.w3.org/qt4cg/compare-inline', 'compareTypes'))?0
+    let $functions := load-xquery-module('http://www.w3.org/qt4cg/compare-inline', 
+                                         { 'content': $final-module,
+                                           'trusted': true()
+                                         }) ? functions
+    let $cmp := $functions? #Q{http://www.w3.org/qt4cg/compare-inline}compareTypes ? 0
     return $cmp()
 };
 
