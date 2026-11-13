@@ -7,6 +7,8 @@
 
    <dependency type="feature" value="XQUpdate"/>
 
+   <dependency type="spec" value="XQUF10+"/>
+
    <test-case name="id-flwor-expr-001">
       <description>Evaluates an insert expression used with FLWOR expression where the let
                   clause is an updating expression.</description>
@@ -493,6 +495,174 @@
       <test><![CDATA[declare variable $input-context external; for $var in for $var in $input-context/works[1]/employee[1]/hours[1] return () return $var]]></test>
       <result>
          <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="id-flwor-expr-030">
+      <description>FLWOR expression with an updating return clause.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <dependency type="spec" value="XQUF30+"/>
+      <test><![CDATA[
+         <a/> transform with {
+           for tumbling window $w in (1, 2, 3, 4)
+             start at $s when true()
+             end at $e when $e - $s = 1
+           return insert node attribute { concat('w', $s) } { $w } into .
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a w1="1 2" w3="3 4"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-flwor-expr-031">
+      <description>FLWOR expression with an updating return clause.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <dependency type="spec" value="XQUF30+"/>
+      <test><![CDATA[
+         <a/> transform with {
+           for sliding window $w in (1, 2, 3)
+             start at $s when true()
+             only end at $e when $e - $s = 1
+           return insert node attribute { concat('w', $s) } { $w } into .
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a w1="1 2" w2="2 3"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-flwor-expr-032">
+      <description>FLWOR expression with an updating return clause.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <dependency type="spec" value="XQUF30+"/>
+      <test><![CDATA[
+         <a><b/><c/><b/></a> transform with {
+           for $node in *
+           group by $name := name($node)
+           return insert node attribute { $name } { count($node) } into .
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a b="2" c="1"><b/><c/><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-flwor-expr-033">
+      <description>FLWOR expression with an updating return clause.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <dependency type="spec" value="XQUF30+"/>
+      <test><![CDATA[
+         <a><b/><b/><b/></a> transform with {
+           for $node in b
+           count $c
+           return insert node attribute n { $c } into $node
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b n="1"/><b n="2"/><b n="3"/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-flwor-expr-034">
+      <description>FLWOR expression with an updating return clause.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <dependency type="spec" value="XQUF30+"/>
+      <test><![CDATA[
+         <a/> transform with {
+           for $i allowing empty in ()
+           return insert node <b>{ count($i) }</b> into .
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b>0</b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-flwor-expr-035">
+      <description>FLWOR expression with an updating return clause.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <dependency type="spec" value="XQUF30+"/>
+      <test><![CDATA[
+         <a/> transform with {
+           for tumbling window $w in (1, 2)
+             start when (delete node .)
+           return ()
+         }]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-flwor-expr-036">
+      <description>FLWOR expression with an updating return clause.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <dependency type="spec" value="XQUF30+"/>
+      <test><![CDATA[
+         <a><b/></a> transform with {
+           for $node in *
+           group by $key := (delete node $node)
+           return ()
+         }]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-flwor-expr-037">
+      <description>FLWOR expression with an updating return clause.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <dependency type="spec" value="XQUF30+"/>
+      <test><![CDATA[
+         <a/> transform with {
+           for $i in (1, 2)
+           where $i = 2
+           return insert node attribute x { $i } into .
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="2"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-flwor-expr-038">
+      <description>FLWOR expression with an updating return clause.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <dependency type="spec" value="XQUF30+"/>
+      <test><![CDATA[
+         <a/> transform with {
+           for sliding window $w in ()
+             start when true()
+             end when true()
+           return insert node <b/> into .
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-flwor-expr-039">
+      <description>FLWOR expression with an updating return clause.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <dependency type="spec" value="XQUF30+"/>
+      <test><![CDATA[
+         <a/> transform with {
+           for tumbling window $w in (1, 2)
+             start when true()
+             end when (delete node .)
+           return ()
+         }]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-flwor-expr-040">
+      <description>FLWOR expression with an updating return clause.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <dependency type="spec" value="XQUF30+"/>
+      <test><![CDATA[
+         <a/> transform with {
+           for $i in (2, 1)
+           order by (delete node .)
+           return ()
+         }]]></test>
+      <result>
+         <error code="XUST0001"/>
       </result>
    </test-case>
 </test-set>

@@ -6,6 +6,8 @@
 
    <dependency type="feature" value="XQUpdate"/>
 
+   <dependency type="spec" value="XQUF10+"/>
+
    <test-case name="applyUpdates-001">
       <description>Apply insertInto then delete.</description>
       <created by="Andrew Eisenberg" on="2008-11-04"/>
@@ -467,6 +469,462 @@
    <pnum>P1</pnum>
    <hours>40</hours>
   </employee>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-030">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>AA<b/>CC</a>
+         modify delete node $c/b
+         return ($c, count($c/text()))]]></test>
+      <result>
+         <assert-deep-eq><![CDATA[<a>AACC</a>, 1]]></assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-031">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>United States</a>
+         modify insert node 'foo' as last into $c
+         return (count($c/text()), string($c))]]></test>
+      <result>
+         <assert-deep-eq>1, "United Statesfoo"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-032">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>United States</a>
+         modify insert node 'foo' into $c
+         return count($c/text())]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-033">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <item><location>US</location><quantity>1</quantity></item>
+         modify (
+           insert node 'foo' as first into $c/location,
+           insert node 'foo' before $c/location,
+           insert node 'foo' as last into $c/quantity
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<item>foo<location>fooUS</location><quantity>1foo</quantity></item>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-034">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <location>US</location>
+         modify insert node 'foo' before $c/text()
+         return (count($c/text()), string($c))]]></test>
+      <result>
+         <assert-deep-eq>1, "fooUS"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-035">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <location>US</location>
+         modify insert node 'foo' after $c/text()
+         return (count($c/text()), string($c))]]></test>
+      <result>
+         <assert-deep-eq>1, "USfoo"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-036">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <location>US</location>
+         modify (
+           insert node 'foo' into $c,
+           delete node $c/text()
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<location>foo</location>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-037">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <item><location>US</location></item>
+         modify (
+           insert node 'foo' after $c/location,
+           insert node 'faa' before $c/location,
+           insert node 'faa' into $c/location,
+           delete node $c/location/text()
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<item>faa<location>faa</location>foo</item>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-038">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n>aa<d/><d/>cc</n>
+         modify (
+           delete node $c/d,
+           insert node 'bb' after $c/d[1]
+         )
+         return (count($c/text()), $c/text())]]></test>
+      <result>
+         <assert-deep-eq>1, text { "aabbcc" }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-039">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n>aa<d/><d/>cc</n>
+         modify (
+           delete node $c/d,
+           insert node 'bb' before $c/d[2]
+         )
+         return (count($c/text()), string($c))]]></test>
+      <result>
+         <assert-deep-eq>1, "aabbcc"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-040">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>shouldBe<Single/>TextNode</a>
+         modify replace node $c/Single with 'Single'
+         return ($c, count($c/text()))]]></test>
+      <result>
+         <assert-deep-eq><![CDATA[<a>shouldBeSingleTextNode</a>, 1]]></assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-041">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n>T1<a/>T2<b/>T3<c/>T4<d/>T5<e/></n>
+         modify (
+           replace node $c/e with 'T6',
+           insert node 'T11' before $c/a,
+           delete nodes ($c/a, $c/b, $c/c),
+           replace node $c/d with (<newd/>, 'T44')
+         )
+         return ($c, count($c/text()))]]></test>
+      <result>
+         <assert-deep-eq><![CDATA[<n>T1T11T2T3T4<newd/>T44T5T6</n>, 2]]></assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-042">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n>a<b/>c</n>
+         modify replace value of node $c/b with 'x'
+         return count($c/text())]]></test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-043">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n>a<b/>c</n>
+         modify insert node ('', '') before $c/b
+         return count($c/text())]]></test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-044">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><b/></n>
+         modify insert node text { '' } into $c
+         return count($c/node())]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-045">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n>a</n>
+         modify replace node $c/text() with text { '' }
+         return count($c/node())]]></test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-046">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a/></n>
+         modify (
+           insert node <i/> as first into $c/a,
+           replace node $c/a with <r/>
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><r/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-047">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a/></n>
+         modify (
+           rename node $c/a as 'b',
+           insert node <x/> after $c/a,
+           replace value of node $c/a with 'v'
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><b>v</b><x/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-048">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a/></n>
+         modify (
+           replace node $c/a with <b/>,
+           insert node <x/> before $c/a,
+           insert node <y/> after $c/a
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><x/><b/><y/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-049">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a/></n>
+         modify (
+           delete node $c/a,
+           insert node <x/> before $c/a,
+           insert node <y/> after $c/a
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><x/><y/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-050">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a><b/></a></n>
+         modify (
+           replace value of node $c/a with 'x',
+           insert node <y/> into $c/a/b
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><a>x</a></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-051">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a x="1"/></n>
+         modify (
+           replace value of node $c/a with 'v',
+           replace value of node $c/a/@x with '2'
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><a x="2">v</a></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-060">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify (
+           insert node 'x' before $c/b,
+           insert node 'y' after $c/b,
+           delete node $c/b
+         )
+         return (count($c/text()), string($c))]]></test>
+      <result>
+         <assert-deep-eq>1, "xy"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-061">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>x<b/>y</a>
+         modify replace node $c/b with ('1', <c/>, '2')
+         return (count($c/text()), string($c))]]></test>
+      <result>
+         <assert-deep-eq>2, "x12y"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-062">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>x<b/>y</a>
+         modify replace node $c/b with text { '1' }
+         return (count($c/text()), string($c))]]></test>
+      <result>
+         <assert-deep-eq>1, "x1y"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-063">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>x<b/>y</a>
+         modify rename node $c/b as 'c'
+         return count($c/text())]]></test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-064">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify (
+           replace value of node $c with 'v',
+           replace node $c/b with <c/>,
+           insert node <d/> into $c/b,
+           rename node $c/b as 'e'
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>v</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-065">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b x="1"/></a>
+         modify (
+           delete node $c/b,
+           replace value of node $c/b/@x with '2',
+           rename node $c/b/@x as 'y'
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-066">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify (
+           insert node <x/> as first into $c/b,
+           insert node <y/> as last into $c/b,
+           replace value of node $c/b with 'v'
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b>v</b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-067">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify (
+           insert node attribute x { 1 } into $c,
+           rename node $c as 'b'
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<b x="1"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-068">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>{ (1 to 5) ! <b/> }</a>
+         modify (
+           for $b at $p in $c/b
+           return if ($p mod 2) then delete node $b else rename node $b as 'c'
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="applyUpdates-069">
+      <description>Evaluation of upd:applyUpdates.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify (
+           replace node $c/b with <c/>,
+           insert node <x/> before $c/b,
+           insert node <y/> after $c/b,
+           insert node <z/> into $c/b
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/><c/><y/></a>]]></assert-xml>
       </result>
    </test-case>
 </test-set>

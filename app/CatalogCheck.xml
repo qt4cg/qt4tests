@@ -282,6 +282,7 @@
     <description> Test that dependencies on the spec version use correct values </description>
     <created by="Michael Kay" on="2015-01-03"/>
     <modified by="Michael Kay" on="2024-11-19" change="avoid FORG0006 when tokenize() returns multiple invalid strings"/>
+    <modified by="Christian Gruen" on="2026-11-10" change="accept XQUF versions"/>
     <environment ref="catalog"/>
     <dependency type="spec" value="XQ10+"/>
     <test><![CDATA[
@@ -291,7 +292,7 @@
              [exists(tokenize(normalize-space(@value), ' ')[not (. =
                           ('XP20', 'XP20+', 'XP30', 'XP30+', 'XP31', 'XP31+', 'XP40+',
                            'XQ10', 'XQ10+', 'XQ30', 'XQ30+', 'XQ31', 'XQ31+', 'XQ40+',
-                           'XT30', 'XT30+', 'XT40+'))])]/
+                           'XT30', 'XT30+', 'XT40+', 'XQUF10', 'XQUF10+', 'XQUF30', 'XQUF30+'))])]/
                            concat(../@name, ' => ', @value)
     ]]></test>
     <result>
@@ -390,17 +391,19 @@
     <description>Check that the spec dependencies of each test case are compatible with those of its test set.</description>
     <created by="Christian Gruen" on="2026-10-03"/>
     <modified by="Christian Gruen" on="2026-10-04" change="faster execution"/>
+    <modified by="Christian Gruen" on="2026-11-10" change="accept XQUF versions"/>
     <environment ref="catalog"/>
     <dependency type="spec" value="XQ30+"/>
     <test><![CDATA[
       declare namespace fots = "http://www.w3.org/2010/09/qt-fots-catalog";
-      let $all := ('XP20', 'XP30', 'XP31', 'XP40', 'XQ10', 'XQ30', 'XQ31', 'XQ40', 'XT30', 'XT40')
+      let $all := ('XP20', 'XP30', 'XP31', 'XP40', 'XQ10', 'XQ30', 'XQ31', 'XQ40', 'XT30', 'XT40',
+                   'XQUF10', 'XQUF30')
       let $versions := function($deps) {
         distinct-values(
           for $token in $deps[@type = 'spec'][not(@satisfied = 'false')]/tokenize(normalize-space(@value), ' ')
           let $base := replace($token, '\+$', '')
           return if (ends-with($token, '+'))
-            then $all[substring(., 1, 2) = substring($base, 1, 2) and . ge $base]
+            then $all[replace(., '\d+$', '') = replace($base, '\d+$', '') and . ge $base]
             else $base
         )
       }

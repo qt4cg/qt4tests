@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-UpdatingFunctions">
+   <description>XQuery Update - Updating Functions</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <dependency type="spec" value="XQUF30+"/>
+
+   <test-case name="upd-updating-function-001">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:delete(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         <a><b/></a> transform with { local:delete(b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-002">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:none() {
+           ()
+         };
+         <a/> transform with { local:none() }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-003">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:upsert(
+           $e  as element(),
+           $an as xs:QName,
+           $av as xs:anyAtomicType
+         ) {
+           let $ea := $e/attribute()[node-name(.) = $an]
+           return if (empty($ea))
+             then insert node attribute { $an } { $av } into $e
+             else replace value of node $ea with $av
+         };
+         <a x="1"/> transform with {
+           local:upsert(., xs:QName('x'), 2),
+           local:upsert(., xs:QName('y'), 3)
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="2" y="3"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-004">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:rename(
+           $nodes as element()*
+         ) {
+           if (exists($nodes)) then (
+             rename node head($nodes) as 'x',
+             local:rename(tail($nodes))
+           ) else ()
+         };
+         <a><b/><c/><d/></a> transform with { local:rename(*) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/><x/><x/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-005">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %private %updating function local:delete(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         <a><b/></a> transform with { local:delete(b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-006">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:delete(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         declare %updating function local:delete-all(
+           $nodes as node()*
+         ) {
+           for $node in $nodes
+           return local:delete($node)
+         };
+         <a><b/><c/>d</a> transform with { local:delete-all(node()) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-007">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:delete(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         declare function local:g(
+           $node as node()
+         ) {
+           local:delete($node)
+         };
+         1]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-008">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:delete(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         <a><b/></a> transform with {
+           let $x := local:delete(b)
+           return ()
+         }]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-009">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:delete(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         count(local:delete(<a/>))]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-010">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:delete(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         local:delete#1 instance of %updating function(*)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-011">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare updating function local:delete(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         local:delete#1 instance of %updating function(*)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-012">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:delete(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         local:delete(?) instance of %updating function(*)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-013">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[fn:put#2 instance of %updating function(*)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-014">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[fn:put#3 instance of %updating function(*)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-015">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:insert(
+           $target as element(),
+           $node   as node()
+         ) {
+           insert node $node into $target
+         };
+         local:insert#2 instance of %updating function(element(), node()) as item()*]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-016">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:insert(
+           $target as element(),
+           $node   as node()
+         ) {
+           insert node $node into $target
+         };
+         local:insert#2 instance of %updating function(element()) as item()*]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-017">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:insert(
+           $target as element(),
+           $node   as node()
+         ) {
+           insert node $node into $target
+         };
+         function-arity(local:insert#2)]]></test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-018">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:insert(
+           $target as element(),
+           $node   as node()
+         ) {
+           insert node $node into $target
+         };
+         function-arity(local:insert(?, <b/>))]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-030">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[%updating function($node) { delete node $node } instance of %updating function(*)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-031">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[%updating function() { () } instance of %updating function(*)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-032">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[function($node) { delete node $node } instance of %updating function(*)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-033">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         %updating function($node as element()) { delete node $node }
+           instance of %updating function(element()) as item()*]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-034">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         %updating function($node as element()) { delete node $node }
+           instance of %updating function(xs:string) as item()*]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-035">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f as %updating function(*) := %updating function($node) {
+           delete node $node
+         }
+         return function-arity($f)]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-036">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) { delete node $node }
+         return typeswitch ($f)
+           case %updating function(*) return 'updating'
+           default return 'other']]></test>
+      <result>
+         <assert-eq>'updating'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-037">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare function local:apply(
+           $f as %updating function(*)
+         ) as xs:integer {
+           function-arity($f)
+         };
+         local:apply(%updating function($a, $b) { () })]]></test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-038">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare variable $delete := %updating function($node) {
+           delete node $node
+         };
+         <a><b/></a> transform with { invoke updating $delete(b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-039">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $f := %updating function($node) {
+           delete node $node
+         }
+         return (
+           <a><b/></a> transform with { invoke updating $f(b) },
+           <c><d/></c> transform with { invoke updating $f(d) }
+         )]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/><c/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-040">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $name := 'x'
+         let $f := %updating function($node) {
+           rename node $node as $name
+         }
+         return <a><b/></a> transform with { invoke updating $f(b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-041">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare function local:renamer(
+           $name as xs:string
+         ) as %updating function(*) {
+           %updating function($node) { rename node $node as $name }
+         };
+         <a><b/></a> transform with { invoke updating local:renamer('x')(b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-042">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         %updating function($s as xs:string) { () }
+           instance of %updating function(xs:string) as item()*]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-050">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:f() {
+           ()
+         };
+         declare %updating function local:f(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         <a><b/></a> transform with { local:f(), local:f(b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-051">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:delete(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         function-name(local:delete#1) = xs:QName('local:delete')]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-052">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:insert(
+           $target as element(),
+           $node   as node()
+         ) {
+           insert node $node into $target
+         };
+         let $f := local:insert(?, ?)
+         return (function-arity($f), $f instance of %updating function(*))]]></test>
+      <result>
+         <assert-deep-eq>2, true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-053">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:insert-copy(
+           $node as element()
+         ) {
+           insert node ($node transform with { rename node . as 'c' }) into $node
+         };
+         <a><b/></a> transform with { local:insert-copy(b) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b><c/></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-054">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:insert(
+           $node  as element(),
+           $count as xs:integer
+         ) {
+           if ($count > 0) then (
+             insert node <x/> into $node,
+             local:insert($node, $count - 1)
+           ) else ()
+         };
+         count((<a/> transform with { local:insert(., 500) })/x)]]></test>
+      <result>
+         <assert-eq>500</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-060">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:delete(
+           $node as element()
+         ) {
+           delete node $node
+         };
+         <a b=""/> transform with { local:delete(@b) }]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-updating-function-061">
+      <description>Evaluation of updating functions.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:delete(
+           $node as node()
+         ) {
+           delete node $node
+         };
+         local:delete#2]]></test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+</test-set>

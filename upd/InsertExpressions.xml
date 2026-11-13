@@ -7,6 +7,8 @@
 
    <dependency type="feature" value="XQUpdate"/>
 
+   <dependency type="spec" value="XQUF10+"/>
+
    <test-case name="id-insert-expr-001">
       <description>Evaluates a simple insert expression with "after" clause only. Inserts
                   an element.</description>
@@ -2434,6 +2436,1178 @@
 </CATEGORIES>
 </BOOKLIST>
 ]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-100">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a/></n>
+         modify (
+           insert node <x1/> as last into $c,
+           insert node <x2/> into $c/a
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><a><x2/></a><x1/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-101">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a/><b/></n>
+         modify (
+           insert node <x1/> into $c/a,
+           insert node <x2/> into $c/b
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><a><x1/></a><b><x2/></b></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-102">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a att="0"/>
+         modify (
+           insert node <b/> as first into $c,
+           delete node $c/@att
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-103">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a att="0"/>
+         modify (
+           insert node <b/> as first into $c,
+           replace node $c/@att with (attribute att1 { 0 }, attribute att2 { 0 })
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a att1="0" att2="0"><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-104">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n/>
+         modify (
+           insert node <e1/> as first into $c,
+           insert node <e2/> as last into $c
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><e1/><e2/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-105">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n/>
+         modify (
+           insert node <e1/> as last into $c,
+           insert node <e2/> as first into $c
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><e2/><e1/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-106">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n/>
+         modify (
+           insert node <e1/> as last into $c,
+           insert node <e2/> as last into $c
+         )
+         return $c]]></test>
+      <result>
+         <any-of>
+            <assert-xml><![CDATA[<n><e1/><e2/></n>]]></assert-xml>
+            <assert-xml><![CDATA[<n><e2/><e1/></n>]]></assert-xml>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-107">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <r><x/><y/></r>
+         modify (
+           for $t in $c/* return insert node <a/> into $t,
+           insert node <b/> as last into $c/x
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<r><x><a/><b/></x><y><a/></y></r>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-108">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <r><x/><y/></r>
+         modify (
+           for $t in $c/* return insert node attribute a { } into $t,
+           insert node attribute b { } into $c/x
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<r><x a="" b=""/><y a=""/></r>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-109">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <X/>
+         modify insert nodes <A/> into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<X><A/></X>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-110">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { () }
+         modify insert nodes <X/> into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<X/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-111">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { () }
+         modify insert nodes (<!--c-->, <X/>, <?pi?>) into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<!--c--><X/><?pi?>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-112">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert nodes () into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-113">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>x</a>
+         modify insert nodes (<b/>, 'y', <!--c-->, <?pi z?>) as last into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>x<b/>y<!--c--><?pi z?></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-114">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b>TEXT</b><b>TEXT</b></a>
+         modify for $b in $c/b return insert node <new/> before $b
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><new/><b>TEXT</b><new/><b>TEXT</b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-115">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b>TEXT</b><b>TEXT</b></a>
+         modify for $b in $c/b return insert node <new/> after $b
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b>TEXT</b><new/><b>TEXT</b><new/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-116">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b>TEXT</b><b>TEXT</b></a>
+         modify for $b in $c/b return insert node <new/> as first into $b
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b><new/>TEXT</b><b><new/>TEXT</b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-117">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b>TEXT</b><b>TEXT</b></a>
+         modify for $b in $c/b return insert node <new/> as last into $b
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b>TEXT<new/></b><b>TEXT<new/></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-118">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <A><B/><C/></A>
+         modify (
+           insert node <X2/> before $c/C,
+           insert node <X1/> after $c/B
+         )
+         return $c]]></test>
+      <result>
+         <any-of>
+            <assert-xml><![CDATA[<A><B/><X1/><X2/><C/></A>]]></assert-xml>
+            <assert-xml><![CDATA[<A><B/><X2/><X1/><C/></A>]]></assert-xml>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-119">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <A><B><C/></B><D><E/></D></A>
+         modify (
+           insert node <XB/> before $c/B,
+           insert node <XC/> before $c/B/C,
+           insert node <XD/> before $c/D,
+           insert node <XE/> before $c/D/E
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<A><XB/><B><XC/><C/></B><XD/><D><XE/><E/></D></A>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-120">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <A><B><C/><D/></B></A>
+         modify (
+           insert node <X><Y/></X> into $c/B/C,
+           insert node <X><Y/></X> before $c/B/C,
+           insert node <X><Y/></X> after $c/B/D
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<A><B><X><Y/></X><C><X><Y/></X></C><D/><X><Y/></X></B></A>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-121">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <A><B/><C><D/></C><E/></A>
+         modify (
+           insert node <X1/> as first into $c/C,
+           insert node <X2/> as last into $c/C
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<A><B/><C><X1/><D/><X2/></C><E/></A>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-122">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <A><B/></A>
+         modify (
+           insert node <P2/> into $c/B,
+           insert node <P3/> as last into $c
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<A><B><P2/></B><P3/></A>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-123">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node attribute b { 'c' } into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a b="c"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-124">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify insert node attribute x { 'y' } before $c/b
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="y"><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-125">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify insert node attribute x { 'y' } as last into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="y"><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-126">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert nodes (attribute x { 1 }, attribute y { 2 }, <b/>) into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="1" y="2"><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-127">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <x>{ for $i in 1 to 30 return attribute { 'a' || $i } { } }</x>
+         modify insert node attribute b { '' } into $c
+         return count($c/@*)]]></test>
+      <result>
+         <assert-eq>31</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-128">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $e := <e>{ for $i in 1 to 31 return attribute { 'a' || $i } { $i } }</e>
+         let $c := copy $c := $e
+                   modify insert node attribute a0 { 0 } as first into $c
+                   return $c
+         return (name($c/@a31/..), count($c/@*[.. is $c]))]]></test>
+      <result>
+         <assert-deep-eq>"e", 32</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-129">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node (for $i in 1 to 1000 return <b/>) into $c
+         return count($c/b)]]></test>
+      <result>
+         <assert-eq>1000</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-130">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <e a=""/>
+         modify insert node attribute xml:a { '' } into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<e xml:a="" a=""/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-131">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <e xml:a=""/>
+         modify insert node attribute a { '' } into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<e a="" xml:a=""/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-132">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <x/>
+         modify for $i in 1 to 2 return insert node attribute a { 'b' } into $c
+         return $c]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-133">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <x a="a"/>
+         modify (
+           delete node $c/@a,
+           for $i in 1 to 2 return insert node attribute a { 'b' } into $c
+         )
+         return $c]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-134">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <x a="a"/>
+         modify (
+           delete node $c/@a,
+           replace node $c/@a with attribute a { 'b' },
+           insert node attribute a { 'b' } into $c
+         )
+         return $c]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-135">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <e a=""/>
+         modify insert node attribute a { '' } into $c
+         return $c]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-136">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <e xml:a=""/>
+         modify insert node attribute xml:a { 'b' } into $c
+         return $c]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-137">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <e xmlns="URI" a=""/>
+         modify insert node attribute a { } into $c
+         return $c]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-138">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a x=""/>
+         modify insert node <b/> into $c/@x
+         return $c]]></test>
+      <result>
+         <error code="XUTY0005"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-139">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node <b/> into 'x'
+         return $c]]></test>
+      <result>
+         <error code="XUTY0005"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-140">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node attribute b { } after 'x'
+         return $c]]></test>
+      <result>
+         <error code="XUTY0006"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-141">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { <a/> }
+         modify insert node <b/> before $c
+         return $c]]></test>
+      <result>
+         <error code="XUTY0006"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-142">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a b=""/>
+         modify insert node <x/> after $c/@b
+         return $c]]></test>
+      <result>
+         <error code="XUTY0006"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-143">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node <b/> before $c
+         return $c]]></test>
+      <result>
+         <error code="XUDY0029"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-144">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node attribute b { } after $c
+         return $c]]></test>
+      <result>
+         <error code="XUDY0029"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-145">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { }
+         modify insert node attribute b { } into $c
+         return $c]]></test>
+      <result>
+         <error code="XUTY0022"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-146">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { <a/> }
+         modify insert node attribute b { } before $c/a
+         return $c]]></test>
+      <result>
+         <error code="XUDY0030"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-147">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { <a/> }
+         modify insert node attribute b { } after $c/a
+         return $c]]></test>
+      <result>
+         <error code="XUDY0030"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-148">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert nodes (<b/>, attribute c { }) into $c
+         return $c]]></test>
+      <result>
+         <error code="XUTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-149">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare namespace x = 'x';
+         copy $c := <x/>
+         modify insert node attribute x:x { } into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<x xmlns:x="x" x:x=""/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-150">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare namespace x = 'x';
+         copy $c := <x><a/></x>
+         modify insert node attribute x:x { } into $c
+         return namespace-uri-for-prefix('x', $c/a)]]></test>
+      <result>
+         <assert-string-value>x</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-151">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare namespace x = 'x';
+         copy $c := <x><a/></x>
+         modify insert node attribute x:x { } into $c/a
+         return $c/a]]></test>
+      <result>
+         <assert-xml><![CDATA[<a xmlns:x="x" x:x=""/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-152">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a xmlns="u"/>
+         modify insert node <b><c/></b> into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a xmlns="u"><b xmlns=""><c/></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-153">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a xmlns="u"/>
+         modify insert node <b><c/></b> into $c
+         return (namespace-uri($c/*), namespace-uri($c/*/*))]]></test>
+      <result>
+         <assert-string-value> </assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-154">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a xmlns="u"/>
+         modify insert node <b xmlns="u"/> into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a xmlns="u"><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-155">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a xmlns="x"/>
+         modify insert node <a xmlns="y"/> into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a xmlns="x"><a xmlns="y"/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-156">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare default element namespace 'xyz';
+         copy $c := <foo/>
+         modify insert nodes (<bar/>, <baz/>) into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<foo xmlns="xyz"><bar/><baz/></foo>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-157">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { <X><C xmlns:c="NS"/></X> }
+         modify insert node <B><B b:b="B" xmlns:b="B"/></B> before $c/X/*:C
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<X><B><B xmlns:b="B" b:b="B"/></B><C xmlns:c="NS"/></X>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-158">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <x/>
+         modify insert node <a xmlns="test"><b><c/></b><d/></a> into $c
+         return $c/*]]></test>
+      <result>
+         <assert-xml><![CDATA[<a xmlns="test"><b><c/></b><d/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-159">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n xmlns:ns="ns"><a/></n>
+         modify insert node <b ns:id="0" xmlns:ns="ns"/> into $c/a
+         return $c/a]]></test>
+      <result>
+         <assert-xml><![CDATA[<a xmlns:ns="ns"><b ns:id="0"/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-160">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a:x xmlns:a="aa"><b:y xmlns:b="bb"/></a:x>
+         return copy $c := <x/>
+                modify insert node $a into $c
+                return $c/*/*]]></test>
+      <result>
+         <assert-xml><![CDATA[<b:y xmlns:b="bb" xmlns:a="aa"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-161">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <x/>
+         modify insert node <a:x xmlns:a="aa"><b:y xmlns:b="bb"/></a:x> into $c
+         return $c/*/*/namespace-uri()]]></test>
+      <result>
+         <assert-string-value>bb</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-162">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a:x xmlns:a="aa"><a:y xmlns:b="bb"/></a:x>
+         return copy $c := <x/>
+                modify insert node $a/*:y into $c
+                return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<x><a:y xmlns:a="aa" xmlns:b="bb"/></x>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-163">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <r><a/></r>
+         modify insert node <b/> into $c/a
+         return $c/a/b/..]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-164">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $b := <b/>
+         let $c := copy $c := <a/>
+                   modify insert node $b into $c
+                   return $c
+         return $c/b is $b]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-165">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node <b/> into $c
+         return ($c/b/parent::a is $c, root($c/b) is $c)]]></test>
+      <result>
+         <assert-deep-eq>true(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-170">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node document { <b/>, <c/> } into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-171">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert nodes (1, 2, 'x') into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>1 2 x</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-172">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert nodes (1, <b/>, 2) into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>1<b/>2</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-173">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert nodes (1, 2) into $c
+         return count($c/text())]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-174">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node $c into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><a/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-175">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify insert node $c/b after $c/b
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-176">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/><d/></a>
+         modify (
+           insert node $c/b into $c/d,
+           delete node $c/b
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><d><b/></d></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-177">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/><d/></a>
+         modify (
+           insert node $c/b into $c/d,
+           rename node $c/b as 'x'
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/><d><b/></d></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-178">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify (
+           insert node <x/> as first into $c,
+           insert node count($c/*) as last into $c
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/><b/>1</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-179">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><d/></a>
+         modify insert nodes (attribute b { }, <c/>) as first into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a b=""><c/><d/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-180">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><d/></a>
+         modify insert nodes (attribute b { }, <c/>) after $c/d
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a b=""><d/><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-181">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { <a/> }
+         modify insert node 'x' as first into $c
+         return (count($c/node()), string($c))]]></test>
+      <result>
+         <assert-deep-eq>2, "x"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-182">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { <a/> }
+         modify insert nodes (<!--c-->, <?pi?>) before $c/a
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<!--c--><?pi?><a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-183">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert nodes (attribute x { 1 }, attribute x { 2 }) into $c
+         return $c]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-184">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <p:a xmlns:p="x"/>
+         modify insert node attribute { QName('y', 'p:b') } { } into $c
+         return $c]]></test>
+      <result>
+         <error code="XUDY0023"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-185">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <p:a xmlns:p="x"/>
+         modify insert node attribute { QName('x', 'p:b') } { } into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<p:a xmlns:p="x" p:b=""/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-186">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node <b>{ attribute x { 1 } }</b> into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b x="1"/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-187">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node <b/>/@* into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-188">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b x="1"/></a>
+         modify insert node $c/b/@x into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="1"><b x="1"/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-189">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node text { '' } into $c
+         return count($c/node())]]></test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-190">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>x</a>
+         modify (
+           insert node 'y' before $c/text(),
+           insert node 'z' after $c/text()
+         )
+         return (count($c/text()), string($c))]]></test>
+      <result>
+         <assert-deep-eq>1, "yxz"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-191">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node <b/> into $c
+         return $c/b/../name()]]></test>
+      <result>
+         <assert-string-value>a</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-192">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify insert node attribute x { } into $c/b
+         return $c//@x/../name()]]></test>
+      <result>
+         <assert-string-value>b</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-193">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node (<b/>, <c/>) into $c
+         return $c/c/preceding-sibling::*/name()]]></test>
+      <result>
+         <assert-string-value>b</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="id-insert-expr-194">
+      <description>Evaluation of an insert expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node true#0 into $c
+         return $c]]></test>
+      <result>
+         <error code="XQTY0105"/>
       </result>
    </test-case>
 </test-set>

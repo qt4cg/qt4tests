@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-TryCatchExpression">
+   <description>XQuery Update - Try/Catch Expressions</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <dependency type="spec" value="XQUF30+"/>
+
+   <test-case name="upd-try-catch-expr-001">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try { insert node <b/> into . }
+           catch * { () }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-002">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try { error() }
+           catch * { insert node <b/> into . }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-003">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try { insert node <b/> into . }
+           catch * { insert node <c/> into . }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-004">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try { insert node <b/> into ., error() }
+           catch * { insert node <c/> into . }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-005">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try { error(QName('http://www.w3.org/2005/xqt-errors', 'FOER0000')) }
+           catch * { insert node <e>{ local-name-from-QName($err:code) }</e> into . }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><e>FOER0000</e></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-006">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try { error(xs:QName('err:XPTY0004')) }
+           catch err:FOER0000 { insert node <b/> into . }
+           catch err:XPTY0004 { insert node <c/> into . }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-007">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try {
+             try { error() }
+             catch err:XPTY0004 { insert node <b/> into . }
+           }
+           catch * { insert node <c/> into . }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-008">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try {
+             rename node . as 'b',
+             rename node . as 'c'
+           }
+           catch err:XUDY0015 { rename node . as 'd' }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<d/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-009">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a><b/></a> transform with {
+           try {
+             replace node b with <c/>,
+             replace node b with <d/>
+           }
+           catch err:XUDY0016 { delete node b }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-010">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try {
+             replace value of node . with 'x',
+             replace value of node . with 'y'
+           }
+           catch err:XUDY0017 { replace value of node . with 'z' }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>z</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-011">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           rename node . as 'b',
+           try { rename node . as 'c' }
+           catch * { () }
+         }]]></test>
+      <result>
+         <error code="XUDY0015"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-012">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try { insert node 1 into . }
+           catch err:XPTY0004 { () }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>1</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-013">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try { error() }
+           catch err:XPTY0004 { insert node <b/> into . }
+         }]]></test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-014">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:safe-rename(
+           $node as element(),
+           $name as xs:string
+         ) {
+           try { rename node $node as $name }
+           catch err:XQDY0074 { () }
+         };
+         <a><b/><c/></a> transform with {
+           local:safe-rename(b, 'x'),
+           local:safe-rename(c, '1')
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-015">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a/>
+         return try { delete node $a }
+           catch * { () }]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-016">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try {
+             try { error() }
+             catch * { insert node <b/> into ., error() }
+           }
+           catch * { insert node <c/> into . }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-017">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try { error(xs:QName('err:FOER0000'), 'msg', 42) }
+           catch * { insert node <e>{ $err:description, $err:value }</e> into . }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><e>msg 42</e></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-018">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare %updating function local:fail(
+           $node as element()
+         ) {
+           insert node <b/> into $node,
+           error()
+         };
+         <a/> transform with {
+           try { local:fail(.) }
+           catch * { insert node <c/> into . }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-019">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try { insert node <b/> into . }
+           catch * { error() }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-020">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $x := <x/>
+         return <a/> transform with {
+           try { insert node <b/> into $x, error() }
+           catch * { insert node <c/> into . }
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-030">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a/>
+         let $x := try { delete node $a } catch * { () }
+         return $x]]></test>
+      <result>
+         <error code="XUST0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-031">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try { error() }
+           catch * { insert node <b/> into ., error(xs:QName('err:FOER0001')) }
+         }]]></test>
+      <result>
+         <error code="FOER0001"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-032">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try { rename node . as 'b' } catch * { () },
+           try { rename node . as 'c' } catch * { () }
+         }]]></test>
+      <result>
+         <error code="XUDY0015"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-033">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           try {
+             insert node attribute x { 1 } into .,
+             insert node attribute x { 2 } into .
+           }
+           catch * { () }
+         }]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-try-catch-expr-034">
+      <description>Evaluation of an updating try/catch expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $x := <x/>
+         return <a/> transform with {
+           try { insert node <b/> into $x }
+           catch * { () }
+         }]]></test>
+      <result>
+         <error code="XUDY0014"/>
+      </result>
+   </test-case>
+</test-set>

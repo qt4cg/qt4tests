@@ -7,6 +7,8 @@
 
    <dependency type="feature" value="XQUpdate"/>
 
+   <dependency type="spec" value="XQUF10+"/>
+
    <test-case name="id-delete-expr-001">
       <description>A delete expression that removes an element from a directly constructed
                   element node.</description>
@@ -881,6 +883,537 @@
     </near-north> text-2D
   </north> text-1D
 </far-north><!-- Comment-6 --><?a-pi pi-6?><!-- Comment-7 -->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-030">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><a><b/></a><c/><d><e><f/></e><g/></d></n>
+         modify (
+           delete node $c//b,
+           delete node $c//f,
+           delete node $c//e
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><a/><c/><d><g/></d></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-031">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/><c/><d/></a>
+         modify (
+           delete node $c/b,
+           delete node $c/c
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><d/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-032">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n1><n2/><n3/><n4/><n5/><n6/><n7/><n8/><n9/><n10/><n11/></n1>
+         modify delete nodes ($c/n3, $c/n5, $c/n7)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n1><n2/><n4/><n6/><n8/><n9/><n10/><n11/></n1>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-033">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/><c/></a>
+         modify delete node $c/c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-034">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <A><B/><C><D/><E/><F/></C></A>
+         modify delete nodes ($c/B, $c/C/D)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<A><C><E/><F/></C></A>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-035">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <A><B/><C/><D/><E/></A>
+         modify delete nodes ($c/C, $c/D)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<A><B/><E/></A>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-036">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify delete nodes $c/x
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-037">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/><c/><d/></a>
+         modify delete nodes $c/*
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-038">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify (
+           delete node $c/b,
+           delete node $c/b
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-039">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify delete node $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-040">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b x="1"><c/></b></a>
+         modify (
+           delete node $c/b,
+           delete node $c/b/@x,
+           delete node $c/b/c
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-041">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <A><B><C/><D/></B><E/></A>
+         modify (
+           insert node <X/> into $c/B/D,
+           delete node $c/B
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<A><E/></A>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-042">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <A><B/><C/><D/><E/></A>
+         modify (
+           delete nodes ($c/B, $c/C),
+           insert node <CNEW><X/></CNEW> before $c/D
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<A><CNEW><X/></CNEW><D/><E/></A>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-043">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <A><B/><C/><D/></A>
+         modify (
+           insert node <X/> after $c/B,
+           delete node $c/C
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<A><B/><X/><D/></A>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-044">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <A><B/><C/><D/></A>
+         modify (
+           insert node <X/> before $c/D,
+           delete node $c/C
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<A><B/><X/><D/></A>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-045">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <A><B/><C/><D/><E/></A>
+         modify (
+           insert node <X/> into $c/B,
+           delete node $c/C
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<A><B><X/></B><D/><E/></A>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-046">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <A><B/></A>
+         modify (
+           insert node <X/> after $c/B,
+           delete node $c/B
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<A><X/></A>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-047">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a b="1" c="2"/>
+         modify delete node $c/@b
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a c="2"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-048">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a b="1" c="2"><d e="3"/></a>
+         modify delete nodes $c//@*
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><d/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-049">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>x<b/>y</a>
+         modify delete nodes $c/text()
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-050">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><!--c--><?pi x?><b/></a>
+         modify delete nodes ($c/comment(), $c/processing-instruction())
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-051">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n>text<keep/></n>
+         modify (
+           replace value of node $c/text() with '',
+           delete node $c/text()
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><keep/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-052">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <n><x at1="0" at2="0"/><y at3="0"/><b/></n>
+         modify (
+           delete node $c//@at1,
+           delete node $c//@at3,
+           rename node $c//@at2 as 'at2x'
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><x at2x="0"/><y/><b/></n>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-053">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { <a/> }
+         modify delete node $c/a
+         return count($c/node())]]></test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-054">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>{ for $i in 1 to 1000 return <b/> }</a>
+         modify delete nodes $c/b[position() mod 2 = 0]
+         return count($c/b)]]></test>
+      <result>
+         <assert-eq>500</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-055">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify delete node 'x'
+         return $c]]></test>
+      <result>
+         <error code="XUTY0007"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-056">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify delete nodes ($c/b, 1)
+         return $c]]></test>
+      <result>
+         <error code="XUTY0007"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-060">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b x="1"><c>t</c><!--d--></b>e</a>
+         modify delete nodes $c//node()
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-061">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b x="1"><c>t</c></b></a>
+         modify delete nodes ($c//node(), $c//@*)
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-062">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/><b/><b/></a>
+         modify delete node $c/b[last()]
+         return count($c/b)]]></test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-063">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a x="1"/>
+         modify (
+           rename node $c/@x as 'y',
+           delete node $c/@x
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-064">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify (
+           rename node $c/b as 'c',
+           delete node $c/b
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-065">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify (
+           replace value of node $c/b with 'x',
+           delete node $c/b
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-066">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b><c/></b></a>
+         modify (
+           replace node $c/b with <x/>,
+           delete node $c/b/c
+         )
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-067">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := document { <a/>, <!--c--> }
+         modify delete node $c/comment()
+         return count($c/node())]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-068">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a> <b/> </a>
+         modify delete nodes $c/text()
+         return count($c/node())]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-069">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a>x<b/>y<b/>z</a>
+         modify delete nodes $c/b
+         return (count($c/text()), string($c))]]></test>
+      <result>
+         <assert-deep-eq>1, "xyz"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-070">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a><b/></a>
+         modify for $i in 1 to 3 return delete node $c/b
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-071">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify delete node true#0
+         return $c]]></test>
+      <result>
+         <error code="XUTY0007"/>
+      </result>
+   </test-case>
+
+   <test-case name="id-delete-expr-072">
+      <description>Evaluation of a delete expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify delete nodes (1 to 3)
+         return $c]]></test>
+      <result>
+         <error code="XUTY0007"/>
       </result>
    </test-case>
 </test-set>

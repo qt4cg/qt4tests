@@ -1,0 +1,1040 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="upd-TransformWith">
+   <description>XQuery Update - Transform With Expressions</description>
+
+   <dependency type="spec" value="XQ30+"/>
+
+   <dependency type="feature" value="XQUpdate"/>
+
+   <dependency type="spec" value="XQUF30+"/>
+
+   <test-case name="upd-transform-with-001">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { insert node <b/> into . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-002">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-003">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { () }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-004">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a x="1"/> transform with { replace value of node @x with 2 }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="2"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-005">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/>x</a> transform with { replace value of node . with 'y' }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>y</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-006">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { replace node b with <c/> }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-007">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/><c/><b/></a> transform with { delete node b }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-008">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { rename node . as 'b' }]]></test>
+      <result>
+         <assert-xml><![CDATA[<b/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-009">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { insert node attribute x { 1 } into . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="1"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-010">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a><b/></a> transform with {
+           insert node <c/> as first into .,
+           insert node <d/> as last into .,
+           insert node <e/> before b,
+           insert node <f/> after b
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/><e/><b/><f/><d/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-011">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a><b><c/></b></a> transform with {
+           for $node in .//*
+           return rename node $node as 'x'
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x><x/></x></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-012">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           for $i in 1 to 3
+           return insert node attribute { concat('b', $i) } { $i } into .
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a b1="1" b2="2" b3="3"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-013">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           if (exists(@x))
+           then replace value of node @x with 1
+           else insert node attribute x { 0 } into .
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="0"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-014">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a>1</a> transform with {
+           typeswitch (.)
+             case element(a) return replace value of node . with 2
+             default return ()
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>2</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-015">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[document { <a/> } transform with { insert node <b/> into a }]]></test>
+      <result>
+         <all-of>
+            <assert-type>document-node(element(a))</assert-type>
+            <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+         </all-of>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-016">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[string(attribute x { 1 } transform with { replace value of node . with 2 })]]></test>
+      <result>
+         <assert-eq>'2'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-017">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $attr := attribute x { 1 } transform with { rename node . as 'y' }
+         return name($attr)]]></test>
+      <result>
+         <assert-eq>'y'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-018">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[string(text { 'x' } transform with { replace value of node . with 'y' })]]></test>
+      <result>
+         <assert-eq>'y'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-019">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[comment { 'x' } transform with { replace value of node . with 'y' }]]></test>
+      <result>
+         <assert-xml><![CDATA[<!--y-->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-020">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[processing-instruction p { 'x' } transform with { rename node . as 'q' }]]></test>
+      <result>
+         <assert-xml><![CDATA[<?q x?>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-021">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <p:a xmlns:p="urn:p"/> transform with {
+           rename node . as QName('urn:q', 'q:b')
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<q:b xmlns:q="urn:q"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-030">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a/>
+         let $b := $a transform with { insert node <b/> into . }
+         return (count($a/*), count($b/*), $a is $b)]]></test>
+      <result>
+         <assert-deep-eq>0, 1, false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-031">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a>/b transform with { insert node <c/> into . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<b><c/></b>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-032">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[empty((<a><b/></a>/b transform with { })/..)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-033">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { insert node <b>{ position(), last() }</b> into . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b>1 1</b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-034">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $x := <x/>
+         return <a/> transform with { insert node $x into . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><x/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-035">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         for $e in (<a/>, <b/>)
+         return $e transform with { insert node attribute x { name() } into . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="a"/><b x="b"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-036">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare function local:strip($e as element()) as element() {
+           $e transform with { delete node @* }
+         };
+         local:strip(<a x="1" y="2"><b z="3"/></a>)]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b z="3"/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-037">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a>1</a>
+         return (
+           $a transform with { replace value of node . with 2 },
+           $a
+         )]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>2</a><a>1</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-038">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[(<a/> transform with { insert node <b>1</b> into . })/b = 1]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-039">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { delete node . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-040">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a><b/></a> transform with {
+           replace node b with (b transform with { rename node . as 'c' })
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-041">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a><b/></a> transform with {
+           insert node (b transform with { insert node <c/> into . }) into .
+         }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/><b><c/></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-042">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         copy $c := <a/>
+         modify insert node (<b/> transform with { insert node <c/> into . }) into $c
+         return $c]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b><c/></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-043">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a/> transform with { insert node <b/> into . }
+         return $a transform with { insert node <c/> into b }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b><c/></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-044">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a/> transform with { insert node <b/> into . }
+         return count($a/b)]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-045">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare variable $a := <a/> transform with { insert node <b/> into . };
+         $a]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-046">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform (: c :) with (: c :) { delete node b }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-047">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><transform/><with/></a> transform with { delete node transform }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><with/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-048">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[count(<transform><with/></transform>/with)]]></test>
+      <result>
+         <assert-eq>1</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-050">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a>1</a> transform with { replace value of node . with 2 } cast as xs:integer]]></test>
+      <result>
+         <assert-eq>2</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-051">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { insert node <b/> into . } instance of element(a)]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-052">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a>1</a> transform with { replace value of node . with 2 } = 2]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-053">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[-<a>1</a> transform with { }]]></test>
+      <result>
+         <error code="XUTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-054">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a>1</a> transform with { } - 1]]></test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-055">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a>1</a> transform with { } + <b>2</b> transform with { }]]></test>
+      <result>
+         <assert-eq>3</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-056">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { } treat as element(a)]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-057">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { } castable as xs:string]]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-058">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { } / b]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-059">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { } ! name()]]></test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-060">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[1 transform with { }]]></test>
+      <result>
+         <error code="XUTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-061">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA['a' transform with { }]]></test>
+      <result>
+         <error code="XUTY0013"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-062">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $x := <x/>
+         return <a/> transform with { insert node <b/> into $x }]]></test>
+      <result>
+         <error code="XUDY0014"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-063">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { rename node . as 'b', rename node . as 'c' }]]></test>
+      <result>
+         <error code="XUDY0015"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-064">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { replace node b with <c/>, replace node b with <d/> }]]></test>
+      <result>
+         <error code="XUDY0016"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-065">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         <a/> transform with {
+           replace value of node . with 'x',
+           replace value of node . with 'y'
+         }]]></test>
+      <result>
+         <error code="XUDY0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-066">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { replace node . with <b/> }]]></test>
+      <result>
+         <error code="XUDY0009"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-067">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { insert node <b/> after . }]]></test>
+      <result>
+         <error code="XUDY0029"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-068">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a x="1" y="2"/> transform with { rename node @x as 'y' }]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-069">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a x="1"/> transform with { insert node attribute x { 2 } into . }]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-070">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { insert node (attribute x { 1 }, attribute x { 2 }) into . }]]></test>
+      <result>
+         <error code="XUDY0021"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-071">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[document { <a/> } transform with { insert node attribute x { 1 } into . }]]></test>
+      <result>
+         <error code="XUTY0022"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-072">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[document { <a/> } transform with { insert node attribute x { 1 } before a }]]></test>
+      <result>
+         <error code="XUDY0030"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-073">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[comment { 'x' } transform with { replace value of node . with 'a--b' }]]></test>
+      <result>
+         <error code="XQDY0072"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-074">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[comment { 'x' } transform with { replace value of node . with 'a-' }]]></test>
+      <result>
+         <error code="XQDY0072"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-075">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[processing-instruction p { 'x' } transform with { replace value of node . with '?>' }]]></test>
+      <result>
+         <error code="XQDY0026"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-076">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[processing-instruction p { 'x' } transform with { rename node . as 'a:b' }]]></test>
+      <result>
+         <error code="XQDY0041"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-077">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { replace node b with attribute x { 1 } }]]></test>
+      <result>
+         <error code="XUTY0010"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-078">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a x="1"/> transform with { replace node @x with <b/> }]]></test>
+      <result>
+         <error code="XUTY0011"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-079">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { insert node (<b/>, attribute x { 1 }) into . }]]></test>
+      <result>
+         <error code="XUTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-080">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a><b/></a>
+         return $a transform with { delete node $a/b }]]></test>
+      <result>
+         <error code="XUDY0014"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-081">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a x="1"/>
+         return $a transform with { delete node $a/@x }]]></test>
+      <result>
+         <error code="XUDY0014"/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-090">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a x="1"/> transform with { delete node @x, insert node attribute x { 2 } into . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="2"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-091">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a x="1"/> transform with { rename node @x as 'y', insert node attribute x { 2 } into . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x="2" y="1"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-092">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { replace value of node . with (1, 2) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>1 2</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-093">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a>x<b/></a> transform with { replace value of node . with () }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-094">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a x="1"/> transform with { replace value of node @x with () }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a x=""/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-095">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a x="1"/> transform with { replace node @x with (attribute y { 2 }, attribute z { 3 }) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a y="2" z="3"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-096">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a x="1"/> transform with { replace node @x with () }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-097">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { replace node b with () }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-098">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { replace node b with ('x', <c/>) }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>x<c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-099">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { delete node b, insert node <c/> into b }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-100">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { replace node b with <c/>, replace value of node . with 'x' }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a>x</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-101">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { rename node b as 'x', replace node b with <c/> }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-102">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { rename node b as 'x', delete node b }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-103">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { replace value of node b with 'x', delete node b }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-104">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { delete node b, delete node b }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-105">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { insert node <b/> into ., delete node . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-106">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { replace node b with <c/>, insert node <d/> after b }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c/><d/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-107">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { delete node b, insert node <d/> after b }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><d/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-108">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a>x</a> transform with { insert node 'y' into . }
+         return (count($a/text()), string($a))]]></test>
+      <result>
+         <assert-deep-eq>1, 'xy'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-109">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[count((<a/> transform with { insert node text { '' } into . })/node())]]></test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-110">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { insert node document { <b/>, 'x' } into . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b/>x</a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-111">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { insert node . into b }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b><a><b/></a></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-112">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { insert node b into b }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><b><b/></b></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-113">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { replace node b with . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><a><b/></a></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-114">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[in-scope-prefixes(<p:a xmlns:p="urn:p" xmlns:q="urn:q"/> transform with { })]]></test>
+      <result>
+         <assert-permutation>'p', 'q', 'xml'</assert-permutation>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-115">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         declare copy-namespaces no-preserve, inherit;
+         in-scope-prefixes(<p:a xmlns:p="urn:p" xmlns:q="urn:q"/> transform with { })]]></test>
+      <result>
+         <assert-permutation>'p', 'xml'</assert-permutation>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-116">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a xmlns="urn:a"/> transform with { insert node <b xmlns=""/> into . }
+         return namespace-uri($a/*) = '']]></test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-117">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a><b/></a> transform with { rename node b as QName('urn:c', 'c') }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><c xmlns="urn:c"/></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-118">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[<a/> transform with { insert node <!--c--> into ., insert node <?p x?> as first into . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a><?p x?><!--c--></a>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-119">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[count((<a/> transform with { insert node (for $i in 1 to 1000 return <b/>) into . })/b)]]></test>
+      <result>
+         <assert-eq>1000</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-120">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         let $a := <a>{ for $i in 1 to 1000 return <b/> }</a>
+         let $c := $a transform with { delete node b[position() mod 2 = 0] }
+         return count($c/b)]]></test>
+      <result>
+         <assert-eq>500</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-121">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[(<a/> transform with { }) is (<a/> transform with { })]]></test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+
+   <test-case name="upd-transform-with-122">
+      <description>Evaluation of a transform with expression.</description>
+      <created by="Christian Gruen" on="2026-11-10"/>
+      <test><![CDATA[
+         for $i in 1 to 2
+         return <a/> transform with { insert node attribute i { $i } into . }]]></test>
+      <result>
+         <assert-xml><![CDATA[<a i="1"/><a i="2"/>]]></assert-xml>
+      </result>
+   </test-case>
+</test-set>
