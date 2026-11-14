@@ -570,6 +570,78 @@ dcccxvii; dcccxxxiv; dcccli; dccclxviii; dccclxxxv; cmii; cmxix; cmxxxvi; cmliii
          </assert-string-value>
       </result>
    </test-case>
+   
+   <test-case name="format-dateTime-011a">
+      <description>
+      	Test format-dateTime: ISO week number within month. Get week number of the last day in the month
+      	Specifically, in the ISO calendar the days of the week are numbered from 1 (Monday) to 7 (Sunday), 
+      	and week 1 in any calendar year is the week (from Monday to Sunday) that includes the first Thursday of that year. 
+      </description>
+      <created by="Michael Kay, Saxonica" on="2026-11-13"/>
+      <environment>
+         <param name="t" as="xs:dateTime" select="xs:dateTime('2026-01-01T12:00:00')"/>
+      </environment>
+      <dependency type="spec" value="XQ30+"/>
+      <test>for $i in 0 to 364,
+                $d in $t + xs:dayTimeDuration('P1D')*$i,
+                $w in format-dateTime($d, '[w]', (), 'ISO', ())
+            group by $month := month-from-dateTime($d)
+            order by $month
+            return concat(format-dateTime($d[1], '[Y0001]-[M01] = '), string-join($w))
+      </test>
+      <result>
+         <assert-deep-eq>
+         "2026-01 = 1111222222233333334444444555555",
+         "2026-02 = 5111111122222223333333444444",
+         "2026-03 = 4111111122222223333333444444411",
+         "2026-04 = 111112222222333333344444445115",
+         "2026-05 = 5551111111222222233333334444444",
+         "2026-06 = 111111122222223333333444444411",
+         "2026-07 = 1111122222223333333444444455155",
+         "2026-08 = 5511111112222222333333344444441",
+         "2026-09 = 111111222222233333334444444111",
+         "2026-10 = 1111222222233333334444444555555",
+         "2026-11 = 511111112222222333333344444441",
+         "2026-12 = 1111112222222333333344444445115"
+         </assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="format-dateTime-011b">
+      <description>
+      	Test format-dateTime: ISO week number within month. Get week number of the last day in the month
+      	Specifically, in the ISO calendar the days of the week are numbered from 1 (Monday) to 7 (Sunday), 
+      	and week 1 in any calendar year is the week (from Monday to Sunday) that includes the first Thursday of that year. 
+      </description>
+      <created by="Michael Kay, Saxonica" on="2026-11-13"/>
+      <environment>
+         <param name="t" as="xs:dateTime" select="xs:dateTime('2028-01-01T12:00:00')"/>
+      </environment>
+      <dependency type="spec" value="XQ30+"/>
+      <test>for $i in 0 to 365,
+                $d in $t + xs:dayTimeDuration('P1D')*$i,
+                $w in format-dateTime($d, '[w]', (), 'ISO', ())
+            group by $month := month-from-dateTime($d)
+            order by $month
+            return concat(format-dateTime($d[1], '[Y0001]-[M01] = '), string-join($w))
+      </test>
+      <result>
+         <assert-deep-eq>
+         "2028-01 = 5511111112222222333333344444441",
+         "2028-02 = 11111122222223333333444444411",
+         "2028-03 = 1111122222223333333444444455155",
+         "2028-04 = 551111111222222233333334444444",
+         "2028-05 = 1111111222222233333334444444111",
+         "2028-06 = 111122222223333333444444455155",
+         "2028-07 = 5511111112222222333333344444441",
+         "2028-08 = 1111112222222333333344444445115",
+         "2028-09 = 555111111122222223333333444444",
+         "2028-10 = 4111111122222223333333444444411",
+         "2028-11 = 111112222222333333344444445115",
+         "2028-12 = 5551111111222222233333334444444"
+         </assert-deep-eq>
+      </result>
+   </test-case>
 
    <test-case name="format-dateTime-012">
       <description>test format-dateTime(): a,b,c... numbering sequence (not actually useful but allowed by the spec... </description>
