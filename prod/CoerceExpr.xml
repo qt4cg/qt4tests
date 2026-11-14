@@ -106,8 +106,96 @@
          <assert-true/>
       </result>
    </test-case>
-
+   
    <test-case name="coerce-011">
+      <description>Evaluation of coerce as expression.</description>
+      <created by="Michael Kay" on="2026-11-14"/>
+      <test>[1, (2, 3)] coerce as xs:integer+ </test>
+      <result>
+         <assert-deep-eq>1, 2, 3</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="coerce-012">
+      <description>Atomize node to untypedAtomic.</description>
+      <created by="Michael Kay" on="2026-11-14"/>
+      <test><![CDATA[parse-xml("<a>172</a>") coerce as xs:integer]]></test>
+      <result>
+         <all-of>
+            <assert-eq>172</assert-eq>
+            <assert-type>xs:integer</assert-type> 
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="coerce-013">
+      <description>Occurrence indicator ambiguity.</description>
+      <created by="Michael Kay" on="2026-11-14"/>
+      <test><![CDATA[parse-xml("<a>172</a>") coerce as xs:integer* - 2.5]]></test>
+      <result>
+         <all-of>
+            <assert-eq>169.5</assert-eq>
+            <assert-type>xs:decimal</assert-type> 
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="coerce-014">
+      <description>JNode to array.</description>
+      <created by="Michael Kay" on="2026-11-14"/>
+      <test>[1, [2, 3]]/*[2] coerce as array(xs:integer)</test>
+      <result>
+         <all-of>
+            <assert-deep-eq>[2, 3]</assert-deep-eq>
+            <assert-type>array(xs:integer)</assert-type> 
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="coerce-015">
+      <description>Mixed sequence.</description>
+      <created by="Michael Kay" on="2026-11-14"/>
+      <test><![CDATA[(parse-xml("<a>172</a>"), 12, (26 idiv 2), [2]/*, [5, 6]) coerce as xs:integer*]]></test>
+      <result>
+         <all-of>
+            <assert-deep-eq>172, 12, 13, 2, 5, 6</assert-deep-eq>
+            <assert-type>xs:integer+</assert-type> 
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="coerce-016">
+      <description>Two-phase coercion</description>
+      <created by="Michael Kay" on="2026-11-14"/>
+      <test>(13e0 coerce as xs:decimal) coerce as xs:integer</test>
+      <result>
+         <assert-eq>13</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="coerce-017">
+      <description>Operator precedence</description>
+      <created by="Michael Kay" on="2026-11-14"/>
+      <test>13e0 cast as xs:decimal coerce as xs:integer</test>
+      <result>
+         <assert-eq>13</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="coerce-018">
+      <description>Labeled record</description>
+      <created by="Michael Kay" on="2026-11-14"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record point (x as xs:double, y as xs:double);
+         {'x': 2, 'y': 3} coerce as point but with {'y':4}
+      </test>
+      <result>
+         <assert-deep-eq>{'x': 2, 'y': 4}</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="coerce-911">
       <description>Evaluation of coerce as expression.</description>
       <created by="Christian Gruen" on="2026-11-04"/>
       <test>{ 'b': 1 } coerce as record(a)</test>
@@ -116,7 +204,7 @@
       </result>
    </test-case>
 
-   <test-case name="coerce-012">
+   <test-case name="coerce-912">
       <description>Evaluation of coerce as expression.</description>
       <created by="Christian Gruen" on="2026-11-04"/>
       <test>(1, 2) coerce as xs:integer</test>
@@ -125,7 +213,7 @@
       </result>
    </test-case>
 
-   <test-case name="coerce-013">
+   <test-case name="coerce-913">
       <description>Evaluation of coerce as expression.</description>
       <created by="Christian Gruen" on="2026-11-04"/>
       <test>() coerce as xs:integer</test>
@@ -134,7 +222,7 @@
       </result>
    </test-case>
 
-   <test-case name="coerce-014">
+   <test-case name="coerce-914">
       <description>Evaluation of coerce as expression.</description>
       <created by="Christian Gruen" on="2026-11-04"/>
       <test>'1' coerce as xs:integer</test>
@@ -143,7 +231,7 @@
       </result>
    </test-case>
 
-   <test-case name="coerce-015">
+   <test-case name="coerce-915">
       <description>Evaluation of coerce as expression.</description>
       <created by="Christian Gruen" on="2026-11-04"/>
       <test>1 coerce as xs:string</test>
@@ -152,7 +240,7 @@
       </result>
    </test-case>
 
-   <test-case name="coerce-016">
+   <test-case name="coerce-916">
       <description>Evaluation of coerce as expression.</description>
       <created by="Christian Gruen" on="2026-11-04"/>
       <test>(fn($x) { $x } coerce as fn(xs:integer) as item()*)('a')</test>
@@ -161,7 +249,7 @@
       </result>
    </test-case>
 
-   <test-case name="coerce-017">
+   <test-case name="coerce-917">
       <description>Evaluation of coerce as expression.</description>
       <created by="Christian Gruen" on="2026-11-04"/>
       <test>({ 0: false() } coerce as fn(xs:integer) as xs:boolean)?0</test>
@@ -170,10 +258,46 @@
       </result>
    </test-case>
 
-   <test-case name="coerce-018">
+   <test-case name="coerce-918">
       <description>Evaluation of coerce as expression.</description>
       <created by="Christian Gruen" on="2026-11-04"/>
       <test>1 coerce as</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="coerce-919">
+      <description>Occurrence indicator ambiguity.</description>
+      <created by="Michael Kay" on="2026-11-14"/>
+      <test>1 coerce as xs:integer + 2</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="coerce-920">
+      <description>Double cannot be coerced to integer.</description>
+      <created by="Michael Kay" on="2026-11-14"/>
+      <test>13e0 coerce as xs:integer</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="coerce-921">
+      <description>Two-phase coercion requires parentheses</description>
+      <created by="Michael Kay" on="2026-11-14"/>
+      <test>13e0 coerce as xs:decimal coerce as xs:integer</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+   
+   <test-case name="coerce-922">
+      <description>Operator precedence</description>
+      <created by="Michael Kay" on="2026-11-14"/>
+      <test>13e0 coerce as xs:decimal cast as xs:integer</test>
       <result>
          <error code="XPST0003"/>
       </result>
