@@ -364,10 +364,52 @@ subsequence(?, 1) => function-name()
    <test-case name="fn-function-name-030" covers-40="PR972">
       <description>Partial Function Application: function name</description>
       <created by="Christian Gruen" on="2026-10-04"/>
+      <modified by="Christian Gruen" on="2026-11-16" change="issue 3082: name is retained"/>
       <dependency type="spec" value="XP40+ XQ40+"/>
       <test><![CDATA[
          let $f := count#1
          return $f(?) => function-name()
+      ]]></test>
+      <result>
+         <assert-eq>fn:QName("http://www.w3.org/2005/xpath-functions", "count")</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-name-031" covers-40="PR972">
+      <description>Partial Function Application: function name, arguments reordered</description>
+      <created by="Christian Gruen" on="2026-11-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         contains(substring := ?, value := ?) => function-name()
+      ]]></test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-name-032" covers-40="PR972">
+      <description>Partial Function Application: function name, dynamic call</description>
+      <created by="Christian Gruen" on="2026-11-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         for $f in (contains#2, starts-with#2)
+         return $f(?, ?) => function-name()
+      ]]></test>
+      <result>
+         <assert-deep-eq>
+            fn:QName("http://www.w3.org/2005/xpath-functions", "contains"),
+            fn:QName("http://www.w3.org/2005/xpath-functions", "starts-with")
+         </assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fn-function-name-033" covers-40="PR972">
+      <description>Partial Function Application: function name, dynamic call with supplied argument</description>
+      <created by="Christian Gruen" on="2026-11-16"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test><![CDATA[
+         let $f := contains#2
+         return $f('abc', ?) => function-name()
       ]]></test>
       <result>
          <assert-empty/>
