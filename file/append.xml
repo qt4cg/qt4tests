@@ -61,6 +61,53 @@
     </result>
   </test-case>
 
+  <test-case name="EXPath-file-append2-010">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-11-16"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+        file:write-text("ap.txt", ""),
+        file:append("ap.txt", <a/>),
+        file:append("ap.txt", <b/>),
+        file:read-text("ap.txt")
+      ]]></test>
+    <result>
+      <assert-string-value><![CDATA[<a/><b/>]]></assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-append2-011">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-11-16"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:write-text("ap.txt", ""),
+        file:append("ap.txt", ("a", "b")),
+        file:append("ap.txt", "c"),
+        file:read-text("ap.txt")
+      </test>
+    <result>
+      <assert-string-value>a bc</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-append2-012">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-11-16"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:write-text("ap.txt", ""),
+        file:append("ap.txt", "a" || char(60) || "b" || char(38) || "c"),
+        file:read-text("ap.txt") eq "a" || char(38) || "lt;b" || char(38) || "amp;c"
+      </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
   <test-case name="EXPath-file-append3-001" covers-40="PR2077">
     <description>Use file:append with three arguments: map serialization options</description>
     <created by="Christian Gruen" on="2026-07-10"/>
@@ -92,6 +139,21 @@
         <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test.txt")) eq
           xs:hexBinary("EFBBBF6162")</assert>
       </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-append3-020">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-11-16"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:write-text("ap.txt", ""),
+        file:append("ap.txt", (1, 2), ()),
+        file:read-text("ap.txt")
+      </test>
+    <result>
+      <assert-string-value>1 2</assert-string-value>
     </result>
   </test-case>
   
