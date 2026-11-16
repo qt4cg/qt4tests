@@ -24,7 +24,18 @@
 		  <description>Schema containing some nasty cases for fn:data.</description>
 		  <created by="Oliver Hallam" on="2009-02-27"/>
 	  </schema>
-   </environment>        
+   </environment> 
+   
+   <environment name="complexDataEmptied">
+      <source role="." file="data/complexDataEmptied.xml" validation="strict">
+         <description>Variant of complexData with emptied elements</description>
+         <created by="Michael Kay" on="2026-11-16"/>
+      </source>
+      <schema uri="http://www.cbcl.co.uk/XQueryTest/complexData" file="data/complexData.xsd">
+		  <description>Schema containing some nasty cases for fn:data.</description>
+		  <created by="Oliver Hallam" on="2009-02-27"/>
+	  </schema>
+   </environment> 
 
    <test-case name="fn-dataint1args-1">
       <description> Evaluates The "data" function with the arguments set as follows: $arg = xs:int(lower bound) </description>
@@ -877,6 +888,114 @@
       <result>
          <assert-string-value>3</assert-string-value>
       </result>
-   </test-case>   
+   </test-case>
+
+   <test-case name="cbcl-data-008">
+      <description> Atomization of empty list on a list type </description>
+      <created by="Michael Kay" on="2026-11-16"/>
+      <environment ref="complexDataEmptied"/>
+      <dependency type="spec" value="XQ10+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test>
+      	import schema namespace cd="http://www.cbcl.co.uk/XQueryTest/complexData"; 
+      	let $x := validate strict {.} 
+      	return count(data($x//cd:listType))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cbcl-data-009">
+      <description> Atomization of empty list on a list type </description>
+      <created by="Michael Kay" on="2026-11-16"/>
+      <environment ref="complexDataEmptied"/>
+      <dependency type="spec" value="XQ10+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test>
+      	import schema namespace cd="http://www.cbcl.co.uk/XQueryTest/complexData"; 
+      	let $x := validate strict {.} 
+      	return count(data($x//cd:listOfUnionType))</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cbcl-data-010">
+      <description> Atomization of a nilled element </description>
+      <created by="Michael Kay" on="2026-11-16"/>
+      <environment ref="complexDataEmptied"/>
+      <dependency type="spec" value="XQ10+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test><![CDATA[
+      	import schema namespace cd="http://www.cbcl.co.uk/XQueryTest/complexData"; 
+      	let $x := validate strict {  
+      	 <cd:complexData xmlns:cd = "http://www.cbcl.co.uk/XQueryTest/complexData" xsi:nil="true"/>
+      	} 
+      	return count(data($x))
+      ]]></test>
+      <result>
+         <error code="FOTY0012"/>
+      </result>
+   </test-case>
+   
+   <test-case name="cbcl-data-011">
+      <description> Atomization of a nilled element </description>
+      <created by="Michael Kay" on="2026-11-16"/>
+      <environment ref="complexDataEmptied"/>
+      <dependency type="spec" value="XQ10+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test><![CDATA[
+      	import schema namespace cd="http://www.cbcl.co.uk/XQueryTest/complexData"; 
+      	let $x := validate strict {  
+      	 <cd:complexTypeWithSimpleContent xmlns:cd = "http://www.cbcl.co.uk/XQueryTest/complexData" 
+      	    xsi:nil="true"
+      	    value="bar"/>
+      	} 
+      	return count(data($x))
+      ]]></test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cbcl-data-012">
+      <description> Implicit atomization of empty list on a list type </description>
+      <created by="Michael Kay" on="2026-11-16"/>
+      <environment ref="complexDataEmptied"/>
+      <dependency type="spec" value="XQ10+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test>
+      	import schema namespace cd="http://www.cbcl.co.uk/XQueryTest/complexData"; 
+      	let $x := validate strict {.} 
+      	let $text := text { $x//cd:listType }
+      	return count($text)
+      </test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="cbcl-data-013">
+      <description> Implicit atomization of empty list on a list type </description>
+      <created by="Michael Kay" on="2026-11-16"/>
+      <environment ref="complexDataEmptied"/>
+      <dependency type="spec" value="XQ10+"/>
+      <dependency type="feature" value="schemaImport"/>
+      <dependency type="feature" value="schemaValidation"/>
+      <test>
+      	import schema namespace cd="http://www.cbcl.co.uk/XQueryTest/complexData"; 
+      	let $x := validate strict {.} 
+      	let $text := text { "[", $x//cd:listType, "]" }
+      	return string($text)
+      </test>
+      <result>
+         <assert-eq>"[ ]"</assert-eq>
+      </result>
+   </test-case>
 
 </test-set>
