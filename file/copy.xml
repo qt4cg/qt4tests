@@ -1,0 +1,268 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-copy">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-copy-001">
+    <description>file:copy existing file, overwriting existing file</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write-text("source.txt", "defenestration"),
+        file:write-text("target.txt", "prague"),
+        file:copy("source.txt", "target.txt")
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("target.txt") eq
+          "defenestration"</assert>
+        <assert>Q{http://expath.org/ns/file}exists("source.txt")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-copy-002">
+    <description>file:copy existing file, creating target file</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write-text("source.txt", "treaty"),
+        file:delete("target.txt"),
+        file:copy("source.txt", "target.txt")
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("target.txt") eq "treaty"</assert>
+        <assert>Q{http://expath.org/ns/file}exists("source.txt")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-copy-003">
+    <description>file:copy existing file, creating target file in specified directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write-text("source.txt", "persecution"),
+        file:delete("dir2", true()),
+        file:create-dir("dir2"),
+        file:copy("source.txt", "dir2")
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}exists("dir2/source.txt")</assert>
+        <assert>Q{http://expath.org/ns/file}read-text("dir2/source.txt") eq
+          "persecution"</assert>
+        <assert>Q{http://expath.org/ns/file}exists("source.txt")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-copy-004">
+    <description>file:copy used to copy a directory, target directory does not exist</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dirsource", true()),
+        file:delete("dirtarget", true()),
+        file:create-dir("dirsource"),
+        file:append-text("dirsource/london.txt", "london"),
+        file:append-text("dirsource/paris.txt", "paris"),
+        file:append-text("dirsource/rome.txt", "rome"),
+        file:append-text("dirsource/madrid.txt", "madrid"),
+        file:copy("dirsource", "dirtarget")
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}exists("dirtarget/paris.txt")</assert>
+        <assert>Q{http://expath.org/ns/file}read-text("dirtarget/paris.txt") eq
+          "paris"</assert>
+        <assert>Q{http://expath.org/ns/file}exists("dirsource/london.txt")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-copy-005">
+    <description>file:copy used to copy a directory, target directory exists</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="Christian Gruen" on="2013-11-20" change="Aligned with latest spec (20131120)"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dirsource", true()),
+        file:delete("dirtarget", true()),
+        file:create-dir("dirsource"),
+        file:create-dir("dirtarget"),
+        file:append-text("dirsource/london.txt", "london"),
+        file:append-text("dirsource/paris.txt", "paris"),
+        file:append-text("dirsource/rome.txt", "rome"),
+        file:append-text("dirsource/madrid.txt", "madrid"),
+        file:copy("dirsource", "dirtarget")
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}exists("dirtarget/dirsource/paris.txt")</assert>
+        <assert>Q{http://expath.org/ns/file}read-text("dirtarget/dirsource/paris.txt") eq
+          "paris"</assert>
+        <!--<assert>Q{http://expath.org/ns/file}exists("dirtarget/paris.txt")</assert>
+        <assert>Q{http://expath.org/ns/file}read-text("dirtarget/paris.txt") eq
+          "paris"</assert>-->
+        <assert>Q{http://expath.org/ns/file}exists("dirsource/london.txt")</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-copy-006">
+    <description>file:copy used to copy a source file to a target file, target directory does not exist (Saxon bug 5577</description>
+    <created by="Michael Kay" on="2022-06-22"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dirsource", true()),
+      file:delete("dirtarget", true()),
+      file:create-dir("dirsource"),
+      file:append-text("dirsource/london.txt", "london"),
+      file:copy("dirsource/london.txt", "dirtarget/new-london.txt")
+    </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}exists("dirtarget/new-london.txt")</assert>
+        <assert>Q{http://expath.org/ns/file}read-text("dirtarget/new-london.txt") eq
+          "london"</assert>
+        <assert>Q{http://expath.org/ns/file}exists("dirsource/london.txt")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-copy-007">
+    <description>file:copy used to copy a source file to a target file, target directory does not exist (Saxon bug 5577</description>
+    <created by="Christian Gruen" on="2026-02-09"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dirsource", true()),
+      file:delete("dirtarget", true()),
+      file:create-dir("dirsource"),
+      file:create-dir("dirtarget"),
+      file:append-text("dirsource/london.txt", "london"),
+      file:copy("dirsource/london.txt", "dirtarget/new-london.txt")
+    </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}exists("dirtarget/new-london.txt")</assert>
+        <assert>Q{http://expath.org/ns/file}read-text("dirtarget/new-london.txt") eq "london"</assert>
+        <assert>Q{http://expath.org/ns/file}exists("dirsource/london.txt")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-copy-008" covers-40="PR2606">
+    <description>file:copy rejects a target located inside the source directory</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dirsource", true()),
+      file:create-dir("dirsource"),
+      file:append-text("dirsource/london.txt", "london"),
+      file:copy("dirsource", "dirsource/sub")
+    </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}cyclic"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-copy-009" covers-40="PR2606">
+    <description>file:copy rejects a target located inside the source directory</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dirsource", true()),
+      file:create-dir("dirsource/sub"),
+      file:append-text("dirsource/london.txt", "london"),
+      file:copy("dirsource", "dirsource/sub")
+    </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}cyclic"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-copy-010" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dirsource", true()),
+      file:create-dir("dirsource"),
+      file:append-text("dirsource/london.txt", "london"),
+      file:copy("dirsource/london.txt", "dirsource")
+    </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("dirsource/london.txt") eq "london"</assert>
+        <assert>count(Q{http://expath.org/ns/file}list("dirsource", true())) eq 1</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-copy-011" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dirparent", true()),
+      file:create-dir("dirparent/dirsource"),
+      file:append-text("dirparent/dirsource/london.txt", "london"),
+      file:copy("dirparent/dirsource", "dirparent")
+    </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("dirparent/dirsource/london.txt") eq "london"</assert>
+        <assert>count(Q{http://expath.org/ns/file}list("dirparent", true())) eq 2</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-copy-012" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dirsource", true()),
+      file:delete("dirnew", true()),
+      file:create-dir("dirsource"),
+      file:append-text("dirsource/london.txt", "london"),
+      file:copy("dirsource", "dirnew/sub/dircopy")
+    </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("dirnew/sub/dircopy/london.txt") eq "london"</assert>
+        <assert>Q{http://expath.org/ns/file}exists("dirsource/london.txt")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+
+  
+</test-set>  

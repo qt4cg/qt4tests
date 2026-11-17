@@ -1,0 +1,143 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-write">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-write2-001">
+    <description>Use file:write to write a string</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write("wr.txt", "hello")
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("wr.txt") eq "hello"</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-write2-002">
+    <description>Use file:write to write a sequence of integers</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write("wr.txt", 1 to 5)
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("wr.txt") eq "1 2 3 4 5"</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-write2-003">
+    <description>Use file:write to overwrite an existing file</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write("wr.txt", "first"),
+        file:write("wr.txt", "second")
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("wr.txt") eq "second"</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-write2-004">
+    <description>Use file:write with a directory as target</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write(".", "x")
+      </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}is-dir"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-write2-005">
+    <description>Use file:write with a non-existent parent directory</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write("nonexistent/wr.txt", "x")
+      </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}no-dir"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-write3-001" covers-40="PR2077">
+    <description>Use file:write with map serialization options, method json</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:write("wr.json", map { 'a': 1 }, map { 'method': 'json' })
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("wr.json") eq '{"a":1}'</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-write3-002" covers-40="PR2077">
+    <description>Use file:write with map serialization options, method xml</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+        file:write("wr.xml", <a>1</a>,
+          map { 'method': 'xml', 'indent': false(), 'omit-xml-declaration': true() })
+      ]]></test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert><![CDATA[Q{http://expath.org/ns/file}read-text("wr.xml") eq "<a>1</a>"]]></assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-write3-003" covers-40="PR2077">
+    <description>Use file:write with a serialization-parameters element, method text</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <modified by="Gunther Rademacher" on="2026-07-21" change="add XQ40+ dependency (no direct constructor in XPath)"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+"/>
+    <test><![CDATA[
+        file:write("wr.txt", <a>1</a>,
+          <output:serialization-parameters xmlns:output="http://www.w3.org/2010/xslt-xquery-serialization">
+            <output:method value="text"/>
+          </output:serialization-parameters>)
+      ]]></test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("wr.txt") eq "1"</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+
+
+
+  
+</test-set>  

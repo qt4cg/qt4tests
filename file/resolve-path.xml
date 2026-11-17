@@ -1,0 +1,115 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-resolve-path">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-resolvePath-001">
+    <description>Use file:resolve-path on a text file</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:resolve-path("test.txt")
+      </test>
+    <result>
+      <any-of>
+        <assert>matches($result, "/.*test\.txt")</assert>
+        <assert>matches($result, "[A-Za-z]:\\.*sandpit\\test\.txt")</assert>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-resolvePath-002" covers-40="PR2077">
+    <description>Use file:resolve-path with a relative base directory</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        Q{http://expath.org/ns/file}resolve-path("test.txt", "relative/base")
+      </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}is-relative"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-resolvePath-010" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:resolve-path("missing/")
+      </test>
+    <result>
+      <any-of>
+        <assert>matches($result, "^/.*/missing/$")</assert>
+        <assert>matches($result, "^[A-Za-z]:\\.*sandpit\\missing\\$")</assert>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-resolvePath-011" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:resolve-path("dir5/./../missing/../test.txt") eq file:resolve-path("test.txt")
+      </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-resolvePath-012" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:resolve-path(file:resolve-path("dir5/") || "../test.txt") eq
+          file:resolve-path("test.txt")
+      </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-resolvePath-013" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        let $dir := file:resolve-path("dir5/")
+        let $base := substring($dir, 1, string-length($dir) - 1)
+        return file:resolve-path("test.txt", $base) eq file:resolve-path("test.txt")
+      </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-resolvePath-014" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:resolve-path("test.txt", file:resolve-path("missing/")) eq
+          file:resolve-path("missing/test.txt")
+      </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+
+  
+</test-set>  

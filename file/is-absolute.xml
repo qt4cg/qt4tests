@@ -1,0 +1,53 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-is-absolute">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-isAbsolute-001" covers-40="PR2077">
+    <description>Use file:is-absolute on an absolute path</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:is-absolute(file:temp-dir())</test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-isAbsolute-002" covers-40="PR2077">
+    <description>Use file:is-absolute on a relative path</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <modified by="Christian Gruen" on="2026-08-02" change="sandpit environment added"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        Q{http://expath.org/ns/file}is-absolute("a/b.txt")</test>
+    <result>
+      <assert-false/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-isAbsolute-003" covers-40="PR2077">
+    <description>Use file:is-absolute on a QName</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:is-absolute(QName('http://saxon.sf.net/', 'local-name'))</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+</test-set>  

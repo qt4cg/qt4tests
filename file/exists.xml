@@ -1,0 +1,167 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-exists">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-exists-001">
+    <description>Use file:exists on an existing file</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:exists("test.bin")
+      </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-exists-002">
+    <description>Use file:exists on an existing directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:exists("../sandpit")
+      </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-exists-003">
+    <description>Use file:exists on a non-existing file</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:exists("nonexisting-file.txt")
+      </test>
+    <result>
+      <assert-false/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-exists-004">
+    <description>Use file:exists on the current directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:exists(".")</test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-exists-005">
+    <description>Use file:exists on an empty sequence</description>
+    <created by="Michael Kay" on="2014-04-22"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:exists(())</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-exists-006">
+    <description>Use file:exists on a URI (works by virtue of URI promotion)</description>
+    <created by="Michael Kay" on="2014-04-22"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:exists(xs:anyURI('.'))</test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-exists-007">
+    <description>Use file:exists on a sequence of names</description>
+    <created by="Michael Kay" on="2014-04-22"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:exists((".", "."))</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-exists-008">
+    <description>Use file:exists on an integer</description>
+    <created by="Michael Kay" on="2014-04-22"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:exists(if (current-date() gt xs:date('1900-01-01')) then 23 else '.')</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-exists-009">
+    <description>Use file:exists on an filename with spaces</description>
+    <created by="John Lumley" on="2015-01-13"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:exists("my file.txt")</test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-exists-010">
+    <description>Use file:exists on an filename with spaces and backslashes</description>
+    <created by="John Lumley" on="2015-01-13"/>
+    <modified by="Michael Kay" on="2021-05-08" 
+      change="change expected result: this test has been on the exceptions list for some years because the result
+              seems inexplicable; I'm now changing the expected result."/>
+    <modified by="Christian Gruen" on="2026-02-09" change="As the normalization is implementation-dependent,
+      the slashes may be rewritten to a single slash."/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:exists(".//\my file.txt")</test>
+    <result>
+      <any-of>
+        <assert-true/>
+        <assert-false/>
+      </any-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-exists-011">
+    <description>Use file:exists on a filename with encoded spaces</description>
+    <created by="John Lumley" on="2015-01-13"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:exists("my%20file.txt")</test>
+    <result>
+      <assert-false/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-exists-012">
+    <description>Use file:exists on a URI generated from a filename with spaces</description>
+    <created by="John Lumley" on="2015-01-13"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:exists(file:path-to-uri("my file.txt"))</test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+</test-set>  

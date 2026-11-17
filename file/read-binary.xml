@@ -1,0 +1,214 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-read-binary">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-readBinary-001">
+    <description>Use file:read-binary on binary data</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:append-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:read-binary("test.bin")</test>
+    <result>
+      <all-of>
+        <assert>xs:hexBinary($result) eq xs:hexBinary("0001020304")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readBinary-002">
+    <description>Use file:read-binary on text data</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:append-text("test.bin", "abc", "UTF-8"),
+        file:read-binary("test.bin")</test>
+    <result>
+      <all-of>
+        <assert>xs:hexBinary($result) eq xs:hexBinary("616263")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readBinary-003">
+    <description>Use file:read-binary, file does not exist</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:append-text("test.bin", "abc", "UTF-8"),
+        file:read-binary("nonexistent.bin")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}not-found"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readBinary-004">
+    <description>Use file:read-binary, file is directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:append-text("test.bin", "abc", "UTF-8"),
+        file:read-binary(".")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}is-dir"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readBinary2-001">
+    <description>Use file:read-binary with zero offset</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:append-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:read-binary("test.bin",0)</test>
+    <result>
+      <all-of>
+        <assert>xs:hexBinary($result) eq xs:hexBinary("0001020304")</assert>
+      </all-of>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-readBinary2-002">
+    <description>Use file:read-binary with non-zero offset</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:append-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:read-binary("test.bin",1)</test>
+    <result>
+      <all-of>
+        <assert>xs:hexBinary($result) eq xs:hexBinary("01020304")</assert>
+      </all-of>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-readBinary2-003">
+    <description>Use file:read-binary with negative offset</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:append-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:read-binary("test.bin",-1)</test>
+    <result>
+      <all-of>
+        <error code="Q{http://expath.org/ns/file}out-of-range"/>
+      </all-of>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-readBinary3-001">
+    <description>Use file:read-binary with negative length</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:append-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:read-binary("test.bin",0,-1)</test>
+    <result>
+      <all-of>
+        <error code="Q{http://expath.org/ns/file}out-of-range"/>
+      </all-of>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-readBinary3-002">
+    <description>Use file:read-binary with non-zero offset and length</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:append-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:read-binary("test.bin",1,2)</test>
+    <result>
+      <all-of>
+        <assert>xs:hexBinary($result) eq xs:hexBinary("0102")</assert>
+      </all-of>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-readBinary3-003">
+    <description>Use file:read-binary with non-zero offset beyond bounds</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:append-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:read-binary("test.bin",10,2)</test>
+    <result>
+      <all-of>
+        <error code="Q{http://expath.org/ns/file}out-of-range"/>
+      </all-of>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-readBinary3-004">
+    <description>Use file:read-binary with non-zero offset and length to bounds</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:append-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:read-binary("test.bin",1,4)</test>
+    <result>
+      <all-of>
+        <assert>xs:hexBinary($result) eq xs:hexBinary("01020304")</assert>
+      </all-of>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-readBinary3-005">
+    <description>Use file:read-binary with non-zero offset and length beyond bounds</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:append-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:read-binary("test.bin",1,5)</test>
+    <result>
+      <all-of>
+        <error code="Q{http://expath.org/ns/file}out-of-range"/>
+      </all-of>
+    </result>
+  </test-case>
+
+
+  <test-case name="EXPath-file-readBinary3-006" covers-40="PR2077">
+    <description>Use file:read-binary with a length but without an offset</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.bin", true()),
+        file:append-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:read-binary("test.bin", (), 2)</test>
+    <result>
+      <assert>xs:hexBinary($result) eq xs:hexBinary("0001")</assert>
+    </result>
+  </test-case>
+
+
+  
+</test-set>  

@@ -1,0 +1,98 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-append">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-append2-001">
+    <description>Use file:append with two arguments</description>
+    <created by="Michael Kay" on="2012-06-15"/>
+    <modified by="Christian Gruen" on="2013-11-20" change="omit-xml-declaration may be true"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.txt"), 
+        file:append("test.txt", ("a", "b", "c", 10))</test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>ends-with(Q{http://expath.org/ns/file}read-text("test.txt"), "a b c 10")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-append2-002">
+    <description>Use file:append with two arguments</description>
+    <created by="Michael Kay" on="2012-06-15"/>
+    <modified by="Christian Gruen" on="2013-11-20" change="omit-xml-declaration may be true"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ10+"/>
+    <test><![CDATA[
+         file:delete("test.txt"),
+        file:append("test.txt", <b/>)
+      ]]></test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert><![CDATA[ends-with(Q{http://expath.org/ns/file}read-text("test.txt"), "<b/>")]]></assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-append2-003">
+    <description>Use file:append with two arguments; first argument incorrect type</description>
+    <created by="Michael Kay" on="2014-04-22"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:append("test.txt"[3], ("a", "b", "c", 10))</test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-append3-001" covers-40="PR2077">
+    <description>Use file:append with three arguments: map serialization options</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt", true()),
+        file:append("test.txt", ("a", "b", "c"), map { 'method': 'text', 'item-separator': '-' }),
+        file:read-text("test.txt")
+      </test>
+    <result>
+      <assert-string-value>a-b-c</assert-string-value>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-append3-010" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:append("test.txt", "a", { "method": "text", "byte-order-mark": true() }),
+        file:append("test.txt", "b", { "method": "text", "byte-order-mark": true() })
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test.txt")) eq
+          xs:hexBinary("EFBBBF6162")</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+</test-set>  
