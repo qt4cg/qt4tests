@@ -1,0 +1,222 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-write-binary">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-writeBinary2-001">
+    <description>Use file:write-binary with two arguments</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304")))
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test.bin")) eq
+          xs:hexBinary("0001020304")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeBinary2-002">
+    <description>Use file:write-binary with two arguments, overwrite existing file</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write-binary("test.bin", 
+           xs:base64Binary(xs:hexBinary("0506")))
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test.bin")) eq
+          xs:hexBinary("0506")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeBinary2-003">
+    <description>Use file:write-binary with two arguments: file is a directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write-binary(".", xs:base64Binary(""))
+      </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}is-dir"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeBinary2-004">
+    <description>Use file:write-binary with two arguments: attempt to create file in non-existent
+      directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write-binary("nonexistent/file.bin", xs:base64Binary(""))
+      </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}no-dir"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeBinary3-001">
+    <description>Use file:write-binary with three arguments, file does not exist</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304")), 0)
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test.bin")) eq
+          xs:hexBinary("0001020304")</assert>
+      </all-of>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-writeBinary3-002">
+    <description>Use file:write-binary with three arguments, file already exists</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0506")),1)
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test.bin")) eq
+          xs:hexBinary("0005060304")</assert>
+      </all-of>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-writeBinary3-003">
+    <description>Use file:write-binary with three arguments: negative offset</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304")), -1)
+      </test>
+    <result>
+      <all-of>
+        <error code="Q{http://expath.org/ns/file}out-of-range"/>
+      </all-of>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-writeBinary3-004">
+    <description>Use file:write-binary with three arguments: offset beyond end of existing
+      file</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"),
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304")), 6)
+      </test>
+    <result>
+      <all-of>
+        <error code="Q{http://expath.org/ns/file}out-of-range"/>
+      </all-of>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-writeBinary3-005">
+    <description>Use file:write-binary with three arguments, file already exists, offset just before end</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0506")),4)
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test.bin")) eq
+          xs:hexBinary("000102030506")</assert>
+      </all-of>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-writeBinary3-006">
+    <description>Use file:write-binary with three arguments, file already exists, offset just at end</description>
+    <created by="John Lumley" on="2013-12-02"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <modified by="Norm Tovey-Walsh" on="2026-02-11" change="rename test to make the name unique"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"), 
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0506")),5)
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test.bin")) eq
+          xs:hexBinary("00010203040506")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeBinary3-010" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.bin"),
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("05")), 0)
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test.bin")) eq
+          xs:hexBinary("0501020304")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeBinary3-011" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.bin"),
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("0001020304"))),
+        file:write-binary("test.bin", xs:base64Binary(xs:hexBinary("05")), ())
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test.bin")) eq
+          xs:hexBinary("05")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  
+</test-set>  

@@ -1,0 +1,109 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-path-to-native">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-pathToNative-001">
+    <description>Use file:path-to-native on a text file</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:path-to-native("test.txt")
+      </test>
+    <result>
+      <any-of>
+        <assert>ends-with($result, "test.txt")</assert>
+        <assert>ends-with($result, "sandpit\test.txt")</assert>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-pathToNative-002">
+    <description>Use file:path-to-native on a text file, multiple slashes</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <modified by="Christian Gruen" on="2026-02-09" change="may yield an error"/>
+    <modified by="Sheila Thomson" on="2026-05-12" change="added not-found error as it is up to the implementation whether to return the invalid-path error instead."/>
+    <environment ref="EXPath-file"/>
+    <test>
+         file:path-to-native("//test.txt")
+      </test>
+    <result>
+      <any-of>
+        <error code="Q{http://expath.org/ns/file}invalid-path"/>
+        <error code="Q{http://expath.org/ns/file}not-found"/>
+        <assert>ends-with($result, "test.txt")</assert>
+        <assert>ends-with($result, "sandpit\test.txt")</assert>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-pathToNative-003">
+    <description>Use file:path-to-native on a text file, redundant component</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+         file:path-to-native("./test.txt")
+      </test>
+    <result>
+      <any-of>
+        <assert>ends-with($result, "test.txt")</assert>
+        <assert>ends-with($result, "sandpit\test.txt")</assert>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-pathToNative-004">
+    <description>Use file:path-to-native on a non-existing file</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <modified by="Christian Gruen" on="2015-01-29" change="Replaced with error"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:path-to-native("file:///i/do/not.exist")
+    </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}not-found"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-pathToNative-005">
+    <description>Use file:path-to-native on a text file, removal of file:/// part</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+         file:path-to-native(".")
+      </test>
+    <result>
+      <assert>$result ne "."</assert>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-pathToNative-006">
+    <description>Use file:path-to-native, removal of file:/// part</description>
+    <created by="Christian Gruen" on="2015-01-29"/>
+    <modified by="Michael Kay" on="2021-08-31" change="build file URI properly, not using string concatenation"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:path-to-native(file:path-to-uri(file:resolve-path('.')))
+    </test>
+    <result>
+      <assert>not(starts-with($result, "file:"))</assert>
+    </result>
+  </test-case>
+
+  
+</test-set>  

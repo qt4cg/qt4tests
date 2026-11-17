@@ -1,0 +1,186 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-write-text">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-writeText2-001">
+    <description>Use file:write-text with two arguments</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.txt"), 
+        file:write-text("test.txt", "abc")</test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("test.txt") eq "abc"</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeText2-002">
+    <description>Use file:write-text writing to an existing file</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>file:write-text("test.txt", "def")</test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("test.txt") eq "def"</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeText2-003">
+    <description>Use file:write-text writing empty string</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>file:write-text("test.txt", "")</test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("test.txt") eq ""</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeText2-004">
+    <description>Use file:write-text : default encoding is UTF-8</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>file:write-text("test.txt", "&#xa3;")</test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("test.txt", "UTF-8") eq
+          "&#xa3;"</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeText2-005">
+    <description>Use file:write-text with two arguments: file is a directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write-text(".", "abc")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}is-dir"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeText2-006">
+    <description>Use file:write-text with two arguments: attempt to create file in non-existent
+      directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write-text("nonexistent/file.xml", "abc")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}no-dir"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeText3-001">
+    <description>Use file:write-text with three arguments, UTF-8</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test2.txt"), 
+        file:write-text("test2.txt", "abc&#xa3;", "UTF-8")</test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}read-text("test2.txt") eq "abc&#xa3;"</assert>
+        <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test2.txt")) eq
+          xs:hexBinary("616263C2A3")</assert>
+        <!-- TODO: allow leading BOM? -->
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeText3-002">
+    <description>Use file:write-text with three arguments: UTF-16 encoding</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <modified by="Michael Kay" on="2021-08-30" change="alternative little-endian result"/>
+    <modified by="Michael Kay" on="2022-04-14" change="more permitted results: with/without BOM, LE/BE"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test3.txt"), 
+        file:write-text("test3.txt", "abc", "UTF-16")</test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <any-of>
+          <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test3.txt")) eq
+            xs:hexBinary("FFFE610062006300")</assert>
+          <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test3.txt")) eq
+            xs:hexBinary("FEFF006100620063")</assert>
+          <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test3.txt")) eq
+            xs:hexBinary("006100620063")</assert>
+          <assert>xs:hexBinary(Q{http://expath.org/ns/file}read-binary("test3.txt")) eq
+            xs:hexBinary("610062006300")</assert>
+        </any-of>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeText3-003">
+    <description>Use file:write-text with three arguments: unsupported encoding</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test4.txt"), 
+        file:write-text("test4.txt", "abc", "encoding-1234")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}unknown-encoding"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeText3-004">
+    <description>Use file:write-text with three arguments: file is a directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write-text(".", "abc", "UTF-8")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}is-dir"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-writeText3-005">
+    <description>Use file:write-text with three arguments: attempt to create file in non-existent
+      directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:write-text("nonexistent/file.xml", "abc", "UTF-8")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}no-dir"/>
+    </result>
+  </test-case>
+
+
+  
+</test-set>  

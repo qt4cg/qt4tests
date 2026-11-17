@@ -1,0 +1,350 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-read-text">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-readText1-001">
+    <description>Use file:read-text with 1 arg</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.txt"), 
+        file:append-text("test.txt", "abcd"),
+        file:read-text("test.txt")</test>
+    <result>
+      <all-of>
+        <assert-eq>"abcd"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText1-002">
+    <description>Use file:read-text with 1 arg, file does not exist</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.txt"), 
+        file:append-text("test.txt", "abcd"),
+        file:read-text("nonexistent.txt")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}not-found"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText1-003">
+    <description>Use file:read-text with 1 arg, file is directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.txt"), 
+        file:append-text("test.txt", "abcd"),
+        file:read-text(".")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}is-dir"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText2-001">
+    <description>Use file:read-text with 2 args</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.txt"), 
+        file:append-text("test.txt", "abcd&#xa3;"),
+        file:read-text("test.txt", "UTF-8")</test>
+    <result>
+      <all-of>
+        <assert-eq>"abcd&#xa3;"</assert-eq>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText2-002">
+    <description>Use file:read-text with 2 args - nonexistent file</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.txt"), 
+        file:append-text("test.txt", "abcd&#xa3;"),
+        file:read-text("test.text", "UTF-8")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}not-found"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText2-003">
+    <description>Use file:read-text with 2 args - file is directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.txt"), 
+        file:append-text("test.txt", "abcd&#xa3;"),
+        file:read-text(".", "UTF-8")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}is-dir"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText2-004">
+    <description>Use file:read-text with 2 args - invalid encoding</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.txt"), 
+        file:append-text("test.txt", "abcd&#xa3;"),
+        file:read-text("test.txt", "UTF-8.5")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}unknown-encoding"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText2-005">
+    <description>Use file:read-text with 2 args - incorrect encoding</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("test.txt"), 
+        file:write-binary("test.txt", 
+                        xs:base64Binary(xs:hexBinary("A3"))),
+        file:read-text("test.txt", "UTF-8")</test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}io-error"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText1-004" covers-40="PR2077">
+    <description>Use file:read-text, newline normalization</description>
+    <created by="Christian Gruen" on="2026-09-16"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:write-binary("test.txt", xs:base64Binary(xs:hexBinary("610D0A62"))),
+        file:read-text("test.txt") => string-to-codepoints()</test>
+    <result>
+      <assert-deep-eq>97, 10, 98</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText1-005" covers-40="PR2077">
+    <description>Use file:read-text, newline normalization</description>
+    <created by="Christian Gruen" on="2026-09-16"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:write-binary("test.txt", xs:base64Binary(xs:hexBinary("610D620D"))),
+        file:read-text("test.txt") => string-to-codepoints()</test>
+    <result>
+      <assert-deep-eq>97, 10, 98, 10</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText1-006" covers-40="PR2077">
+    <description>Use file:read-text, newline normalization</description>
+    <created by="Christian Gruen" on="2026-09-16"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:write-binary("test.txt", xs:base64Binary(xs:hexBinary("610A0D62"))),
+        file:read-text("test.txt") => string-to-codepoints()</test>
+    <result>
+      <assert-deep-eq>97, 10, 10, 98</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText1-007" covers-40="PR2077">
+    <description>Use file:read-text, newline normalization</description>
+    <created by="Christian Gruen" on="2026-09-16"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:write-binary("test.txt", xs:base64Binary(xs:hexBinary("610D0D0A62"))),
+        file:read-text("test.txt") => string-to-codepoints()</test>
+    <result>
+      <assert-deep-eq>97, 10, 10, 98</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-readText1-008" covers-40="PR2929">
+    <description>Evaluation of file:read-text and file:read-text-lines.</description>
+    <created by="Christian Gruen" on="2026-09-29"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:write-binary("test.txt", xs:base64Binary(xs:hexBinary("FFFE61000D000A006200"))),
+        file:read-text("test.txt") => string-to-codepoints()</test>
+    <result>
+      <assert-deep-eq>97, 10, 98</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText1-009" covers-40="PR2929">
+    <description>Evaluation of file:read-text and file:read-text-lines.</description>
+    <created by="Christian Gruen" on="2026-09-29"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:write-binary("test.txt", xs:base64Binary(xs:hexBinary("FEFF0061000D000A0062"))),
+        file:read-text("test.txt") => string-to-codepoints()</test>
+    <result>
+      <assert-deep-eq>97, 10, 98</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText1-010" covers-40="PR2929">
+    <description>Evaluation of file:read-text and file:read-text-lines.</description>
+    <created by="Christian Gruen" on="2026-09-29"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:write-binary("test.txt", xs:base64Binary(xs:hexBinary("EFBBBF61"))),
+        file:read-text("test.txt") => string-to-codepoints()</test>
+    <result>
+      <assert-deep-eq>97</assert-deep-eq>
+    </result>
+  </test-case>
+
+
+  <test-case name="EXPath-file-readText2-006" covers-40="PR2077">
+    <description>Use file:read-text, newline normalization</description>
+    <created by="Christian Gruen" on="2026-09-16"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:write-binary("test.txt", xs:base64Binary(xs:hexBinary("61000D000A006200"))),
+        file:read-text("test.txt", "UTF-16LE") => string-to-codepoints()</test>
+    <result>
+      <assert-deep-eq>97, 10, 98</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText2-007" covers-40="PR2077">
+    <description>Use file:read-text, newline normalization</description>
+    <created by="Christian Gruen" on="2026-09-16"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:write-binary("test.txt", xs:base64Binary(xs:hexBinary("61000D000A006200"))),
+        file:read-text("test.txt", { "encoding": "UTF-16LE" }) => string-to-codepoints()</test>
+    <result>
+      <assert-deep-eq>97, 10, 98</assert-deep-eq>
+    </result>
+  </test-case>
+
+  
+  <test-case name="EXPath-file-readText2-008" covers-40="PR2929">
+    <description>Evaluation of file:read-text and file:read-text-lines.</description>
+    <created by="Christian Gruen" on="2026-09-29"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:write-binary("test.txt", xs:base64Binary(xs:hexBinary("610D0A620D63"))),
+        file:read-text("test.txt", { "normalize-newlines": false() }) => string-to-codepoints()</test>
+    <result>
+      <assert-deep-eq>97, 13, 10, 98, 13, 99</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText2-009" covers-40="PR2929">
+    <description>Evaluation of file:read-text and file:read-text-lines.</description>
+    <created by="Christian Gruen" on="2026-09-29"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:write-binary("test.txt", xs:base64Binary(xs:hexBinary("610D0A620D63"))),
+        file:read-text("test.txt", { "normalize-newlines": true() }) => string-to-codepoints()</test>
+    <result>
+      <assert-deep-eq>97, 10, 98, 10, 99</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-readText2-010" covers-40="PR2929">
+    <description>Evaluation of file:read-text and file:read-text-lines.</description>
+    <created by="Christian Gruen" on="2026-09-29"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("test.txt"),
+        file:write-binary("test.txt", xs:base64Binary(xs:hexBinary("FFFE61000D000A006200"))),
+        file:read-text("test.txt", { "encoding": (), "normalize-newlines": false() })
+          => string-to-codepoints()</test>
+    <result>
+      <assert-deep-eq>97, 13, 10, 98</assert-deep-eq>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-read-fallback-001" covers-40="PR2510">
+    <description>file:read-text</description>
+    <created by="Norm Tovey-Walsh" on="2026-02-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      file:read-text("non-xml.txt")
+    </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}io-error"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-read-fallback-002" covers-40="PR2510">
+    <description>file:read-text</description>
+    <created by="Norm Tovey-Walsh" on="2026-02-10"/>
+    <modified by="Michael Ennen" on="2026-09-18" change="Pass fallback in the options map"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      file:read-text("non-xml.txt", { "encoding": "UTF-8", "fallback": false() })
+    </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}io-error"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-read-fallback-003" covers-40="PR2510">
+    <description>file:read-text</description>
+    <created by="Norm Tovey-Walsh" on="2026-02-10"/>
+    <modified by="Christian Gruen" on="2026-09-08" change="XML 1.1 repertoire is mandatory"/>
+    <modified by="Michael Ennen" on="2026-09-18" change="Pass fallback in the options map"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XP40+ XQ40+"/>
+    <test>
+      file:read-text("non-xml.txt", { "encoding": (), "fallback": true() })
+    </test>
+    <result>
+      <assert>starts-with($result, "U0000=�")</assert>
+    </result>
+  </test-case>
+
+
+
+
+  
+</test-set>  

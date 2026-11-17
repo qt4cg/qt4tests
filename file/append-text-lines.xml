@@ -1,0 +1,137 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-append-text-lines">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-appendTextLines2-001">
+    <description>Use file:append-text-lines to a new file and read the lines back</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("atl.txt", true()),
+        file:append-text-lines("atl.txt", ("a", "b"))
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>deep-equal(Q{http://expath.org/ns/file}read-text-lines("atl.txt"), ("a", "b"))</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-appendTextLines2-002">
+    <description>Use file:append-text-lines to append to an existing file</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("atl.txt", true()),
+        file:append-text-lines("atl.txt", ("a", "b")),
+        file:append-text-lines("atl.txt", ("c", "d"))
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>deep-equal(Q{http://expath.org/ns/file}read-text-lines("atl.txt"), ("a", "b", "c", "d"))</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-appendTextLines2-003">
+    <description>Use file:append-text-lines with a directory as target</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:append-text-lines(".", "a")
+      </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}is-dir"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-appendTextLines2-004">
+    <description>Use file:append-text-lines with a non-existent parent directory</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:append-text-lines("nonexistent/atl.txt", "a")
+      </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}no-dir"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-appendTextLines3-001">
+    <description>Use file:append-text-lines with an explicit encoding</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("atl.txt", true()),
+        file:append-text-lines("atl.txt", ("a", "b"), "UTF-8")
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>deep-equal(Q{http://expath.org/ns/file}read-text-lines("atl.txt"), ("a", "b"))</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-appendTextLines3-002">
+    <description>Use file:append-text-lines with an unsupported encoding</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:append-text-lines("atl.txt", "a", "no-such-encoding")
+      </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}unknown-encoding"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-appendTextLines3-010" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("atl.txt"),
+        file:append-text-lines("atl.txt", ("a", "b"), "UTF-16"),
+        file:append-text-lines("atl.txt", "c", "UTF-16")
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>deep-equal(Q{http://expath.org/ns/file}read-text-lines("atl.txt", "UTF-16"),
+          ("a", "b", "c"))</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-appendTextLines3-011" covers-40="PR3002">
+    <description>Evaluation of file module functions</description>
+    <created by="Christian Gruen" on="2026-10-27"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:delete("atl.txt"),
+        file:append-text-lines("atl.txt", lines := ("x", "y"))
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>deep-equal(Q{http://expath.org/ns/file}read-text-lines("atl.txt"), ("x", "y"))</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  
+</test-set>  

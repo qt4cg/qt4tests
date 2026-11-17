@@ -1,0 +1,414 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-list">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-list-001">
+    <description>List empty directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:list("dir5")
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}exists("dir5")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-002">
+    <description>List empty directory, recursive = true</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:list("dir5", true())
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}exists("dir5")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-003">
+    <description>List empty directory, recursive = false</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:list("dir5", false())
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}exists("dir5")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-004">
+    <description>List empty directory, recursive = true, with glob</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:list("dir5", true(), "*.*")
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}exists("dir5")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-005">
+    <description>List non-empty directory, recursive = true</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:write-text("dir5/berlin.txt", "berlin"),
+        file:write-text("dir5/geneva.txt", "geneva"),
+        file:write-text("dir5/oslo.txt", "oslo"),
+        file:list("dir5", true())
+      </test>
+    <result>
+      <all-of>
+        <assert-permutation>"berlin.txt", "geneva.txt", "oslo.txt"</assert-permutation>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-006">
+    <description>List non-empty directory, recursive = false</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:write-text("dir5/berlin.txt", "berlin"),
+        file:write-text("dir5/geneva.txt", "geneva"),
+        file:write-text("dir5/oslo.txt", "oslo"),
+        file:list("dir5", false())
+      </test>
+    <result>
+      <all-of>
+        <assert-permutation>"berlin.txt", "geneva.txt", "oslo.txt"</assert-permutation>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-007">
+    <description>List non-empty directory, recursive = unspecified</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:write-text("dir5/berlin.txt", "berlin"),
+        file:write-text("dir5/geneva.txt", "geneva"),
+        file:write-text("dir5/oslo.txt", "oslo"),
+        file:list("dir5", false())
+      </test>
+    <result>
+      <all-of>
+        <assert-permutation>"berlin.txt", "geneva.txt", "oslo.txt"</assert-permutation>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-008">
+    <description>List non-empty directory with subdirectories, recursive = true</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="Christian Gruen" on="2013-11-20" change="Aligned with latest spec (20131120)"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:write-text("dir5/berlin.txt", "berlin"),
+        file:write-text("dir5/geneva.txt", "geneva"),
+        file:write-text("dir5/oslo.txt", "oslo"),
+        file:create-dir("dir5/dir6"),
+        file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+        file:list("dir5", true())
+      </test>
+    <result>
+      <any-of>
+        <assert-permutation>"berlin.txt", "geneva.txt", "oslo.txt", "dir6\",
+          "dir6\helsinki.txt"</assert-permutation>
+        <assert-permutation>"berlin.txt", "geneva.txt", "oslo.txt", "dir6/",
+          "dir6/helsinki.txt"</assert-permutation>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-009">
+    <description>List non-empty directory with subdirectories, recursive = false</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="Christian Gruen" on="2013-11-20"
+      change="Alternative added, aligned with latest spec (20131120)"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:write-text("dir5/berlin.txt", "berlin"),
+        file:write-text("dir5/geneva.txt", "geneva"),
+        file:write-text("dir5/oslo.txt", "oslo"),
+        file:create-dir("dir5/dir6"),
+        file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+        file:list("dir5", false())
+      </test>
+    <result>
+      <any-of>
+        <assert-permutation>"berlin.txt", "geneva.txt", "oslo.txt", "dir6\"</assert-permutation>
+        <assert-permutation>"berlin.txt", "geneva.txt", "oslo.txt", "dir6/"</assert-permutation>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-010">
+    <description>List non-empty directory with subdirectories, recursive = unspecified</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="Christian Gruen" on="2013-11-20"
+      change="Alternative added, aligned with latest spec (20131120)"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:write-text("dir5/berlin.txt", "berlin"),
+        file:write-text("dir5/geneva.txt", "geneva"),
+        file:write-text("dir5/oslo.txt", "oslo"),
+        file:create-dir("dir5/dir6"),
+        file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+        file:list("dir5", false())
+      </test>
+    <result>
+      <any-of>
+        <assert-permutation>"berlin.txt", "geneva.txt", "oslo.txt", "dir6\"</assert-permutation>
+        <assert-permutation>"berlin.txt", "geneva.txt", "oslo.txt", "dir6/"</assert-permutation>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-011">
+    <description>List applied to non- directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:write-text("dir5/berlin.txt", "berlin"),
+        file:list("dir5/berlin.txt", false())
+      </test>
+    <result>
+      <error code="Q{http://expath.org/ns/file}no-dir"/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-012">
+    <description>List applied to non-existent path</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <modified by="Christian Gruen" on="2026-02-09" change="alternative error added"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:write-text("dir5/berlin.txt", "berlin"),
+        file:list("non/existent/path", false())
+      </test>
+    <result>
+      <any-of>
+        <error code="Q{http://expath.org/ns/file}no-dir"/>
+        <error code="Q{http://expath.org/ns/file}not-found"/>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-013">
+    <description>List non-empty directory with subdirectories, recursive = true, with
+      glob</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="Christian Gruen" on="2013-11-20" change="Alternative added"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:write-text("dir5/berlin.txt", "berlin"),
+        file:write-text("dir5/berlin.csv", "geneva"),
+        file:write-text("dir5/oslo.dat", "oslo"),
+        file:create-dir("dir5/dir6"),
+        file:write-text("dir5/dir6/berlin.jpg", "helsinki"),
+        file:list("dir5", true(), "berlin.*")
+      </test>
+    <result>
+      <!--<assert-permutation>"berlin.txt", "berlin.csv", "dir6\berlin.jpg"</assert-permutation>-->
+      <any-of>
+            <assert-permutation>"berlin.txt", "berlin.csv", "dir6/berlin.jpg"</assert-permutation>
+            <assert-permutation>"berlin.txt", "berlin.csv", "dir6\berlin.jpg"</assert-permutation>
+         </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-014">
+    <description>List non-empty directory with subdirectories, recursive = true, with
+      glob</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:write-text("dir5/berlin.txt", "berlin"),
+        file:write-text("dir5/berlin.csv", "geneva"),
+        file:write-text("dir5/oslo.dat", "oslo"),
+        file:create-dir("dir5/dir6"),
+        file:write-text("dir5/dir6/berlin.jpg", "helsinki"),
+        file:list("dir5", false(), "berlin.*")
+      </test>
+    <result>
+      <all-of>
+        <assert-permutation>"berlin.txt", "berlin.csv"</assert-permutation>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-015">
+    <description>List non-empty directory with subdirectories, recursive = true, with
+      glob</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="Christian Gruen" on="2013-11-20" change="Alternative added"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:write-text("dir5/berlin.txt", "berlin"),
+        file:write-text("dir5/geneva.txt", "geneva"),
+        file:write-text("dir5/oslo.dat", "oslo"),
+        file:create-dir("dir5/dir6"),
+        file:write-text("dir5/dir6/helsinki.txt", "helsinki"),
+        file:list("dir5", true(), "*.txt")
+      </test>
+    <result>
+      <any-of>
+        <assert-permutation>"berlin.txt", "geneva.txt", "dir6/helsinki.txt"</assert-permutation>
+        <assert-permutation>"berlin.txt", "geneva.txt", "dir6\helsinki.txt"</assert-permutation>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-016">
+    <description>List non-empty directory with subdirectories, recursive = true, with
+      glob</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="Christian Gruen" on="2013-11-20" change="Alternative added"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:write-text("dir5/berlin.txt", "berlin"),
+        file:write-text("dir5/geneva.tat", "geneva"),
+        file:write-text("dir5/oslo.dat", "oslo"),
+        file:create-dir("dir5/dir6"),
+        file:write-text("dir5/dir6/helsinki.tit", "helsinki"),
+        file:list("dir5", true(), "*.t?t")
+      </test>
+    <result>
+      <any-of>
+        <assert-permutation>"berlin.txt", "geneva.tat", "dir6/helsinki.tit"</assert-permutation>
+        <assert-permutation>"berlin.txt", "geneva.tat", "dir6\helsinki.tit"</assert-permutation>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-017">
+    <description>List non-empty directory with subdirectories, recursive = true, with
+      glob</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="Christian Gruen" on="2013-11-20" change="Alternative added"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:write-text("dir5/berlin1.txt", "berlin"),
+        file:write-text("dir5/berlin2.tat", "geneva"),
+        file:write-text("dir5/berlin3.dat", "oslo"),
+        file:create-dir("dir5/dir6"),
+        file:write-text("dir5/dir6/berlin4.tit", "helsinki"),
+        file:list("dir5", true(), "berlin*.*")
+      </test>
+    <result>
+      <any-of>
+        <assert-permutation>"berlin1.txt", "berlin2.tat", "berlin3.dat",
+          "dir6/berlin4.tit"</assert-permutation>
+        <assert-permutation>"berlin1.txt", "berlin2.tat", "berlin3.dat",
+          "dir6\berlin4.tit"</assert-permutation>
+      </any-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-018">
+    <description>List contents of current directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        exists(file:list("."))
+      </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-list-019">
+    <description>List contents of parent of current directory</description>
+    <created by="Michael Kay" on="2012-06-11"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        exists(file:list(".."))
+      </test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+
+  
+</test-set>  

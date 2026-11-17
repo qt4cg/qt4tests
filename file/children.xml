@@ -1,0 +1,91 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-children">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-children-001">
+    <description>List empty directory</description>
+    <created by="Christian Gruen" on="2015-01-29"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:delete("dir5", true()),
+        file:create-dir("dir5"),
+        file:children("dir5")
+      </test>
+    <result>
+      <all-of>
+        <assert-empty/>
+        <assert>Q{http://expath.org/ns/file}exists("dir5")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-children-002">
+    <description>Return children of non-empty directory</description>
+    <created by="Christian Gruen" on="2015-01-29"/>
+    <modified by="Michael Kay" on="2023-04-21" change="avoid namespace dependency in test assertion"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dir5", true()),
+      file:create-dir("dir5"),
+      file:write-text("dir5/roma.txt", ""),
+      file:write-text("dir5/napoli.txt", ""),
+      file:children("dir5")
+    </test>
+    <result>
+      <all-of>
+        <assert>count($result) = 2</assert>
+        <assert>every $r in $result satisfies contains($r, Q{http://expath.org/ns/file}dir-separator())</assert>
+        <assert>some $r in $result satisfies ends-with($r, 'roma.txt')</assert>
+        <assert>some $r in $result satisfies ends-with($r, 'napoli.txt')</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-children-003">
+    <description>Return single child (directory) of non-empty directory</description>
+    <created by="Christian Gruen" on="2015-01-29"/>
+    <modified by="Michael Kay" on="2023-04-21" change="avoid namespace dependency in test assertion"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dir5", true()),
+      file:create-dir("dir5/dir6"),
+      file:children("dir5")
+    </test>
+    <result>
+      <all-of>
+        <assert>count($result) = 1</assert>
+        <assert>ends-with($result, Q{http://expath.org/ns/file}dir-separator())</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-children-004">
+    <description>Child (directory) of non-empty directory</description>
+    <created by="Christian Gruen" on="2015-01-29"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:delete("dir5", true()),
+      file:create-dir("dir5"),
+      file:write-text("dir5/palermo.txt", ""),
+      file:children("dir5/palermo.txt")
+    </test>
+    <result>
+      <all-of>
+        <error code="Q{http://expath.org/ns/file}no-dir"/>
+      </all-of>
+    </result>
+  </test-case>
+
+  
+</test-set>  

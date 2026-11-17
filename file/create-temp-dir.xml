@@ -1,0 +1,133 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="file-create-temp-dir">
+  <description>Tests for the extension functions in the EXPath "file" package.
+  The tests rely on being able to modify a “sandpit” folder. The sandpit element
+  in the environment instructs the test driver to copy that folder to a
+  “sandpit” directory in a temporary location and set the current working
+  directory to that temporary location.
+</description>
+
+  <environment name="EXPath-file">
+    <namespace prefix="file" uri="http://expath.org/ns/file"/>
+    <sandpit path="sandpit"/>
+  </environment>
+  
+  <dependency type="feature" value="expath-file"/>
+
+  <test-case name="EXPath-file-createTempDir-001">
+    <description>Create temporary directory: in default location</description>
+    <created by="John Lumley" on="2013-11-27"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        file:create-temp-dir("EXPathFile",".tmp")
+      </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert>Q{http://expath.org/ns/file}exists($result)</assert>
+        <assert>$result ne Q{http://expath.org/ns/file}create-temp-dir("EXPathFile",".tmp")</assert>
+      </all-of>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-createTempDir-002">
+    <description>Create temporary directory: in defined location</description>
+    <created by="John Lumley" on="2013-11-27"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
+    <test>
+        if (file:exists("temp")) then () else file:create-dir("temp"),      
+        file:create-temp-dir("EXPathFile",".tmp","temp")
+      </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert>Q{http://expath.org/ns/file}exists($result)</assert>
+        <assert>$result ne Q{http://expath.org/ns/file}create-temp-dir("EXPathFile",".tmp","temp")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-createTempDir-003" covers-40="PR2077">
+    <description>Create temporary directory: no arguments</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:create-temp-dir()
+      </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert>Q{http://expath.org/ns/file}is-dir($result)</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-createTempDir-004" covers-40="PR2077">
+    <description>Create temporary directory: prefix only</description>
+    <created by="Christian Gruen" on="2026-07-10"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:create-temp-dir("prefix")
+      </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert>Q{http://expath.org/ns/file}is-dir($result)</assert>
+        <assert>starts-with(Q{http://expath.org/ns/file}name($result), "prefix")</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-createTempDir-005" covers-40="PR2077">
+    <description>Create temporary directory: short prefix [Java requires three chars]</description>
+    <created by="Michael Kay" on="2026-08-20"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:create-temp-dir("K")
+      </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert>Q{http://expath.org/ns/file}is-dir($result)</assert>
+        <assert>starts-with(Q{http://expath.org/ns/file}name($result), "K")</assert>
+      </all-of>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-createTempDir-006" covers-40="PR2077">
+    <description>Create temporary directory: empty prefix [Java requires three chars]</description>
+    <created by="Michael Kay" on="2026-08-20"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:create-temp-dir("")
+      </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert>Q{http://expath.org/ns/file}is-dir($result)</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  <test-case name="EXPath-file-createTempDir-007" covers-40="PR2077">
+    <description>Create temporary directory: suffix only</description>
+    <created by="Michael Kay" on="2026-08-20"/>
+    <environment ref="EXPath-file"/>
+    <dependency type="spec" value="XQ40+ XP40+"/>
+    <test>
+        file:create-temp-dir((), ".tmp")
+      </test>
+    <result>
+      <all-of>
+        <assert-type>xs:string</assert-type>
+        <assert>Q{http://expath.org/ns/file}is-dir($result)</assert>
+      </all-of>
+    </result>
+  </test-case>
+
+  
+</test-set>  
