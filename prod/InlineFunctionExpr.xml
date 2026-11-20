@@ -455,7 +455,7 @@
    <test-case name="inline-fn-032">
       <description>Type of an inline function</description>
       <created by="Michael Kay" on="2016-03-09"/>
-      <dependency type="spec" value="XP30+ XQ30+"/>
+      <dependency type="spec" value="XP30 XP31 XQ30 XQ31"/>
       <test>
          function($a, $b) {$a + $b}
       </test>
@@ -475,10 +475,35 @@
       </result>
    </test-case>
    
+   <test-case name="inline-fn-032a" covers-40="PR3100">
+      <description>Type of an inline function</description>
+      <created by="Christian Gruen" on="2026-11-20"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         function($a, $b) {$a + $b}
+      </test>
+      <result>
+         <all-of>
+            <assert-type>item()</assert-type>
+            <assert-type>function(*)</assert-type>
+            <assert-type>function(item()*, item()*) as item()*</assert-type>
+            <not>
+               <assert-type>function(xs:integer, xs:integer) as item()*</assert-type>
+            </not>
+            <not>
+               <assert-type>function(item()*, item()*) as xs:integer</assert-type>
+            </not>
+            <not>
+               <assert-type>function(item()*, item()*, item()*) as item()*</assert-type>
+            </not>
+         </all-of>
+      </result>
+   </test-case>
+
    <test-case name="inline-fn-033">
       <description>Type of an inline function</description>
       <created by="Michael Kay" on="2016-03-09"/>
-      <dependency type="spec" value="XP30+ XQ30+"/>
+      <dependency type="spec" value="XP30 XP31 XQ30 XQ31"/>
       <test>
          function($a as xs:integer, $b as xs:integer) as xs:integer {$a + $b}
       </test>
@@ -488,6 +513,32 @@
             <assert-type>function(*)</assert-type>
             <assert-type>function(xs:integer, xs:integer) as item()*</assert-type>
             <assert-type>function(xs:long, xs:long) as xs:integer+</assert-type>
+            <not>
+               <assert-type>function(item()*, item()*) as xs:integer</assert-type>
+            </not>
+            <not>
+               <assert-type>function(xs:integer, xs:decimal) as xs:integer</assert-type>
+            </not>
+         </all-of>
+      </result>
+   </test-case>
+   
+   <test-case name="inline-fn-033a" covers-40="PR3100">
+      <description>Type of an inline function</description>
+      <created by="Christian Gruen" on="2026-11-20"/>
+      <dependency type="spec" value="XP40+ XQ40+"/>
+      <test>
+         function($a as xs:integer, $b as xs:integer) as xs:integer {$a + $b}
+      </test>
+      <result>
+         <all-of>
+            <assert-type>item()</assert-type>
+            <assert-type>function(*)</assert-type>
+            <assert-type>function(xs:integer, xs:integer) as item()*</assert-type>
+            <assert-type>function(xs:integer, xs:integer) as xs:integer+</assert-type>
+            <not>
+               <assert-type>function(xs:long, xs:long) as xs:integer+</assert-type>
+            </not>
             <not>
                <assert-type>function(item()*, item()*) as xs:integer</assert-type>
             </not>
