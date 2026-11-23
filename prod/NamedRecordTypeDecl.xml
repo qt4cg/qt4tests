@@ -1932,14 +1932,15 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-151" covers-40="PR3037">
+   <test-case name="recordTypeDecl-151" covers-40="PR3037 PR3103">
       <description>Evaluation of derived record types.</description>
       <created by="Christian Gruen" on="2026-11-11"/>
+      <modified by="Christian Gruen" on="2026-11-23" change="PR3103"/>
       <test>
          declare record local:point(x as xs:double, y as xs:double);
          declare record local:point3d extends local:point(z as xs:double := 0);
          declare record local:place extends local:point3d(name as xs:string);
-         let $p := local:place(1, 2, 'Origin', 5)
+         let $p := local:place(1, 2, 5, 'Origin')
          return (map:keys($p), $p?z, $p?name)
       </test>
       <result>
@@ -2048,17 +2049,19 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-158" covers-40="PR3037">
+   <test-case name="recordTypeDecl-158" covers-40="PR3037 PR3103">
       <description>Evaluation of derived record types.</description>
       <created by="Christian Gruen" on="2026-11-11"/>
+      <modified by="Christian Gruen" on="2026-11-23" change="PR3103"/>
       <test>
          declare record local:a(x := 1);
          declare record local:b extends local:a(y);
-         let $b := local:b(2)
-         return (map:keys($b), $b?*)
+         let $b := local:b(3, 2)
+         let $c := { 'y': 2 } coerce as local:b
+         return (map:keys($b), $b?*, $c?*)
       </test>
       <result>
-         <assert-deep-eq>'x', 'y', 1, 2</assert-deep-eq>
+         <assert-deep-eq>'x', 'y', 3, 2, 1, 2</assert-deep-eq>
       </result>
    </test-case>
 
@@ -2324,16 +2327,17 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-181" covers-40="PR3037">
+   <test-case name="recordTypeDecl-181" covers-40="PR3037 PR3103">
       <description>Evaluation of derived record types.</description>
       <created by="Christian Gruen" on="2026-11-11"/>
+      <modified by="Christian Gruen" on="2026-11-25" change="PR3103"/>
       <test>
          declare record local:a(x);
          declare record local:b extends local:a(y := 1, z);
-         1
+         local:b(0, z := 2)?*
       </test>
       <result>
-         <error code="XQST0148"/>
+         <assert-deep-eq>0, 1, 2</assert-deep-eq>
       </result>
    </test-case>
 
@@ -2392,7 +2396,7 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-200">
+   <test-case name="recordTypeDecl-200" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2405,7 +2409,7 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-201">
+   <test-case name="recordTypeDecl-201" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2424,7 +2428,7 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-202">
+   <test-case name="recordTypeDecl-202" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2436,7 +2440,7 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-203">
+   <test-case name="recordTypeDecl-203" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2448,7 +2452,7 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-204">
+   <test-case name="recordTypeDecl-204" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2466,7 +2470,7 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-205">
+   <test-case name="recordTypeDecl-205" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2479,7 +2483,7 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-206">
+   <test-case name="recordTypeDecl-206" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2487,11 +2491,11 @@
          local:pos(0)
       </test>
       <result>
-         <error code="XPDY0156"/>
+         <error code="XPDY0157"/>
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-207">
+   <test-case name="recordTypeDecl-207" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2499,11 +2503,11 @@
          { 'x': 0 } coerce as local:pos
       </test>
       <result>
-         <error code="XPDY0156"/>
+         <error code="XPDY0157"/>
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-208">
+   <test-case name="recordTypeDecl-208" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2511,11 +2515,11 @@
          { 'x': '0' } cast as local:pos
       </test>
       <result>
-         <error code="XPDY0156"/>
+         <error code="XPDY0157"/>
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-209">
+   <test-case name="recordTypeDecl-209" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2523,11 +2527,11 @@
          local:pos(1) but with { 'x': 0 }
       </test>
       <result>
-         <error code="XPDY0156"/>
+         <error code="XPDY0157"/>
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-210">
+   <test-case name="recordTypeDecl-210" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2536,23 +2540,23 @@
          { 'x': 0, 'y': 1 } coerce as local:pair
       </test>
       <result>
-         <error code="XPDY0156"/>
+         <error code="XPDY0157"/>
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-211">
+   <test-case name="recordTypeDecl-211" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
          declare record local:pos(x as xs:integer) where ?x gt 0;
-         try { local:pos(0) } catch err:XPDY0156 { 'caught' }
+         try { local:pos(0) } catch err:XPDY0157 { 'caught' }
       </test>
       <result>
          <assert-eq>'caught'</assert-eq>
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-212">
+   <test-case name="recordTypeDecl-212" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2564,7 +2568,7 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-213">
+   <test-case name="recordTypeDecl-213" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2576,7 +2580,7 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-214">
+   <test-case name="recordTypeDecl-214" covers-40="PR3103">
       <description>Record types: field order, subtyping and coercion</description>
       <created by="Christian Gruen" on="2026-11-22"/>
       <test>
@@ -2590,6 +2594,20 @@
       </test>
       <result>
          <assert-deep-eq>true(), true(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-215" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-23"/>
+      <test>
+         declare record local:point(x as xs:double, y as xs:double);
+         declare record local:point3d extends local:point(z as xs:double := 0);
+         declare record local:place extends local:point3d(name as xs:string);
+         local:place(1, 2, 'Origin')
+      </test>
+      <result>
+         <error code="XPST0017"/>
       </result>
    </test-case>
    
