@@ -11110,7 +11110,7 @@ return count(distinct-ordered-nodes(
       <test>
         
 { 'title': 'Sojourner Truth', 'draft': true() }
-=&gt; update(fn { .//draft })
+=&gt; update(fn { .//draft }, { 'delete': () })
                
       </test>
       <result>
@@ -11124,8 +11124,23 @@ return count(distinct-ordered-nodes(
       <environment ref="global"/>
       <test>
         
+[ 'Rachel Carson', 'draft', 'Silent Spring' ]
+=&gt; update(fn { *[. = 'draft'] }, { 'delete': (), 'insert-after': [ 'final' ] })
+               
+      </test>
+      <result>
+         <assert-deep-eq>[ "Rachel Carson", "final", "Silent Spring" ]</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-update-003">
+      <description>Test case for fn:update</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
+      <environment ref="global"/>
+      <test>
+        
 { 'title': 'Ida Wells', 'price': 39 }
-=&gt; update(fn { .//price }, { 'value': fn { . * 2 } })
+=&gt; update(fn { .//price }, { 'replace-value': fn { . * 2 } })
                
       </test>
       <result>
@@ -11133,7 +11148,7 @@ return count(distinct-ordered-nodes(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-003">
+   <test-case name="fo-test-fn-update-004">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
@@ -11148,7 +11163,7 @@ return count(distinct-ordered-nodes(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-004">
+   <test-case name="fo-test-fn-update-005">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
@@ -11157,7 +11172,7 @@ return count(distinct-ordered-nodes(
 { 'price': 39 }
 =&gt; update(
   fn { .//price },
-  { 'rename': 'cost', 'value': fn { . * 2 } }
+  { 'rename': 'cost', 'replace-value': fn { . * 2 } }
 )
                
       </test>
@@ -11166,7 +11181,7 @@ return count(distinct-ordered-nodes(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-005">
+   <test-case name="fo-test-fn-update-006">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
@@ -11181,7 +11196,7 @@ return count(distinct-ordered-nodes(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-006">
+   <test-case name="fo-test-fn-update-007">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
@@ -11196,14 +11211,14 @@ return count(distinct-ordered-nodes(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-007">
+   <test-case name="fo-test-fn-update-008">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
       <test>
         
 [ 'Vandana Shiva' ]
-=&gt; update(fn { * }, { 'value': [ 'Vandana', 'Shiva' ] })
+=&gt; update(fn { * }, { 'replace-value': [ 'Vandana', 'Shiva' ] })
                
       </test>
       <result>
@@ -11211,7 +11226,7 @@ return count(distinct-ordered-nodes(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-008">
+   <test-case name="fo-test-fn-update-009">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
@@ -11230,7 +11245,7 @@ return update(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-009">
+   <test-case name="fo-test-fn-update-010">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
@@ -11240,7 +11255,7 @@ let $person := { 'name': 'Savitribai Phule' }
 return update(
   $person,
   fn { .//name },
-  { 'value': { 'first': 'Savitribai', 'last': 'Phule' } }
+  { 'replace-value': { 'first': 'Savitribai', 'last': 'Phule' } }
 )
                
       </test>
@@ -11249,7 +11264,7 @@ return update(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-010">
+   <test-case name="fo-test-fn-update-011">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
@@ -11264,38 +11279,19 @@ return update(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-011">
+   <test-case name="fo-test-fn-update-012">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
       <test>
         
 let $book := jtree({ 'book': { 'year': 1987 } })/book
-return update($book, fn { ./year }, { 'value': 1988 })
+return update($book, fn { ./year }, { 'replace-value': 1988 })
 ! (jkey(), jvalue())
                
       </test>
       <result>
          <assert-deep-eq>"book", { "year": 1988 }</assert-deep-eq>
-      </result>
-   </test-case>
-
-   <test-case name="fo-test-fn-update-012">
-      <description>Test case for fn:update</description>
-      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
-      <environment ref="global"/>
-      <dependency type="spec" value="XQ40+" satisfied="true"/>
-      <test>
-        
-update(
-  &lt;item&gt;&lt;price cur="EUR"&gt;39&lt;/price&gt;&lt;/item&gt;,
-  fn { ./price },
-  { 'value': fn { . * 2 } }
-)
-               
-      </test>
-      <result>
-         <assert-xml ignore-prefixes="false"><![CDATA[<item><price cur="EUR">78</price></item>]]></assert-xml>
       </result>
    </test-case>
 
@@ -11307,13 +11303,14 @@ update(
       <test>
         
 update(
-  &lt;book draft="true"&gt;&lt;title&gt;Malala Yousafzai&lt;/title&gt;&lt;/book&gt;,
-  fn { .//@draft }
+  &lt;item&gt;&lt;price cur="EUR"&gt;39&lt;/price&gt;&lt;/item&gt;,
+  fn { ./price },
+  { 'replace-value': fn { . * 2 } }
 )
                
       </test>
       <result>
-         <assert-xml ignore-prefixes="false"><![CDATA[<book><title>Malala Yousafzai</title></book>]]></assert-xml>
+         <assert-xml ignore-prefixes="false"><![CDATA[<item><price cur="EUR">78</price></item>]]></assert-xml>
       </result>
    </test-case>
 
@@ -11325,14 +11322,14 @@ update(
       <test>
         
 update(
-  &lt;item&gt;&lt;price cur="EUR"&gt;39&lt;/price&gt;&lt;/item&gt;,
-  fn { ./price },
-  { 'value': fn { . * 2 }, 'after': &lt;currency&gt;EUR&lt;/currency&gt; }
+  &lt;book draft="true"&gt;&lt;title&gt;Malala Yousafzai&lt;/title&gt;&lt;/book&gt;,
+  fn { .//@draft },
+  { 'delete': () }
 )
                
       </test>
       <result>
-         <assert-xml ignore-prefixes="false"><![CDATA[<item><price cur="EUR">78</price><currency>EUR</currency></item>]]></assert-xml>
+         <assert-xml ignore-prefixes="false"><![CDATA[<book><title>Malala Yousafzai</title></book>]]></assert-xml>
       </result>
    </test-case>
 
@@ -11344,14 +11341,14 @@ update(
       <test>
         
 update(
-  &lt;books&gt;&lt;book id="1"&gt;&lt;title/&gt;&lt;/book&gt;&lt;/books&gt;,
-  fn { ./book },
-  { 'value': 'Yosano Akiko' }
+  &lt;item&gt;&lt;price cur="EUR"&gt;39&lt;/price&gt;&lt;/item&gt;,
+  fn { ./price },
+  { 'replace-value': fn { . * 2 }, 'insert-after': &lt;currency&gt;EUR&lt;/currency&gt; }
 )
                
       </test>
       <result>
-         <assert-xml ignore-prefixes="false"><![CDATA[<books><book id="1">Yosano Akiko</book></books>]]></assert-xml>
+         <assert-xml ignore-prefixes="false"><![CDATA[<item><price cur="EUR">78</price><currency>EUR</currency></item>]]></assert-xml>
       </result>
    </test-case>
 
@@ -11362,11 +11359,15 @@ update(
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
         
-update(&lt;event days=""/&gt;, fn { ./@days }, { 'value': ('Mon', 'Tue') })
+update(
+  &lt;books&gt;&lt;book id="1"&gt;&lt;title/&gt;&lt;/book&gt;&lt;/books&gt;,
+  fn { ./book },
+  { 'replace-value': 'Yosano Akiko' }
+)
                
       </test>
       <result>
-         <assert-xml ignore-prefixes="false"><![CDATA[<event days="Mon Tue"/>]]></assert-xml>
+         <assert-xml ignore-prefixes="false"><![CDATA[<books><book id="1">Yosano Akiko</book></books>]]></assert-xml>
       </result>
    </test-case>
 
@@ -11377,10 +11378,25 @@ update(&lt;event days=""/&gt;, fn { ./@days }, { 'value': ('Mon', 'Tue') })
       <dependency type="spec" value="XQ40+" satisfied="true"/>
       <test>
         
+update(&lt;event days=""/&gt;, fn { ./@days }, { 'replace-value': ('Mon', 'Tue') })
+               
+      </test>
+      <result>
+         <assert-xml ignore-prefixes="false"><![CDATA[<event days="Mon Tue"/>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="fo-test-fn-update-018">
+      <description>Test case for fn:update</description>
+      <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
+      <environment ref="global"/>
+      <dependency type="spec" value="XQ40+" satisfied="true"/>
+      <test>
+        
 update(
   &lt;name&gt;&lt;last&gt;Parks&lt;/last&gt;&lt;/name&gt;,
   fn { ./last },
-  { 'before': &lt;first&gt;Rosa&lt;/first&gt; }
+  { 'insert-before': &lt;first&gt;Rosa&lt;/first&gt; }
 )
                
       </test>
@@ -11389,7 +11405,7 @@ update(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-018">
+   <test-case name="fo-test-fn-update-019">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
@@ -11408,7 +11424,7 @@ update(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-019">
+   <test-case name="fo-test-fn-update-020">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
@@ -11427,7 +11443,7 @@ update(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-020">
+   <test-case name="fo-test-fn-update-021">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
@@ -11446,7 +11462,7 @@ update(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-021">
+   <test-case name="fo-test-fn-update-022">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
@@ -11465,7 +11481,7 @@ update(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-022">
+   <test-case name="fo-test-fn-update-023">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
@@ -11475,7 +11491,7 @@ update(
 update(
   &lt;doc xmlns:p="u"&gt;&lt;page&gt;&lt;p:name/&gt;&lt;/page&gt;&lt;/doc&gt;/page,
   fn { .//*:name },
-  { 'value': 'Ida Wells' }
+  { 'replace-value': 'Ida Wells' }
 )
                
       </test>
@@ -11484,7 +11500,7 @@ update(
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-023">
+   <test-case name="fo-test-fn-update-024">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
@@ -11499,7 +11515,7 @@ update(&lt;a&gt;&lt;b/&gt;&lt;/a&gt;, fn { .//b }, { 'replace': &lt;b/&gt; })
       </result>
    </test-case>
 
-   <test-case name="fo-test-fn-update-024">
+   <test-case name="fo-test-fn-update-025">
       <description>Test case for fn:update</description>
       <created by="Michael Kay using generate-qt3-test-set.xsl" on="2026-11-24"/>
       <environment ref="global"/>
