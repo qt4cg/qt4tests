@@ -2405,6 +2405,280 @@
       </result>
    </test-case>
    
+   <test-case name="recordTypeDecl-191" covers-40="PR2979 PR3037">
+      <description>Trivial extension to add an integrity constraint.</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:rectangle(x as xs:double, y as xs:double) where ?x ge 0 and ?y ge 0;
+         declare record local:square extends local:rectangle() where ?x eq ?y;
+         declare function local:square($x as xs:double) {
+            local:square($x, $x)
+         };   
+         local:square(5)?y
+      </test>
+      <result>
+         <assert-eq>5</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-192" covers-40="PR2979 PR3037">
+      <description>Trivial extension to add an integrity constraint.</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:rectangle(x as xs:double, y as xs:double) where ?x ge 0 and ?y ge 0;
+         declare record local:square extends local:rectangle() where ?x eq ?y;
+         declare function local:square($x as xs:double) {
+            local:square($x, $x)
+         };   
+         local:square(-5)?y
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-193" covers-40="PR2979 PR3037">
+      <description>Instance-of test with record extension.</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:rectangle(x as xs:double, y as xs:double);
+         declare record local:square extends local:rectangle() where ?x eq ?y;
+         local:square(5, 5) instance of local:rectangle
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-194" covers-40="PR2979 PR3037">
+      <description>Instance-of test with record extension.</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:rectangle(x as xs:double, y as xs:double);
+         declare record local:square extends local:rectangle() where ?x eq ?y;
+         local:rectangle(5, 5) instance of local:square
+      </test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-195" covers-40="PR2979 PR3037">
+      <description>Treat as with record extension.</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:rectangle(x as xs:double, y as xs:double);
+         declare record local:square extends local:rectangle() where ?x eq ?y;
+         (local:square(5, 5) treat as local:rectangle) instance of local:square
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-196" covers-40="PR2979 PR3037">
+      <description>Failing cast.</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:rectangle(x as xs:double, y as xs:double);
+         declare record local:square extends local:rectangle() where ?x eq ?y;
+         local:rectangle(5, 6) cast as local:square
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-197" covers-40="PR2979 PR3037">
+      <description>Successful cast.</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:rectangle(x as xs:double, y as xs:double);
+         declare record local:square extends local:rectangle() where ?x eq ?y;
+         type-of(local:rectangle(5, 5) cast as local:square)
+      </test>
+      <result>
+         <assert>contains($result, 'square')</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-198" covers-40="PR2979 PR3037">
+      <description>An integrity constraint that uses local variables</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:data(name as xs:string, value as xs:integer*)
+            where every $i in ?value satisfies $i gt 0;
+         local:data("foo", (8, 6, 3, 5, 10))
+      </test>
+      <result>
+         <assert>sum($result?value) = 32</assert>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-199" covers-40="PR2979 PR3037">
+      <description>An integrity constraint that uses local variables</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:data(name as xs:string, value as xs:integer*)
+            where every $i in ?value satisfies $i gt 0;
+         local:data("foo", (8, 6, 3, -5, 10))
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-200" covers-40="PR2979 PR3037">
+      <description>An very simple integrity constraint</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:data(name as xs:string, value as xs:integer)
+            where ?value gt 0;
+         local:data("foo", -10)
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-201" covers-40="PR2979 PR3037">
+      <description>An very simple integrity constraint</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:data(name as xs:string, value as xs:integer)
+            where ?value gt 0;
+         {"name":"foo", "value":-10} coerce as local:data
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-202" covers-40="PR2979 PR3037">
+      <description>An very simple integrity constraint, used in a cast expression </description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:data(name as xs:string, value as xs:integer)
+            where ?value gt 0;
+         {"name":"foo", "value":-10} cast as local:data
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-203" covers-40="PR2979 PR3037">
+      <description>Integrity constraint referencing global variable</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare variable $var := 10;
+         declare record local:data(name as xs:string, value as xs:integer)
+            where ?value gt $var;
+         local:data("foo", 20)?value
+      </test>
+      <result>
+         <assert-eq>20</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-204" covers-40="PR2979 PR3037">
+      <description>Integrity constraint referencing global variable</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare variable $var := 10;
+         declare record local:data(name as xs:string, value as xs:integer)
+            where ?value gt $var;
+         local:data("foo", 5)?value
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-205" covers-40="PR2979 PR3037">
+      <description>Integrity constraint referencing user-defined function</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare function test($x) { $x gt 10 };
+         declare record local:data(name as xs:string, value as xs:integer)
+            where test(?value);
+         local:data("foo", 5)?value
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-206" covers-40="PR2979 PR3037">
+      <description>Integrity constraint referencing user-defined function</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare function test($x) { $x gt 10 };
+         declare record local:data(name as xs:string, value as xs:integer)
+            where test(?value);
+         local:data("foo", 20)?value
+      </test>
+      <result>
+         <assert-eq>20</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-207" covers-40="PR2979 PR3037">
+      <description>Integrity constraint referencing another record type</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:percentage (n as xs:integer) where ?n ge 0 and ?n le 100;
+         declare record local:data(name as xs:string, value as xs:integer)
+            where {"n": ?value} castable as local:percentage;
+         local:data("foo", 5)?value
+      </test>
+      <result>
+         <assert-eq>5</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-208" covers-40="PR2979 PR3037">
+      <description>Integrity constraint referencing another record type</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:percentage (n as xs:integer) where ?n ge 0 and ?n le 100;
+         declare record local:data(name as xs:string, value as xs:integer)
+            where {"n": ?value} castable as local:percentage;
+         local:data("foo", 105)?value
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-209" covers-40="PR2979 PR3037">
+      <description>Integrity constraint uses EBV</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:data(name as xs:string, value as element(*)*)
+            where ?value;
+         local:data("foo", ())?name
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   
+   <test-case name="recordTypeDecl-210" covers-40="PR2979 PR3037">
+      <description>Integrity constraint uses EBV</description>
+      <created by="Michael Kay" on="2026-11-11"/>
+      <test>
+         declare record local:data(name as xs:string, value as element(*)*)
+            where ?value;
+         local:data("foo", element #e {})?name
+      </test>
+      <result>
+         <assert-eq>"foo"</assert-eq>
+      </result>
+   </test-case>
+   
+   
+   
    
  
 
