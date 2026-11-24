@@ -648,6 +648,62 @@
       </result>
    </test-case>
 
+   <test-case name="cast-record-010" covers-40="PR3058">
+      <description>Casting to a labeled record type with fixed fields</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record R(x as xs:integer, %fixed f := 1);
+         declare record S extends R(%fixed f := 2);
+         S(1) cast as R
+      </test>
+      <result>
+         <assert-deep-eq>{ "x": 1, "f": 1 }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="cast-record-011" covers-40="PR3058">
+      <description>Casting to a labeled record type with fixed fields</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record R(x as xs:integer, %fixed f := 1);
+         declare record S extends R(%fixed f := 2);
+         let $r := S(1) cast as R
+         return ($r instance of R, $r instance of S)
+      </test>
+      <result>
+         <assert-deep-eq>true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="cast-record-012" covers-40="PR3058">
+      <description>Casting to a labeled record type with fixed fields</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record R(x as xs:integer, %fixed f := 1);
+         R(1) cast as R
+      </test>
+      <result>
+         <assert-deep-eq>{ "x": 1, "f": 1 }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="cast-record-013" covers-40="PR3058">
+      <description>Casting to a labeled record type with fixed fields</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record R(x as xs:integer, %fixed f := 1);
+         declare record S extends R(y, %fixed f := 2);
+         S(1, 'y') cast as R
+      </test>
+      <result>
+         <assert-deep-eq>{ "x": 1, "f": 1 }</assert-deep-eq>
+      </result>
+   </test-case>
+
    <test-case name="cast-record-901" covers-40="PR2855">
       <description>Casting to a wildcard array, map, or record type</description>
       <created by="Christian Gruen" on="2026-08-26"/>
@@ -748,6 +804,19 @@
       <test>
          declare record coord (x as xs:integer, y as xs:integer, % fixed z as xs:integer := 25);
          {"x": 1, "y": 2, "z": 3} cast as coord</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="cast-record-911" covers-40="PR3058">
+      <description>Casting to a labeled record type with fixed fields</description>
+      <created by="Christian Gruen" on="2026-11-11"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare record R(x as xs:integer, %fixed f := 1);
+         { "x": 1, "f": 1 } cast as R
+      </test>
       <result>
          <error code="XPTY0004"/>
       </result>
