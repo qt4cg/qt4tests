@@ -1945,14 +1945,15 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-151" covers-40="PR3037">
+   <test-case name="recordTypeDecl-151" covers-40="PR3037 PR3103">
       <description>Evaluation of derived record types.</description>
       <created by="Christian Gruen" on="2026-11-11"/>
+      <modified by="Christian Gruen" on="2026-11-23" change="PR3103"/>
       <test>
          declare record local:point(x as xs:double, y as xs:double);
          declare record local:point3d extends local:point(z as xs:double := 0);
          declare record local:place extends local:point3d(name as xs:string);
-         let $p := local:place(1, 2, 'Origin', 5)
+         let $p := local:place(1, 2, 5, 'Origin')
          return (map:keys($p), $p?z, $p?name)
       </test>
       <result>
@@ -2061,17 +2062,19 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-158" covers-40="PR3037">
+   <test-case name="recordTypeDecl-158" covers-40="PR3037 PR3103">
       <description>Evaluation of derived record types.</description>
       <created by="Christian Gruen" on="2026-11-11"/>
+      <modified by="Christian Gruen" on="2026-11-23" change="PR3103"/>
       <test>
          declare record local:a(x := 1);
          declare record local:b extends local:a(y);
-         let $b := local:b(2)
-         return (map:keys($b), $b?*)
+         let $b := local:b(3, 2)
+         let $c := { 'y': 2 } coerce as local:b
+         return (map:keys($b), $b?*, $c?*)
       </test>
       <result>
-         <assert-deep-eq>'x', 'y', 1, 2</assert-deep-eq>
+         <assert-deep-eq>'x', 'y', 3, 2, 1, 2</assert-deep-eq>
       </result>
    </test-case>
 
@@ -2337,16 +2340,17 @@
       </result>
    </test-case>
 
-   <test-case name="recordTypeDecl-181" covers-40="PR3037">
+   <test-case name="recordTypeDecl-181" covers-40="PR3037 PR3103">
       <description>Evaluation of derived record types.</description>
       <created by="Christian Gruen" on="2026-11-11"/>
+      <modified by="Christian Gruen" on="2026-11-25" change="PR3103"/>
       <test>
          declare record local:a(x);
          declare record local:b extends local:a(y := 1, z);
-         1
+         local:b(0, z := 2)?*
       </test>
       <result>
-         <error code="XQST0148"/>
+         <assert-deep-eq>0, 1, 2</assert-deep-eq>
       </result>
    </test-case>
 
@@ -2402,6 +2406,221 @@
       </test>
       <result>
          <assert-deep-eq>'shape', 'kind', 'name', 'radius', 'circle'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-200" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:a(%fixed m := 1, x := 0);
+         declare record local:b extends local:a(%fixed m := 2, y := 0);
+         (local:a(5) coerce as local:b) => map:for-each(fn($k, $v) { `{ $k }={ $v }` })
+      </test>
+      <result>
+         <assert-deep-eq>'m=2', 'x=5', 'y=0'</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-201" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:a(%fixed m := 1, x := 0);
+         declare record local:b extends local:a(%fixed m := 2, y := 0);
+         declare record local:c extends local:a(%fixed m := 3, y := 0);
+         (
+           (local:a() cast as local:b)?m,
+           (local:b() cast as local:a)?m,
+           (local:c() cast as local:b)?m,
+           (local:c() coerce as local:b)?m
+         )
+      </test>
+      <result>
+         <assert-deep-eq>2, 1, 2, 2</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-202" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:a(%fixed m := 1, x := 0);
+         { 'm': 1, 'x': 0 } coerce as local:a
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-203" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:a(%fixed m := 1, x := 0);
+         { 'm': 1, 'x': 0 } cast as local:a
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-204" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:shape(
+           %fixed area as fn(local:shape) as xs:double := fn { 0 }
+         );
+         declare record local:square extends local:shape(
+           side as xs:double,
+           %fixed area := fn { ?side * ?side }
+         );
+         (local:square(2) but with { 'side': 3 }) =?> area()
+      </test>
+      <result>
+         <assert-eq>9</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-205" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:a(%fixed m := 1, x := 0);
+         declare record local:b extends local:a(y := 0);
+         local:b() but with local:a()
+      </test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-206" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:pos(x as xs:integer) where ?x gt 0;
+         local:pos(0)
+      </test>
+      <result>
+         <error code="XPDY0157"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-207" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:pos(x as xs:integer) where ?x gt 0;
+         { 'x': 0 } coerce as local:pos
+      </test>
+      <result>
+         <error code="XPDY0157"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-208" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:pos(x as xs:integer) where ?x gt 0;
+         { 'x': '0' } cast as local:pos
+      </test>
+      <result>
+         <error code="XPDY0157"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-209" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:pos(x as xs:integer) where ?x gt 0;
+         local:pos(1) but with { 'x': 0 }
+      </test>
+      <result>
+         <error code="XPDY0157"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-210" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:pos(x as xs:integer) where ?x gt 0;
+         declare record local:pair extends local:pos(y as xs:integer);
+         { 'x': 0, 'y': 1 } coerce as local:pair
+      </test>
+      <result>
+         <error code="XPDY0157"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-211" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:pos(x as xs:integer) where ?x gt 0;
+         try { local:pos(0) } catch err:XPDY0157 { 'caught' }
+      </test>
+      <result>
+         <assert-eq>'caught'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-212" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:r(x) where error();
+         local:r(1)
+      </test>
+      <result>
+         <error code="FOER0000"/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-213" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:complex(r as xs:double, i as xs:double := 0);
+         ({ 'r': 3e0 } coerce as local:complex)?i instance of xs:double
+      </test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-214" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-22"/>
+      <test>
+         declare record local:a(%fixed f as xs:double := 1);
+         declare record local:b extends local:a(%fixed f := 2);
+         (
+           local:b()?f,
+           ({ } coerce as local:b)?f,
+           ({ } cast as local:b)?f
+         ) ! (. instance of xs:double)
+      </test>
+      <result>
+         <assert-deep-eq>true(), true(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="recordTypeDecl-215" covers-40="PR3103">
+      <description>Record types: field order, subtyping and coercion</description>
+      <created by="Christian Gruen" on="2026-11-23"/>
+      <test>
+         declare record local:point(x as xs:double, y as xs:double);
+         declare record local:point3d extends local:point(z as xs:double := 0);
+         declare record local:place extends local:point3d(name as xs:string);
+         local:place(1, 2, 'Origin')
+      </test>
+      <result>
+         <error code="XPST0017"/>
       </result>
    </test-case>
    

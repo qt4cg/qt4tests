@@ -3283,16 +3283,17 @@
       </result>
    </test-case>
    
-   <test-case name="function-decl-40-913" covers-40="PR197 PR800">
+   <test-case name="function-decl-40-913" covers-40="PR197 PR800 PR3103">
       <description> Default parameters: syntax. </description>
       <created by="Christian Gruen" on="2025-01-22"/>
+      <modified by="Christian Gruen" on="2026-11-25" change="PR3103"/>
       <dependency type="spec" value="XQ40+"/>
       <test>
          declare function local:f($a := 1, $b) { };
          local:f(1, 2)
       </test>
       <result>
-         <error code="XQST0148"/>
+         <assert-empty/>
       </result>
    </test-case>
    
@@ -3350,6 +3351,68 @@
       </test>
       <result>
          <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="function-decl-40-920" covers-40="PR3103">
+      <description>Default values of function parameters.</description>
+      <created by="Christian Gruen" on="2026-11-25"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($a := 1, $b, $c := 3) { $a * 100 + $b * 10 + $c };
+         (
+           local:f(4, 5, 6),
+           local:f(4, 5),
+           local:f(b := 5),
+           local:f(b := 5, c := 6),
+           local:f(b := ?)(5),
+           local:f#2(4, 5)
+         )
+      </test>
+      <result>
+         <assert-deep-eq>456, 453, 153, 156, 153, 453</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="function-decl-40-921" covers-40="PR3103">
+      <description>Default values of function parameters.</description>
+      <created by="Christian Gruen" on="2026-11-25"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($a := 1, $b, $c := 3) { $a * 100 + $b * 10 + $c };
+         local:f(4)
+      </test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="function-decl-40-922" covers-40="PR3103">
+      <description>Default values of function parameters.</description>
+      <created by="Christian Gruen" on="2026-11-25"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($a := 1, $b, $c := 3) { $a * 100 + $b * 10 + $c };
+         local:f#1
+      </test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+
+   <test-case name="function-decl-40-923" covers-40="PR3103">
+      <description>Default values of function parameters.</description>
+      <created by="Christian Gruen" on="2026-11-25"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test>
+         declare function local:f($a := 1, $b, $c := 3) { $a * 100 + $b * 10 + $c };
+         (
+           empty(function-lookup(#local:f, 1)),
+           function-lookup(#local:f, 2)(4, 5)
+         )
+      </test>
+      <result>
+         <assert-deep-eq>true(), 453</assert-deep-eq>
       </result>
    </test-case>
    
