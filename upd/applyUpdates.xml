@@ -475,12 +475,18 @@
    <test-case name="applyUpdates-030">
       <description>Evaluation of upd:applyUpdates.</description>
       <created by="Christian Gruen" on="2026-11-10"/>
+      <modified by="Michael Kay" on="2026-11-27" change="Assertion must be XPath expression"/>
       <test><![CDATA[
          copy $c := <a>AA<b/>CC</a>
          modify delete node $c/b
          return ($c, count($c/text()))]]></test>
       <result>
-         <assert-deep-eq><![CDATA[<a>AACC</a>, 1]]></assert-deep-eq>
+         <all-of>
+            <assert>name($result[1]) = "a"</assert>
+            <assert>count($result[1]/*) = 0</assert>
+            <assert>string($result[1]) = "AACC"</assert>
+            <assert>$result[2] = 1</assert>
+         </all-of>
       </result>
    </test-case>
 
@@ -551,21 +557,28 @@
    <test-case name="applyUpdates-036">
       <description>Evaluation of upd:applyUpdates.</description>
       <created by="Christian Gruen" on="2026-11-10"/>
+      <modified by="Michael Kay" on="2026-11-27" change="Assertion must be XPath expression"/>
+      <modified by="Michael Kay" on="2026-11-27" change="Alternative result: see qt4tests bug #506"/>
       <test><![CDATA[
          copy $c := <location>US</location>
          modify (
            insert node 'foo' into $c,
            delete node $c/text()
          )
-         return $c]]></test>
+         return serialize($c)]]></test>
       <result>
-         <assert-xml><![CDATA[<location>foo</location>]]></assert-xml>
+         <any-of>
+            <assert-eq><![CDATA["<location>foo</location>"]]></assert-eq>
+            <assert-eq><![CDATA["<location>USfoo</location>"]]></assert-eq>
+         </any-of>
       </result>
    </test-case>
 
    <test-case name="applyUpdates-037">
       <description>Evaluation of upd:applyUpdates.</description>
       <created by="Christian Gruen" on="2026-11-10"/>
+      <modified by="Michael Kay" on="2026-11-27" change="Assertion must be XPath expression"/>
+      <modified by="Michael Kay" on="2026-11-27" change="Alternative result: see qt4tests bug #506"/>
       <modified by="Christian Gruen" on="2026-11-27" change="issue 506: alternative result for eager text node merging"/>
       <test><![CDATA[
          copy $c := <item><location>US</location></item>
@@ -575,11 +588,11 @@
            insert node 'faa' into $c/location,
            delete node $c/location/text()
          )
-         return $c]]></test>
+         return serialize($c)]]></test>
       <result>
          <any-of>
-            <assert-xml><![CDATA[<item>faa<location>faa</location>foo</item>]]></assert-xml>
-            <assert-xml><![CDATA[<item>faa<location/>foo</item>]]></assert-xml>
+            <assert-eq><![CDATA["<item>faa<location>faa</location>foo</item>"]]></assert-eq>
+            <assert-eq><![CDATA["<item>faa<location>USfaa</location>foo</item>"]]></assert-eq>
          </any-of>
       </result>
    </test-case>
@@ -617,18 +630,20 @@
    <test-case name="applyUpdates-040">
       <description>Evaluation of upd:applyUpdates.</description>
       <created by="Christian Gruen" on="2026-11-10"/>
+      <modified by="Michael Kay" on="2026-11-27" change="Assertion must be XPath expression"/>
       <test><![CDATA[
          copy $c := <a>shouldBe<Single/>TextNode</a>
          modify replace node $c/Single with 'Single'
-         return ($c, count($c/text()))]]></test>
+         return (serialize($c), count($c/text()))]]></test>
       <result>
-         <assert-deep-eq><![CDATA[<a>shouldBeSingleTextNode</a>, 1]]></assert-deep-eq>
+         <assert-deep-eq><![CDATA["<a>shouldBeSingleTextNode</a>", 1]]></assert-deep-eq>
       </result>
    </test-case>
 
    <test-case name="applyUpdates-041">
       <description>Evaluation of upd:applyUpdates.</description>
       <created by="Christian Gruen" on="2026-11-10"/>
+      <modified by="Michael Kay" on="2026-11-27" change="Assertion must be XPath expression"/>
       <test><![CDATA[
          copy $c := <n>T1<a/>T2<b/>T3<c/>T4<d/>T5<e/></n>
          modify (
@@ -637,9 +652,9 @@
            delete nodes ($c/a, $c/b, $c/c),
            replace node $c/d with (<newd/>, 'T44')
          )
-         return ($c, count($c/text()))]]></test>
+         return (serialize($c), count($c/text()))]]></test>
       <result>
-         <assert-deep-eq><![CDATA[<n>T1T11T2T3T4<newd/>T44T5T6</n>, 2]]></assert-deep-eq>
+         <assert-deep-eq><![CDATA["<n>T1T11T2T3T4<newd/>T44T5T6</n>", 2]]></assert-deep-eq>
       </result>
    </test-case>
 
