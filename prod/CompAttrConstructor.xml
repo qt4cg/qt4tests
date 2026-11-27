@@ -1639,4 +1639,79 @@
       </result>
    </test-case>
 
+   <test-case name="Constr-compattr-prefix-1">
+      <description>Conflicting prefixes in element and attribute names.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[
+         let $e := element { QName("A", "p:e") } { attribute { QName("B", "p:a") } { } }
+         return (
+           namespace-uri($e),
+           namespace-uri($e/@*),
+           every $n in ($e, $e/@*) satisfies
+             namespace-uri-for-prefix(prefix-from-QName(node-name($n)), $e) eq namespace-uri($n)
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>"A", "B", true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compattr-prefix-2">
+      <description>Conflicting prefixes in element and attribute names.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[
+         let $e := element e {
+           attribute { QName("A", "p:a") } { },
+           attribute { QName("B", "p:b") } { }
+         }
+         return (
+           for $a in $e/@* order by local-name($a) return namespace-uri($a),
+           every $a in $e/@* satisfies
+             namespace-uri-for-prefix(prefix-from-QName(node-name($a)), $e) eq namespace-uri($a)
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>"A", "B", true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compattr-prefix-3">
+      <description>Conflicting prefixes in element and attribute names.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[
+         let $e := <p:e xmlns:p="A">{ attribute { QName("B", "p:a") } { } }</p:e>
+         let $prefix := prefix-from-QName(node-name($e/@*))
+         return (
+           namespace-uri-for-prefix("p", $e),
+           $prefix ne "p",
+           namespace-uri-for-prefix($prefix, $e)
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>"A", true(), "B"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compattr-prefix-4">
+      <description>Conflicting prefixes in element and attribute names.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[
+         let $a := <x xmlns:p="B" p:a=""/>/@*
+         let $e := <p:e xmlns:p="A">{ $a }</p:e>
+         let $prefix := prefix-from-QName(node-name($e/@*))
+         return (
+           namespace-uri-for-prefix("p", $e),
+           $prefix ne "p",
+           namespace-uri-for-prefix($prefix, $e)
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>"A", true(), "B"</assert-deep-eq>
+      </result>
+   </test-case>
+
 </test-set>

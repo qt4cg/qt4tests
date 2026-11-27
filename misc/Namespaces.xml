@@ -1,0 +1,1957 @@
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="misc-Namespaces" covers-40="fn-in-scope-namespaces">
+  <description>Namespace bindings: rebinding, aliasing, undeclaration, copying and prefix conflicts</description>
+  <link type="spec" document="XQuery" idref="id-ns-nodes-on-elements"/>
+
+  <dependency type="spec" value="XQ40+"/>
+
+  <environment name="namespaces">
+    <source role="." file="Namespaces/namespaces.xml">
+      <description>Document with rebound, aliased, undeclared and case-sensitive prefixes.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+    </source>
+  </environment>
+
+  <!-- names and namespace URIs -->
+
+  <test-case name="namespaces-001">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      //*[@id = ('i2', 'i3', 'i4')] ! (name(), string(namespace-uri()))
+    ]]></test>
+    <result>
+      <assert-deep-eq>"p:item", "urn:p-2", "p:item", "urn:p-3", "p:item", "urn:p-1"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-002">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      //*[@id = ('i1', 'i2', 'i3', 'i4')]/@*:a ! string(namespace-uri())
+    ]]></test>
+    <result>
+      <assert-permutation>"urn:p-1", "urn:q", "", "urn:p-2", "urn:p-3", "urn:p-1"</assert-permutation>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-003">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace p = "urn:p-1";
+      (//p:item/@id ! string(), //@p:a ! string())
+    ]]></test>
+    <result>
+      <assert-deep-eq>"i4", "p1", "p1-again"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-004">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace q = "urn:q";
+      //q:item ! (name(), string(@id))
+    ]]></test>
+    <result>
+      <assert-deep-eq>"alias:item", "i5", "q:item", "i6"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-005">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $i5 := //*[@id = 'i5']
+      let $i6 := //*[@id = 'i6']
+      return (
+        node-name($i5) eq node-name($i6),
+        name($i5) eq name($i6),
+        deep-equal($i5, $i6)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>true(), false(), false()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-006">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $i10 := //*[@id = 'i10']
+      return (
+        $i10/* ! string(namespace-uri()),
+        node-name($i10) eq node-name($i10/*[@id = 'i12']),
+        name($i10) eq name($i10/*[@id = 'i12'])
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:default-1", "urn:default-2", true(), false()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-007">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $i1 := //*[@id = 'i1']
+      return (string(namespace-uri($i1)), string(namespace-uri($i1/@a)))
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:default-1", ""</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-008">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $attrs := //*[@id = 'i36']/@*[local-name() = 'k']
+      return (count($attrs), sort($attrs ! string(namespace-uri())))
+    ]]></test>
+    <result>
+      <assert-deep-eq>6, "", "urn:P-upper", "urn:p-1", "urn:q", "urn:r-1", "urn:r-2"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-009">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $i7 := //*[@id = 'i7']
+      return (
+        string(namespace-uri($i7)),
+        $i7/@*:item ! (name(), string(namespace-uri()), string())
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:P-upper", "p:item", "urn:p-1", "attribute-named-item"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-010">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $x := //*[@id = 'i32']/*
+      return (
+        $x ! name(),
+        count(distinct-values($x ! node-name())),
+        distinct-values($x ! string(namespace-uri()))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"a1:x", "a2:x", "a3:x", 1, "urn:same"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-011">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      //*[@id = 'i21']/descendant-or-self::* ! (
+        string(namespace-uri()), string(namespace-uri(@*:level))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        "urn:default-1", "urn:n-0",
+        "urn:n-1", "urn:n-1",
+        "urn:n-2", "urn:n-2",
+        "urn:n-3", "urn:n-3",
+        "urn:n-4", "urn:n-4",
+        "urn:n-5", "urn:n-5",
+        "urn:n-5", ""
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-012">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $i26 := //*[@id = 'i26']
+      return (node-name($i26) eq node-name($i26/*), name($i26), name($i26/*))
+    ]]></test>
+    <result>
+      <assert-deep-eq>true(), "n:x", "x"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-013">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      count(distinct-values(//* ! string(namespace-uri())))
+    ]]></test>
+    <result>
+      <assert-eq>17</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-014">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test>
+      declare namespace &#xF6; = "urn:umlaut";
+      //&#xF6;:item ! (string(@id), string(@&#xF6;:attr), name(@*:attr))
+    </test>
+    <result>
+      <assert-deep-eq>"i31", "&#xE4;", "&#xF6;:attr"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-015">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $i30 := //*[@id = 'i30']
+      return (
+        string($i30/@xml:lang),
+        lang('en', $i30),
+        string(namespace-uri($i30/@*:space))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"en", true(), "http://www.w3.org/XML/1998/namespace"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <!-- name tests and default element namespaces -->
+
+  <test-case name="namespaces-020">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare default element namespace "urn:default-1";
+      //item/@id ! string()
+    ]]></test>
+    <result>
+      <assert-deep-eq>"i1", "i11"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-021">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare default element namespace "urn:default-2";
+      //item/@id ! string()
+    ]]></test>
+    <result>
+      <assert-deep-eq>"i10", "i12"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-022">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare default element namespace "##any";
+      //item/@id ! string()
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        "i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8",
+        "i9", "i10", "i11", "i12", "i13", "i14", "i31"
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-023">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare default element namespace "##any";
+      //x/@id ! string()
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        "i22", "i23", "i24", "i25", "i26", "i27",
+        "i33", "i34", "i35", "i40", "i41"
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-024">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      (//Q{}*/@id ! string(), count(//Q{urn:same}x), count(//Q{urn:n-5}*))
+    ]]></test>
+    <result>
+      <assert-deep-eq>"i8", "i9", "i19", 3, 2</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-025">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace xs = "urn:not-xml-schema";
+      declare namespace fn = "urn:not-functions";
+      (//xs:item/@id ! string(), //fn:item/@id ! string(), //@xs:type ! string())
+    ]]></test>
+    <result>
+      <assert-deep-eq>"i13", "i14", "xs:string"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-026">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace P = "urn:p-1";
+      declare namespace p = "urn:P-upper";
+      (//P:item/@id ! string(), //p:item/@id ! string())
+    ]]></test>
+    <result>
+      <assert-deep-eq>"i4", "i7"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <!-- in-scope namespaces -->
+
+  <test-case name="namespaces-030">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      //*[@id = ('root', 'i9', 'i26')] ! string-join(sort(in-scope-prefixes(.)), ',')
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        ",P,alias,fn,p,q,xml,xs",
+        "P,alias,fn,p,q,xml,xs",
+        ",P,alias,fn,n,p,q,xml,xs"
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-031">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      //*[@id = ('i1', 'i2', 'i3', 'i4', 'i12', 'i40', 'i41')] ! string(namespace-uri-for-prefix('p', .))
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        "urn:p-1", "urn:p-2", "urn:p-3", "urn:p-1", "urn:default-2", "urn:p-1", "urn:p-other"
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-032">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      //*[@id = ('i1', 'i8', 'i9', 'i10', 'i11', 'i26', 'i27')] ! (
+        namespace-uri-for-prefix('', .) otherwise '-'
+      ) ! string()
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        "urn:default-1", "-", "-", "urn:default-2", "urn:default-1", "urn:n-5", "urn:n-5"
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-033">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      //*[@id = ('i37', 'i38', 'i33')] ! map:size(in-scope-namespaces(.))
+    ]]></test>
+    <result>
+      <assert-deep-eq>11, 10, 10</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-034">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      every $e in //*
+      satisfies deep-equal(sort(map:keys(in-scope-namespaces($e))), sort(in-scope-prefixes($e)))
+    ]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-035">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      every $e in //*
+      satisfies (
+        count($e/namespace::*) = count(in-scope-prefixes($e)) and
+        (every $ns in $e/namespace::* satisfies in-scope-namespaces($e)(name($ns)) = string($ns))
+      )
+    ]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-036">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $consistent := fn($root) {
+        every $e in $root/descendant-or-self::*, $n in ($e, $e/@*[prefix-from-QName(node-name())])
+        satisfies string(namespace-uri-for-prefix(prefix-from-QName(node-name($n)), $e)) =
+          string(namespace-uri($n))
+      }
+      return $consistent(/*)
+    ]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-037">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      count(//*[@id = 'i26']/namespace::*),
+      //*[@id = 'i30']/namespace::xml ! string(),
+      //*[@id = 'i32']/namespace::* [string() = 'urn:same'] ! name() => sort()
+    ]]></test>
+    <result>
+      <assert-deep-eq>9, "http://www.w3.org/XML/1998/namespace", "a1", "a2", "a3"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <!-- QName-valued content -->
+
+  <test-case name="namespaces-040">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      //*:qname ! resolve-QName(string(), .) ! string(namespace-uri-from-QName(.))
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:p-1", "urn:p-shadow", "urn:default-1", "", "urn:q"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-041">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace p = "urn:p-shadow";
+      let $i16 := //*[@id = 'i16']
+      let $i17 := //*[@id = 'i17']
+      return (
+        resolve-QName(string($i16), $i16) eq resolve-QName('p:local', //*[@id = 'i4']),
+        resolve-QName(string($i16), $i16) eq resolve-QName('p:local', //*[@id = 'i2']),
+        resolve-QName(string($i17), $i17) eq xs:QName('p:local'),
+        resolve-QName(string(//*[@id = 'i20']), //*[@id = 'i20']) eq QName('urn:q', 'q:local')
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>true(), false(), true(), true()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-042">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $i13 := //*[@id = 'i13']
+      let $i14 := //*[@id = 'i14']
+      return (
+        resolve-QName(string($i13), $i13) eq xs:QName('xs:string'),
+        resolve-QName(string($i13), $i13) eq QName('urn:not-xml-schema', 'string'),
+        resolve-QName(string($i14), $i14) eq QName('urn:not-functions', 'true')
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>false(), true(), true()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-043">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      resolve-QName('u1:local', //*[@id = 'i9'])
+    ]]></test>
+    <result>
+      <error code="FONS0004"/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-044">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      //*[@id = ('i37', 'i38')] ! resolve-QName('u2:local', .) ! expanded-QName(.)
+    ]]></test>
+    <result>
+      <assert-deep-eq>"Q{urn:unused-2}local", "Q{urn:unused-2}local"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <!-- paths -->
+
+  <test-case name="namespaces-050">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      //*[@id = ('i6', 'i12')] ! path(),
+      //*[@id = 'i4']/@*:a ! path(),
+      //*[@id = 'i9']/@id ! path()
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        "/Q{urn:default-1}root[1]/Q{urn:q}item[2]",
+        "/Q{urn:default-1}root[1]/Q{}item[1]/Q{urn:default-2}item[1]/Q{urn:default-2}item[1]",
+        "/Q{urn:default-1}root[1]/Q{urn:p-2}item[1]/Q{urn:p-3}item[1]/Q{urn:p-1}item[1]/@Q{urn:p-1}a",
+        "/Q{urn:default-1}root[1]/Q{}item[1]/Q{}item[1]/@id"
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <!-- copying -->
+
+  <test-case name="namespaces-060">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $wrap := <p:wrap xmlns:p="urn:wrap">{ //*[@id = 'i4'] }</p:wrap>
+      return (
+        string(namespace-uri-for-prefix('p', $wrap)),
+        $wrap/* ! (name(), string(namespace-uri()), string(namespace-uri-for-prefix('p', .)))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:wrap", "p:item", "urn:p-1", "urn:p-1"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-061">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $copy := <wrap xmlns="urn:w" xmlns:z="urn:z">{ //*[@id = 'i9'] }</wrap>/*
+      return (
+        string(namespace-uri($copy)),
+        exists(namespace-uri-for-prefix('', $copy)),
+        string(namespace-uri-for-prefix('z', $copy))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"", false(), "urn:z"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-062">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces no-preserve, no-inherit;
+      //*[@id = ('i36', 'i33', 'i35', 'i6')] ! string-join(sort(in-scope-prefixes(<w>{ . }</w>/*)), ',')
+    ]]></test>
+    <result>
+      <assert-deep-eq>"alias,q,xml", "a1,xml", "a1,a3,xml", ",P,p,q,r1,r2,xml"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-063">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces no-preserve, inherit;
+      let $copy := <w xmlns:q="urn:other-q" xmlns:z="urn:z">{ //*[@id = 'i6'] }</w>/*
+      return ('q', 'alias', 'z', 'p') ! string(namespace-uri-for-prefix(., $copy))
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:q", "urn:q", "urn:z", ""</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-064">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces preserve, no-inherit;
+      let $copy := <w xmlns="urn:w" xmlns:z="urn:z">{ //*[@id = 'i38'] }</w>/*
+      return (
+        string(namespace-uri-for-prefix('', $copy)),
+        in-scope-prefixes($copy) = 'z',
+        in-scope-prefixes($copy) = ('u1', 'u2')
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:default-1", false(), true()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-065">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $wrap := <w xmlns:n="urn:wrap">{ //*[@id = 'i21'] }</w>
+      return (
+        string(namespace-uri-for-prefix('n', $wrap/*)),
+        $wrap//*:x ! string(namespace-uri()),
+        $wrap//*:x ! string(namespace-uri-for-prefix('n', .))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        "urn:n-0",
+        "urn:n-1", "urn:n-2", "urn:n-3", "urn:n-4", "urn:n-5", "urn:n-5",
+        "urn:n-1", "urn:n-2", "urn:n-3", "urn:n-4", "urn:n-5", "urn:n-5"
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-066">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      <p:a xmlns:p="urn:1">
+        <p:b xmlns:p="urn:2">{ //*[@id = 'i40'] }</p:b>
+      </p:a>//*[@id = 'i40'] ! (string(namespace-uri()), string(namespace-uri-for-prefix('p', .)))
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:p-1", "urn:p-1"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-067">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $doc := parse-xml(serialize(/))
+      return (
+        deep-equal(/, $doc),
+        deep-equal(//* ! name(), $doc//* ! name()),
+        deep-equal(//@* ! name(), $doc//@* ! name()),
+        every $i in 1 to count(//*)
+        satisfies deep-equal(
+          sort(in-scope-prefixes((//*)[$i])), sort(in-scope-prefixes(($doc//*)[$i]))
+        )
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>true(), true(), true(), true()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <!-- conflicts, generated prefixes, duplicates -->
+
+  <test-case name="namespaces-080">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $consistent := fn($root) {
+        every $e in $root/descendant-or-self::*, $n in ($e, $e/@*[prefix-from-QName(node-name())])
+        satisfies string(namespace-uri-for-prefix(prefix-from-QName(node-name($n)), $e)) =
+          string(namespace-uri($n))
+      }
+      let $e := element e { //*[@id = 'i40']/@*:y, //*[@id = 'i41']/@*:y }
+      return (
+        count($e/@*),
+        sort($e/@* ! string(namespace-uri())),
+        count(distinct-values($e/@* ! prefix-from-QName(node-name()))),
+        $consistent($e)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>2, "urn:p-1", "urn:p-other", 2, true()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-081">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := <p:e xmlns:p="urn:fresh">{ //*[@id = 'i40']/@*:y }</p:e>
+      let $prefix := prefix-from-QName(node-name($e/@*))
+      return (
+        string(namespace-uri-for-prefix('p', $e)),
+        string(namespace-uri($e/@*)),
+        $prefix ne 'p',
+        string(namespace-uri-for-prefix($prefix, $e))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:fresh", "urn:p-1", true(), "urn:p-1"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-082">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace q = "urn:q";
+      element e { //*[@id = 'i6']/@*:b, attribute q:b { 'x' } }
+    ]]></test>
+    <result>
+      <error code="XQDY0025"/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-083">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      element e { //*[@id = ('i1', 'i2', 'i3', 'i4')]/@*:a }
+    ]]></test>
+    <result>
+      <error code="XQDY0025"/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-084">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $consistent := fn($root) {
+        every $e in $root/descendant-or-self::*, $n in ($e, $e/@*[prefix-from-QName(node-name())])
+        satisfies string(namespace-uri-for-prefix(prefix-from-QName(node-name($n)), $e)) =
+          string(namespace-uri($n))
+      }
+      let $e := element e { //*[@id = ('i1', 'i2', 'i3')]/@*:a }
+      return (
+        count($e/@*),
+        sort($e/@* ! string(namespace-uri())),
+        sort($e/@* ! string()),
+        $consistent($e)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        5, "", "urn:p-1", "urn:p-2", "urn:p-3", "urn:q",
+        "none", "p1", "p2", "p3", "q", true()
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-085">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $consistent := fn($root) {
+        every $e in $root/descendant-or-self::*, $n in ($e, $e/@*[prefix-from-QName(node-name())])
+        satisfies string(namespace-uri-for-prefix(prefix-from-QName(node-name($n)), $e)) =
+          string(namespace-uri($n))
+      }
+      let $e := element merged { //*[@id = 'i21']/descendant-or-self::*/@*:level }
+      return (
+        count($e/@*),
+        count(distinct-values($e/@* ! prefix-from-QName(node-name()))),
+        sort($e/@* ! string(namespace-uri())),
+        $consistent($e)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        6, 6, "urn:n-0", "urn:n-1", "urn:n-2", "urn:n-3", "urn:n-4", "urn:n-5", true()
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-086">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := element merged { //*[@id = 'i21']/descendant-or-self::*/@*:level }
+      let $doc := parse-xml(serialize($e))
+      return deep-equal(
+        sort($e/@* ! expanded-QName(node-name())),
+        sort($doc/*/@* ! expanded-QName(node-name()))
+      )
+    ]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-087">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $consistent := fn($root) {
+        every $e in $root/descendant-or-self::*, $n in ($e, $e/@*[prefix-from-QName(node-name())])
+        satisfies string(namespace-uri-for-prefix(prefix-from-QName(node-name($n)), $e)) =
+          string(namespace-uri($n))
+      }
+      let $e := element { QName('urn:conflict', 'alias:e') } { //*[@id = 'i6']/@*:b }
+      return (
+        string(namespace-uri($e)),
+        string(namespace-uri($e/@*)),
+        $consistent($e)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:conflict", "urn:q", true()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-088">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $consistent := fn($root) {
+        every $e in $root/descendant-or-self::*, $n in ($e, $e/@*[prefix-from-QName(node-name())])
+        satisfies string(namespace-uri-for-prefix(prefix-from-QName(node-name($n)), $e)) =
+          string(namespace-uri($n))
+      }
+      let $i2 := //*[@id = 'i2']
+      let $e := element { QName('urn:changed', name($i2)) } { $i2/@* }
+      return (
+        string(namespace-uri($e)),
+        $e/@*[local-name() = 'a'] ! string(namespace-uri()),
+        $consistent($e)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:changed", "urn:p-2", true()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-089">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $consistent := fn($root) {
+        every $e in $root/descendant-or-self::*, $n in ($e, $e/@*[prefix-from-QName(node-name())])
+        satisfies string(namespace-uri-for-prefix(prefix-from-QName(node-name($n)), $e)) =
+          string(namespace-uri($n))
+      }
+      let $e := <r1:e xmlns:r1="urn:r-2">{ //*[@id = 'i36']/@* }</r1:e>
+      return (
+        count($e/@*),
+        string(namespace-uri-for-prefix('r1', $e)),
+        sort($e/@*[local-name() = 'k'] ! string(namespace-uri())),
+        $consistent($e)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        7, "urn:r-2", "", "urn:P-upper", "urn:p-1", "urn:q", "urn:r-1", "urn:r-2", true()
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-090">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := element root {
+        //*[@id = ('i2', 'i3', 'i4')] ! element { node-name(.) } { }
+      }
+      return (
+        $e/* ! name(),
+        $e/* ! string(namespace-uri-for-prefix('p', .)),
+        deep-equal(
+          $e/* ! expanded-QName(node-name()),
+          parse-xml(serialize($e))/*/* ! expanded-QName(node-name())
+        )
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        "p:item", "p:item", "p:item", "urn:p-2", "urn:p-3", "urn:p-1", true()
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <!-- namespace nodes from the document -->
+
+  <test-case name="namespaces-100">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      element e { //*[@id = 'i2']/namespace::p, //*[@id = 'i3']/namespace::p }
+    ]]></test>
+    <result>
+      <error code="XQDY0102"/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-101">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := element e { //*[@id = 'i1']/namespace::p, //*[@id = 'i4']/namespace::p }
+      return in-scope-namespaces($e)?p
+    ]]></test>
+    <result>
+      <assert-eq>"urn:p-1"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-102">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      element e { //*[@id = 'i10']/namespace::*[name() = ''] }
+    ]]></test>
+    <result>
+      <error code="XQDY0102"/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-103">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := element { QName('urn:other', 'n:z') } { //*[@id = 'i26']/namespace::n }
+      let $prefix := prefix-from-QName(node-name($e))
+      return (
+        string(namespace-uri($e)),
+        string(namespace-uri-for-prefix('n', $e)),
+        $prefix = 'n',
+        string(namespace-uri-for-prefix($prefix, $e))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:other", "urn:n-5", false(), "urn:other"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-104">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      element e { //*[@id = 'i26']/namespace::* ! namespace { name() } { string() } }
+    ]]></test>
+    <result>
+      <error code="XQDY0102"/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-105">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $i26 := //*[@id = 'i26']
+      let $e := element e { $i26/namespace::*[name()] ! namespace { name() } { string() } }
+      return deep-equal(
+        sort(in-scope-prefixes($e)),
+        sort(in-scope-prefixes($i26)[.])
+      )
+    ]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-106">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := element { node-name(//*[@id = 'i26']) } { //*[@id = 'i26']/namespace::* }
+      return (string(namespace-uri($e)), map:size(in-scope-namespaces($e)))
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:n-5", 9</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-107">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      <e xmlns:alias="urn:not-q">{ //*[@id = 'i5']/namespace::alias }</e>
+    ]]></test>
+    <result>
+      <error code="XQDY0102"/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-108">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := <e xmlns:alias="urn:q">{ //*[@id = 'i5']/namespace::alias, //*[@id = 'i6']/@*:b }</e>
+      return (in-scope-namespaces($e)?alias, name($e/@*))
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:q", "alias:b"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <!-- more conflicts and copies -->
+
+  <test-case name="namespaces-110">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := <p:e xmlns:p="urn:a">{ //*[@id = 'i4']/@*:a }</p:e>
+      return (
+        $e/@* ! count(..),
+        string(namespace-uri($e/@*)),
+        string(namespace-uri-for-prefix(prefix-from-QName(node-name($e/@*)), $e))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>1, "urn:p-1", "urn:p-1"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-111">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <test><![CDATA[
+      let $e := element { QName('urn:a', 'e') } { namespace { '' } { 'urn:b' } }
+      let $prefix := prefix-from-QName(node-name($e))
+      return (
+        string(namespace-uri($e)),
+        exists($prefix),
+        string(namespace-uri-for-prefix('', $e)),
+        string(namespace-uri-for-prefix($prefix, $e))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:a", true(), "urn:b", "urn:a"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-112">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      element e { //*[@id = 'i10'] }/* ! (
+        string(namespace-uri()), string(namespace-uri-for-prefix('', .))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:default-2", "urn:default-2"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-113">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $signature := fn($root) {
+        $root/descendant-or-self::* ! (
+          expanded-QName(node-name()),
+          sort(@* ! expanded-QName(node-name())),
+          let $ns := in-scope-namespaces(.)
+          for $prefix in sort(map:keys($ns))
+          return `{ $prefix }={ $ns($prefix) }`
+        )
+      }
+      let $w := <w xmlns="urn:w" xmlns:p="urn:w-p" xmlns:q="urn:w-q">{ /*/* }</w>
+      return deep-equal($signature($w), $signature(parse-xml(serialize($w))/*))
+    ]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-114">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces no-preserve, inherit;
+      let $signature := fn($root) {
+        $root/descendant-or-self::* ! (
+          expanded-QName(node-name()),
+          sort(@* ! expanded-QName(node-name())),
+          let $ns := in-scope-namespaces(.)
+          for $prefix in sort(map:keys($ns))
+          return `{ $prefix }={ $ns($prefix) }`
+        )
+      }
+      let $w := <w xmlns="urn:w" xmlns:p="urn:w-p" xmlns:q="urn:w-q">{ /*/* }</w>
+      return deep-equal($signature($w), $signature(parse-xml(serialize($w))/*))
+    ]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-115">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces preserve, no-inherit;
+      let $signature := fn($root) {
+        $root/descendant-or-self::* ! (
+          expanded-QName(node-name()),
+          sort(@* ! expanded-QName(node-name())),
+          let $ns := in-scope-namespaces(.)
+          for $prefix in sort(map:keys($ns))
+          return `{ $prefix }={ $ns($prefix) }`
+        )
+      }
+      let $w := <w xmlns="urn:w" xmlns:p="urn:w-p" xmlns:q="urn:w-q">{ /*/* }</w>
+      return deep-equal($signature($w), $signature(parse-xml(serialize($w))/*))
+    ]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-116">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces no-preserve, no-inherit;
+      let $names := fn($root) {
+        $root/descendant-or-self::* ! (
+          expanded-QName(node-name()),
+          sort(@* ! expanded-QName(node-name()))
+        )
+      }
+      let $w := <w xmlns="urn:w" xmlns:p="urn:w-p" xmlns:q="urn:w-q">{ /*/* }</w>
+      return (
+        deep-equal($names($w), $names(parse-xml(serialize($w))/*)),
+        deep-equal($w/*, /*/*)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>true(), true()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-117">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces no-preserve, no-inherit;
+      let $consistent := fn($root) {
+        every $e in $root/descendant-or-self::*, $n in ($e, $e/@*[prefix-from-QName(node-name())])
+        satisfies string(namespace-uri-for-prefix(prefix-from-QName(node-name($n)), $e)) =
+          string(namespace-uri($n))
+      }
+      return $consistent(<w xmlns="urn:w" xmlns:p="urn:w-p" xmlns:q="urn:w-q">{ /*/* }</w>)
+    ]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-118">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := element e { //*[@id = 'i40']/@*:y, namespace p { 'urn:z' } }
+      let $prefix := prefix-from-QName(node-name($e/@*))
+      return (
+        string(namespace-uri-for-prefix('p', $e)),
+        string(namespace-uri($e/@*)),
+        $prefix = 'p',
+        string(namespace-uri-for-prefix($prefix, $e))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:z", "urn:p-1", false(), "urn:p-1"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-119">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces no-preserve, no-inherit;
+      let $copy := <w>{ //*[@id = 'i16'] }</w>/*
+      return resolve-QName(string($copy), $copy)
+    ]]></test>
+    <result>
+      <error code="FONS0004"/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-120">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces no-preserve, inherit;
+      let $copy := <w xmlns:p="urn:hijack">{ //*[@id = 'i16'] }</w>/*
+      return string(namespace-uri-from-QName(resolve-QName(string($copy), $copy)))
+    ]]></test>
+    <result>
+      <assert-eq>"urn:hijack"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-121">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $y := //*[@id = 'i41']/@*:y
+      let $e := element e { [ //*[@id = 'i40']/@*:y, $y ] }
+      return (
+        count($e/@*),
+        deep-equal($e/@*[namespace-uri() = 'urn:p-other'], $y),
+        node-name($e/@*[namespace-uri() = 'urn:p-other']) eq node-name($y),
+        name($e/@*[namespace-uri() = 'urn:p-other']) eq name($y)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>2, true(), true(), false()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-122">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      document { //*[@id = 'i8'] }//*[@id = 'i12'] ! path()
+    ]]></test>
+    <result>
+      <assert-eq>"/Q{}item[1]/Q{urn:default-2}item[1]/Q{urn:default-2}item[1]"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-123">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace p = "urn:p-1";
+      //*[@id = 'i12'] ! (
+        . instance of element(Q{urn:default-2}item),
+        . instance of element(p:item),
+        . instance of element(*:item)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>true(), false(), true()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-124">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := element { QName('urn:default-1', 'e') } { /*/namespace::*[name() = ''] }
+      return in-scope-namespaces($e)('')
+    ]]></test>
+    <result>
+      <assert-eq>"urn:default-1"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-125">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := element e { //@xml:lang, //@xml:space, //*[@id = 'i30']/namespace::xml }
+      return ($e/@* ! name(), in-scope-prefixes($e))
+    ]]></test>
+    <result>
+      <assert-deep-eq>"xml:lang", "xml:space", "xml"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-126">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $consistent := fn($root) {
+        every $e in $root/descendant-or-self::*, $n in ($e, $e/@*[prefix-from-QName(node-name())])
+        satisfies string(namespace-uri-for-prefix(prefix-from-QName(node-name($n)), $e)) =
+          string(namespace-uri($n))
+      }
+      let $e := element { QName('urn:z', 'p:e') } {
+        //*[@id = 'i2']/@*:a,
+        //*[@id = 'i41']/@*:y,
+        namespace q { 'urn:qq' },
+        //*[@id = 'i6']/@*:b
+      }
+      return (
+        count($e/@*),
+        $e/@* ! count(..),
+        sort($e/@* ! string(namespace-uri())),
+        string(namespace-uri-for-prefix('q', $e)),
+        $consistent($e)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>3, 1, 1, 1, "urn:p-2", "urn:p-other", "urn:q", "urn:qq", true()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-127">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      element e { jtree([ //*[@id = 'i40']/@*:y, //*[@id = 'i41']/@*:y ])/* }/@* ! (
+        string(namespace-uri()), count(..)
+      )
+    ]]></test>
+    <result>
+      <assert-permutation>"urn:p-1", "urn:p-other", 1, 1</assert-permutation>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-128">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      count(document { [ //*[@id = 'i40']/@*:y ] }/node())
+    ]]></test>
+    <result>
+      <error code="XPTY0004"/>
+    </result>
+  </test-case>
+
+  <!-- copies of the complete document -->
+
+  <test-case name="namespaces-140">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      <w xmlns:p="urn:w-p">{ /* }</w>//*[@id = ('i1', 'i3', 'i9', 'i41')] ! (
+        string(namespace-uri-for-prefix('p', .))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:p-1", "urn:p-3", "urn:p-1", "urn:p-other"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-141">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces no-preserve, inherit;
+      <w xmlns:p="urn:w-p">{ /* }</w>//*[@id = ('i1', 'i3', 'i9', 'i41')] ! (
+        string(namespace-uri-for-prefix('p', .))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:p-1", "urn:p-3", "urn:w-p", "urn:p-other"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-142">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces preserve, no-inherit;
+      <w xmlns:p="urn:w-p">{ /* }</w>//*[@id = ('i1', 'i3', 'i9', 'i41')] ! (
+        string(namespace-uri-for-prefix('p', .))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:p-1", "urn:p-3", "urn:p-1", "urn:p-other"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-143">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces no-preserve, no-inherit;
+      <w xmlns:p="urn:w-p">{ /* }</w>//*[@id = ('i1', 'i3', 'i9', 'i41')] ! (
+        string(namespace-uri-for-prefix('p', .))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:p-1", "urn:p-3", "", "urn:p-other"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-144">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      <w xmlns:z="urn:z">{ / }</w>//*[@id = ('root', 'i27')] ! (
+        string(namespace-uri-for-prefix('z', .))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:z", "urn:z"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-145">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces preserve, no-inherit;
+      <w xmlns:z="urn:z">{ / }</w>//*[@id = ('root', 'i27')] ! (
+        exists(namespace-uri-for-prefix('z', .))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>false(), false()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-146">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      <w xmlns="urn:w">{ /* }</w>//*[@id = ('i9', 'i19', 'i27', 'i38')] ! (
+        string(namespace-uri-for-prefix('', .))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"", "", "urn:n-5", "urn:default-1"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-147">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare copy-namespaces no-preserve, inherit;
+      let $signature := fn($root) {
+        $root/descendant-or-self::* ! (
+          expanded-QName(node-name()),
+          sort(@* ! expanded-QName(node-name())),
+          let $ns := in-scope-namespaces(.)
+          for $prefix in sort(map:keys($ns))
+          return `{ $prefix }={ $ns($prefix) }`
+        )
+      }
+      let $w := <w xmlns="urn:w" xmlns:p="urn:w-p" xmlns:q="urn:w-q">{ / }</w>
+      return deep-equal($signature($w), $signature(parse-xml(serialize($w))/*))
+    ]]></test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+
+  <!-- fn:update -->
+
+  <test-case name="namespaces-150">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $root := update(/*, fn { .//*[@id = 'i2'] }, { 'rename': QName('urn:x', 'p:item') })
+      let $e := $root//*[@id = 'i2']
+      let $a := $e/@*[local-name() = 'a']
+      return (
+        string(namespace-uri($e)),
+        string(namespace-uri-for-prefix('p', $e)),
+        string(namespace-uri($a)),
+        prefix-from-QName(node-name($a)) = 'p',
+        string(namespace-uri-for-prefix(prefix-from-QName(node-name($a)), $e)),
+        string(namespace-uri-for-prefix('p', $e/*))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:x", "urn:x", "urn:p-2", false(), "urn:p-2", "urn:p-3"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-151">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := update(
+        //*[@id = 'i1'],
+        fn { @*:a[namespace-uri() = 'urn:p-1'] },
+        { 'rename': QName('urn:x', 'p:a') }
+      )
+      let $a := $e/@*[namespace-uri() = 'urn:x']
+      return (
+        string(namespace-uri-for-prefix('p', $e)),
+        prefix-from-QName(node-name($a)) = 'p',
+        string(namespace-uri-for-prefix(prefix-from-QName(node-name($a)), $e)),
+        $e/@* ! count(..)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:p-1", false(), "urn:x", 1, 1, 1, 1</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-152">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := update(
+        //*[@id = 'i1'],
+        fn { @a },
+        { 'insert-after': attribute { QName('urn:other', 'p:z') } { } }
+      )
+      let $z := $e/@*:z
+      return (
+        string(namespace-uri($z)),
+        prefix-from-QName(node-name($z)) = 'p',
+        string(namespace-uri-for-prefix(prefix-from-QName(node-name($z)), $e)),
+        string(namespace-uri-for-prefix('p', $e)),
+        count($z/..)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:other", false(), "urn:other", "urn:p-1", 1</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-153">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $root := update(/*, fn { .//*[@id = 'i10'] }, { 'rename': QName('', 'item') })
+      let $e := $root//*[@id = 'i10']
+      return (
+        exists(namespace-uri-for-prefix('', $e)),
+        string(namespace-uri($e)),
+        $e/* ! string(namespace-uri()),
+        $e/* ! string(namespace-uri-for-prefix('', .))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        false(), "", "urn:default-1", "urn:default-2", "urn:default-1", "urn:default-2"
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-154">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $root := update(/*, fn { .//*[@id = 'i36'] }, { 'rename': QName('urn:new', 'r1:attrs') })
+      let $e := $root//*[@id = 'i36']
+      let $k := $e/@*[namespace-uri() = 'urn:r-1']
+      return (
+        string(namespace-uri-for-prefix('r1', $e)),
+        prefix-from-QName(node-name($k)) = 'r1',
+        string(namespace-uri-for-prefix(prefix-from-QName(node-name($k)), $e)),
+        count($e/@*)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:new", false(), "urn:r-1", 7</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-155">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := update(//*[@id = 'i40'], fn { @*:y }, { 'replace': //*[@id = 'i41']/@*:y })
+      let $y := $e/@*:y
+      return (
+        string(namespace-uri($y)),
+        prefix-from-QName(node-name($y)) = 'p',
+        string(namespace-uri-for-prefix(prefix-from-QName(node-name($y)), $e)),
+        string(namespace-uri-for-prefix('p', $e)),
+        count($y/..)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:p-other", false(), "urn:p-other", "urn:p-1", 1</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-156">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $e := update(//*[@id = 'i40'], fn { @*:y }, { 'insert-after': //*[@id = 'i41']/@*:y })
+      return (
+        sort($e/@*[local-name() = 'y'] ! string(namespace-uri())),
+        count(distinct-values($e/@*[local-name() = 'y'] ! prefix-from-QName(node-name()))),
+        $e/@* ! count(..)
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:p-1", "urn:p-other", 2, 1, 1, 1</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-157">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $root := update(/*, fn { .//*[@id = 'i10'] }, { 'rename': QName('', 'item') })
+      let $e := parse-xml(serialize($root//*[@id = 'i8']))/*
+      return $e/descendant-or-self::* ! string(namespace-uri())
+    ]]></test>
+    <result>
+      <assert-deep-eq>"", "", "", "urn:default-1", "urn:default-2"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <!-- casts to xs:QName: prefixes are resolved in the static context -->
+
+  <test-case name="namespaces-160">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace p = "urn:query";
+      //*[@id = 'i16'] ! (
+        expanded-QName(xs:QName(string())),
+        expanded-QName(resolve-QName(string(), .))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"Q{urn:query}local", "Q{urn:p-1}local"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-161">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      xs:QName(string(//*[@id = 'i16']))
+    ]]></test>
+    <result>
+      <error code="FONS0004"/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-162">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      //*[@id = 'i13'] ! (
+        expanded-QName(xs:QName(.)),
+        expanded-QName(resolve-QName(., .)),
+        expanded-QName(xs:QName(@*:type))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        "Q{http://www.w3.org/2001/XMLSchema}string",
+        "Q{urn:not-xml-schema}string",
+        "Q{http://www.w3.org/2001/XMLSchema}string"
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-163">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      //*[@id = 'i18'] ! (
+        expanded-QName(xs:QName(.)),
+        expanded-QName(resolve-QName(., .))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"Q{}local", "Q{urn:default-1}local"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-164">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare default element namespace "urn:dflt";
+      //*[@id = 'i18'] ! expanded-QName(xs:QName(.))
+    ]]></test>
+    <result>
+      <assert-eq>"Q{urn:dflt}local"</assert-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-165">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare default element namespace "##any";
+      (
+        //*[@id = 'i18'] ! expanded-QName(xs:QName(.)),
+        (element { 'local' } { }, <local/>) ! expanded-QName(node-name())
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"Q{}local", "Q{}local", "Q{}local"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-166">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      let $i14 := //*[@id = 'i14']
+      return (
+        expanded-QName(xs:QName($i14)),
+        expanded-QName(resolve-QName($i14, $i14))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"Q{http://www.w3.org/2005/xpath-functions}true", "Q{urn:not-functions}true"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-167">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace fn = "urn:not-functions";
+      //*[@id = 'i14'] ! (expanded-QName(xs:QName(.)), string(true()))
+    ]]></test>
+    <result>
+      <assert-deep-eq>"Q{urn:not-functions}true", "true"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-168">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace p = "urn:x";
+      //*:qname ! (string() castable as xs:QName),
+      //*:qname ! (try { expanded-QName(xs:QName(.)) } catch err:FONS0004 { 'FONS0004' })
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        true(), true(), true(), true(), false(),
+        "Q{urn:x}local", "Q{urn:x}local", "Q{}local", "Q{}local", "FONS0004"
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-169">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace alias = "urn:q";
+      declare namespace q = "urn:q";
+      let $qname := xs:QName(string(//*[@id = 'i20']))
+      return ($qname eq xs:QName('q:local'), string($qname), prefix-from-QName($qname))
+    ]]></test>
+    <result>
+      <assert-deep-eq>true(), "alias:local", "alias"</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-170">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace p = "urn:p-1";
+      declare namespace n = "urn:n-0";
+      //*[@id = ('i2', 'i3', 'i4')] ! (xs:QName(name()) eq node-name(.)),
+      //*[@id = 'i21']/descendant-or-self::*/@*:level ! (xs:QName(name()) eq node-name(.))
+    ]]></test>
+    <result>
+      <assert-deep-eq>
+        false(), false(), true(),
+        true(), false(), false(), false(), false(), false()
+      </assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-171">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace alias = "urn:other";
+      let $cast := xs:QName#1
+      let $lookup := function-lookup(xs:QName('xs:QName'), 1)
+      return //*[@id = 'i5'] ! (
+        expanded-QName($cast(name())),
+        expanded-QName($lookup(name())),
+        node-name(.) eq $cast(name())
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"Q{urn:other}item", "Q{urn:other}item", false()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-172">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace p = "urn:query";
+      (//*[@id = 'i16'] ! xs:QName(.)) = (//*[@id = 'i17'] ! xs:QName(.)),
+      (//*[@id = 'i16'] ! resolve-QName(., .)) = (//*[@id = 'i17'] ! resolve-QName(., .))
+    ]]></test>
+    <result>
+      <assert-deep-eq>true(), false()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-173">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <test><![CDATA[
+      declare namespace p = "urn:p-1";
+      let $e := element e { xs:QName('p:local') }
+      return (string($e), in-scope-prefixes($e), xs:QName(' xml:lang ') eq node-name(//@xml:lang))
+    ]]></test>
+    <result>
+      <assert-deep-eq>"p:local", "xml", true()</assert-deep-eq>
+    </result>
+  </test-case>
+
+  <!-- updates -->
+
+  <test-case name="namespaces-130">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <dependency type="feature" value="XQUpdate"/>
+    <test><![CDATA[
+      copy $c := //*[@id = 'i2']
+      modify insert node attribute { QName('urn:x', 'p:z') } { } into $c
+      return $c
+    ]]></test>
+    <result>
+      <error code="XUDY0023"/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-131">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <dependency type="feature" value="XQUpdate"/>
+    <test><![CDATA[
+      copy $c := //*[@id = 'i2']
+      modify rename node $c as QName('urn:x', 'p:item')
+      return $c
+    ]]></test>
+    <result>
+      <error code="XUDY0023"/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-132">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <dependency type="feature" value="XQUpdate"/>
+    <test><![CDATA[
+      copy $c := //*[@id = 'i2']
+      modify rename node $c/@*:a as QName('urn:x', 'p:a')
+      return $c
+    ]]></test>
+    <result>
+      <error code="XUDY0023"/>
+    </result>
+  </test-case>
+
+  <test-case name="namespaces-133">
+    <description>Namespace bindings in documents and queries.</description>
+    <created by="Christian Gruen" on="2026-11-27"/>
+    <environment ref="namespaces"/>
+    <dependency type="feature" value="XQUpdate"/>
+    <test><![CDATA[
+      copy $c := //*[@id = 'i8']
+      modify insert node //*[@id = 'i40'] into $c
+      return $c/*[last()] ! (
+        string(namespace-uri-for-prefix('p', .)),
+        string(namespace-uri-for-prefix('', .))
+      )
+    ]]></test>
+    <result>
+      <assert-deep-eq>"urn:p-1", "urn:default-1"</assert-deep-eq>
+    </result>
+  </test-case>
+
+</test-set>
