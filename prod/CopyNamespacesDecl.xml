@@ -572,4 +572,199 @@
          <assert-eq>'xml'</assert-eq>
       </result>
    </test-case>
+
+   <test-case name="copy-namespaces-decl-010">
+      <description>Copied elements in no namespace do not inherit a default namespace.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[
+         let $d := <d/>
+         return in-scope-prefixes(<w xmlns="u">{ $d }</w>/*)
+      ]]></test>
+      <result>
+         <assert-eq>'xml'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-011">
+      <description>Copied elements in no namespace do not inherit a default namespace.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[
+         declare copy-namespaces no-preserve, inherit;
+         let $d := <d/>
+         return in-scope-prefixes(<w xmlns="u">{ $d }</w>/*)
+      ]]></test>
+      <result>
+         <assert-eq>'xml'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-012">
+      <description>Copied elements in no namespace do not inherit a default namespace.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         in-scope-prefixes(
+           element { QName('u', 'w') } { parse-xml('<d/>')/* }/*
+         )
+      ]]></test>
+      <result>
+         <assert-eq>'xml'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-013">
+      <description>Copied elements in no namespace do not inherit a default namespace.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         <w xmlns="u">{ parse-xml('<d><e/></d>')/* }</w>
+      ]]></test>
+      <result>
+         <assert-xml><![CDATA[<w xmlns="u"><d xmlns=""><e/></d></w>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-014">
+      <description>Copied elements in no namespace do not inherit a default namespace.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         <w xmlns="u">{
+           parse-xml('<d><e xmlns="v"><f xmlns=""/></e></d>')/*
+         }</w>
+      ]]></test>
+      <result>
+         <assert-xml><![CDATA[<w xmlns="u"><d xmlns=""><e xmlns="v"><f xmlns=""/></e></d></w>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-015">
+      <description>Copied elements in no namespace do not inherit a default namespace.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         <w xmlns="u">{ parse-xml('<d/>') }</w>
+      ]]></test>
+      <result>
+         <assert-xml><![CDATA[<w xmlns="u"><d xmlns=""/></w>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-016">
+      <description>Copied elements in no namespace do not inherit a default namespace.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[
+         declare namespace p = 'P';
+         let $d := <d/>
+         return in-scope-prefixes(<a xmlns="u">{ element p:w { $d } }</a>/*/*)
+      ]]></test>
+      <result>
+         <assert-permutation>'p', 'xml'</assert-permutation>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-017">
+      <description>Copied elements in no namespace do not inherit a default namespace.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         declare namespace p = 'P';
+         let $d := <d/>
+         return in-scope-prefixes(element p:w { namespace { '' } { 'u' }, $d }/*)
+      ]]></test>
+      <result>
+         <assert-permutation>'p', 'xml'</assert-permutation>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-020">
+      <description>Copied elements retain namespaces inherited from their ancestors.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[
+         let $y := <r xmlns:a="A" xmlns:b="B" xmlns:c="C"><x><a:y/></x></r>//*:y
+         return in-scope-prefixes(<n>{ $y }</n>/*)
+      ]]></test>
+      <result>
+         <assert-permutation>'a', 'b', 'c', 'xml'</assert-permutation>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-021">
+      <description>Copied elements retain namespaces inherited from their ancestors.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         let $y := parse-xml(
+           '<r xmlns:a="A" xmlns:b="B" xmlns:c="C"><x><a:y/></x></r>'
+         )//*:y
+         return in-scope-prefixes(<n>{ $y }</n>/*)
+      ]]></test>
+      <result>
+         <assert-permutation>'a', 'b', 'c', 'xml'</assert-permutation>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-022">
+      <description>Copied elements retain namespaces inherited from their ancestors.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         let $y := parse-xml(
+           '<r xmlns:a="A" xmlns:b="B" xmlns:c="C"><x><a:y b:z=""/></x></r>'
+         )//*:y
+         return in-scope-prefixes(<n>{ $y }</n>/*)
+      ]]></test>
+      <result>
+         <assert-permutation>'a', 'b', 'c', 'xml'</assert-permutation>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-023">
+      <description>Copied elements retain namespaces inherited from their ancestors.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         declare copy-namespaces preserve, no-inherit;
+         let $y := parse-xml(
+           '<r xmlns:a="A" xmlns:b="B" xmlns:c="C"><x><a:y/></x></r>'
+         )//*:y
+         return in-scope-prefixes(<n xmlns:q="Q">{ $y }</n>/*)
+      ]]></test>
+      <result>
+         <assert-permutation>'a', 'b', 'c', 'xml'</assert-permutation>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-024">
+      <description>Copied elements retain namespaces inherited from their ancestors.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         let $y := parse-xml(
+           '<r xmlns:a="A" xmlns:b="B" xmlns:c="C"><x><a:y><z/></a:y></x></r>'
+         )//*:y
+         return in-scope-prefixes(<n>{ $y }</n>//z)
+      ]]></test>
+      <result>
+         <assert-permutation>'a', 'b', 'c', 'xml'</assert-permutation>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-025">
+      <description>Copied elements retain namespaces inherited from their ancestors.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         <n>{
+           parse-xml('<r xmlns:a="A" xmlns:b="B" xmlns:c="C"><x><a:y/></x></r>')//*:y
+         }</n>
+      ]]></test>
+      <result>
+         <assert-xml><![CDATA[<n><a:y xmlns:a="A" xmlns:b="B" xmlns:c="C"/></n>]]></assert-xml>
+      </result>
+   </test-case>
 </test-set>
