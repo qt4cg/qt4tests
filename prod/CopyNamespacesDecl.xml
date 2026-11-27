@@ -767,4 +767,68 @@
          <assert-xml><![CDATA[<n><a:y xmlns:a="A" xmlns:b="B" xmlns:c="C"/></n>]]></assert-xml>
       </result>
    </test-case>
+
+   <test-case name="copy-namespaces-decl-030">
+      <description>Copied elements in document constructors and subtrees.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         let $d := document {
+           parse-xml('<a xmlns:u="U" xmlns:v="V"><v:b/></a>')/*
+         }
+         return in-scope-prefixes($d/*/*)
+      ]]></test>
+      <result>
+         <assert-permutation>'u', 'v', 'xml'</assert-permutation>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-031">
+      <description>Copied elements in document constructors and subtrees.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         declare copy-namespaces no-preserve, inherit;
+         let $d := document {
+           parse-xml('<a xmlns:u="U" xmlns:v="V"><v:b/></a>')/*
+         }
+         return (in-scope-prefixes($d/*), '|', in-scope-prefixes($d/*/*))
+      ]]></test>
+      <result>
+         <any-of>
+            <assert-deep-eq>'xml', '|', 'v', 'xml'</assert-deep-eq>
+            <assert-deep-eq>'xml', '|', 'xml', 'v'</assert-deep-eq>
+         </any-of>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-032">
+      <description>Copied elements in document constructors and subtrees.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         declare copy-namespaces no-preserve, no-inherit;
+         in-scope-prefixes(
+           <n xmlns:q="Q">{ parse-xml('<a xmlns:u="U"><b><c/></b></a>')/* }</n>//c
+         )
+      ]]></test>
+      <result>
+         <assert-eq>'xml'</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="copy-namespaces-decl-033">
+      <description>Copied elements in document constructors and subtrees.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ30+"/>
+      <test><![CDATA[
+         declare copy-namespaces no-preserve, inherit;
+         in-scope-prefixes(
+           <n xmlns:q="Q">{ parse-xml('<a xmlns:u="U"><b><c/></b></a>')/* }</n>//c
+         )
+      ]]></test>
+      <result>
+         <assert-permutation>'q', 'xml'</assert-permutation>
+      </result>
+   </test-case>
 </test-set>

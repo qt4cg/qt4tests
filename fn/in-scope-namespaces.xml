@@ -146,5 +146,182 @@
       </result>
    </test-case>
 
+   <test-case name="in-scope-namespaces-20">
+      <description>Evaluation of in-scope-namespaces function.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         let $e := <z:a xmlns="http://example.org/one" xmlns:z="http://example.org/two">
+           <b xmlns=""/>
+         </z:a>
+         return map:keys(in-scope-namespaces($e/b))
+      ]]></test>
+      <result>
+         <assert-permutation>"z", "xml"</assert-permutation>
+      </result>
+   </test-case>
+
+   <test-case name="in-scope-namespaces-21">
+      <description>Evaluation of in-scope-namespaces function.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[in-scope-namespaces(<a xmlns:r="R"><b/></a>/b)]]></test>
+      <result>
+         <assert-deep-eq>{ "r": "R", "xml": "http://www.w3.org/XML/1998/namespace" }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="in-scope-namespaces-22">
+      <description>Evaluation of in-scope-namespaces function.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[in-scope-namespaces(<a xmlns:r="R">{ element b { } }</a>/b)]]></test>
+      <result>
+         <assert-deep-eq>{ "r": "R", "xml": "http://www.w3.org/XML/1998/namespace" }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="in-scope-namespaces-23">
+      <description>Evaluation of in-scope-namespaces function.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare copy-namespaces no-preserve, no-inherit;
+         in-scope-namespaces(<a xmlns:r="R">{ element b { } }</a>/b)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "xml": "http://www.w3.org/XML/1998/namespace" }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="in-scope-namespaces-24">
+      <description>Evaluation of in-scope-namespaces function.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare copy-namespaces no-preserve, inherit;
+         in-scope-namespaces(<a xmlns:r="R">{ element b { } }</a>/b)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "r": "R", "xml": "http://www.w3.org/XML/1998/namespace" }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="in-scope-namespaces-25">
+      <description>Evaluation of in-scope-namespaces function.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace p = "P";
+         in-scope-namespaces(element e { attribute p:a { } })
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "p": "P", "xml": "http://www.w3.org/XML/1998/namespace" }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="in-scope-namespaces-26">
+      <description>Evaluation of in-scope-namespaces function.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         let $e := element e { attribute { QName("U", "a") } { } }
+         let $ns := in-scope-namespaces($e)
+         return (
+           map:size($ns),
+           $ns(prefix-from-QName(node-name($e/@*)))
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>2, "U"</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="in-scope-namespaces-27">
+      <description>Evaluation of in-scope-namespaces function.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <test><![CDATA[
+         let $ns := in-scope-namespaces(parse-xml('<e xmlns:r="R" xmlns="D"/>')/*)
+         return (
+           every $prefix in map:keys($ns)[. ne ""] satisfies $prefix instance of xs:NCName,
+           every $uri in map:items($ns) satisfies $uri instance of xs:anyURI
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>true(), true()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="in-scope-namespaces-28">
+      <description>Evaluation of in-scope-namespaces function.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <test><![CDATA[
+         let $e := parse-xml('<a xmlns:r="R" xmlns="D"><b xmlns:s="S" xmlns=""/></a>')//*:b
+         let $ns := in-scope-namespaces($e)
+         return (
+           deep-equal(sort(map:keys($ns)), sort(in-scope-prefixes($e))),
+           every $prefix in map:keys($ns) satisfies $ns($prefix) eq namespace-uri-for-prefix($prefix, $e),
+           map:contains($ns, "")
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>true(), true(), false()</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="in-scope-namespaces-29">
+      <description>Evaluation of in-scope-namespaces function.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[in-scope-namespaces(element e { namespace r { "R" }, namespace s { "S" } })]]></test>
+      <result>
+         <assert-deep-eq>{ "r": "R", "s": "S", "xml": "http://www.w3.org/XML/1998/namespace" }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="in-scope-namespaces-30">
+      <description>Evaluation of in-scope-namespaces function.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <test><![CDATA[
+         in-scope-namespaces(parse-xml('<e xmlns:xml="http://www.w3.org/XML/1998/namespace"/>')/*)
+      ]]></test>
+      <result>
+         <assert-deep-eq>{ "xml": "http://www.w3.org/XML/1998/namespace" }</assert-deep-eq>
+      </result>
+   </test-case>
+
+   <test-case name="in-scope-namespaces-31">
+      <description>Evaluation of in-scope-namespaces function.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <test><![CDATA[in-scope-namespaces(parse-xml('<e a=""/>')/*/@a)]]></test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+
+   <test-case name="in-scope-namespaces-32">
+      <description>Evaluation of in-scope-namespaces function.</description>
+      <created by="Christian Gruen" on="2026-11-27"/>
+      <dependency type="spec" value="XQ40+"/>
+      <test><![CDATA[
+         declare namespace p = "P";
+         declare namespace q = "Q";
+         declare namespace f = "F";
+         in-scope-namespaces(
+           element #p:a {
+             attribute #q:b { "f:x" },
+             namespace #r { "R" }
+           }
+         )
+      ]]></test>
+      <result>
+         <assert-deep-eq>{
+           "p": "P",
+           "q": "Q",
+           "r": "R",
+           "xml": "http://www.w3.org/XML/1998/namespace"
+         }</assert-deep-eq>
+      </result>
+   </test-case>
 
 </test-set>
