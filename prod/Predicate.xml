@@ -2504,7 +2504,7 @@ count((-1, 0, 1, 2147483647, 2147483648, 2147483649, 4294967295, 4294967296, 429
       <description>Values at the limits of numeric precision.</description>
       <created by="Christian Gruen" on="2026-10-03"/>
       <dependency type="spec" value="XP30+ XQ30+"/>
-      <test><![CDATA[("a", "b", "c")[position() > 9223372036854775807]]]></test>
+      <test>("a", "b", "c")[position() > 9223372036854775807]</test>
       <result>
          <any-of>
             <assert-empty/>
@@ -2517,7 +2517,7 @@ count((-1, 0, 1, 2147483647, 2147483648, 2147483649, 4294967295, 4294967296, 429
       <description>Values at the limits of numeric precision.</description>
       <created by="Christian Gruen" on="2026-10-16"/>
       <dependency type="spec" value="XP30+ XQ30+"/>
-      <test><![CDATA[("a", "b", "c")[position() > 2147483648]]]></test>
+      <test>("a", "b", "c")[position() > 2147483648]</test>
       <result>
          <assert-empty/>
       </result>
@@ -2527,7 +2527,56 @@ count((-1, 0, 1, 2147483647, 2147483648, 2147483649, 4294967295, 4294967296, 429
       <description>Values at the limits of numeric precision.</description>
       <created by="Christian Gruen" on="2026-10-16"/>
       <dependency type="spec" value="XP30+ XQ30+"/>
-      <test><![CDATA[("a", "b", "c")[position() < -2147483649]]]></test>
+      <test>("a", "b", "c")[position() &lt; -2147483649]</test>
+      <result>
+         <assert-empty/>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-530">
+      <description>Potential optimization of positional filter expressions.</description>
+      <created by="Michael Kay" on="2026-11-25"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>
+         let $zero := year-from-date(current-date()) idiv 10000
+         return ("a", "b", "c", 1 idiv $zero)[position() = 1]
+      </test>
+      <result>
+         <assert-eq>"a"</assert-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-531">
+      <description>Potential optimization of positional filter expressions.</description>
+      <created by="Michael Kay" on="2026-11-25"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>
+         let $zero := year-from-date(current-date()) idiv 10000
+         return ("a", "b", "c", "d", 1 idiv $zero)[position() lt 4]</test>
+      <result>
+         <assert-deep-eq>"a", "b", "c"</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-532">
+      <description>Potential optimization of positional filter expressions. Saxon bug 7342.</description>
+      <created by="Michael Kay" on="2026-11-25"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>
+         let $empty := year-from-date(current-date())[. gt 10000]
+         return (2, 4, 6, 12)[not(position() = $empty)]</test>
+      <result>
+         <assert-deep-eq>(2, 4, 6, 12)</assert-deep-eq>
+      </result>
+   </test-case>
+   
+   <test-case name="predicate-533">
+      <description>Potential optimization of positional filter expressions.</description>
+      <created by="Michael Kay" on="2026-11-25"/>
+      <dependency type="spec" value="XP30+ XQ30+"/>
+      <test>
+         let $empty := year-from-date(current-date())[. gt 10000]
+         return (2, 4, 6, 12)[position() = $empty]</test>
       <result>
          <assert-empty/>
       </result>
